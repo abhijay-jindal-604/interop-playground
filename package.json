@@ -37,13 +37,18 @@
     "ci:fast": "npm run bff:cli -- suite run --profile ci-fast"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
     "@eslint/js": "10.0.1",
+    "@playwright/test": "1.63.0",
+    "@testing-library/dom": "10.4.2",
+    "@testing-library/react": "16.3.3",
     "@types/node": "22.20.5",
     "@vitest/coverage-v8": "4.1.11",
     "ajv": "8.20.0",
     "ajv-formats": "3.0.1",
     "eslint": "10.12.0",
     "eslint-config-prettier": "10.1.8",
+    "jsdom": "29.1.1",
     "openapi-typescript": "7.13.0",
     "prettier": "3.9.9",
     "tsx": "4.23.15",

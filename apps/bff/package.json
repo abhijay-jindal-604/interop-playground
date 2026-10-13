@@ -10,10 +10,15 @@
     }
   },
   "dependencies": {
+    "@fastify/static": "10.1.5",
     "@interop-playground/adapters": "*",
-    "@interop-playground/api": "*"
+    "@interop-playground/api": "*",
+    "better-sqlite3": "13.0.3",
+    "fastify": "5.12.5",
+    "ulid": "3.0.2"
   },
   "devDependencies": {
-    "@interop-playground/testkit": "*"
+    "@interop-playground/testkit": "*",
+    "@types/better-sqlite3": "9.6.0"
   }
 }
