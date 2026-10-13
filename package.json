@@ -1,0 +1,57 @@
+{
+  "name": "interop-playground",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Inji Interoperability Playground for Verifiable Credentials (MOSIP Decode 2026, PS02)",
+  "workspaces": [
+    "packages/adapters",
+    "packages/api",
+    "packages/testkit",
+    "apps/bff",
+    "apps/ui"
+  ],
+  "engines": {
+    "node": ">=22.22.2 <23"
+  },
+  "scripts": {
+    "build": "tsc -b && npm run build --workspaces --if-present && npm run contracts:generate",
+    "typecheck": "tsc -b",
+    "lint": "eslint . && npm run lint:github && npm run check:secrets && npm run validate:flows",
+    "lint:github": "node scripts/lint-no-github-write.mjs",
+    "check:secrets": "node scripts/check-secrets.mjs",
+    "validate:flows": "node scripts/validate-flows.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:unit": "vitest run --project unit",
+    "test:contract": "vitest run --project contract",
+    "test:integration": "vitest run --project integration --passWithNoTests",
+    "test:repo": "vitest run --project repo",
+    "test:ui": "vitest run --project unit apps/ui",
+    "e2e": "playwright test",
+    "contrast": "node scripts/contrast.mjs",
+    "contracts:generate": "node scripts/contracts-generate.mjs",
+    "contracts:check": "npm run contracts:generate && git diff --exit-code -- packages/api/openapi.yaml packages/api/api.schema.json packages/api/src/client.gen.ts",
+    "bff:cli": "tsx apps/bff/src/cli.ts",
+    "ci:fast": "npm run bff:cli -- suite run --profile ci-fast"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@types/node": "22.20.5",
+    "@vitest/coverage-v8": "4.1.11",
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1",
+    "eslint": "10.12.0",
+    "eslint-config-prettier": "10.1.8",
+    "openapi-typescript": "7.13.0",
+    "prettier": "3.9.9",
+    "tsx": "4.23.15",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.71.1",
+    "typescript-json-schema": "0.68.0",
+    "vite": "7.3.6",
+    "vitest": "4.1.11",
+    "yaml": "2.9.1"
+  }
+}

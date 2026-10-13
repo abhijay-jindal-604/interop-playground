@@ -1,0 +1,39 @@
+{
+  "issuanceDate": "2026-09-27T13:18:33.547Z",
+  "credentialSubject": {
+    "gender": "Female",
+    "primaryCropType": "${primaryCropType}",
+    "mobileNumber": "${mobileNumber}",
+    "postalCode": "${postalCode}",
+    "landArea": "${landArea}",
+    "fullName": "Playground Farmer",
+    "secondaryCropType": "${secondaryCropType}",
+    "dateOfBirth": "1990-01-01",
+    "face": "${face}",
+    "farmerID": "${farmerID}",
+    "villageOrTown": "${villageOrTown}",
+    "district": "${district}",
+    "id": "did:jwk:eyJrdHkiOiJFQyIsIngiOiItUlJXaENRM1ZMR3VlbXFXc29iVnRVZ3hOSWJLM2c1R1hJXzZ6NVh6Mk93IiwieSI6IjJTT1lUeUt5R3hLWVYtRURWWmlEc1dCV0t2RGhXZFVFbUJFOWo1UDhFZjQiLCJjcnYiOiJQLTI1NiJ9#0",
+    "state": "${state}",
+    "landOwnershipType": "${landOwnershipType}"
+  },
+  "id": "https://mosip.io/credential/f1b9d2c0-4f06-48e1-8b86-4cecf586cbbb",
+  "type": [
+    "VerifiableCredential",
+    "FarmerCredential"
+  ],
+  "@context": [
+    "https://www.w3.org/2018/credentials/v1",
+    "https://inji.github.io/inji-config/contexts/farmer.json",
+    "https://w3id.org/security/suites/ed25519-2020/v1"
+  ],
+  "issuer": "did:web:8398-2405-201-1029-3025-e142-9ad3-e1f2-f543.ngrok-free.app",
+  "expirationDate": "2028-09-26T13:18:33.547Z",
+  "proof": {
+    "type": "Ed25519Signature2020",
+    "created": "2026-09-27T13:18:33Z",
+    "proofPurpose": "assertionMethod",
+    "verificationMethod": "did:web:8398-2405-201-1029-3025-e142-9ad3-e1f2-f543.ngrok-free.app#pjEZsqKzo-FScSiqK5-YshMpMLJTtvoe6CsD5bBBTtY",
+    "proofValue": "z4XG6jNpLm7SpphnY3cX5rC7DEx74xhb5wL2cYzXoSzHAnHGQSj4mv94Z8Rt467S9fNpgeiyavfRDLcHusedTHxVS"
+  }
+}

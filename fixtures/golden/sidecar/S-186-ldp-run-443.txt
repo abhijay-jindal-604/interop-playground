@@ -1,0 +1,14 @@
+  [http] POST https://172.16.134.37/v1/certify/pre-authorized-data -> 200
+  pre-authorized-data -> {"credential_offer_uri":"openid-credential-offer://?credential_offer_uri=https%3A%2F%2F172.16.134.37%2Fv1%2Fcertify%2Fcredential-offer-data%2F57b2688d-8e68-4a51-8877-bb820ce4d075"}
+offer passed to VCIClient: openid-credential-offer://?credential_offer_uri=https%3A%2F%2F172.16.134.37%2Fv1%2Fcertify%2Fcredential-offer-data%2F57b2688d-8e68-4a51-8877-bb820ce4d075
+  token cb: grant=PRE_AUTHORIZED endpoint=https://172.16.134.37/v1/certify/oauth/token preAuth=true
+  [http] POST https://172.16.134.37/v1/certify/oauth/token -> 200
+  token resp -> {"access_token":"<redacted>","token_type":"Bearer","expires_in":600}
+  proof cb: aud=https://172.16.134.37 nonce=3223a373-73ef-4349-afbc-49c5856d8ceb algs=[RS256, ES256]
+Oct 05, 2026 8:04:01 PM io.mosip.vciclient.credential.request.CredentialRequestExecutor requestCredential
+INFO: Credential downloaded successfully
+VCIClient -> configId=FarmerCredential issuer=https://172.16.134.37 n=1
+credential (json object) head: {"issuanceDate":"2026-10-05T14:34:00.655Z","credentialSubject":{"gender":"Female","primary
+Oct 05, 2026 8:04:01 PM io.mosip.vercred.vcverifier.credentialverifier.verifier.LdpVerifier verify
+INFO: Received Credentials Verification - Start
+vcverifier(LDP_VC) -> VerificationResult(verificationStatus=true, verificationMessage=, verificationErrorCode=) in 2444 ms

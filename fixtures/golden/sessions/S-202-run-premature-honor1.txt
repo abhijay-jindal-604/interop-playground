@@ -1,0 +1,5 @@
+-- results BEFORE the wallet posts
+{"errorCode":"NO_VP_SUBMISSION","errorMessage":"No VP submission found for given transaction ID."} [status 404]
+{} [wallet post 200]
+-- results AFTER the post (retry)
+{"errorCode":"VP_SESSION_INVALID","errorMessage":"Your VP verification session is invalid. Please restart the process and try again"} [status 401]

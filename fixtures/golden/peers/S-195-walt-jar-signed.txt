@@ -1,0 +1,12 @@
+=== authenticateVerifier ===
+Oct 06, 2026 12:20:37 AM io.mosip.openID4VP.exceptions.OpenID4VPExceptions <init>
+SEVERE: ERROR [invalid_request] - request_object_signing_alg_values_supported is not present in wallet metadata | Class: AuthorizationRequest
+Oct 06, 2026 12:20:37 AM io.mosip.openID4VP.authorizationRequest.authorizationRequestHandler.ClientIdPrefixBasedAuthorizationRequestHandler handleRequestObjectByReference
+WARNING: Failed to process wallet metadata for POST request_uri: request_object_signing_alg_values_supported is not present in wallet metadata. Continuing without metadata.
+Oct 06, 2026 12:20:37 AM io.mosip.openID4VP.exceptions.OpenID4VPExceptions <init>
+SEVERE: ERROR [invalid_request] - Request URI response validation failed No enum constant io.mosip.openID4VP.constants.SignatureAlgorithm.ES256 | Class: ClientIdPrefixBasedAuthorizationRequestHandler
+Oct 06, 2026 12:20:37 AM io.mosip.openID4VP.exceptions.OpenID4VPExceptions <init>
+SEVERE: ERROR [error_dispatch_failure] - Failed to send error to verifier: Response URI is not set. Cannot send error to verifier. | Class: AuthorizationResponseHandler
+Oct 06, 2026 12:20:37 AM io.mosip.openID4VP.exceptions.OpenID4VPExceptions$Companion error
+SEVERE: ERROR : Failed to send error to verifier: Response URI is not set. Cannot send error to verifier. | Class: OpenID4VP
+Exception in thread "main" io.mosip.openID4VP.exceptions.OpenID4VPExceptions$VerificationFailure: Request URI response validation failed No enum constant io.mosip.openID4VP.constants.SignatureAlgorithm.ES256

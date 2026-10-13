@@ -1,0 +1,3 @@
+{"t":"2026-10-05T19:40:34.417Z","method":"GET","url":"/return/vp","host":"127.0.0.1:3100"}
+{"t":"2026-10-05T19:40:34.451Z","method":"POST","url":"/return/vp/code","host":"127.0.0.1:3100","body":"{\"responseCode\":\"6000f511-4d0a-43be-9a73-f4426f5bc7a0\"}"}
+{"t":"2026-10-05T19:40:34.465Z","method":"GET","url":"/favicon.ico","host":"127.0.0.1:3100"}

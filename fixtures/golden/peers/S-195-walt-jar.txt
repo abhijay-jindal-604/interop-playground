@@ -1,0 +1,16 @@
+Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/home/aj/Desktop/everything/hackathons/MOSIP2026/research/spikes/r5d7/tls/sidecar-truststore.p12 -Djavax.net.ssl.trustStorePassword=changeit -Djavax.net.ssl.trustStoreType=PKCS12
+=== authenticateVerifier ===
+Oct 06, 2026 12:19:56 AM io.mosip.openID4VP.exceptions.OpenID4VPExceptions <init>
+SEVERE: ERROR [invalid_request] - Error while fetching request_uri: HTTP status code 406 & body:  | Class: ClientIdPrefixBasedAuthorizationRequestHandler
+Oct 06, 2026 12:19:56 AM io.mosip.openID4VP.exceptions.OpenID4VPExceptions <init>
+SEVERE: ERROR [error_dispatch_failure] - Failed to send error to verifier: Response URI is not set. Cannot send error to verifier. | Class: AuthorizationResponseHandler
+Oct 06, 2026 12:19:56 AM io.mosip.openID4VP.exceptions.OpenID4VPExceptions$Companion error
+SEVERE: ERROR : Failed to send error to verifier: Response URI is not set. Cannot send error to verifier. | Class: OpenID4VP
+Exception in thread "main" io.mosip.openID4VP.exceptions.OpenID4VPExceptions$InvalidData: Error while fetching request_uri: HTTP status code 406 & body: 
+	at io.mosip.openID4VP.authorizationRequest.authorizationRequestHandler.ClientIdPrefixBasedAuthorizationRequestHandler.handleRequestObjectByReference(ClientIdPrefixBasedAuthorizationRequestHandler.kt:181)
+	at io.mosip.openID4VP.authorizationRequest.authorizationRequestHandler.ClientIdPrefixBasedAuthorizationRequestHandler.fetchAuthorizationRequest(ClientIdPrefixBasedAuthorizationRequestHandler.kt:108)
+	at io.mosip.openID4VP.authorizationRequest.authorizationRequestHandler.ClientIdPrefixBasedAuthorizationRequestHandler.handle(ClientIdPrefixBasedAuthorizationRequestHandler.kt:83)
+	at io.mosip.openID4VP.authorizationRequest.AuthorizationRequest$Companion.getAuthorizationRequest(AuthorizationRequest.kt:64)
+	at io.mosip.openID4VP.authorizationRequest.AuthorizationRequest$Companion.validateAndCreateAuthorizationRequest(AuthorizationRequest.kt:44)
+	at io.mosip.openID4VP.OpenID4VP.authenticateVerifier(OpenID4VP.kt:33)
+	at Present.main(Present.java:72)

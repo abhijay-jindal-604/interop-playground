@@ -1,0 +1,28 @@
+== 1 vp-session-request (responseCodeValidationRequired=true)
+[status 201]
+Set-Cookie: transaction_id=<v>; Path=/v1/verify; Max-Age=300; Expires=Mon, 05 Oct 2026 19:44:50 GMT; Secure; HttpOnly; SameSite=Lax
+{"transactionId":"txn_0522f4ad-5893-4db6-9077-b4ac84425af8","requestId":"req_7dcab98e-7940-4229-8240-a3022da3d8d6","ad":{"clientId":"redirect_uri:https://172.16.134.37:8443/v1/verify/v2/vp-submission/direct-post","responseUri":"https://172.16.134.37:8443/v1/verify/v2/vp-submission/direct-post","responseMode":"direct_post","responseCodeValidationRequired":true,"nonce":"TKBInsIJcIC7nX2UVq4Zc9d3ee1WYRkZ"}}
+== 2 wallet builds VP (JsonWebSignature2020/ES256, domain=redirect_uri:https://172.16.134.37:8443/v1/verify/v2/vp-submission/direct-post)
+VP written ../vp-s200.json holder did:jwk:eyJjcnYiOiJQLTI1NiIsIm... proof type JsonWebSignature2020
+== 3 wallet direct_post
+[status 200]
+HTTP/1.1 200 
+{"redirect_uri":"http://127.0.0.1:3100/return/vp#response_code=b6e61559-6374-4047-8da0-071ec8bc5e86"}
+== 4 result BEFORE response_code (cookie, body {})
+{"errorCode":"RESPONSE_CODE_NOT_FOUND","errorMessage":"Response code is missing for this VP Submission"}
+[status 400]
+== 5 browser returns to redirect_uri (curl, fragment not sent)
+[status 200] http://127.0.0.1:3100/return/vp
+== 6 result with responseCode WITHOUT cookie
+{"errorCode":"VP_SESSION_INVALID","errorMessage":"Your VP verification session is invalid. Please restart the process and try again"}
+[status 401]
+== 7 result with wrong responseCode + cookie
+{"errorCode":"RESPONSE_CODE_NOT_MATCHING","errorMessage":"Response code is not matching the VP Submission response"}
+[status 400]
+== 8 result with right responseCode + cookie
+[status 200]
+Set-Cookie: transaction_id=; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:10 GMT; Path=/v1/verify; Secure; HttpOnly
+{"allChecksSuccessful":false,"transactionId":"txn_0522f4ad-5893-4db6-9077-b4ac84425af8","credentialResults":[{"holderProofCheck":{"valid":true,"error":null},"schemaAndSignatureCheck":{"valid":false,"error":{"errorCode":"ERR_SIGNATURE_VERIFICATION_FAILED","errorMessage":"Verification Failed"}},"expiryCheck":null}]}
+== 9 replay of same responseCode (cookie jar re-used)
+{"errorCode":"RESPONSE_CODE_USED","errorMessage":"Response code has been used"}
+[status 400]

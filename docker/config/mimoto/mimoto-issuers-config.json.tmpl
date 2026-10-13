@@ -1,0 +1,31 @@
+{
+  "issuers": [
+    {
+      "credential_issuer": "PlaygroundFarmer",
+      "issuer_id": "PlaygroundFarmer",
+      "protocol": "OpenId4VCI",
+      "display": [
+        {
+          "name": "Playground Farmer (local eSignet)",
+          "logo": {
+            "url": "https://mosip.github.io/inji-config/logos/agro-vertias-logo.png",
+            "alt_text": "agri-logo"
+          },
+          "title": "Playground Farmer (local eSignet)",
+          "description": "Download Farmers Credentials",
+          "language": "en"
+        }
+      ],
+      "client_id": "playground-mimoto",
+      "redirect_uri": "io.mosip.residentapp.inji://oauthredirect",
+      "token_endpoint": "http://localhost:8099/v1/mimoto/get-token/PlaygroundFarmer",
+      "authorization_audience": "http://${PUBLIC_HOST}:3005/v1/esignet/oauth/v2/token",
+      "proxy_token_endpoint": "http://${PUBLIC_HOST}:3005/v1/esignet/oauth/v2/token",
+      "client_alias": "playground-mimoto-client",
+      "qr_code_type": "EmbeddedVC",
+      "credential_issuer_host": "http://${PUBLIC_HOST}:8093",
+      "enabled": "true",
+      "wellknown_endpoint": "http://${PUBLIC_HOST}:8093/.well-known/openid-credential-issuer"
+    }
+  ]
+}

@@ -1,0 +1,114 @@
+{
+  "flowId": "FLOW-01",
+  "kind": "issuance",
+  "title": "Pre-authorized code, no tx_code: reference skeleton",
+  "targetStepKey": "vci.credential",
+  "lifelines": [
+    "IUI",
+    "I",
+    "W",
+    "L"
+  ],
+  "steps": [
+    {
+      "stepKey": "vci.setup.variant",
+      "order": 1,
+      "from": "IUI",
+      "to": "I",
+      "label": "ensure variant credential configuration",
+      "kind": "http",
+      "messages": 2,
+      "skipReason": "no issuer-side knob differs from its default"
+    },
+    {
+      "stepKey": "vci.setup.config-read",
+      "order": 2,
+      "from": "IUI",
+      "to": "I",
+      "label": "GET credential-configurations/{id}",
+      "kind": "http",
+      "messages": 2
+    },
+    {
+      "stepKey": "vci.offer.mint",
+      "order": 3,
+      "from": "IUI",
+      "to": "I",
+      "label": "POST /pre-authorized-data",
+      "kind": "http",
+      "messages": 2
+    },
+    {
+      "stepKey": "vci.offer.fetch",
+      "order": 4,
+      "from": "W",
+      "to": "I",
+      "label": "GET credential-offer-data/{uuid}",
+      "kind": "http",
+      "messages": 2
+    },
+    {
+      "stepKey": "vci.metadata.issuer",
+      "order": 5,
+      "from": "W",
+      "to": "I",
+      "label": "GET /.well-known/openid-credential-issuer",
+      "kind": "http",
+      "messages": 2
+    },
+    {
+      "stepKey": "vci.metadata.as",
+      "order": 6,
+      "from": "W",
+      "to": "I",
+      "label": "GET /.well-known/oauth-authorization-server",
+      "kind": "http",
+      "messages": 2
+    },
+    {
+      "stepKey": "vci.token",
+      "order": 7,
+      "from": "W",
+      "to": "I",
+      "label": "POST /oauth/token",
+      "kind": "http",
+      "messages": 2
+    },
+    {
+      "stepKey": "vci.nonce",
+      "order": 8,
+      "from": "W",
+      "to": "I",
+      "label": "POST /nonce",
+      "kind": "http",
+      "messages": 2
+    },
+    {
+      "stepKey": "vci.proof.sign",
+      "order": 9,
+      "from": "W",
+      "to": "L",
+      "label": "sign proof JWT (ES256, P1363)",
+      "kind": "engine",
+      "messages": 1
+    },
+    {
+      "stepKey": "vci.credential",
+      "order": 10,
+      "from": "W",
+      "to": "I",
+      "label": "POST /issuance/credential",
+      "kind": "http",
+      "messages": 2
+    },
+    {
+      "stepKey": "vci.credential.inspect",
+      "order": 11,
+      "from": "W",
+      "to": "L",
+      "label": "decode credential, extract artifacts",
+      "kind": "engine",
+      "messages": 1
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "checkedAt": "2026-10-06",
+  "images": {
+    "node:22-bookworm-slim": "sha256:1b3abbc0bf2421c8733f58c6fd7bbb961a960f37e05ed7369eccd1fbb0edcc84",
+    "eclipse-temurin:21-jre-jammy": "sha256:f04fb34e053148344e83317976114ec3f37e4b830ec8bdab5a2fe3cecd7d010b",
+    "postgres:15": "sha256:c67d80f67f7618bedcee720e33d4e5bab04294d3a51b985955b79b605800ad64",
+    "postgres:13": "sha256:4689940c683801b4ab839ab3b0a0a3555a5fe425371422310944e89eca7d8068",
+    "postgres:bookworm": "sha256:7d3852670a11f0cb9cb1cd50916dc02a0021143fb22d96b78eeef26348abe55c",
+    "redis:6.0": "sha256:b99ffd0554dc8d300230b9d1b9f2a129a6abf595bf8589883beb980ed1feae3d",
+    "nginx:stable": "sha256:0623fd2455fb2bb0bc2ba7038817adcf7805d0790f78af91de33389d50774385",
+    "injistack/inji-certify-with-plugins:1.0.0-alpha.1": "sha256:1579b2449f1a7213fe25de1f6a1509b5636f1fedf0d7f5c4cfd07b9f0fc5b346",
+    "injistackdev/inji-certify-with-plugins:develop": "sha256:3e45d85b2a1d258fbe8234b32778a878ff19dfcc493698d456a6bf2f76c85e65",
+    "injistackdev/inji-certify-with-plugins:develop#iae": "sha256:764653071d76787e85019923fd2bd67ce0555cc8ffcbe127c0d6bb20f4795bca",
+    "injistack/mimoto:1.0.0-alpha.1": "sha256:d59f102482eeb5b17b84f252714c1914e5b5d22a9cd9b2a69e82f7112093b571",
+    "injistack/inji-web:1.0.0-alpha.1": "sha256:110407949164f8af268abce0908789114c35e1304bfd7c19e80f0fae7c97a2e3",
+    "injistack/inji-verify-service:1.0.0-alpha.1": "sha256:064fcfa12773ec11834d5d769f2b6bb6bcc61cf9ae89ae918f8ae3934419907d",
+    "injistack/inji-verify-ui:1.0.0-alpha.1": "sha256:e30b69ca51ab98cafd2ccf24f9c8c7da3c56cbb1b266d4e222f772a8fca82167",
+    "mosipid/esignet-with-plugins:1.8.0": "sha256:47fffdb5a45198b29885a533841129877a7385a12bcb6020c0f6d4335477be39",
+    "mosipid/oidc-ui:1.8.0": "sha256:8a2a6839b4e22be6c967dabc6308190c165c54604a778c2d9b1aae8091db93e7",
+    "mosipid/mock-identity-system:0.13.0": "sha256:8073830530daae63bf3cd90f594da22331aee8901b53669a1dc4bd6df3d97470",
+    "waltid/issuer-api2:1.1.0": "sha256:e7f8a9ff6b22f0116faf51a64e4cd96767cc170f6723b75e67d6a7fa740ddf65",
+    "waltid/verifier-api2:1.1.0": "sha256:73552cba94067c41cf194aaa037bbc915d67a625f36a6f0a2716e96db054e0ec",
+    "ghcr.io/eu-digital-identity-wallet/eudi-srv-verifier-endpoint:v0.11.0": "sha256:2f2772b1df39a529f3683c7e82d10d03221b475e67da7b2d8cb1b9aebe6f71f9",
+    "cloudflare/cloudflared:2026.9.0": "sha256:ff69a2225ad7c6f85ed84fbd5f3087df46202426b2388ec60214098e0adf05e9"
+  }
+}

@@ -1,0 +1,4 @@
+== 3 wallet direct_post
+[status 200]
+{"redirect_uri":"http://127.0.0.1:3100/return/vp#response_code=6000f511-4d0a-43be-9a73-f4426f5bc7a0"}
+BROWSER_URL=http://127.0.0.1:3100/return/vp#response_code=6000f511-4d0a-43be-9a73-f4426f5bc7a0

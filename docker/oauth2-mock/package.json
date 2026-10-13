@@ -1,0 +1,10 @@
+{
+  "name": "playground-oauth2-mock",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Google stand-in for Mimoto login (S-025): oauth2-mock-server, plain OAuth2 with a userinfo hook",
+  "type": "module",
+  "dependencies": {
+    "oauth2-mock-server": "9.2.0"
+  }
+}

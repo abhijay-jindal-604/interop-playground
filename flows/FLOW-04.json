@@ -1,0 +1,43 @@
+{
+  "flowId": "FLOW-04",
+  "kind": "issuance",
+  "extends": "FLOW-01",
+  "title": "Format delta: dc+sd-jwt via pre-auth (PlaygroundSdJwt)",
+  "targetStepKey": "vci.credential",
+  "lifelines": [
+    "IUI",
+    "I",
+    "W",
+    "L"
+  ],
+  "steps": [
+    {
+      "stepKey": "vci.setup.variant",
+      "order": 1,
+      "from": "IUI",
+      "to": "I",
+      "label": "ensure variant (sdClaim syntax)",
+      "kind": "http",
+      "messages": 2,
+      "skipReason": "no issuer-side knob differs from its default"
+    },
+    {
+      "stepKey": "vci.setup.config-read",
+      "order": 2,
+      "from": "IUI",
+      "to": "I",
+      "label": "GET credential-configurations/{id} (sdClaim)",
+      "kind": "http",
+      "messages": 2
+    },
+    {
+      "stepKey": "vci.credential.inspect",
+      "order": 11,
+      "from": "W",
+      "to": "L",
+      "label": "decode SD-JWT, count disclosures, read cnf and x5c",
+      "kind": "engine",
+      "messages": 1
+    }
+  ]
+}

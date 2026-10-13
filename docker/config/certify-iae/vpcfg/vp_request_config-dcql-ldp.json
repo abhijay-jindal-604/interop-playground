@@ -1,0 +1,12 @@
+{
+  "dcqlQuery": {
+    "credentials": [
+      {
+        "id": "prereq",
+        "format": "ldp_vc",
+        "meta": { "type_values": [["VerifiableCredential", "FarmerCredential"]] },
+        "claims": [ { "path": ["fullName"] } ]
+      }
+    ]
+  }
+}

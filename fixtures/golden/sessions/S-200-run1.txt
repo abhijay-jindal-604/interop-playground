@@ -1,0 +1,27 @@
+== 1 vp-session-request (responseCodeValidationRequired=true)
+[status 201]
+Set-Cookie: transaction_id=<v>; Path=/v1/verify; Max-Age=300; Expires=Mon, 05 Oct 2026 19:44:42 GMT; Secure; HttpOnly; SameSite=Lax
+{"transactionId":"txn_ddab709e-fe52-4a70-953d-c26c40483ecc","requestId":"req_a99b15b2-90e5-48d8-a732-b39bf7d13250","ad":{"clientId":"redirect_uri:https://172.16.134.37:8443/v1/verify/v2/vp-submission/direct-post","responseUri":"https://172.16.134.37:8443/v1/verify/v2/vp-submission/direct-post","responseMode":"direct_post","responseCodeValidationRequired":true,"nonce":"MtGmM4Jvs0D4yTp-D135YBWm47BEgxd3"}}
+== 2 wallet builds VP (JsonWebSignature2020/ES256, domain=redirect_uri:https://172.16.134.37:8443/v1/verify/v2/vp-submission/direct-post)
+VP written ../vp-s200.json holder did:jwk:eyJjcnYiOiJQLTI1NiIsIm... proof type JsonWebSignature2020
+== 3 wallet direct_post
+[status 200]
+HTTP/1.1 200 
+{"redirect_uri":"http://127.0.0.1:3100/return/vp#response_code=f12dd455-f05c-4656-82af-13a401d61956"}
+== 4 result BEFORE response_code (cookie, body {})
+{"timestamp":"2026-10-05T19:39:45.505+00:00","status":404,"error":"Not Found"}
+[status 404]
+== 5 browser returns to redirect_uri (curl, fragment not sent)
+[status 200] http://127.0.0.1:3100/return/vp
+== 6 result with responseCode WITHOUT cookie
+{"timestamp":"2026-10-05T19:39:45.534+00:00","status":404,"error":"Not Found"}
+[status 404]
+== 7 result with wrong responseCode + cookie
+{"timestamp":"2026-10-05T19:39:45.549+00:00","status":404,"error":"Not Found"}
+[status 404]
+== 8 result with right responseCode + cookie
+[status 404]
+{"allChecksSuccessful":null,"transactionId":null,"credentialResults":[]}
+== 9 replay of same responseCode (cookie jar re-used)
+{"timestamp":"2026-10-05T19:39:45.584+00:00","status":404,"error":"Not Found"}
+[status 404]

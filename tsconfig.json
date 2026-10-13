@@ -1,0 +1,11 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./packages/adapters" },
+    { "path": "./packages/api" },
+    { "path": "./packages/testkit" },
+    { "path": "./apps/bff" },
+    { "path": "./apps/ui" },
+    { "path": "./tsconfig.tooling.json" }
+  ]
+}

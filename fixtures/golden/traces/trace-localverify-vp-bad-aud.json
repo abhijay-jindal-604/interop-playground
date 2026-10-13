@@ -1,0 +1,236 @@
+[
+  {
+    "method": "POST",
+    "url": "http://localhost:8090/v1/certify/pre-authorized-data",
+    "reqHeaders": {
+      "Content-Type": "application/json"
+    },
+    "reqBody": "{\"credential_configuration_id\":\"PlaygroundSdJwt\",\"claims\":{\"fullName\":\"Asha Rao\",\"dateOfBirth\":\"1994-03-12\",\"gender\":\"Female\",\"email\":\"asha@example.org\"}}",
+    "status": 200,
+    "ms": 49,
+    "resHeaders": {
+      "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+      "connection": "keep-alive",
+      "content-type": "application/json",
+      "date": "Sun, 27 Sep 2026 14:55:11 GMT",
+      "expires": "0",
+      "keep-alive": "timeout=60",
+      "pragma": "no-cache",
+      "transfer-encoding": "chunked",
+      "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "x-xss-protection": "0"
+    },
+    "resBody": {
+      "credential_offer_uri": "openid-credential-offer://?credential_offer_uri=http%3A%2F%2Flocalhost%3A8090%2Fv1%2Fcertify%2Fcredential-offer-data%2Fd6ef329c-c2b1-4e9e-ac67-a15be822da95"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "http://localhost:8090/v1/certify/credential-offer-data/d6ef329c-c2b1-4e9e-ac67-a15be822da95",
+    "reqHeaders": {},
+    "status": 200,
+    "ms": 7,
+    "resHeaders": {
+      "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+      "connection": "keep-alive",
+      "content-type": "application/json",
+      "date": "Sun, 27 Sep 2026 14:55:11 GMT",
+      "expires": "0",
+      "keep-alive": "timeout=60",
+      "pragma": "no-cache",
+      "transfer-encoding": "chunked",
+      "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "x-xss-protection": "0"
+    },
+    "resBody": {
+      "credential_issuer": "http://localhost:8090",
+      "credential_configuration_ids": [
+        "PlaygroundSdJwt"
+      ],
+      "grants": {
+        "urn:ietf:params:oauth:grant-type:pre-authorized_code": {
+          "pre-authorized_code": "VWICgbFi0mytpSymrzBCfl7Rrohts298"
+        }
+      }
+    }
+  },
+  {
+    "method": "POST",
+    "url": "http://localhost:8090/v1/certify/oauth/token",
+    "reqHeaders": {
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    "reqBody": "grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Apre-authorized_code&pre-authorized_code=VWICgbFi0mytpSymrzBCfl7Rrohts298",
+    "status": 200,
+    "ms": 13,
+    "resHeaders": {
+      "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+      "connection": "keep-alive",
+      "content-type": "application/json",
+      "date": "Sun, 27 Sep 2026 14:55:11 GMT",
+      "expires": "0",
+      "keep-alive": "timeout=60",
+      "pragma": "no-cache",
+      "transfer-encoding": "chunked",
+      "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "x-xss-protection": "0"
+    },
+    "resBody": {
+      "access_token": "eyJraWQiOiJDQkJsRllKS0gwcXpxQ294YkYtbERVX280bUFjSDZUSHpxcno4RmJzZzU4IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJ7XCJmdWxsTmFtZVwiOlwiQXNoYSBSYW9cIixcImRhdGVPZkJpcnRoXCI6XCIxOTk0LTAzLTEyXCIsXCJnZW5kZXJcIjpcIkZlbWFsZVwiLFwiZW1haWxcIjpcImFzaGFAZXhhbXBsZS5vcmdcIn0iLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjgwOTAvdjEvY2VydGlmeS9pc3N1YW5jZS9jcmVkZW50aWFsIiwic2NvcGUiOiJwbGF5Z3JvdW5kX3Nkand0IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDkwIiwiZXhwIjoxNzkwNTIxNTExLCJpYXQiOjE3OTA1MjA5MTEsImNsaWVudF9pZCI6IiJ9.ot08Oxajw2n5VPLMnmWe0PbnebVfMQ3E67j38uad_CmOHzKXLUTaL6UF-j70RFSQ5fvuJ6ROJdcayFSL0AkMirDZcTNkPhfWklBqn3A82cfYKne3UhA-bP9RXJ3ArrNablXViDs6HpjQnGyFhiaWsF3Mypdu4urmbJyzlt9S6nL6HHL09_1LueGswRMt7IK24MaBx75k44ciRSB5_NXpo4uieDoVKucxn2Wp-YQQQ8cfistWlFewLt4gebIxIx3eBssugEwO_B_BUQumI77kgTXj5dBw3h4zDoGExu2cDBLuZhKFpnVECdLzylHaqnu1s9SmH4M_mdHIPQxm33i38Q",
+      "token_type": "Bearer",
+      "expires_in": 600
+    }
+  },
+  {
+    "method": "POST",
+    "url": "http://localhost:8090/v1/certify/nonce",
+    "reqHeaders": {},
+    "status": 200,
+    "ms": 6,
+    "resHeaders": {
+      "cache-control": "no-store",
+      "connection": "keep-alive",
+      "content-type": "application/json",
+      "date": "Sun, 27 Sep 2026 14:55:11 GMT",
+      "keep-alive": "timeout=60",
+      "transfer-encoding": "chunked",
+      "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "x-xss-protection": "0"
+    },
+    "resBody": {
+      "c_nonce": "ac327460-778c-466e-8a1e-9563b15fd961"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "http://localhost:8090/v1/certify/issuance/credential",
+    "reqHeaders": {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer eyJraWQiOiJDQkJsRllKS0gwcXpxQ294YkYtbERVX280bUFjSDZUSHpxcno4RmJzZzU4IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJ7XCJmdWxsTmFtZVwiOlwiQXNoYSBSYW9cIixcImRhdGVPZkJpcnRoXCI6XCIxOTk0LTAzLTEyXCIsXCJnZW5kZXJcIjpcIkZlbWFsZVwiLFwiZW1haWxcIjpcImFzaGFAZXhhbXBsZS5vcmdcIn0iLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjgwOTAvdjEvY2VydGlmeS9pc3N1YW5jZS9jcmVkZW50aWFsIiwic2NvcGUiOiJwbGF5Z3JvdW5kX3Nkand0IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDkwIiwiZXhwIjoxNzkwNTIxNTExLCJpYXQiOjE3OTA1MjA5MTEsImNsaWVudF9pZCI6IiJ9.ot08Oxajw2n5VPLMnmWe0PbnebVfMQ3E67j38uad_CmOHzKXLUTaL6UF-j70RFSQ5fvuJ6ROJdcayFSL0AkMirDZcTNkPhfWklBqn3A82cfYKne3UhA-bP9RXJ3ArrNablXViDs6HpjQnGyFhiaWsF3Mypdu4urmbJyzlt9S6nL6HHL09_1LueGswRMt7IK24MaBx75k44ciRSB5_NXpo4uieDoVKucxn2Wp-YQQQ8cfistWlFewLt4gebIxIx3eBssugEwO_B_BUQumI77kgTXj5dBw3h4zDoGExu2cDBLuZhKFpnVECdLzylHaqnu1s9SmH4M_mdHIPQxm33i38Q"
+    },
+    "reqBody": "{\"credential_configuration_id\":\"PlaygroundSdJwt\",\"proofs\":{\"jwt\":[\"eyJhbGciOiJFUzI1NiIsInR5cCI6Im9wZW5pZDR2Y2ktcHJvb2Yrand0Iiwia2lkIjoiZGlkOmp3azpleUpyZEhraU9pSkZReUlzSW5naU9pSmlhSE14U1dsbFMwdG9kRWx5T0ZkUlNqSnNjMWxsU0daaE0yVjBOa0UyVmpCNlYzQkJUVVk1WkZwdklpd2llU0k2SW5Kc2JGZEZaVWhVV21KWGVqZFRTMHRRYkc1YU4wRk1kbUZGVUc1U1VIUkJVVTlVYURaRWR5MU5hRGdpTENKamNuWWlPaUpRTFRJMU5pSjkjMCJ9.eyJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjgwOTAiLCJpYXQiOjE3OTA1MjA5MTEsIm5vbmNlIjoiYWMzMjc0NjAtNzc4Yy00NjZlLThhMWUtOTU2M2IxNWZkOTYxIn0.sUiXoLIM04I1CfqrLbTukg4DInyDWUsPvRnNC_E2UEqzNjgTZX9gVLC_RULSPLquOR0RXMT7cD__ACxDI8gYuw\"]}}",
+    "status": 200,
+    "ms": 36,
+    "resHeaders": {
+      "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+      "connection": "keep-alive",
+      "content-type": "application/json",
+      "date": "Sun, 27 Sep 2026 14:55:11 GMT",
+      "expires": "0",
+      "keep-alive": "timeout=60",
+      "pragma": "no-cache",
+      "transfer-encoding": "chunked",
+      "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "x-xss-protection": "0"
+    },
+    "resBody": {
+      "credentials": [
+        {
+          "credential": "eyJ4NXQjUzI1NiI6InVMYmFieEpsaklIdkdWRWNyUWtINDJob0dPMUlSSzVtRUwtYk53VGMtV0UiLCJ4NWMiOlsiTUlJREVEQ0NBZmlnQXdJQkFnSUlRQTR4ZXkzamdjUXdEUVlKS29aSWh2Y05BUUVMQlFBd2VERUxNQWtHQTFVRUJoTUNTVTR4Q3pBSkJnTlZCQWdNQWt0Qk1SSXdFQVlEVlFRSERBbENRVTVIUVV4UFVrVXhEakFNQmdOVkJBb01CVWxKU1ZSQ01SY3dGUVlEVlFRTERBNUZXRUZOVUV4RkxVTkZUbFJGVWpFZk1CMEdBMVVFQXd3V2QzZDNMbVY0WVcxd2JHVXVZMjl0SUNoU1QwOVVLVEFlRncweU5qQTVNamN4TXpFM01UUmFGdzB5T1RBNU1qWXhNekUzTVRSYU1JR2JNUXN3Q1FZRFZRUUdFd0pKVGpFTE1Ba0dBMVVFQ0F3Q1MwRXhFakFRQmdOVkJBY01DVUpCVGtkQlRFOVNSVEVPTUF3R0ExVUVDZ3dGU1VsSlZFSXhGekFWQmdOVkJBc01Ea1ZZUVUxUVRFVXRRMFZPVkVWU01VSXdRQVlEVlFRREREbDNkM2N1WlhoaGJYQnNaUzVqYjIwZ0tFTkZVbFJKUmxsZlZrTmZVMGxIVGw5RlExOVNNUzFGUTE5VFJVTlFNalUyVWpGZlUwbEhUaWt3V1RBVEJnY3Foa2pPUFFJQkJnZ3Foa2pPUFFNQkJ3TkNBQVJoNmsvR0V5Z2FrS082dDhZTXA1TUFzSmxETks4aHIxYU1sK21yRDllT0Q2bnFHQmRnSllJbUFGSllZeGxZQnY5K2VRTWpKVU90S1E2QU04bHRyZUlvbzBVd1F6QVNCZ05WSFJNQkFmOEVDREFHQVFIL0FnRUJNQjBHQTFVZERnUVdCQlNtdmUxdHlodjJrYmpjVmFjd2pqL3lNTHF5VERBT0JnTlZIUThCQWY4RUJBTUNBb1F3RFFZSktvWklodmNOQVFFTEJRQURnZ0VCQUliaGtrdCtjL1cwaWM5cDZkYlhqL28rS05WRkZsUWk1cHlGN1pBM1ZkRWNxTUdFa1NtY2l4NGVlakM2SG81bGVmOUxENkYrenlJNUZMb2FRVElKRVhvTkV1Qi82NlFTajkyTkVBNkJ4VFh2MHhGblpDTHNIdzV2ajVWOWdRbFRlbnR1SzZhSzEzZE5uSTd3M1R2MURFLzVweWl0Sm1tMlZoL2ZUWHI4ZWlEbUlFZnlIZEN4bWYzcURoNTdsZzB6QURrNDYwTm1LelBGVXRBb052b2N3MDBzeUhIMGdhZ2I5eEpqU3RIc3o3NFJNKzhrekZ2NDFjQU5tbW1zQ0hIUFN5d0pDWHVuTFVvMnpMb2UzbEQ2cHN6dVVZdTBEWkhWaDc1b0VVeE9SenUvOUpycVhGdlhrNW1PNHJGQmViOWpERks1VGQ4d1R3dmtybVBwK2x0NGowOD0iLCJNSUlEdHpDQ0FwK2dBd0lCQWdJSXI1cWhYM2xsOFVRd0RRWUpLb1pJaHZjTkFRRUxCUUF3ZURFTE1Ba0dBMVVFQmhNQ1NVNHhDekFKQmdOVkJBZ01Ba3RCTVJJd0VBWURWUVFIREFsQ1FVNUhRVXhQVWtVeERqQU1CZ05WQkFvTUJVbEpTVlJDTVJjd0ZRWURWUVFMREE1RldFRk5VRXhGTFVORlRsUkZVakVmTUIwR0ExVUVBd3dXZDNkM0xtVjRZVzF3YkdVdVkyOXRJQ2hTVDA5VUtUQWVGdzB5TmpBNU1qY3hNekUzTVROYUZ3MHpOREE1TWpVeE16RTNNVE5hTUhneEN6QUpCZ05WQkFZVEFrbE9NUXN3Q1FZRFZRUUlEQUpMUVRFU01CQUdBMVVFQnd3SlFrRk9SMEZNVDFKRk1RNHdEQVlEVlFRS0RBVkpTVWxVUWpFWE1CVUdBMVVFQ3d3T1JWaEJUVkJNUlMxRFJVNVVSVkl4SHpBZEJnTlZCQU1NRm5kM2R5NWxlR0Z0Y0d4bExtTnZiU0FvVWs5UFZDa3dnZ0VpTUEwR0NTcUdTSWIzRFFFQkFRVUFBNElCRHdBd2dnRUtBb0lCQVFDenFKbnlwMTlsb2J6cVppVTFRNWMrSzZNVHBPbVlHZGtLbkhKTmNtSUFUSmFudEVOQW9BSk9hV2pVTU00YVZsUlJCZm54azY5QTZlaWp0NlM3TkxUUDc1K0xUK3ROVXhPZVl4RVRQLzRvcVdleHh6RzE4Zk5qeWZDNXFBM3ZWNXNha2xHek1GcEZFTWtmTXZydVEySUNMN1R6R3BSUld2MWNyS0dNak9SZWVCRzI1TGJ5eWh6blVoaGI1TktSd0hXYW9KckVtRm5memh2M3FCaC9LeGxWc3VNNVlYSWxXZmFXUEx6WW1CN0gyVTFsK0dOVzFWbTZHYm1vcGZHaTQwS1JTQ1NIa2dJNkg1ZlZxSGFpYmw4RjhmQ0ZyV25QQ1lYN3FKaHplSEZFem9idVNhL0Z0WG9MSkI3ZE9McTM3QlRpbjE1M1NLTi9hRlZxNzI3MWRwYW5BZ01CQUFHalJUQkRNQklHQTFVZEV3RUIvd1FJTUFZQkFmOENBUUl3SFFZRFZSME9CQllFRko4V2lEaHdFN3lyUVpMdStscFh3b0JmSWx5ck1BNEdBMVVkRHdFQi93UUVBd0lDaERBTkJna3Foa2lHOXcwQkFRc0ZBQU9DQVFFQUNKSWFUWDFvc093d1JDR21LQnVFbllmTVFCY05VNkRQMlB0dWViaHM0dUYvUlNRZ3FWYWZ2d3FlNTl3TVE4UlZRcE5mQUJlbnV5b080emc4VWZKU1crWDgvS2NpWTVhLys3UUtBeDAzeVFlTlIwc3B0RXNDa2FqR0JoVUJIN0Y3SnFTYW1aSS9iZGFxaGJhY2gxSG9YSEloY251cDRueUNSN3RQNk15OFdaNjhKcC9VQk9jM0oyNVd2WmdzY0labVNVT3FkbmZ2SHRUVzhlT01xQzA4RS9iU3FaNjNpTzk1ZjhpR0RCV3g1NUZGZEpVZ1IvR3ZqQ2Rib1Q5Z0IzYWpXbjcwK284Sk1VQ09ZUUQvK0lRdGFYaWVwTm83ajZiczRZQUNseXowUU9ObnBldTluWktuaWlNcEd6YUIybmIyL0tZT3FDK2FlMVF0VkNraDNyTEFvdz09Il0sImtpZCI6InNTT1BlQVJhMTFJWWl4Sk5KdFhUWkV6Qkp5QnRDazFsRUt5bHYzeFc1cWMiLCJ0eXAiOiJkYytzZC1qd3QiLCJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwOTAiLCJfc2QiOlsiRUs2MUZkbU1lSWl6V243RE5MRFI3dHljN0VENzg0bmFTRTB6dm94VzNsOCIsIkszODVldk1mZ0JxSExMQUZoMHpnUE1kMzFDY2NSSDMyUTdYdzBoeEV5TDgiLCJnaDEtTGhfMFRTcGdsUHVyYlloclhxaDV0dHFLdHhDYlNmazNZaWdUUVpjIiwidDZVSWJQT19Ld0V1bzNHVTlhSjJuUm1tZmNrR2VLdUp4WU5ZSl9PenZkMCJdLCJjbmYiOnsia2lkIjoiZGlkOmp3azpleUpyZEhraU9pSkZReUlzSW5naU9pSmlhSE14U1dsbFMwdG9kRWx5T0ZkUlNqSnNjMWxsU0daaE0yVjBOa0UyVmpCNlYzQkJUVVk1WkZwdklpd2llU0k2SW5Kc2JGZEZaVWhVV21KWGVqZFRTMHRRYkc1YU4wRk1kbUZGVUc1U1VIUkJVVTlVYURaRWR5MU5hRGdpTENKamNuWWlPaUpRTFRJMU5pSjkjMCJ9LCJpZCI6Imh0dHBzOi8vbW9zaXAuaW8vY3JlZGVudGlhbC83MTViYTcyOS01ZTliLTQ1NWEtYWRkYi0yNThhNzgzZWY2MjgiLCJ2Y3QiOiJQbGF5Z3JvdW5kU2RKd3QifQ.Dzzm69Qq_JYafgpu0c1v9l0iQnmvMXVvYeR_9sB1LR1hdAl2gO2D6JcznWOIANkx17I2IhyoijshqBJY6zHNKQ~WyJfQ3RuZ1ByVEhRd3IyZjBKZTQ0N0hBIiwiZ2VuZGVyIiwiRmVtYWxlIl0~WyJhVlJTV01iSGZhN2o5ZEV4Z1ViLXdRIiwiZnVsbE5hbWUiLCJBc2hhIFJhbyJd~WyJ5OV9NNzNwVzNFa2lYUVZIdVg0VTBnIiwiZGF0ZU9mQmlydGgiLCIxOTk0LTAzLTEyIl0~WyJKaG5EeG9EZ2xOdzFUQmZjblVsVlB3IiwiZW1haWwiLCJhc2hhQGV4YW1wbGUub3JnIl0~"
+        }
+      ]
+    }
+  },
+  {
+    "method": "POST",
+    "url": "http://localhost:8080/v2/vp-request",
+    "reqHeaders": {
+      "Content-Type": "application/json"
+    },
+    "reqBody": "{\"clientId\":\"playground-spike\",\"dcqlQuery\":{\"credentials\":[{\"id\":\"pg\",\"format\":\"dc+sd-jwt\",\"meta\":{\"vct_values\":[\"PlaygroundSdJwt\"]},\"claims\":[{\"path\":[\"fullName\"]}]}]}}",
+    "status": 201,
+    "ms": 11,
+    "resHeaders": {
+      "connection": "keep-alive",
+      "content-type": "application/json",
+      "date": "Sun, 27 Sep 2026 14:55:11 GMT",
+      "keep-alive": "timeout=60",
+      "transfer-encoding": "chunked"
+    },
+    "resBody": {
+      "transactionId": "txn_06f5918c-0090-4ff1-9d39-9ae068cdb347",
+      "requestId": "req_41bdbef0-4e5e-4501-af8a-10d3bcc80087",
+      "authorizationDetails": {
+        "clientId": "playground-spike",
+        "dcqlQuery": {
+          "credentials": [
+            {
+              "id": "pg",
+              "format": "dc+sd-jwt",
+              "meta": {
+                "vct_values": [
+                  "PlaygroundSdJwt"
+                ]
+              },
+              "claims": [
+                {
+                  "path": [
+                    "fullName"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "nonce": "xEV5PXE6nqLHrcvXfY8L5-IzihtYB7Co",
+        "responseUri": "http://localhost:8080/v2/vp-submission/direct-post",
+        "responseCodeValidationRequired": false,
+        "responseType": "vp_token",
+        "responseMode": "direct_post",
+        "issuedAt": 1790520911989
+      },
+      "expiresAt": 1790521211989
+    }
+  },
+  {
+    "method": "POST",
+    "url": "http://localhost:8080/v2/vp-submission/direct-post",
+    "reqHeaders": {
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    "reqBody": "vp_token=%7B%22pg%22%3A%5B%22eyJ4NXQjUzI1NiI6InVMYmFieEpsaklIdkdWRWNyUWtINDJob0dPMUlSSzVtRUwtYk53VGMtV0UiLCJ4NWMiOlsiTUlJREVEQ0NBZmlnQXdJQkFnSUlRQTR4ZXkzamdjUXdEUVlKS29aSWh2Y05BUUVMQlFBd2VERUxNQWtHQTFVRUJoTUNTVTR4Q3pBSkJnTlZCQWdNQWt0Qk1SSXdFQVlEVlFRSERBbENRVTVIUVV4UFVrVXhEakFNQmdOVkJBb01CVWxKU1ZSQ01SY3dGUVlEVlFRTERBNUZXRUZOVUV4RkxVTkZUbFJGVWpFZk1CMEdBMVVFQXd3V2QzZDNMbVY0WVcxd2JHVXVZMjl0SUNoU1QwOVVLVEFlRncweU5qQTVNamN4TXpFM01UUmFGdzB5T1RBNU1qWXhNekUzTVRSYU1JR2JNUXN3Q1FZRFZRUUdFd0pKVGpFTE1Ba0dBMVVFQ0F3Q1MwRXhFakFRQmdOVkJBY01DVUpCVGtkQlRFOVNSVEVPTUF3R0ExVUVDZ3dGU1VsSlZFSXhGekFWQmdOVkJBc01Ea1ZZUVUxUVRFVXRRMFZPVkVWU01VSXdRQVlEVlFRREREbDNkM2N1WlhoaGJYQnNaUzVqYjIwZ0tFTkZVbFJKUmxsZlZrTmZVMGxIVGw5RlExOVNNUzFGUTE5VFJVTlFNalUyVWpGZlUwbEhUaWt3V1RBVEJnY3Foa2pPUFFJQkJnZ3Foa2pPUFFNQkJ3TkNBQVJoNmsvR0V5Z2FrS082dDhZTXA1TUFzSmxETks4aHIxYU1sK21yRDllT0Q2bnFHQmRnSllJbUFGSllZeGxZQnY5K2VRTWpKVU90S1E2QU04bHRyZUlvbzBVd1F6QVNCZ05WSFJNQkFmOEVDREFHQVFIL0FnRUJNQjBHQTFVZERnUVdCQlNtdmUxdHlodjJrYmpjVmFjd2pqL3lNTHF5VERBT0JnTlZIUThCQWY4RUJBTUNBb1F3RFFZSktvWklodmNOQVFFTEJRQURnZ0VCQUliaGtrdCtjL1cwaWM5cDZkYlhqL28rS05WRkZsUWk1cHlGN1pBM1ZkRWNxTUdFa1NtY2l4NGVlakM2SG81bGVmOUxENkYrenlJNUZMb2FRVElKRVhvTkV1Qi82NlFTajkyTkVBNkJ4VFh2MHhGblpDTHNIdzV2ajVWOWdRbFRlbnR1SzZhSzEzZE5uSTd3M1R2MURFLzVweWl0Sm1tMlZoL2ZUWHI4ZWlEbUlFZnlIZEN4bWYzcURoNTdsZzB6QURrNDYwTm1LelBGVXRBb052b2N3MDBzeUhIMGdhZ2I5eEpqU3RIc3o3NFJNKzhrekZ2NDFjQU5tbW1zQ0hIUFN5d0pDWHVuTFVvMnpMb2UzbEQ2cHN6dVVZdTBEWkhWaDc1b0VVeE9SenUvOUpycVhGdlhrNW1PNHJGQmViOWpERks1VGQ4d1R3dmtybVBwK2x0NGowOD0iLCJNSUlEdHpDQ0FwK2dBd0lCQWdJSXI1cWhYM2xsOFVRd0RRWUpLb1pJaHZjTkFRRUxCUUF3ZURFTE1Ba0dBMVVFQmhNQ1NVNHhDekFKQmdOVkJBZ01Ba3RCTVJJd0VBWURWUVFIREFsQ1FVNUhRVXhQVWtVeERqQU1CZ05WQkFvTUJVbEpTVlJDTVJjd0ZRWURWUVFMREE1RldFRk5VRXhGTFVORlRsUkZVakVmTUIwR0ExVUVBd3dXZDNkM0xtVjRZVzF3YkdVdVkyOXRJQ2hTVDA5VUtUQWVGdzB5TmpBNU1qY3hNekUzTVROYUZ3MHpOREE1TWpVeE16RTNNVE5hTUhneEN6QUpCZ05WQkFZVEFrbE9NUXN3Q1FZRFZRUUlEQUpMUVRFU01CQUdBMVVFQnd3SlFrRk9SMEZNVDFKRk1RNHdEQVlEVlFRS0RBVkpTVWxVUWpFWE1CVUdBMVVFQ3d3T1JWaEJUVkJNUlMxRFJVNVVSVkl4SHpBZEJnTlZCQU1NRm5kM2R5NWxlR0Z0Y0d4bExtTnZiU0FvVWs5UFZDa3dnZ0VpTUEwR0NTcUdTSWIzRFFFQkFRVUFBNElCRHdBd2dnRUtBb0lCQVFDenFKbnlwMTlsb2J6cVppVTFRNWMrSzZNVHBPbVlHZGtLbkhKTmNtSUFUSmFudEVOQW9BSk9hV2pVTU00YVZsUlJCZm54azY5QTZlaWp0NlM3TkxUUDc1K0xUK3ROVXhPZVl4RVRQLzRvcVdleHh6RzE4Zk5qeWZDNXFBM3ZWNXNha2xHek1GcEZFTWtmTXZydVEySUNMN1R6R3BSUld2MWNyS0dNak9SZWVCRzI1TGJ5eWh6blVoaGI1TktSd0hXYW9KckVtRm5memh2M3FCaC9LeGxWc3VNNVlYSWxXZmFXUEx6WW1CN0gyVTFsK0dOVzFWbTZHYm1vcGZHaTQwS1JTQ1NIa2dJNkg1ZlZxSGFpYmw4RjhmQ0ZyV25QQ1lYN3FKaHplSEZFem9idVNhL0Z0WG9MSkI3ZE9McTM3QlRpbjE1M1NLTi9hRlZxNzI3MWRwYW5BZ01CQUFHalJUQkRNQklHQTFVZEV3RUIvd1FJTUFZQkFmOENBUUl3SFFZRFZSME9CQllFRko4V2lEaHdFN3lyUVpMdStscFh3b0JmSWx5ck1BNEdBMVVkRHdFQi93UUVBd0lDaERBTkJna3Foa2lHOXcwQkFRc0ZBQU9DQVFFQUNKSWFUWDFvc093d1JDR21LQnVFbllmTVFCY05VNkRQMlB0dWViaHM0dUYvUlNRZ3FWYWZ2d3FlNTl3TVE4UlZRcE5mQUJlbnV5b080emc4VWZKU1crWDgvS2NpWTVhLys3UUtBeDAzeVFlTlIwc3B0RXNDa2FqR0JoVUJIN0Y3SnFTYW1aSS9iZGFxaGJhY2gxSG9YSEloY251cDRueUNSN3RQNk15OFdaNjhKcC9VQk9jM0oyNVd2WmdzY0labVNVT3FkbmZ2SHRUVzhlT01xQzA4RS9iU3FaNjNpTzk1ZjhpR0RCV3g1NUZGZEpVZ1IvR3ZqQ2Rib1Q5Z0IzYWpXbjcwK284Sk1VQ09ZUUQvK0lRdGFYaWVwTm83ajZiczRZQUNseXowUU9ObnBldTluWktuaWlNcEd6YUIybmIyL0tZT3FDK2FlMVF0VkNraDNyTEFvdz09Il0sImtpZCI6InNTT1BlQVJhMTFJWWl4Sk5KdFhUWkV6Qkp5QnRDazFsRUt5bHYzeFc1cWMiLCJ0eXAiOiJkYytzZC1qd3QiLCJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwOTAiLCJfc2QiOlsiRUs2MUZkbU1lSWl6V243RE5MRFI3dHljN0VENzg0bmFTRTB6dm94VzNsOCIsIkszODVldk1mZ0JxSExMQUZoMHpnUE1kMzFDY2NSSDMyUTdYdzBoeEV5TDgiLCJnaDEtTGhfMFRTcGdsUHVyYlloclhxaDV0dHFLdHhDYlNmazNZaWdUUVpjIiwidDZVSWJQT19Ld0V1bzNHVTlhSjJuUm1tZmNrR2VLdUp4WU5ZSl9PenZkMCJdLCJjbmYiOnsia2lkIjoiZGlkOmp3azpleUpyZEhraU9pSkZReUlzSW5naU9pSmlhSE14U1dsbFMwdG9kRWx5T0ZkUlNqSnNjMWxsU0daaE0yVjBOa0UyVmpCNlYzQkJUVVk1WkZwdklpd2llU0k2SW5Kc2JGZEZaVWhVV21KWGVqZFRTMHRRYkc1YU4wRk1kbUZGVUc1U1VIUkJVVTlVYURaRWR5MU5hRGdpTENKamNuWWlPaUpRTFRJMU5pSjkjMCJ9LCJpZCI6Imh0dHBzOi8vbW9zaXAuaW8vY3JlZGVudGlhbC83MTViYTcyOS01ZTliLTQ1NWEtYWRkYi0yNThhNzgzZWY2MjgiLCJ2Y3QiOiJQbGF5Z3JvdW5kU2RKd3QifQ.Dzzm69Qq_JYafgpu0c1v9l0iQnmvMXVvYeR_9sB1LR1hdAl2gO2D6JcznWOIANkx17I2IhyoijshqBJY6zHNKQ%7EWyJhVlJTV01iSGZhN2o5ZEV4Z1ViLXdRIiwiZnVsbE5hbWUiLCJBc2hhIFJhbyJd%7EeyJhbGciOiJFUzI1NiIsInR5cCI6ImtiK2p3dCJ9.eyJpYXQiOjE3OTA1MjA5MTEsImF1ZCI6InNvbWVvbmUtZWxzZSIsIm5vbmNlIjoieEVWNVBYRTZucUxIcmN2WGZZOEw1LUl6aWh0WUI3Q28iLCJzZF9oYXNoIjoiWjhnQk9fQzI0MDNVcTJoZ0NRcUlCNmZsenY4V1JEYlUtVE5jeUw3TlJlOCJ9.vnW529j2xWvjAPAEExPWq14N0L5xhSQdTGRXrYkTn43JBReuGVNE8FcyXaqkf8R9Xsh3v5Ucc6gIaCtyOFP7ng%22%5D%7D&state=req_41bdbef0-4e5e-4501-af8a-10d3bcc80087",
+    "status": 400,
+    "ms": 12,
+    "resHeaders": {
+      "connection": "close",
+      "content-type": "application/json",
+      "date": "Sun, 27 Sep 2026 14:55:12 GMT",
+      "transfer-encoding": "chunked"
+    },
+    "resBody": {
+      "errorCode": "invalid_request",
+      "errorMessage": "Client id validation failed due to invalid client_id/domain."
+    }
+  },
+  {
+    "method": "POST",
+    "url": "http://localhost:8080/v2/vp-results/txn_06f5918c-0090-4ff1-9d39-9ae068cdb347",
+    "reqHeaders": {
+      "Content-Type": "application/json"
+    },
+    "reqBody": "{}",
+    "status": 404,
+    "ms": 13,
+    "resHeaders": {
+      "connection": "keep-alive",
+      "content-type": "application/json",
+      "date": "Sun, 27 Sep 2026 14:55:12 GMT",
+      "keep-alive": "timeout=60",
+      "transfer-encoding": "chunked"
+    },
+    "resBody": {
+      "errorCode": "NO_VP_SUBMISSION",
+      "errorMessage": "No VP submission found for given transaction ID."
+    }
+  }
+]

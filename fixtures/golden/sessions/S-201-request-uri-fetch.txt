@@ -1,0 +1,23 @@
+{"client_id":"Verifier","request_uri":"https://172.16.134.37:18444/wallet/request.jwt/c-2AjzZONzAlPN3IpwfILpUcntAF5zr8cIu4ZmZF_9V6VY4oQwdlBsrDi61YbVxL0dUiZbjMmOek09ZfXIqBAA","request_uri_method":"get"}
+-- GET request_uri (1st)
+HTTP/1.1 200 OK
+Server: nginx/1.30.5
+Date: Tue, 06 Oct 2026 03:54:26 GMT
+Content-Type: application/oauth-authz-req+jwt
+Content-Length: 8283
+Connection: keep-alive
+Vary: Origin
+Vary: Access-Control-Request-Method
+header {"kid":"access_certificate","typ":"oauth-authz-req+jwt","alg":"ES512"}
+payload keys response_uri,aud,response_type,state,dcql_query,verifier_info,iat,nonce,client_id,client_metadata,response_mode
+{"client_id":"Verifier","response_type":"vp_token","response_mode":"direct_post","state":"c-2AjzZONzAlPN3IpwfILpUcntAF5zr8cIu4ZmZF_9V6VY4oQwdlBsrDi61YbVxL0dUiZbjMmOek09ZfXIqBAA","aud":"https://self-issued.me/v2","client_metadata":["vp_formats_supported"]}
+-- GET request_uri (2nd, same id)
+400
+-- POST request_uri (request_uri_method=post)
+400
+-- by_value for comparison: request key present?
+["client_id","request","transaction_id"]
+-- deny: public-keys.json through front
+200
+get
+Verifier

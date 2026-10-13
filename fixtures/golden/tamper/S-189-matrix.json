@@ -1,0 +1,1041 @@
+{
+ "res": [
+  {
+   "id": "C0",
+   "mutation": "baseline (no mutation)",
+   "status": 200,
+   "body": "{credential issued}"
+  },
+  {
+   "id": "C3b",
+   "mutation": "same proof (same nonce c_nonce, same access token) replayed",
+   "status": 200,
+   "body": "{credential issued}"
+  },
+  {
+   "id": "C6c",
+   "mutation": "access token reused with fresh nonce+proof (2nd credential)",
+   "status": 200,
+   "body": "{credential issued}"
+  },
+  {
+   "id": "C3b2",
+   "mutation": "consumed nonce reused in a NEW (re-signed) proof",
+   "status": 200,
+   "body": "{credential issued}"
+  },
+  {
+   "id": "C1a",
+   "mutation": "header alg=ES384 on an ES256 P1363 signature",
+   "status": 400,
+   "body": {
+    "error": "invalid_proof",
+    "error_description": "None of the submitted proofs passed validation."
+   }
+  },
+  {
+   "id": "C1b",
+   "mutation": "header alg=EdDSA on an ES256 P1363 signature",
+   "status": 500,
+   "body": {
+    "error": "unknown_error",
+    "error_description": "class com.nimbusds.jose.jwk.ECKey cannot be cast to class com.nimbusds.jose.jwk.OctetKeyPair (com.nimbusds.jose.jwk.ECKey and com.nimbusds.jose.jwk.OctetKeyPair are in unnamed module of loader org.springframework.boot.loader.launch.LaunchedClassLoader @433c675d)"
+   }
+  },
+  {
+   "id": "C1c",
+   "mutation": "header alg=HS256 on an ES256 P1363 signature",
+   "status": 400,
+   "body": {
+    "error": "invalid_proof",
+    "error_description": "None of the submitted proofs passed validation."
+   }
+  },
+  {
+   "id": "C1d",
+   "mutation": "header alg=none on an ES256 P1363 signature",
+   "status": 400,
+   "body": {
+    "error": "invalid_proof",
+    "error_description": "Error encountered during proof jwt parsing."
+   }
+  },
+  {
+   "id": "C2a",
+   "mutation": "payload aud=https://evil.example",
+   "status": 400,
+   "body": {
+    "error": "invalid_proof",
+    "error_description": "None of the submitted proofs passed validation."
+   }
+  },
+  {
+   "id": "C2b",
+   "mutation": "payload aud=https://172.16.134.37/",
+   "status": 400,
+   "body": {
+    "error": "invalid_proof",
+    "error_description": "None of the submitted proofs passed validation."
+   }
+  },
+  {
+   "id": "C2c",
+   "mutation": "payload aud omitted",
+   "status": 400,
+   "body": {
+    "error": "invalid_proof",
+    "error_description": "None of the submitted proofs passed validation."
+   }
+  },
+  {
+   "id": "C3a",
+   "mutation": "nonce = random UUID never issued",
+   "status": 400,
+   "body": {
+    "error": "invalid_nonce",
+    "error_description": "c_nonce is invalid or expired"
+   }
+  },
+  {
+   "id": "C3c",
+   "mutation": "nonce omitted from payload",
+   "status": 400,
+   "body": {
+    "error": "invalid_proof",
+    "error_description": "nonce claim is missing, but issuer support nonce"
+   }
+  },
+  {
+   "id": "C4",
+   "mutation": "DER (ASN.1) ECDSA signature instead of P1363",
+   "status": 400,
+   "body": {
+    "error": "invalid_proof",
+    "error_description": "None of the submitted proofs passed validation."
+   }
+  },
+  {
+   "id": "C5a",
+   "mutation": "payload iat+1 after signing",
+   "status": 400,
+   "body": {
+    "error": "invalid_proof",
+    "error_description": "None of the submitted proofs passed validation."
+   }
+  },
+  {
+   "id": "C5b",
+   "mutation": "header kid -> other did:jwk (key swap) after signing",
+   "status": 400,
+   "body": {
+    "error": "invalid_proof",
+    "error_description": "None of the submitted proofs passed validation."
+   }
+  },
+  {
+   "id": "C5c",
+   "mutation": "one bit flipped in signature",
+   "status": 400,
+   "body": {
+    "error": "invalid_proof",
+    "error_description": "None of the submitted proofs passed validation."
+   }
+  },
+  {
+   "id": "C6a",
+   "mutation": "pre-auth code, 1st redemption",
+   "status": 200,
+   "body": {
+    "access_token": "eyJraWQiOiJBOUd4Tno3VUlhLXdsXzFTZ0hCM1hVOWFNUlIwQlNnbi1KakFXR3BXNTE4IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJ7XCJmdWxsTmFtZVwiOlwiQXNoYSBUZXN0XCIsXCJkYXRlT2ZCaXJ0aFwiOlwiMTk5MC0wMS0wMVwiLFwiZ2VuZGVyXCI6XCJGZW1hbGVcIixcImVtYWlsXCI6XCJhc2hhQGV4YW1wbGUub3JnXCJ9IiwiYXVkIjoiaHR0cHM6Ly8xNzIuMTYuMTM0LjM3L3YxL2NlcnRpZnkvaXNzdWFuY2UvY3JlZGVudGlhbCIsInNjb3BlIjoicGxheWdyb3VuZF9zZGp3dCIsImlzcyI6Imh0dHBzOi8vMTcyLjE2LjEzNC4zNyIsImV4cCI6MTc5MTIxNDgyOSwiaWF0IjoxNzkxMjE0MjI5LCJjbGllbnRfaWQiOiIifQ.NpQe30FDwgkAdFNpCdA8zK3ZdDjHDf0J3vtid79DjqCSE0_a6yZbzBZUSgEpzDKzGSphEq4siHLgX6XPtB9d_-bhO2xf7c7fTiPru8sM4wYm3CDnBZAMrZNqnFH5f-xsMgnFrZ4W3UB3Nm_geFt2MkxVCo4nF5XVFuJArBhPJC9PSfreDC14X8vH3-PCbFGWQ6MNAHNsvm1F1V0X-qrX1l8NK_DzRhTGEnmiGoPzR6RUlYIINB4ZnudfnPRmIKqmIOty-nYzSFtJjvF38KHeIiGk0vgWGeq6M2jbn9dbmVnmAfeySWwub_fkrRv6vFrZqN4FIi-4XoIDc4tnXgrAQg",
+    "token_type": "Bearer",
+    "expires_in": 600
+   }
+  },
+  {
+   "id": "C6b",
+   "mutation": "pre-auth code replayed (2nd redemption)",
+   "status": 400,
+   "body": {
+    "error": "invalid_grant",
+    "error_description": "Pre-authorized code has already been used  or invalid"
+   }
+  },
+  {
+   "id": "C6b2",
+   "mutation": "first access token still usable after code replay?",
+   "status": 200,
+   "body": "{credential issued}"
+  },
+  {
+   "id": "T1",
+   "mutation": "token: unknown pre-authorized_code",
+   "status": 400,
+   "body": {
+    "error": "invalid_grant",
+    "error_description": "Pre-authorized code has already been used  or invalid"
+   }
+  },
+  {
+   "id": "T2",
+   "mutation": "token: wrong grant_type",
+   "status": 400,
+   "body": {
+    "error": "invalid_request",
+    "error_description": "code is required"
+   }
+  },
+  {
+   "id": "T2b",
+   "mutation": "token: code redeemable after failed grant_type?",
+   "status": 200,
+   "body": {
+    "access_token": "eyJraWQiOiJBOUd4Tno3VUlhLXdsXzFTZ0hCM1hVOWFNUlIwQlNnbi1KakFXR3BXNTE4IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJ7XCJmdWxsTmFtZVwiOlwiQXNoYSBUZXN0XCIsXCJkYXRlT2ZCaXJ0aFwiOlwiMTk5MC0wMS0wMVwiLFwiZ2VuZGVyXCI6XCJGZW1hbGVcIixcImVtYWlsXCI6XCJhc2hhQGV4YW1wbGUub3JnXCJ9IiwiYXVkIjoiaHR0cHM6Ly8xNzIuMTYuMTM0LjM3L3YxL2NlcnRpZnkvaXNzdWFuY2UvY3JlZGVudGlhbCIsInNjb3BlIjoicGxheWdyb3VuZF9zZGp3dCIsImlzcyI6Imh0dHBzOi8vMTcyLjE2LjEzNC4zNyIsImV4cCI6MTc5MTIxNDgyOSwiaWF0IjoxNzkxMjE0MjI5LCJjbGllbnRfaWQiOiIifQ.NpQe30FDwgkAdFNpCdA8zK3ZdDjHDf0J3vtid79DjqCSE0_a6yZbzBZUSgEpzDKzGSphEq4siHLgX6XPtB9d_-bhO2xf7c7fTiPru8sM4wYm3CDnBZAMrZNqnFH5f-xsMgnFrZ4W3UB3Nm_geFt2MkxVCo4nF5XVFuJArBhPJC9PSfreDC14X8vH3-PCbFGWQ6MNAHNsvm1F1V0X-qrX1l8NK_DzRhTGEnmiGoPzR6RUlYIINB4ZnudfnPRmIKqmIOty-nYzSFtJjvF38KHeIiGk0vgWGeq6M2jbn9dbmVnmAfeySWwub_fkrRv6vFrZqN4FIi-4XoIDc4tnXgrAQg",
+    "token_type": "Bearer",
+    "expires_in": 600
+   }
+  },
+  {
+   "id": "T3",
+   "mutation": "token: pre-authorized_code missing",
+   "status": 500,
+   "body": {
+    "error": "server_error",
+    "error_description": "Internal server error"
+   }
+  },
+  {
+   "id": "T4",
+   "mutation": "credential: no/invalid bearer",
+   "status": 401,
+   "body": ""
+  }
+ ],
+ "raw": [
+  {
+   "label": "mint",
+   "status": 200,
+   "body": {
+    "credential_offer_uri": "openid-credential-offer://?credential_offer_uri=https%3A%2F%2F172.16.134.37%2Fv1%2Fcertify%2Fcredential-offer-data%2Fe28491fe-31f8-4d7e-905f-d29f713f43d2"
+   }
+  },
+  {
+   "label": "offer",
+   "status": 200,
+   "body": {
+    "credential_issuer": "https://172.16.134.37",
+    "credential_configuration_ids": [
+     "PlaygroundSdJwt"
+    ],
+    "grants": {
+     "urn:ietf:params:oauth:grant-type:pre-authorized_code": {
+      "pre-authorized_code": "sw0yFsQvLNraE91YPPv4eAkipmqeM8Nd"
+     }
+    }
+   }
+  },
+  {
+   "label": "token",
+   "status": 200,
+   "body": {
+    "access_token": "eyJraWQiOiJBOUd4Tno3VUlhLXdsXzFTZ0hCM1hVOWFNUlIwQlNnbi1KakFXR3BXNTE4IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJ7XCJmdWxsTmFtZVwiOlwiQXNoYSBUZXN0XCIsXCJkYXRlT2ZCaXJ0aFwiOlwiMTk5MC0wMS0wMVwiLFwiZ2VuZGVyXCI6XCJGZW1hbGVcIixcImVtYWlsXCI6XCJhc2hhQGV4YW1wbGUub3JnXCJ9IiwiYXVkIjoiaHR0cHM6Ly8xNzIuMTYuMTM0LjM3L3YxL2NlcnRpZnkvaXNzdWFuY2UvY3JlZGVudGlhbCIsInNjb3BlIjoicGxheWdyb3VuZF9zZGp3dCIsImlzcyI6Imh0dHBzOi8vMTcyLjE2LjEzNC4zNyIsImV4cCI6MTc5MTIxNDgyOCwiaWF0IjoxNzkxMjE0MjI4LCJjbGllbnRfaWQiOiIifQ.SLMJm4IKn7FZGnew_uxNjXcGKJizpLcRJnWLrCniBYltCb2rmEL4pYCig7soy9ggptUtf6SN2jD_qcCErr57cbo8u2Em9PUiIrqH4_4Dm59_AhQYMepHs3VDylfTFhEU0JlyPh1v0FCR7Amm6YnysthCe-YuLrUURKloHrWAuYDZwGlUOLWJPjUFLPOSvs_aKn0phXrn4CkPwH67GOo2OcpCNWTr7ZtpJjSjhU8YDIKCa44ivsk2gGTvG5QUQhR8sRWEUTgqt_TEfVQW1rUJO1t5v9SWkC2a5kwwX-0W5io4ptKrhzAHHnyCcHijyFqooAlK0bGEtDZRqKKgW4xhkQ",
+    "token_type": "Bearer",
+    "expires_in": 600
+   }
+  },
+  {
+   "label": "nonce",
+   "status": 200,
+   "body": {
+    "c_nonce": "c2b018e8-2bca-4eb3-9fc9-833246ea0d0a"
+   }
+  },
+  {
+   "label": "credential",
+   "status": 200,
+   "body": {
+    "credentials": [
+     {
+      "credential": "eyJ4NXQjUzI1NiI6IkZIdmdKZGY0QXdxaExPdHhjVlBEX0txYmVQMXE3VkZFODNUY3FBOFNtN0UiLCJ4NWMiOlsiTUlJREVEQ0NBZmlnQXdJQkFnSUk4NVg5QnE2UEhGQXdEUVlKS29aSWh2Y05BUUVMQlFBd2VERUxNQWtHQTFVRUJoTUNTVTR4Q3pBSkJnTlZCQWdNQWt0Qk1SSXdFQVlEVlFRSERBbENRVTVIUVV4UFVrVXhEakFNQmdOVkJBb01CVWxKU1ZSQ01SY3dGUVlEVlFRTERBNUZXRUZOVUV4RkxVTkZUbFJGVWpFZk1CMEdBMVVFQXd3V2QzZDNMbVY0WVcxd2JHVXVZMjl0SUNoU1QwOVVLVEFlRncweU5qRXdNRFV4TlRJNU5UQmFGdzB5T1RFd01EUXhOVEk1TlRCYU1JR2JNUXN3Q1FZRFZRUUdFd0pKVGpFTE1Ba0dBMVVFQ0F3Q1MwRXhFakFRQmdOVkJBY01DVUpCVGtkQlRFOVNSVEVPTUF3R0ExVUVDZ3dGU1VsSlZFSXhGekFWQmdOVkJBc01Ea1ZZUVUxUVRFVXRRMFZPVkVWU01VSXdRQVlEVlFRREREbDNkM2N1WlhoaGJYQnNaUzVqYjIwZ0tFTkZVbFJKUmxsZlZrTmZVMGxIVGw5RlExOVNNUzFGUTE5VFJVTlFNalUyVWpGZlUwbEhUaWt3V1RBVEJnY3Foa2pPUFFJQkJnZ3Foa2pPUFFNQkJ3TkNBQVRRQTM5OWZ6SVFsNkJxd1o4bXRHTXNlOElzcVRBMTJKWFNiN0FrQ243WG9xeEViK2VsS0hYVXFkMVAzc2Q3SXZxMmRKb0VwZXJxc1F5MEp1SkVEd0o3bzBVd1F6QVNCZ05WSFJNQkFmOEVDREFHQVFIL0FnRUJNQjBHQTFVZERnUVdCQlJDSmJJZ0l6NG1nUlpSR1QxVU53M0ZEdGVQTWpBT0JnTlZIUThCQWY4RUJBTUNBb1F3RFFZSktvWklodmNOQVFFTEJRQURnZ0VCQUZRWHF0YTRJTnJ3Q0dMZDFqL2YwTy85R2tzbVk3YmpMbWI3a3dhM3IwVlBYZTNuVUZ2QVNDN2pIZ3haVXVYVnhuQ25QRldWMVNDbHZBaGZtYzEzYWFrbFd3SXExaWZsZ25hM0VMam9UUzhGeDQ0MitZNUxCUWtsa0hlWXdwNk1PVnBqSlMvZ3NpWHZ0QjNvKzNZL0Q5Q1NDR3F2cmpBbFFBMEZXaVBkR3oyT0twTGhyMVROb0lleWlXbnFwQXFCMU9QdHdUWmdoMFh1cnBFc2J3dlNvN3h2cGZFZk90S2FjSHVxbnpqbk9GYnNyQjhyWlppVU9Jamg3dGs3OHdvZ2I3RFp3NjZxUmVnbTZXT0NITmp5ZkFEekRqYy9ZbjVXTXl1ZGlvSnBXNjhjYjhkdFNHQkljM3BUNkVqbld2MlJwSnZlNDJxZGNpSms2OTdFL3cvVGE5OD0iLCJNSUlEdHpDQ0FwK2dBd0lCQWdJSU1MZGYrc0szemhrd0RRWUpLb1pJaHZjTkFRRUxCUUF3ZURFTE1Ba0dBMVVFQmhNQ1NVNHhDekFKQmdOVkJBZ01Ba3RCTVJJd0VBWURWUVFIREFsQ1FVNUhRVXhQVWtVeERqQU1CZ05WQkFvTUJVbEpTVlJDTVJjd0ZRWURWUVFMREE1RldFRk5VRXhGTFVORlRsUkZVakVmTUIwR0ExVUVBd3dXZDNkM0xtVjRZVzF3YkdVdVkyOXRJQ2hTVDA5VUtUQWVGdzB5TmpFd01EVXhOVEk1TkRsYUZ3MHpOREV3TURNeE5USTVORGxhTUhneEN6QUpCZ05WQkFZVEFrbE9NUXN3Q1FZRFZRUUlEQUpMUVRFU01CQUdBMVVFQnd3SlFrRk9SMEZNVDFKRk1RNHdEQVlEVlFRS0RBVkpTVWxVUWpFWE1CVUdBMVVFQ3d3T1JWaEJUVkJNUlMxRFJVNVVSVkl4SHpBZEJnTlZCQU1NRm5kM2R5NWxlR0Z0Y0d4bExtTnZiU0FvVWs5UFZDa3dnZ0VpTUEwR0NTcUdTSWIzRFFFQkFRVUFBNElCRHdBd2dnRUtBb0lCQVFDZ3NGWkFGWGcwWGc3NDI5QUtQVTEvMFhuYytZQTh5eTRMU3ljRzBJT0o4dzJEYUlpL0VtRnByMHFSMzhXWXB0cHVpWTZUM0ZlRUV5TGczR1lSSEtaaWhxVHczaHRvQXR4bHp1NnRZMmNvNFNLSXB2eWRNYzZIL2lqdmRSK1V3bXFjOE82b3U1cXdmT29FNUVZM1pTdnQySnhWOC9rU0MrK0Fkajhlc0V6aUx2T3o5V3JLakRyRmx3Q1dSbUJ1bjhjcGFMSVZsbHcrWktUYUMzeXR3Z00yTGUrK0ZlWUJqNU13OS9uTVdSQ1lZYzBQQzdMWHpvaVNZa0cxcjhYcDBpUG9weHBFRmRVLzBTUkxpcHEyZnJOZm1ZWWFSWFhSdlBuVzlCVDZSblVWS1FvM2pVQUMxS05lbC9nVnRvRWM5bWJlMzRNUGxnMVBWaXpkcTFER0ltUjFBZ01CQUFHalJUQkRNQklHQTFVZEV3RUIvd1FJTUFZQkFmOENBUUl3SFFZRFZSME9CQllFRktyeGZDZFJCZTAvZGY3M1Q4TWtsTy9talhwdk1BNEdBMVVkRHdFQi93UUVBd0lDaERBTkJna3Foa2lHOXcwQkFRc0ZBQU9DQVFFQURVV1VyTllISHNOellrdWQ5dDRDZWExNDNDYTdmUmFVbHhTczdVOGZSYVVOMHRyVXZvMEhMK3BuTDNZanEzSHVPM08vRXdKenR4ek5yY0d3cW1RR3UzRVdacjdyUVRXakdnU056YW5iK0FKSktSSmk0azk5aVFISDVTRmNXMlFsMEkrTjdnbm8veVgvZGljdm43aEFKTUpmSFRoMkU1MWtSbzR4TzdWOUYvemkxNzh3dHZXSW8zOU93MmlaczZkc3orNFpFR2NDVzBsN2gwQTNKSHJzekUxZzhXM084VkYwZDA0L2xWRm9sUXZEdlYxeGFnelBqVElrMHRHc094dHpvc2ZXRkJRYVpiN29Ub0t1MnF4L0R4VzJHQUQ2cHZtTnRVeUFqYkJyYWtHM2ZLZHEyVkJNZm96VUJyQkVJY1g2Z2F2R3lLcSt2djJ2bGltWU1ncHpCdz09Il0sImtpZCI6ImQ2V3hWVU9mY2hUQWJvSmg5cDI3NnU1Rkp4bDFIazI4REtkNS1TNDI2bzQiLCJ0eXAiOiJkYytzZC1qd3QiLCJhbGciOiJFUzI1NiJ9.eyJnZW5kZXIiOiJGZW1hbGUiLCJ2Y3QiOiJQbGF5Z3JvdW5kU2RKd3QiLCJpc3MiOiJodHRwczovLzE3Mi4xNi4xMzQuMzciLCJmdWxsTmFtZSI6IkFzaGEgVGVzdCIsImRhdGVPZkJpcnRoIjoiMTk5MC0wMS0wMSIsImNuZiI6eyJraWQiOiJkaWQ6andrOmV5SnJkSGtpT2lKRlF5SXNJbmdpT2lKQk1XTkdaMmhZTkY5a2FVbFpPWEZuWjNCV2RWUm5aMGRTVnpaNFNtdFVOakExYzA1S1NYQm9lRlYzSWl3aWVTSTZJa2xIUlVKaVh6bDJSbTkzVUhodGIwTmxlalo1U21Gb1VubEhiblp1UkVOVlJXbE5WSGQzWlcxSkxVa2lMQ0pqY25ZaU9pSlFMVEkxTmlKOSMwIn0sImlkIjoiaHR0cHM6Ly9tb3NpcC5pby9jcmVkZW50aWFsL2YyOThkYWE5LTQzMmYtNGQ1OC04Y2VjLWJmMjhiZWUzZTMxMCIsImVtYWlsIjoiYXNoYUBleGFtcGxlLm9yZyJ9.GCAnEquCQtuZLdoz3QKuAKXd3sRhz20cxuXDoSyKV47n5pnPaxHRnweotjdJL78iZtwPRmgmfOQmF_dc8rKfGw~"
+     }
+    ]
+   }
+  },
+  {
+   "label": "credential",
+   "status": 200,
+   "body": {
+    "credentials": [
+     {
+      "credential": "eyJ4NXQjUzI1NiI6IkZIdmdKZGY0QXdxaExPdHhjVlBEX0txYmVQMXE3VkZFODNUY3FBOFNtN0UiLCJ4NWMiOlsiTUlJREVEQ0NBZmlnQXdJQkFnSUk4NVg5QnE2UEhGQXdEUVlKS29aSWh2Y05BUUVMQlFBd2VERUxNQWtHQTFVRUJoTUNTVTR4Q3pBSkJnTlZCQWdNQWt0Qk1SSXdFQVlEVlFRSERBbENRVTVIUVV4UFVrVXhEakFNQmdOVkJBb01CVWxKU1ZSQ01SY3dGUVlEVlFRTERBNUZXRUZOVUV4RkxVTkZUbFJGVWpFZk1CMEdBMVVFQXd3V2QzZDNMbVY0WVcxd2JHVXVZMjl0SUNoU1QwOVVLVEFlRncweU5qRXdNRFV4TlRJNU5UQmFGdzB5T1RFd01EUXhOVEk1TlRCYU1JR2JNUXN3Q1FZRFZRUUdFd0pKVGpFTE1Ba0dBMVVFQ0F3Q1MwRXhFakFRQmdOVkJBY01DVUpCVGtkQlRFOVNSVEVPTUF3R0ExVUVDZ3dGU1VsSlZFSXhGekFWQmdOVkJBc01Ea1ZZUVUxUVRFVXRRMFZPVkVWU01VSXdRQVlEVlFRREREbDNkM2N1WlhoaGJYQnNaUzVqYjIwZ0tFTkZVbFJKUmxsZlZrTmZVMGxIVGw5RlExOVNNUzFGUTE5VFJVTlFNalUyVWpGZlUwbEhUaWt3V1RBVEJnY3Foa2pPUFFJQkJnZ3Foa2pPUFFNQkJ3TkNBQVRRQTM5OWZ6SVFsNkJxd1o4bXRHTXNlOElzcVRBMTJKWFNiN0FrQ243WG9xeEViK2VsS0hYVXFkMVAzc2Q3SXZxMmRKb0VwZXJxc1F5MEp1SkVEd0o3bzBVd1F6QVNCZ05WSFJNQkFmOEVDREFHQVFIL0FnRUJNQjBHQTFVZERnUVdCQlJDSmJJZ0l6NG1nUlpSR1QxVU53M0ZEdGVQTWpBT0JnTlZIUThCQWY4RUJBTUNBb1F3RFFZSktvWklodmNOQVFFTEJRQURnZ0VCQUZRWHF0YTRJTnJ3Q0dMZDFqL2YwTy85R2tzbVk3YmpMbWI3a3dhM3IwVlBYZTNuVUZ2QVNDN2pIZ3haVXVYVnhuQ25QRldWMVNDbHZBaGZtYzEzYWFrbFd3SXExaWZsZ25hM0VMam9UUzhGeDQ0MitZNUxCUWtsa0hlWXdwNk1PVnBqSlMvZ3NpWHZ0QjNvKzNZL0Q5Q1NDR3F2cmpBbFFBMEZXaVBkR3oyT0twTGhyMVROb0lleWlXbnFwQXFCMU9QdHdUWmdoMFh1cnBFc2J3dlNvN3h2cGZFZk90S2FjSHVxbnpqbk9GYnNyQjhyWlppVU9Jamg3dGs3OHdvZ2I3RFp3NjZxUmVnbTZXT0NITmp5ZkFEekRqYy9ZbjVXTXl1ZGlvSnBXNjhjYjhkdFNHQkljM3BUNkVqbld2MlJwSnZlNDJxZGNpSms2OTdFL3cvVGE5OD0iLCJNSUlEdHpDQ0FwK2dBd0lCQWdJSU1MZGYrc0szemhrd0RRWUpLb1pJaHZjTkFRRUxCUUF3ZURFTE1Ba0dBMVVFQmhNQ1NVNHhDekFKQmdOVkJBZ01Ba3RCTVJJd0VBWURWUVFIREFsQ1FVNUhRVXhQVWtVeERqQU1CZ05WQkFvTUJVbEpTVlJDTVJjd0ZRWURWUVFMREE1RldFRk5VRXhGTFVORlRsUkZVakVmTUIwR0ExVUVBd3dXZDNkM0xtVjRZVzF3YkdVdVkyOXRJQ2hTVDA5VUtUQWVGdzB5TmpFd01EVXhOVEk1TkRsYUZ3MHpOREV3TURNeE5USTVORGxhTUhneEN6QUpCZ05WQkFZVEFrbE9NUXN3Q1FZRFZRUUlEQUpMUVRFU01CQUdBMVVFQnd3SlFrRk9SMEZNVDFKRk1RNHdEQVlEVlFRS0RBVkpTVWxVUWpFWE1CVUdBMVVFQ3d3T1JWaEJUVkJNUlMxRFJVNVVSVkl4SHpBZEJnTlZCQU1NRm5kM2R5NWxlR0Z0Y0d4bExtTnZiU0FvVWs5UFZDa3dnZ0VpTUEwR0NTcUdTSWIzRFFFQkFRVUFBNElCRHdBd2dnRUtBb0lCQVFDZ3NGWkFGWGcwWGc3NDI5QUtQVTEvMFhuYytZQTh5eTRMU3ljRzBJT0o4dzJEYUlpL0VtRnByMHFSMzhXWXB0cHVpWTZUM0ZlRUV5TGczR1lSSEtaaWhxVHczaHRvQXR4bHp1NnRZMmNvNFNLSXB2eWRNYzZIL2lqdmRSK1V3bXFjOE82b3U1cXdmT29FNUVZM1pTdnQySnhWOC9rU0MrK0Fkajhlc0V6aUx2T3o5V3JLakRyRmx3Q1dSbUJ1bjhjcGFMSVZsbHcrWktUYUMzeXR3Z00yTGUrK0ZlWUJqNU13OS9uTVdSQ1lZYzBQQzdMWHpvaVNZa0cxcjhYcDBpUG9weHBFRmRVLzBTUkxpcHEyZnJOZm1ZWWFSWFhSdlBuVzlCVDZSblVWS1FvM2pVQUMxS05lbC9nVnRvRWM5bWJlMzRNUGxnMVBWaXpkcTFER0ltUjFBZ01CQUFHalJUQkRNQklHQTFVZEV3RUIvd1FJTUFZQkFmOENBUUl3SFFZRFZSME9CQllFRktyeGZDZFJCZTAvZGY3M1Q4TWtsTy9talhwdk1BNEdBMVVkRHdFQi93UUVBd0lDaERBTkJna3Foa2lHOXcwQkFRc0ZBQU9DQVFFQURVV1VyTllISHNOellrdWQ5dDRDZWExNDNDYTdmUmFVbHhTczdVOGZSYVVOMHRyVXZvMEhMK3BuTDNZanEzSHVPM08vRXdKenR4ek5yY0d3cW1RR3UzRVdacjdyUVRXakdnU056YW5iK0FKSktSSmk0azk5aVFISDVTRmNXMlFsMEkrTjdnbm8veVgvZGljdm43aEFKTUpmSFRoMkU1MWtSbzR4TzdWOUYvemkxNzh3dHZXSW8zOU93MmlaczZkc3orNFpFR2NDVzBsN2gwQTNKSHJzekUxZzhXM084VkYwZDA0L2xWRm9sUXZEdlYxeGFnelBqVElrMHRHc094dHpvc2ZXRkJRYVpiN29Ub0t1MnF4L0R4VzJHQUQ2cHZtTnRVeUFqYkJyYWtHM2ZLZHEyVkJNZm96VUJyQkVJY1g2Z2F2R3lLcSt2djJ2bGltWU1ncHpCdz09Il0sImtpZCI6ImQ2V3hWVU9mY2hUQWJvSmg5cDI3NnU1Rkp4bDFIazI4REtkNS1TNDI2bzQiLCJ0eXAiOiJkYytzZC1qd3QiLCJhbGciOiJFUzI1NiJ9.eyJnZW5kZXIiOiJGZW1hbGUiLCJ2Y3QiOiJQbGF5Z3JvdW5kU2RKd3QiLCJpc3MiOiJodHRwczovLzE3Mi4xNi4xMzQuMzciLCJmdWxsTmFtZSI6IkFzaGEgVGVzdCIsImRhdGVPZkJpcnRoIjoiMTk5MC0wMS0wMSIsImNuZiI6eyJraWQiOiJkaWQ6andrOmV5SnJkSGtpT2lKRlF5SXNJbmdpT2lKQk1XTkdaMmhZTkY5a2FVbFpPWEZuWjNCV2RWUm5aMGRTVnpaNFNtdFVOakExYzA1S1NYQm9lRlYzSWl3aWVTSTZJa2xIUlVKaVh6bDJSbTkzVUhodGIwTmxlalo1U21Gb1VubEhiblp1UkVOVlJXbE5WSGQzWlcxSkxVa2lMQ0pqY25ZaU9pSlFMVEkxTmlKOSMwIn0sImlkIjoiaHR0cHM6Ly9tb3NpcC5pby9jcmVkZW50aWFsL2I5YzZmYmQ3LWM0ODYtNDhlNy05NmI1LTkxN2ZiMmU1NjkzNyIsImVtYWlsIjoiYXNoYUBleGFtcGxlLm9yZyJ9.LvXG-8SMuPmpQO_6niDZme1uZw7GdsusaGWa6IZsAyDooou0nmqEWL38lwvJ48B__wVSSsZv1YWfX3Jg-VOqWg~"
+     }
+    ]
+   }
+  },
+  {
+   "label": "nonce",
+   "status": 200,
+   "body": {
+    "c_nonce": "2f973072-812c-45ce-974f-b2ce61e20bd4"
+   }
+  },
+  {
+   "label": "credential",
+   "status": 200,
+   "body": {
+    "credentials": [
+     {
+      "credential": "eyJ4NXQjUzI1NiI6IkZIdmdKZGY0QXdxaExPdHhjVlBEX0txYmVQMXE3VkZFODNUY3FBOFNtN0UiLCJ4NWMiOlsiTUlJREVEQ0NBZmlnQXdJQkFnSUk4NVg5QnE2UEhGQXdEUVlKS29aSWh2Y05BUUVMQlFBd2VERUxNQWtHQTFVRUJoTUNTVTR4Q3pBSkJnTlZCQWdNQWt0Qk1SSXdFQVlEVlFRSERBbENRVTVIUVV4UFVrVXhEakFNQmdOVkJBb01CVWxKU1ZSQ01SY3dGUVlEVlFRTERBNUZXRUZOVUV4RkxVTkZUbFJGVWpFZk1CMEdBMVVFQXd3V2QzZDNMbVY0WVcxd2JHVXVZMjl0SUNoU1QwOVVLVEFlRncweU5qRXdNRFV4TlRJNU5UQmFGdzB5T1RFd01EUXhOVEk1TlRCYU1JR2JNUXN3Q1FZRFZRUUdFd0pKVGpFTE1Ba0dBMVVFQ0F3Q1MwRXhFakFRQmdOVkJBY01DVUpCVGtkQlRFOVNSVEVPTUF3R0ExVUVDZ3dGU1VsSlZFSXhGekFWQmdOVkJBc01Ea1ZZUVUxUVRFVXRRMFZPVkVWU01VSXdRQVlEVlFRREREbDNkM2N1WlhoaGJYQnNaUzVqYjIwZ0tFTkZVbFJKUmxsZlZrTmZVMGxIVGw5RlExOVNNUzFGUTE5VFJVTlFNalUyVWpGZlUwbEhUaWt3V1RBVEJnY3Foa2pPUFFJQkJnZ3Foa2pPUFFNQkJ3TkNBQVRRQTM5OWZ6SVFsNkJxd1o4bXRHTXNlOElzcVRBMTJKWFNiN0FrQ243WG9xeEViK2VsS0hYVXFkMVAzc2Q3SXZxMmRKb0VwZXJxc1F5MEp1SkVEd0o3bzBVd1F6QVNCZ05WSFJNQkFmOEVDREFHQVFIL0FnRUJNQjBHQTFVZERnUVdCQlJDSmJJZ0l6NG1nUlpSR1QxVU53M0ZEdGVQTWpBT0JnTlZIUThCQWY4RUJBTUNBb1F3RFFZSktvWklodmNOQVFFTEJRQURnZ0VCQUZRWHF0YTRJTnJ3Q0dMZDFqL2YwTy85R2tzbVk3YmpMbWI3a3dhM3IwVlBYZTNuVUZ2QVNDN2pIZ3haVXVYVnhuQ25QRldWMVNDbHZBaGZtYzEzYWFrbFd3SXExaWZsZ25hM0VMam9UUzhGeDQ0MitZNUxCUWtsa0hlWXdwNk1PVnBqSlMvZ3NpWHZ0QjNvKzNZL0Q5Q1NDR3F2cmpBbFFBMEZXaVBkR3oyT0twTGhyMVROb0lleWlXbnFwQXFCMU9QdHdUWmdoMFh1cnBFc2J3dlNvN3h2cGZFZk90S2FjSHVxbnpqbk9GYnNyQjhyWlppVU9Jamg3dGs3OHdvZ2I3RFp3NjZxUmVnbTZXT0NITmp5ZkFEekRqYy9ZbjVXTXl1ZGlvSnBXNjhjYjhkdFNHQkljM3BUNkVqbld2MlJwSnZlNDJxZGNpSms2OTdFL3cvVGE5OD0iLCJNSUlEdHpDQ0FwK2dBd0lCQWdJSU1MZGYrc0szemhrd0RRWUpLb1pJaHZjTkFRRUxCUUF3ZURFTE1Ba0dBMVVFQmhNQ1NVNHhDekFKQmdOVkJBZ01Ba3RCTVJJd0VBWURWUVFIREFsQ1FVNUhRVXhQVWtVeERqQU1CZ05WQkFvTUJVbEpTVlJDTVJjd0ZRWURWUVFMREE1RldFRk5VRXhGTFVORlRsUkZVakVmTUIwR0ExVUVBd3dXZDNkM0xtVjRZVzF3YkdVdVkyOXRJQ2hTVDA5VUtUQWVGdzB5TmpFd01EVXhOVEk1TkRsYUZ3MHpOREV3TURNeE5USTVORGxhTUhneEN6QUpCZ05WQkFZVEFrbE9NUXN3Q1FZRFZRUUlEQUpMUVRFU01CQUdBMVVFQnd3SlFrRk9SMEZNVDFKRk1RNHdEQVlEVlFRS0RBVkpTVWxVUWpFWE1CVUdBMVVFQ3d3T1JWaEJUVkJNUlMxRFJVNVVSVkl4SHpBZEJnTlZCQU1NRm5kM2R5NWxlR0Z0Y0d4bExtTnZiU0FvVWs5UFZDa3dnZ0VpTUEwR0NTcUdTSWIzRFFFQkFRVUFBNElCRHdBd2dnRUtBb0lCQVFDZ3NGWkFGWGcwWGc3NDI5QUtQVTEvMFhuYytZQTh5eTRMU3ljRzBJT0o4dzJEYUlpL0VtRnByMHFSMzhXWXB0cHVpWTZUM0ZlRUV5TGczR1lSSEtaaWhxVHczaHRvQXR4bHp1NnRZMmNvNFNLSXB2eWRNYzZIL2lqdmRSK1V3bXFjOE82b3U1cXdmT29FNUVZM1pTdnQySnhWOC9rU0MrK0Fkajhlc0V6aUx2T3o5V3JLakRyRmx3Q1dSbUJ1bjhjcGFMSVZsbHcrWktUYUMzeXR3Z00yTGUrK0ZlWUJqNU13OS9uTVdSQ1lZYzBQQzdMWHpvaVNZa0cxcjhYcDBpUG9weHBFRmRVLzBTUkxpcHEyZnJOZm1ZWWFSWFhSdlBuVzlCVDZSblVWS1FvM2pVQUMxS05lbC9nVnRvRWM5bWJlMzRNUGxnMVBWaXpkcTFER0ltUjFBZ01CQUFHalJUQkRNQklHQTFVZEV3RUIvd1FJTUFZQkFmOENBUUl3SFFZRFZSME9CQllFRktyeGZDZFJCZTAvZGY3M1Q4TWtsTy9talhwdk1BNEdBMVVkRHdFQi93UUVBd0lDaERBTkJna3Foa2lHOXcwQkFRc0ZBQU9DQVFFQURVV1VyTllISHNOellrdWQ5dDRDZWExNDNDYTdmUmFVbHhTczdVOGZSYVVOMHRyVXZvMEhMK3BuTDNZanEzSHVPM08vRXdKenR4ek5yY0d3cW1RR3UzRVdacjdyUVRXakdnU056YW5iK0FKSktSSmk0azk5aVFISDVTRmNXMlFsMEkrTjdnbm8veVgvZGljdm43aEFKTUpmSFRoMkU1MWtSbzR4TzdWOUYvemkxNzh3dHZXSW8zOU93MmlaczZkc3orNFpFR2NDVzBsN2gwQTNKSHJzekUxZzhXM084VkYwZDA0L2xWRm9sUXZEdlYxeGFnelBqVElrMHRHc094dHpvc2ZXRkJRYVpiN29Ub0t1MnF4L0R4VzJHQUQ2cHZtTnRVeUFqYkJyYWtHM2ZLZHEyVkJNZm96VUJyQkVJY1g2Z2F2R3lLcSt2djJ2bGltWU1ncHpCdz09Il0sImtpZCI6ImQ2V3hWVU9mY2hUQWJvSmg5cDI3NnU1Rkp4bDFIazI4REtkNS1TNDI2bzQiLCJ0eXAiOiJkYytzZC1qd3QiLCJhbGciOiJFUzI1NiJ9.eyJnZW5kZXIiOiJGZW1hbGUiLCJ2Y3QiOiJQbGF5Z3JvdW5kU2RKd3QiLCJpc3MiOiJodHRwczovLzE3Mi4xNi4xMzQuMzciLCJmdWxsTmFtZSI6IkFzaGEgVGVzdCIsImRhdGVPZkJpcnRoIjoiMTk5MC0wMS0wMSIsImNuZiI6eyJraWQiOiJkaWQ6andrOmV5SnJkSGtpT2lKRlF5SXNJbmdpT2lKQk1XTkdaMmhZTkY5a2FVbFpPWEZuWjNCV2RWUm5aMGRTVnpaNFNtdFVOakExYzA1S1NYQm9lRlYzSWl3aWVTSTZJa2xIUlVKaVh6bDJSbTkzVUhodGIwTmxlalo1U21Gb1VubEhiblp1UkVOVlJXbE5WSGQzWlcxSkxVa2lMQ0pqY25ZaU9pSlFMVEkxTmlKOSMwIn0sImlkIjoiaHR0cHM6Ly9tb3NpcC5pby9jcmVkZW50aWFsLzZlYzZlNzlmLWQ4YWItNDMyYi1hODhhLTQ5OTA3ZTIzNmVmNiIsImVtYWlsIjoiYXNoYUBleGFtcGxlLm9yZyJ9.bgpvPYPISzPnSY1VbPEOvoV7cnp7IhNOmAwOG-xdYSNsHfTGPxdn4L_P-Tb5T_TVI68LT9hQHxv1zrvLl2h7lQ~"
+     }
+    ]
+   }
+  },
+  {
+   "label": "credential",
+   "status": 200,
+   "body": {
+    "credentials": [
+     {
+      "credential": "eyJ4NXQjUzI1NiI6IkZIdmdKZGY0QXdxaExPdHhjVlBEX0txYmVQMXE3VkZFODNUY3FBOFNtN0UiLCJ4NWMiOlsiTUlJREVEQ0NBZmlnQXdJQkFnSUk4NVg5QnE2UEhGQXdEUVlKS29aSWh2Y05BUUVMQlFBd2VERUxNQWtHQTFVRUJoTUNTVTR4Q3pBSkJnTlZCQWdNQWt0Qk1SSXdFQVlEVlFRSERBbENRVTVIUVV4UFVrVXhEakFNQmdOVkJBb01CVWxKU1ZSQ01SY3dGUVlEVlFRTERBNUZXRUZOVUV4RkxVTkZUbFJGVWpFZk1CMEdBMVVFQXd3V2QzZDNMbVY0WVcxd2JHVXVZMjl0SUNoU1QwOVVLVEFlRncweU5qRXdNRFV4TlRJNU5UQmFGdzB5T1RFd01EUXhOVEk1TlRCYU1JR2JNUXN3Q1FZRFZRUUdFd0pKVGpFTE1Ba0dBMVVFQ0F3Q1MwRXhFakFRQmdOVkJBY01DVUpCVGtkQlRFOVNSVEVPTUF3R0ExVUVDZ3dGU1VsSlZFSXhGekFWQmdOVkJBc01Ea1ZZUVUxUVRFVXRRMFZPVkVWU01VSXdRQVlEVlFRREREbDNkM2N1WlhoaGJYQnNaUzVqYjIwZ0tFTkZVbFJKUmxsZlZrTmZVMGxIVGw5RlExOVNNUzFGUTE5VFJVTlFNalUyVWpGZlUwbEhUaWt3V1RBVEJnY3Foa2pPUFFJQkJnZ3Foa2pPUFFNQkJ3TkNBQVRRQTM5OWZ6SVFsNkJxd1o4bXRHTXNlOElzcVRBMTJKWFNiN0FrQ243WG9xeEViK2VsS0hYVXFkMVAzc2Q3SXZxMmRKb0VwZXJxc1F5MEp1SkVEd0o3bzBVd1F6QVNCZ05WSFJNQkFmOEVDREFHQVFIL0FnRUJNQjBHQTFVZERnUVdCQlJDSmJJZ0l6NG1nUlpSR1QxVU53M0ZEdGVQTWpBT0JnTlZIUThCQWY4RUJBTUNBb1F3RFFZSktvWklodmNOQVFFTEJRQURnZ0VCQUZRWHF0YTRJTnJ3Q0dMZDFqL2YwTy85R2tzbVk3YmpMbWI3a3dhM3IwVlBYZTNuVUZ2QVNDN2pIZ3haVXVYVnhuQ25QRldWMVNDbHZBaGZtYzEzYWFrbFd3SXExaWZsZ25hM0VMam9UUzhGeDQ0MitZNUxCUWtsa0hlWXdwNk1PVnBqSlMvZ3NpWHZ0QjNvKzNZL0Q5Q1NDR3F2cmpBbFFBMEZXaVBkR3oyT0twTGhyMVROb0lleWlXbnFwQXFCMU9QdHdUWmdoMFh1cnBFc2J3dlNvN3h2cGZFZk90S2FjSHVxbnpqbk9GYnNyQjhyWlppVU9Jamg3dGs3OHdvZ2I3RFp3NjZxUmVnbTZXT0NITmp5ZkFEekRqYy9ZbjVXTXl1ZGlvSnBXNjhjYjhkdFNHQkljM3BUNkVqbld2MlJwSnZlNDJxZGNpSms2OTdFL3cvVGE5OD0iLCJNSUlEdHpDQ0FwK2dBd0lCQWdJSU1MZGYrc0szemhrd0RRWUpLb1pJaHZjTkFRRUxCUUF3ZURFTE1Ba0dBMVVFQmhNQ1NVNHhDekFKQmdOVkJBZ01Ba3RCTVJJd0VBWURWUVFIREFsQ1FVNUhRVXhQVWtVeERqQU1CZ05WQkFvTUJVbEpTVlJDTVJjd0ZRWURWUVFMREE1RldFRk5VRXhGTFVORlRsUkZVakVmTUIwR0ExVUVBd3dXZDNkM0xtVjRZVzF3YkdVdVkyOXRJQ2hTVDA5VUtUQWVGdzB5TmpFd01EVXhOVEk1TkRsYUZ3MHpOREV3TURNeE5USTVORGxhTUhneEN6QUpCZ05WQkFZVEFrbE9NUXN3Q1FZRFZRUUlEQUpMUVRFU01CQUdBMVVFQnd3SlFrRk9SMEZNVDFKRk1RNHdEQVlEVlFRS0RBVkpTVWxVUWpFWE1CVUdBMVVFQ3d3T1JWaEJUVkJNUlMxRFJVNVVSVkl4SHpBZEJnTlZCQU1NRm5kM2R5NWxlR0Z0Y0d4bExtTnZiU0FvVWs5UFZDa3dnZ0VpTUEwR0NTcUdTSWIzRFFFQkFRVUFBNElCRHdBd2dnRUtBb0lCQVFDZ3NGWkFGWGcwWGc3NDI5QUtQVTEvMFhuYytZQTh5eTRMU3ljRzBJT0o4dzJEYUlpL0VtRnByMHFSMzhXWXB0cHVpWTZUM0ZlRUV5TGczR1lSSEtaaWhxVHczaHRvQXR4bHp1NnRZMmNvNFNLSXB2eWRNYzZIL2lqdmRSK1V3bXFjOE82b3U1cXdmT29FNUVZM1pTdnQySnhWOC9rU0MrK0Fkajhlc0V6aUx2T3o5V3JLakRyRmx3Q1dSbUJ1bjhjcGFMSVZsbHcrWktUYUMzeXR3Z00yTGUrK0ZlWUJqNU13OS9uTVdSQ1lZYzBQQzdMWHpvaVNZa0cxcjhYcDBpUG9weHBFRmRVLzBTUkxpcHEyZnJOZm1ZWWFSWFhSdlBuVzlCVDZSblVWS1FvM2pVQUMxS05lbC9nVnRvRWM5bWJlMzRNUGxnMVBWaXpkcTFER0ltUjFBZ01CQUFHalJUQkRNQklHQTFVZEV3RUIvd1FJTUFZQkFmOENBUUl3SFFZRFZSME9CQllFRktyeGZDZFJCZTAvZGY3M1Q4TWtsTy9talhwdk1BNEdBMVVkRHdFQi93UUVBd0lDaERBTkJna3Foa2lHOXcwQkFRc0ZBQU9DQVFFQURVV1VyTllISHNOellrdWQ5dDRDZWExNDNDYTdmUmFVbHhTczdVOGZSYVVOMHRyVXZvMEhMK3BuTDNZanEzSHVPM08vRXdKenR4ek5yY0d3cW1RR3UzRVdacjdyUVRXakdnU056YW5iK0FKSktSSmk0azk5aVFISDVTRmNXMlFsMEkrTjdnbm8veVgvZGljdm43aEFKTUpmSFRoMkU1MWtSbzR4TzdWOUYvemkxNzh3dHZXSW8zOU93MmlaczZkc3orNFpFR2NDVzBsN2gwQTNKSHJzekUxZzhXM084VkYwZDA0L2xWRm9sUXZEdlYxeGFnelBqVElrMHRHc094dHpvc2ZXRkJRYVpiN29Ub0t1MnF4L0R4VzJHQUQ2cHZtTnRVeUFqYkJyYWtHM2ZLZHEyVkJNZm96VUJyQkVJY1g2Z2F2R3lLcSt2djJ2bGltWU1ncHpCdz09Il0sImtpZCI6ImQ2V3hWVU9mY2hUQWJvSmg5cDI3NnU1Rkp4bDFIazI4REtkNS1TNDI2bzQiLCJ0eXAiOiJkYytzZC1qd3QiLCJhbGciOiJFUzI1NiJ9.eyJnZW5kZXIiOiJGZW1hbGUiLCJ2Y3QiOiJQbGF5Z3JvdW5kU2RKd3QiLCJpc3MiOiJodHRwczovLzE3Mi4xNi4xMzQuMzciLCJmdWxsTmFtZSI6IkFzaGEgVGVzdCIsImRhdGVPZkJpcnRoIjoiMTk5MC0wMS0wMSIsImNuZiI6eyJraWQiOiJkaWQ6andrOmV5SnJkSGtpT2lKRlF5SXNJbmdpT2lKQk1XTkdaMmhZTkY5a2FVbFpPWEZuWjNCV2RWUm5aMGRTVnpaNFNtdFVOakExYzA1S1NYQm9lRlYzSWl3aWVTSTZJa2xIUlVKaVh6bDJSbTkzVUhodGIwTmxlalo1U21Gb1VubEhiblp1UkVOVlJXbE5WSGQzWlcxSkxVa2lMQ0pqY25ZaU9pSlFMVEkxTmlKOSMwIn0sImlkIjoiaHR0cHM6Ly9tb3NpcC5pby9jcmVkZW50aWFsLzk2NzQwMDlmLTBjMmYtNDM2Mi1iNjIzLTZiYTdiZmMzZWNlMiIsImVtYWlsIjoiYXNoYUBleGFtcGxlLm9yZyJ9.eVnU0eGZXLCzZsES9V0ooYXzXW02inyNg3iqlyNWD5ZSNDTtQCe3cLB3LFppWMN1qqaVtlsFGiF0fJbmsKMQVw~"
+     }
+    ]
+   }
+  },
+  {
+   "label": "mint",
+   "status": 200,
+   "body": {
+    "credential_offer_uri": "openid-credential-offer://?credential_offer_uri=https%3A%2F%2F172.16.134.37%2Fv1%2Fcertify%2Fcredential-offer-data%2F9b218214-293f-4ff7-85d1-c665d99ba0ce"
+   }
+  },
+  {
+   "label": "offer",
+   "status": 200,
+   "body": {
+    "credential_issuer": "https://172.16.134.37",
+    "credential_configuration_ids": [
+     "PlaygroundSdJwt"
+    ],
+    "grants": {
+     "urn:ietf:params:oauth:grant-type:pre-authorized_code": {
+      "pre-authorized_code": "30t52GwJR1Ppn4I2QKSkexCyH4pcecd0"
+     }
+    }
+   }
+  },
+  {
+   "label": "token",
+   "status": 200,
+   "body": {
+    "access_token": "eyJraWQiOiJBOUd4Tno3VUlhLXdsXzFTZ0hCM1hVOWFNUlIwQlNnbi1KakFXR3BXNTE4IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJ7XCJmdWxsTmFtZVwiOlwiQXNoYSBUZXN0XCIsXCJkYXRlT2ZCaXJ0aFwiOlwiMTk5MC0wMS0wMVwiLFwiZ2VuZGVyXCI6XCJGZW1hbGVcIixcImVtYWlsXCI6XCJhc2hhQGV4YW1wbGUub3JnXCJ9IiwiYXVkIjoiaHR0cHM6Ly8xNzIuMTYuMTM0LjM3L3YxL2NlcnRpZnkvaXNzdWFuY2UvY3JlZGVudGlhbCIsInNjb3BlIjoicGxheWdyb3VuZF9zZGp3dCIsImlzcyI6Imh0dHBzOi8vMTcyLjE2LjEzNC4zNyIsImV4cCI6MTc5MTIxNDgyOSwiaWF0IjoxNzkxMjE0MjI5LCJjbGllbnRfaWQiOiIifQ.NpQe30FDwgkAdFNpCdA8zK3ZdDjHDf0J3vtid79DjqCSE0_a6yZbzBZUSgEpzDKzGSphEq4siHLgX6XPtB9d_-bhO2xf7c7fTiPru8sM4wYm3CDnBZAMrZNqnFH5f-xsMgnFrZ4W3UB3Nm_geFt2MkxVCo4nF5XVFuJArBhPJC9PSfreDC14X8vH3-PCbFGWQ6MNAHNsvm1F1V0X-qrX1l8NK_DzRhTGEnmiGoPzR6RUlYIINB4ZnudfnPRmIKqmIOty-nYzSFtJjvF38KHeIiGk0vgWGeq6M2jbn9dbmVnmAfeySWwub_fkrRv6vFrZqN4FIi-4XoIDc4tnXgrAQg",
+    "token_type": "Bearer",
+    "expires_in": 600
+   }
+  },
+  {
+   "label": "nonce",
+   "status": 200,
+   "body": {
+    "c_nonce": "eab80f80-33a7-4e09-b974-0c589c649763"
+   }
+  },
+  {
+   "label": "credential",
+   "status": 400,
+   "body": {
+    "error": "invalid_proof",
+    "error_description": "None of the submitted proofs passed validation."
+   }
+  },
+  {
+   "label": "mint",
+   "status": 200,
+   "body": {
+    "credential_offer_uri": "openid-credential-offer://?credential_offer_uri=https%3A%2F%2F172.16.134.37%2Fv1%2Fcertify%2Fcredential-offer-data%2F7e66f3af-45b3-489f-85ce-5a550338f126"
+   }
+  },
+  {
+   "label": "offer",
+   "status": 200,
+   "body": {
+    "credential_issuer": "https://172.16.134.37",
+    "credential_configuration_ids": [
+     "PlaygroundSdJwt"
+    ],
+    "grants": {
+     "urn:ietf:params:oauth:grant-type:pre-authorized_code": {
+      "pre-authorized_code": "Q7dS9w8efJnOVQrFP8KWCH7ZPHir6hav"
+     }
+    }
+   }
+  },
+  {
+   "label": "token",
+   "status": 200,
+   "body": {
+    "access_token": "eyJraWQiOiJBOUd4Tno3VUlhLXdsXzFTZ0hCM1hVOWFNUlIwQlNnbi1KakFXR3BXNTE4IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJ7XCJmdWxsTmFtZVwiOlwiQXNoYSBUZXN0XCIsXCJkYXRlT2ZCaXJ0aFwiOlwiMTk5MC0wMS0wMVwiLFwiZ2VuZGVyXCI6XCJGZW1hbGVcIixcImVtYWlsXCI6XCJhc2hhQGV4YW1wbGUub3JnXCJ9IiwiYXVkIjoiaHR0cHM6Ly8xNzIuMTYuMTM0LjM3L3YxL2NlcnRpZnkvaXNzdWFuY2UvY3JlZGVudGlhbCIsInNjb3BlIjoicGxheWdyb3VuZF9zZGp3dCIsImlzcyI6Imh0dHBzOi8vMTcyLjE2LjEzNC4zNyIsImV4cCI6MTc5MTIxNDgyOSwiaWF0IjoxNzkxMjE0MjI5LCJjbGllbnRfaWQiOiIifQ.NpQe30FDwgkAdFNpCdA8zK3ZdDjHDf0J3vtid79DjqCSE0_a6yZbzBZUSgEpzDKzGSphEq4siHLgX6XPtB9d_-bhO2xf7c7fTiPru8sM4wYm3CDnBZAMrZNqnFH5f-xsMgnFrZ4W3UB3Nm_geFt2MkxVCo4nF5XVFuJArBhPJC9PSfreDC14X8vH3-PCbFGWQ6MNAHNsvm1F1V0X-qrX1l8NK_DzRhTGEnmiGoPzR6RUlYIINB4ZnudfnPRmIKqmIOty-nYzSFtJjvF38KHeIiGk0vgWGeq6M2jbn9dbmVnmAfeySWwub_fkrRv6vFrZqN4FIi-4XoIDc4tnXgrAQg",
+    "token_type": "Bearer",
+    "expires_in": 600
+   }
+  },
+  {
+   "label": "nonce",
+   "status": 200,
+   "body": {
+    "c_nonce": "f139b4d2-8e05-4df2-86a4-6ccd2fe08a58"
+   }
+  },
+  {
+   "label": "credential",
+   "status": 500,
+   "body": {
+    "error": "unknown_error",
+    "error_description": "class com.nimbusds.jose.jwk.ECKey cannot be cast to class com.nimbusds.jose.jwk.OctetKeyPair (com.nimbusds.jose.jwk.ECKey and com.nimbusds.jose.jwk.OctetKeyPair are in unnamed module of loader org.springframework.boot.loader.launch.LaunchedClassLoader @433c675d)"
+   }
+  },
+  {
+   "label": "mint",
+   "status": 200,
+   "body": {
+    "credential_offer_uri": "openid-credential-offer://?credential_offer_uri=https%3A%2F%2F172.16.134.37%2Fv1%2Fcertify%2Fcredential-offer-data%2F26efbebc-edba-4baa-bed7-a70ca647cecd"
+   }
+  },
+  {
+   "label": "offer",
+   "status": 200,
+   "body": {
+    "credential_issuer": "https://172.16.134.37",
+    "credential_configuration_ids": [
+     "PlaygroundSdJwt"
+    ],
+    "grants": {
+     "urn:ietf:params:oauth:grant-type:pre-authorized_code": {
+      "pre-authorized_code": "R534SXqyUVtSbPKM1IfSSVzI8ti6wEh4"
+     }
+    }
+   }
+  },
+  {
+   "label": "token",
+   "status": 200,
+   "body": {
+    "access_token": "eyJraWQiOiJBOUd4Tno3VUlhLXdsXzFTZ0hCM1hVOWFNUlIwQlNnbi1KakFXR3BXNTE4IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJ7XCJmdWxsTmFtZVwiOlwiQXNoYSBUZXN0XCIsXCJkYXRlT2ZCaXJ0aFwiOlwiMTk5MC0wMS0wMVwiLFwiZ2VuZGVyXCI6XCJGZW1hbGVcIixcImVtYWlsXCI6XCJhc2hhQGV4YW1wbGUub3JnXCJ9IiwiYXVkIjoiaHR0cHM6Ly8xNzIuMTYuMTM0LjM3L3YxL2NlcnRpZnkvaXNzdWFuY2UvY3JlZGVudGlhbCIsInNjb3BlIjoicGxheWdyb3VuZF9zZGp3dCIsImlzcyI6Imh0dHBzOi8vMTcyLjE2LjEzNC4zNyIsImV4cCI6MTc5MTIxNDgyOSwiaWF0IjoxNzkxMjE0MjI5LCJjbGllbnRfaWQiOiIifQ.NpQe30FDwgkAdFNpCdA8zK3ZdDjHDf0J3vtid79DjqCSE0_a6yZbzBZUSgEpzDKzGSphEq4siHLgX6XPtB9d_-bhO2xf7c7fTiPru8sM4wYm3CDnBZAMrZNqnFH5f-xsMgnFrZ4W3UB3Nm_geFt2MkxVCo4nF5XVFuJArBhPJC9PSfreDC14X8vH3-PCbFGWQ6MNAHNsvm1F1V0X-qrX1l8NK_DzRhTGEnmiGoPzR6RUlYIINB4ZnudfnPRmIKqmIOty-nYzSFtJjvF38KHeIiGk0vgWGeq6M2jbn9dbmVnmAfeySWwub_fkrRv6vFrZqN4FIi-4XoIDc4tnXgrAQg",
+    "token_type": "Bearer",
+    "expires_in": 600
+   }
+  },
+  {
+   "label": "nonce",
+   "status": 200,
+   "body": {
+    "c_nonce": "6ede667d-70c2-4c98-9a32-90c7beb16a03"
+   }
+  },
+  {
+   "label": "credential",
+   "status": 400,
+   "body": {
+    "error": "invalid_proof",
+    "error_description": "None of the submitted proofs passed validation."
+   }
+  },
+  {
+   "label": "mint",
+   "status": 200,
+   "body": {
+    "credential_offer_uri": "openid-credential-offer://?credential_offer_uri=https%3A%2F%2F172.16.134.37%2Fv1%2Fcertify%2Fcredential-offer-data%2F6aa305a5-8f5f-414d-8e38-5ce5fcd2dd37"
+   }
+  },
+  {
+   "label": "offer",
+   "status": 200,
+   "body": {
+    "credential_issuer": "https://172.16.134.37",
+    "credential_configuration_ids": [
+     "PlaygroundSdJwt"
+    ],
+    "grants": {
+     "urn:ietf:params:oauth:grant-type:pre-authorized_code": {
+      "pre-authorized_code": "4xbCtgPYpooqavxlnB2OAplawid0ij2g"
+     }
+    }
+   }
+  },
+  {
+   "label": "token",
+   "status": 200,
+   "body": {
+    "access_token": "eyJraWQiOiJBOUd4Tno3VUlhLXdsXzFTZ0hCM1hVOWFNUlIwQlNnbi1KakFXR3BXNTE4IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJ7XCJmdWxsTmFtZVwiOlwiQXNoYSBUZXN0XCIsXCJkYXRlT2ZCaXJ0aFwiOlwiMTk5MC0wMS0wMVwiLFwiZ2VuZGVyXCI6XCJGZW1hbGVcIixcImVtYWlsXCI6XCJhc2hhQGV4YW1wbGUub3JnXCJ9IiwiYXVkIjoiaHR0cHM6Ly8xNzIuMTYuMTM0LjM3L3YxL2NlcnRpZnkvaXNzdWFuY2UvY3JlZGVudGlhbCIsInNjb3BlIjoicGxheWdyb3VuZF9zZGp3dCIsImlzcyI6Imh0dHBzOi8vMTcyLjE2LjEzNC4zNyIsImV4cCI6MTc5MTIxNDgyOSwiaWF0IjoxNzkxMjE0MjI5LCJjbGllbnRfaWQiOiIifQ.NpQe30FDwgkAdFNpCdA8zK3ZdDjHDf0J3vtid79DjqCSE0_a6yZbzBZUSgEpzDKzGSphEq4siHLgX6XPtB9d_-bhO2xf7c7fTiPru8sM4wYm3CDnBZAMrZNqnFH5f-xsMgnFrZ4W3UB3Nm_geFt2MkxVCo4nF5XVFuJArBhPJC9PSfreDC14X8vH3-PCbFGWQ6MNAHNsvm1F1V0X-qrX1l8NK_DzRhTGEnmiGoPzR6RUlYIINB4ZnudfnPRmIKqmIOty-nYzSFtJjvF38KHeIiGk0vgWGeq6M2jbn9dbmVnmAfeySWwub_fkrRv6vFrZqN4FIi-4XoIDc4tnXgrAQg",
+    "token_type": "Bearer",
+    "expires_in": 600
+   }
+  },
+  {
+   "label": "nonce",
+   "status": 200,
+   "body": {
+    "c_nonce": "f68be9f1-682b-48ab-b015-7b92d88dcd5a"
+   }
+  },
+  {
+   "label": "credential",
+   "status": 400,
+   "body": {
+    "error": "invalid_proof",
+    "error_description": "Error encountered during proof jwt parsing."
+   }
+  },
+  {
+   "label": "mint",
+   "status": 200,
+   "body": {
+    "credential_offer_uri": "openid-credential-offer://?credential_offer_uri=https%3A%2F%2F172.16.134.37%2Fv1%2Fcertify%2Fcredential-offer-data%2F26158625-a526-43bf-9ae0-9202f1f7b876"
+   }
+  },
+  {
+   "label": "offer",
+   "status": 200,
+   "body": {
+    "credential_issuer": "https://172.16.134.37",
+    "credential_configuration_ids": [
+     "PlaygroundSdJwt"
+    ],
+    "grants": {
+     "urn:ietf:params:oauth:grant-type:pre-authorized_code": {
+      "pre-authorized_code": "ub1QwJdWQdqFCmr9IPg4LWtLfux3vmej"
+     }
+    }
+   }
+  },
+  {
+   "label": "token",
+   "status": 200,
+   "body": {
+    "access_token": "eyJraWQiOiJBOUd4Tno3VUlhLXdsXzFTZ0hCM1hVOWFNUlIwQlNnbi1KakFXR3BXNTE4IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJ7XCJmdWxsTmFtZVwiOlwiQXNoYSBUZXN0XCIsXCJkYXRlT2ZCaXJ0aFwiOlwiMTk5MC0wMS0wMVwiLFwiZ2VuZGVyXCI6XCJGZW1hbGVcIixcImVtYWlsXCI6XCJhc2hhQGV4YW1wbGUub3JnXCJ9IiwiYXVkIjoiaHR0cHM6Ly8xNzIuMTYuMTM0LjM3L3YxL2NlcnRpZnkvaXNzdWFuY2UvY3JlZGVudGlhbCIsInNjb3BlIjoicGxheWdyb3VuZF9zZGp3dCIsImlzcyI6Imh0dHBzOi8vMTcyLjE2LjEzNC4zNyIsImV4cCI6MTc5MTIxNDgyOSwiaWF0IjoxNzkxMjE0MjI5LCJjbGllbnRfaWQiOiIifQ.NpQe30FDwgkAdFNpCdA8zK3ZdDjHDf0J3vtid79DjqCSE0_a6yZbzBZUSgEpzDKzGSphEq4siHLgX6XPtB9d_-bhO2xf7c7fTiPru8sM4wYm3CDnBZAMrZNqnFH5f-xsMgnFrZ4W3UB3Nm_geFt2MkxVCo4nF5XVFuJArBhPJC9PSfreDC14X8vH3-PCbFGWQ6MNAHNsvm1F1V0X-qrX1l8NK_DzRhTGEnmiGoPzR6RUlYIINB4ZnudfnPRmIKqmIOty-nYzSFtJjvF38KHeIiGk0vgWGeq6M2jbn9dbmVnmAfeySWwub_fkrRv6vFrZqN4FIi-4XoIDc4tnXgrAQg",
+    "token_type": "Bearer",
+    "expires_in": 600
+   }
+  },
+  {
+   "label": "nonce",
+   "status": 200,
+   "body": {
+    "c_nonce": "fe10c53f-8398-4c3a-8915-714cc7e3d921"
+   }
+  },
+  {
+   "label": "credential",
+   "status": 400,
+   "body": {
+    "error": "invalid_proof",
+    "error_description": "None of the submitted proofs passed validation."
+   }
+  },
+  {
+   "label": "mint",
+   "status": 200,
+   "body": {
+    "credential_offer_uri": "openid-credential-offer://?credential_offer_uri=https%3A%2F%2F172.16.134.37%2Fv1%2Fcertify%2Fcredential-offer-data%2F0bc694cc-2de8-488d-b90d-882af2c71232"
+   }
+  },
+  {
+   "label": "offer",
+   "status": 200,
+   "body": {
+    "credential_issuer": "https://172.16.134.37",
+    "credential_configuration_ids": [
+     "PlaygroundSdJwt"
+    ],
+    "grants": {
+     "urn:ietf:params:oauth:grant-type:pre-authorized_code": {
+      "pre-authorized_code": "NhijFBZRUj3WVsRptJjcBVGZzAV098AT"
+     }
+    }
+   }
+  },
+  {
+   "label": "token",
+   "status": 200,
+   "body": {
+    "access_token": "eyJraWQiOiJBOUd4Tno3VUlhLXdsXzFTZ0hCM1hVOWFNUlIwQlNnbi1KakFXR3BXNTE4IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJ7XCJmdWxsTmFtZVwiOlwiQXNoYSBUZXN0XCIsXCJkYXRlT2ZCaXJ0aFwiOlwiMTk5MC0wMS0wMVwiLFwiZ2VuZGVyXCI6XCJGZW1hbGVcIixcImVtYWlsXCI6XCJhc2hhQGV4YW1wbGUub3JnXCJ9IiwiYXVkIjoiaHR0cHM6Ly8xNzIuMTYuMTM0LjM3L3YxL2NlcnRpZnkvaXNzdWFuY2UvY3JlZGVudGlhbCIsInNjb3BlIjoicGxheWdyb3VuZF9zZGp3dCIsImlzcyI6Imh0dHBzOi8vMTcyLjE2LjEzNC4zNyIsImV4cCI6MTc5MTIxNDgyOSwiaWF0IjoxNzkxMjE0MjI5LCJjbGllbnRfaWQiOiIifQ.NpQe30FDwgkAdFNpCdA8zK3ZdDjHDf0J3vtid79DjqCSE0_a6yZbzBZUSgEpzDKzGSphEq4siHLgX6XPtB9d_-bhO2xf7c7fTiPru8sM4wYm3CDnBZAMrZNqnFH5f-xsMgnFrZ4W3UB3Nm_geFt2MkxVCo4nF5XVFuJArBhPJC9PSfreDC14X8vH3-PCbFGWQ6MNAHNsvm1F1V0X-qrX1l8NK_DzRhTGEnmiGoPzR6RUlYIINB4ZnudfnPRmIKqmIOty-nYzSFtJjvF38KHeIiGk0vgWGeq6M2jbn9dbmVnmAfeySWwub_fkrRv6vFrZqN4FIi-4XoIDc4tnXgrAQg",
+    "token_type": "Bearer",
+    "expires_in": 600
+   }
+  },
+  {
+   "label": "nonce",
+   "status": 200,
+   "body": {
+    "c_nonce": "c597ee0a-d64f-4668-90d1-b63e54c1cc73"
+   }
+  },
+  {
+   "label": "credential",
+   "status": 400,
+   "body": {
+    "error": "invalid_proof",
+    "error_description": "None of the submitted proofs passed validation."
+   }
+  },
+  {
+   "label": "mint",
+   "status": 200,
+   "body": {
+    "credential_offer_uri": "openid-credential-offer://?credential_offer_uri=https%3A%2F%2F172.16.134.37%2Fv1%2Fcertify%2Fcredential-offer-data%2Fa6399d61-f280-442b-b685-2dbd088a9657"
+   }
+  },
+  {
+   "label": "offer",
+   "status": 200,
+   "body": {
+    "credential_issuer": "https://172.16.134.37",
+    "credential_configuration_ids": [
+     "PlaygroundSdJwt"
+    ],
+    "grants": {
+     "urn:ietf:params:oauth:grant-type:pre-authorized_code": {
+      "pre-authorized_code": "ATALUERXwXEYwxnXdQRCwgJN3ipqXLFx"
+     }
+    }
+   }
+  },
+  {
+   "label": "token",
+   "status": 200,
+   "body": {
+    "access_token": "eyJraWQiOiJBOUd4Tno3VUlhLXdsXzFTZ0hCM1hVOWFNUlIwQlNnbi1KakFXR3BXNTE4IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJ7XCJmdWxsTmFtZVwiOlwiQXNoYSBUZXN0XCIsXCJkYXRlT2ZCaXJ0aFwiOlwiMTk5MC0wMS0wMVwiLFwiZ2VuZGVyXCI6XCJGZW1hbGVcIixcImVtYWlsXCI6XCJhc2hhQGV4YW1wbGUub3JnXCJ9IiwiYXVkIjoiaHR0cHM6Ly8xNzIuMTYuMTM0LjM3L3YxL2NlcnRpZnkvaXNzdWFuY2UvY3JlZGVudGlhbCIsInNjb3BlIjoicGxheWdyb3VuZF9zZGp3dCIsImlzcyI6Imh0dHBzOi8vMTcyLjE2LjEzNC4zNyIsImV4cCI6MTc5MTIxNDgyOSwiaWF0IjoxNzkxMjE0MjI5LCJjbGllbnRfaWQiOiIifQ.NpQe30FDwgkAdFNpCdA8zK3ZdDjHDf0J3vtid79DjqCSE0_a6yZbzBZUSgEpzDKzGSphEq4siHLgX6XPtB9d_-bhO2xf7c7fTiPru8sM4wYm3CDnBZAMrZNqnFH5f-xsMgnFrZ4W3UB3Nm_geFt2MkxVCo4nF5XVFuJArBhPJC9PSfreDC14X8vH3-PCbFGWQ6MNAHNsvm1F1V0X-qrX1l8NK_DzRhTGEnmiGoPzR6RUlYIINB4ZnudfnPRmIKqmIOty-nYzSFtJjvF38KHeIiGk0vgWGeq6M2jbn9dbmVnmAfeySWwub_fkrRv6vFrZqN4FIi-4XoIDc4tnXgrAQg",
+    "token_type": "Bearer",
+    "expires_in": 600
+   }
+  },
+  {
+   "label": "nonce",
+   "status": 200,
+   "body": {
+    "c_nonce": "03e47826-dab1-4152-9351-d3a5bb6a6e61"
+   }
+  },
+  {
+   "label": "credential",
+   "status": 400,
+   "body": {
+    "error": "invalid_proof",
+    "error_description": "None of the submitted proofs passed validation."
+   }
+  },
+  {
+   "label": "mint",
+   "status": 200,
+   "body": {
+    "credential_offer_uri": "openid-credential-offer://?credential_offer_uri=https%3A%2F%2F172.16.134.37%2Fv1%2Fcertify%2Fcredential-offer-data%2F4231de3e-be74-4647-8dd2-21505aa51cee"
+   }
+  },
+  {
+   "label": "offer",
+   "status": 200,
+   "body": {
+    "credential_issuer": "https://172.16.134.37",
+    "credential_configuration_ids": [
+     "PlaygroundSdJwt"
+    ],
+    "grants": {
+     "urn:ietf:params:oauth:grant-type:pre-authorized_code": {
+      "pre-authorized_code": "hHpeOOmA7sbhCFqNw8ZhDomdZ9KBaP6q"
+     }
+    }
+   }
+  },
+  {
+   "label": "token",
+   "status": 200,
+   "body": {
+    "access_token": "eyJraWQiOiJBOUd4Tno3VUlhLXdsXzFTZ0hCM1hVOWFNUlIwQlNnbi1KakFXR3BXNTE4IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJ7XCJmdWxsTmFtZVwiOlwiQXNoYSBUZXN0XCIsXCJkYXRlT2ZCaXJ0aFwiOlwiMTk5MC0wMS0wMVwiLFwiZ2VuZGVyXCI6XCJGZW1hbGVcIixcImVtYWlsXCI6XCJhc2hhQGV4YW1wbGUub3JnXCJ9IiwiYXVkIjoiaHR0cHM6Ly8xNzIuMTYuMTM0LjM3L3YxL2NlcnRpZnkvaXNzdWFuY2UvY3JlZGVudGlhbCIsInNjb3BlIjoicGxheWdyb3VuZF9zZGp3dCIsImlzcyI6Imh0dHBzOi8vMTcyLjE2LjEzNC4zNyIsImV4cCI6MTc5MTIxNDgyOSwiaWF0IjoxNzkxMjE0MjI5LCJjbGllbnRfaWQiOiIifQ.NpQe30FDwgkAdFNpCdA8zK3ZdDjHDf0J3vtid79DjqCSE0_a6yZbzBZUSgEpzDKzGSphEq4siHLgX6XPtB9d_-bhO2xf7c7fTiPru8sM4wYm3CDnBZAMrZNqnFH5f-xsMgnFrZ4W3UB3Nm_geFt2MkxVCo4nF5XVFuJArBhPJC9PSfreDC14X8vH3-PCbFGWQ6MNAHNsvm1F1V0X-qrX1l8NK_DzRhTGEnmiGoPzR6RUlYIINB4ZnudfnPRmIKqmIOty-nYzSFtJjvF38KHeIiGk0vgWGeq6M2jbn9dbmVnmAfeySWwub_fkrRv6vFrZqN4FIi-4XoIDc4tnXgrAQg",
+    "token_type": "Bearer",
+    "expires_in": 600
+   }
+  },
+  {
+   "label": "credential",
+   "status": 400,
+   "body": {
+    "error": "invalid_nonce",
+    "error_description": "c_nonce is invalid or expired"
+   }
+  },
+  {
+   "label": "mint",
+   "status": 200,
+   "body": {
+    "credential_offer_uri": "openid-credential-offer://?credential_offer_uri=https%3A%2F%2F172.16.134.37%2Fv1%2Fcertify%2Fcredential-offer-data%2F4239552a-e49d-4670-846b-ecdb314ab96c"
+   }
+  },
+  {
+   "label": "offer",
+   "status": 200,
+   "body": {
+    "credential_issuer": "https://172.16.134.37",
+    "credential_configuration_ids": [
+     "PlaygroundSdJwt"
+    ],
+    "grants": {
+     "urn:ietf:params:oauth:grant-type:pre-authorized_code": {
+      "pre-authorized_code": "ckCWJJdDqc7ypyckoBuWWib0QnXVKn2H"
+     }
+    }
+   }
+  },
+  {
+   "label": "token",
+   "status": 200,
+   "body": {
+    "access_token": "eyJraWQiOiJBOUd4Tno3VUlhLXdsXzFTZ0hCM1hVOWFNUlIwQlNnbi1KakFXR3BXNTE4IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJ7XCJmdWxsTmFtZVwiOlwiQXNoYSBUZXN0XCIsXCJkYXRlT2ZCaXJ0aFwiOlwiMTk5MC0wMS0wMVwiLFwiZ2VuZGVyXCI6XCJGZW1hbGVcIixcImVtYWlsXCI6XCJhc2hhQGV4YW1wbGUub3JnXCJ9IiwiYXVkIjoiaHR0cHM6Ly8xNzIuMTYuMTM0LjM3L3YxL2NlcnRpZnkvaXNzdWFuY2UvY3JlZGVudGlhbCIsInNjb3BlIjoicGxheWdyb3VuZF9zZGp3dCIsImlzcyI6Imh0dHBzOi8vMTcyLjE2LjEzNC4zNyIsImV4cCI6MTc5MTIxNDgyOSwiaWF0IjoxNzkxMjE0MjI5LCJjbGllbnRfaWQiOiIifQ.NpQe30FDwgkAdFNpCdA8zK3ZdDjHDf0J3vtid79DjqCSE0_a6yZbzBZUSgEpzDKzGSphEq4siHLgX6XPtB9d_-bhO2xf7c7fTiPru8sM4wYm3CDnBZAMrZNqnFH5f-xsMgnFrZ4W3UB3Nm_geFt2MkxVCo4nF5XVFuJArBhPJC9PSfreDC14X8vH3-PCbFGWQ6MNAHNsvm1F1V0X-qrX1l8NK_DzRhTGEnmiGoPzR6RUlYIINB4ZnudfnPRmIKqmIOty-nYzSFtJjvF38KHeIiGk0vgWGeq6M2jbn9dbmVnmAfeySWwub_fkrRv6vFrZqN4FIi-4XoIDc4tnXgrAQg",
+    "token_type": "Bearer",
+    "expires_in": 600
+   }
+  },
+  {
+   "label": "nonce",
+   "status": 200,
+   "body": {
+    "c_nonce": "ad012b47-abbc-4648-8524-1570e7af63ff"
+   }
+  },
+  {
+   "label": "credential",
+   "status": 400,
+   "body": {
+    "error": "invalid_proof",
+    "error_description": "nonce claim is missing, but issuer support nonce"
+   }
+  },
+  {
+   "label": "mint",
+   "status": 200,
+   "body": {
+    "credential_offer_uri": "openid-credential-offer://?credential_offer_uri=https%3A%2F%2F172.16.134.37%2Fv1%2Fcertify%2Fcredential-offer-data%2F3dfdfc8d-3a32-4128-b2c3-75a48110db1b"
+   }
+  },
+  {
+   "label": "offer",
+   "status": 200,
+   "body": {
+    "credential_issuer": "https://172.16.134.37",
+    "credential_configuration_ids": [
+     "PlaygroundSdJwt"
+    ],
+    "grants": {
+     "urn:ietf:params:oauth:grant-type:pre-authorized_code": {
+      "pre-authorized_code": "l1LMHtb6RrNUGiZxCuOe2blPzwPGPTq6"
+     }
+    }
+   }
+  },
+  {
+   "label": "token",
+   "status": 200,
+   "body": {
+    "access_token": "eyJraWQiOiJBOUd4Tno3VUlhLXdsXzFTZ0hCM1hVOWFNUlIwQlNnbi1KakFXR3BXNTE4IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJ7XCJmdWxsTmFtZVwiOlwiQXNoYSBUZXN0XCIsXCJkYXRlT2ZCaXJ0aFwiOlwiMTk5MC0wMS0wMVwiLFwiZ2VuZGVyXCI6XCJGZW1hbGVcIixcImVtYWlsXCI6XCJhc2hhQGV4YW1wbGUub3JnXCJ9IiwiYXVkIjoiaHR0cHM6Ly8xNzIuMTYuMTM0LjM3L3YxL2NlcnRpZnkvaXNzdWFuY2UvY3JlZGVudGlhbCIsInNjb3BlIjoicGxheWdyb3VuZF9zZGp3dCIsImlzcyI6Imh0dHBzOi8vMTcyLjE2LjEzNC4zNyIsImV4cCI6MTc5MTIxNDgyOSwiaWF0IjoxNzkxMjE0MjI5LCJjbGllbnRfaWQiOiIifQ.NpQe30FDwgkAdFNpCdA8zK3ZdDjHDf0J3vtid79DjqCSE0_a6yZbzBZUSgEpzDKzGSphEq4siHLgX6XPtB9d_-bhO2xf7c7fTiPru8sM4wYm3CDnBZAMrZNqnFH5f-xsMgnFrZ4W3UB3Nm_geFt2MkxVCo4nF5XVFuJArBhPJC9PSfreDC14X8vH3-PCbFGWQ6MNAHNsvm1F1V0X-qrX1l8NK_DzRhTGEnmiGoPzR6RUlYIINB4ZnudfnPRmIKqmIOty-nYzSFtJjvF38KHeIiGk0vgWGeq6M2jbn9dbmVnmAfeySWwub_fkrRv6vFrZqN4FIi-4XoIDc4tnXgrAQg",
+    "token_type": "Bearer",
+    "expires_in": 600
+   }
+  },
+  {
+   "label": "nonce",
+   "status": 200,
+   "body": {
+    "c_nonce": "ba88d887-0a9d-4ec1-b2ff-97dfd2ad780c"
+   }
+  },
+  {
+   "label": "credential",
+   "status": 400,
+   "body": {
+    "error": "invalid_proof",
+    "error_description": "None of the submitted proofs passed validation."
+   }
+  },
+  {
+   "label": "mint",
+   "status": 200,
+   "body": {
+    "credential_offer_uri": "openid-credential-offer://?credential_offer_uri=https%3A%2F%2F172.16.134.37%2Fv1%2Fcertify%2Fcredential-offer-data%2F750fae0b-20fb-4817-a0aa-4763a5c39e29"
+   }
+  },
+  {
+   "label": "offer",
+   "status": 200,
+   "body": {
+    "credential_issuer": "https://172.16.134.37",
+    "credential_configuration_ids": [
+     "PlaygroundSdJwt"
+    ],
+    "grants": {
+     "urn:ietf:params:oauth:grant-type:pre-authorized_code": {
+      "pre-authorized_code": "LmcK3Y3saa7oftqIybDH7XH8eOZFWQ6p"
+     }
+    }
+   }
+  },
+  {
+   "label": "token",
+   "status": 200,
+   "body": {
+    "access_token": "eyJraWQiOiJBOUd4Tno3VUlhLXdsXzFTZ0hCM1hVOWFNUlIwQlNnbi1KakFXR3BXNTE4IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJ7XCJmdWxsTmFtZVwiOlwiQXNoYSBUZXN0XCIsXCJkYXRlT2ZCaXJ0aFwiOlwiMTk5MC0wMS0wMVwiLFwiZ2VuZGVyXCI6XCJGZW1hbGVcIixcImVtYWlsXCI6XCJhc2hhQGV4YW1wbGUub3JnXCJ9IiwiYXVkIjoiaHR0cHM6Ly8xNzIuMTYuMTM0LjM3L3YxL2NlcnRpZnkvaXNzdWFuY2UvY3JlZGVudGlhbCIsInNjb3BlIjoicGxheWdyb3VuZF9zZGp3dCIsImlzcyI6Imh0dHBzOi8vMTcyLjE2LjEzNC4zNyIsImV4cCI6MTc5MTIxNDgyOSwiaWF0IjoxNzkxMjE0MjI5LCJjbGllbnRfaWQiOiIifQ.NpQe30FDwgkAdFNpCdA8zK3ZdDjHDf0J3vtid79DjqCSE0_a6yZbzBZUSgEpzDKzGSphEq4siHLgX6XPtB9d_-bhO2xf7c7fTiPru8sM4wYm3CDnBZAMrZNqnFH5f-xsMgnFrZ4W3UB3Nm_geFt2MkxVCo4nF5XVFuJArBhPJC9PSfreDC14X8vH3-PCbFGWQ6MNAHNsvm1F1V0X-qrX1l8NK_DzRhTGEnmiGoPzR6RUlYIINB4ZnudfnPRmIKqmIOty-nYzSFtJjvF38KHeIiGk0vgWGeq6M2jbn9dbmVnmAfeySWwub_fkrRv6vFrZqN4FIi-4XoIDc4tnXgrAQg",
+    "token_type": "Bearer",
+    "expires_in": 600
+   }
+  },
+  {
+   "label": "nonce",
+   "status": 200,
+   "body": {
+    "c_nonce": "3d8a61ae-0a88-42d7-9442-920a32ba7599"
+   }
+  },
+  {
+   "label": "credential",
+   "status": 400,
+   "body": {
+    "error": "invalid_proof",
+    "error_description": "None of the submitted proofs passed validation."
+   }
+  },
+  {
+   "label": "mint",
+   "status": 200,
+   "body": {
+    "credential_offer_uri": "openid-credential-offer://?credential_offer_uri=https%3A%2F%2F172.16.134.37%2Fv1%2Fcertify%2Fcredential-offer-data%2F493d26eb-d876-4d8f-bff3-2e0377fe3dfc"
+   }
+  },
+  {
+   "label": "offer",
+   "status": 200,
+   "body": {
+    "credential_issuer": "https://172.16.134.37",
+    "credential_configuration_ids": [
+     "PlaygroundSdJwt"
+    ],
+    "grants": {
+     "urn:ietf:params:oauth:grant-type:pre-authorized_code": {
+      "pre-authorized_code": "YHAOlc9xY4XZvEhVsA5GqldCFELKqEnf"
+     }
+    }
+   }
+  },
+  {
+   "label": "token",
+   "status": 200,
+   "body": {
+    "access_token": "eyJraWQiOiJBOUd4Tno3VUlhLXdsXzFTZ0hCM1hVOWFNUlIwQlNnbi1KakFXR3BXNTE4IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJ7XCJmdWxsTmFtZVwiOlwiQXNoYSBUZXN0XCIsXCJkYXRlT2ZCaXJ0aFwiOlwiMTk5MC0wMS0wMVwiLFwiZ2VuZGVyXCI6XCJGZW1hbGVcIixcImVtYWlsXCI6XCJhc2hhQGV4YW1wbGUub3JnXCJ9IiwiYXVkIjoiaHR0cHM6Ly8xNzIuMTYuMTM0LjM3L3YxL2NlcnRpZnkvaXNzdWFuY2UvY3JlZGVudGlhbCIsInNjb3BlIjoicGxheWdyb3VuZF9zZGp3dCIsImlzcyI6Imh0dHBzOi8vMTcyLjE2LjEzNC4zNyIsImV4cCI6MTc5MTIxNDgyOSwiaWF0IjoxNzkxMjE0MjI5LCJjbGllbnRfaWQiOiIifQ.NpQe30FDwgkAdFNpCdA8zK3ZdDjHDf0J3vtid79DjqCSE0_a6yZbzBZUSgEpzDKzGSphEq4siHLgX6XPtB9d_-bhO2xf7c7fTiPru8sM4wYm3CDnBZAMrZNqnFH5f-xsMgnFrZ4W3UB3Nm_geFt2MkxVCo4nF5XVFuJArBhPJC9PSfreDC14X8vH3-PCbFGWQ6MNAHNsvm1F1V0X-qrX1l8NK_DzRhTGEnmiGoPzR6RUlYIINB4ZnudfnPRmIKqmIOty-nYzSFtJjvF38KHeIiGk0vgWGeq6M2jbn9dbmVnmAfeySWwub_fkrRv6vFrZqN4FIi-4XoIDc4tnXgrAQg",
+    "token_type": "Bearer",
+    "expires_in": 600
+   }
+  },
+  {
+   "label": "nonce",
+   "status": 200,
+   "body": {
+    "c_nonce": "167aec0f-fc4c-42c3-b8a2-2cdb26726550"
+   }
+  },
+  {
+   "label": "credential",
+   "status": 400,
+   "body": {
+    "error": "invalid_proof",
+    "error_description": "None of the submitted proofs passed validation."
+   }
+  },
+  {
+   "label": "mint",
+   "status": 200,
+   "body": {
+    "credential_offer_uri": "openid-credential-offer://?credential_offer_uri=https%3A%2F%2F172.16.134.37%2Fv1%2Fcertify%2Fcredential-offer-data%2Fc7bc739c-14ec-4a2a-9ca5-5e49442adbe0"
+   }
+  },
+  {
+   "label": "offer",
+   "status": 200,
+   "body": {
+    "credential_issuer": "https://172.16.134.37",
+    "credential_configuration_ids": [
+     "PlaygroundSdJwt"
+    ],
+    "grants": {
+     "urn:ietf:params:oauth:grant-type:pre-authorized_code": {
+      "pre-authorized_code": "3Vfcajb84j5Mb3uIF3t5ACRPQtGGVhL0"
+     }
+    }
+   }
+  },
+  {
+   "label": "token",
+   "status": 200,
+   "body": {
+    "access_token": "eyJraWQiOiJBOUd4Tno3VUlhLXdsXzFTZ0hCM1hVOWFNUlIwQlNnbi1KakFXR3BXNTE4IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJ7XCJmdWxsTmFtZVwiOlwiQXNoYSBUZXN0XCIsXCJkYXRlT2ZCaXJ0aFwiOlwiMTk5MC0wMS0wMVwiLFwiZ2VuZGVyXCI6XCJGZW1hbGVcIixcImVtYWlsXCI6XCJhc2hhQGV4YW1wbGUub3JnXCJ9IiwiYXVkIjoiaHR0cHM6Ly8xNzIuMTYuMTM0LjM3L3YxL2NlcnRpZnkvaXNzdWFuY2UvY3JlZGVudGlhbCIsInNjb3BlIjoicGxheWdyb3VuZF9zZGp3dCIsImlzcyI6Imh0dHBzOi8vMTcyLjE2LjEzNC4zNyIsImV4cCI6MTc5MTIxNDgyOSwiaWF0IjoxNzkxMjE0MjI5LCJjbGllbnRfaWQiOiIifQ.NpQe30FDwgkAdFNpCdA8zK3ZdDjHDf0J3vtid79DjqCSE0_a6yZbzBZUSgEpzDKzGSphEq4siHLgX6XPtB9d_-bhO2xf7c7fTiPru8sM4wYm3CDnBZAMrZNqnFH5f-xsMgnFrZ4W3UB3Nm_geFt2MkxVCo4nF5XVFuJArBhPJC9PSfreDC14X8vH3-PCbFGWQ6MNAHNsvm1F1V0X-qrX1l8NK_DzRhTGEnmiGoPzR6RUlYIINB4ZnudfnPRmIKqmIOty-nYzSFtJjvF38KHeIiGk0vgWGeq6M2jbn9dbmVnmAfeySWwub_fkrRv6vFrZqN4FIi-4XoIDc4tnXgrAQg",
+    "token_type": "Bearer",
+    "expires_in": 600
+   }
+  },
+  {
+   "label": "nonce",
+   "status": 200,
+   "body": {
+    "c_nonce": "03f1aee8-e341-4bf9-8939-c73f21238bcb"
+   }
+  },
+  {
+   "label": "credential",
+   "status": 400,
+   "body": {
+    "error": "invalid_proof",
+    "error_description": "None of the submitted proofs passed validation."
+   }
+  },
+  {
+   "label": "mint",
+   "status": 200,
+   "body": {
+    "credential_offer_uri": "openid-credential-offer://?credential_offer_uri=https%3A%2F%2F172.16.134.37%2Fv1%2Fcertify%2Fcredential-offer-data%2F25bd79a3-f207-4348-b984-207e3431baa0"
+   }
+  },
+  {
+   "label": "offer",
+   "status": 200,
+   "body": {
+    "credential_issuer": "https://172.16.134.37",
+    "credential_configuration_ids": [
+     "PlaygroundSdJwt"
+    ],
+    "grants": {
+     "urn:ietf:params:oauth:grant-type:pre-authorized_code": {
+      "pre-authorized_code": "MH51nJ7KchPDRBK3xkHPH6AkvgiiZbB0"
+     }
+    }
+   }
+  },
+  {
+   "label": "token",
+   "status": 200,
+   "body": {
+    "access_token": "eyJraWQiOiJBOUd4Tno3VUlhLXdsXzFTZ0hCM1hVOWFNUlIwQlNnbi1KakFXR3BXNTE4IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJ7XCJmdWxsTmFtZVwiOlwiQXNoYSBUZXN0XCIsXCJkYXRlT2ZCaXJ0aFwiOlwiMTk5MC0wMS0wMVwiLFwiZ2VuZGVyXCI6XCJGZW1hbGVcIixcImVtYWlsXCI6XCJhc2hhQGV4YW1wbGUub3JnXCJ9IiwiYXVkIjoiaHR0cHM6Ly8xNzIuMTYuMTM0LjM3L3YxL2NlcnRpZnkvaXNzdWFuY2UvY3JlZGVudGlhbCIsInNjb3BlIjoicGxheWdyb3VuZF9zZGp3dCIsImlzcyI6Imh0dHBzOi8vMTcyLjE2LjEzNC4zNyIsImV4cCI6MTc5MTIxNDgyOSwiaWF0IjoxNzkxMjE0MjI5LCJjbGllbnRfaWQiOiIifQ.NpQe30FDwgkAdFNpCdA8zK3ZdDjHDf0J3vtid79DjqCSE0_a6yZbzBZUSgEpzDKzGSphEq4siHLgX6XPtB9d_-bhO2xf7c7fTiPru8sM4wYm3CDnBZAMrZNqnFH5f-xsMgnFrZ4W3UB3Nm_geFt2MkxVCo4nF5XVFuJArBhPJC9PSfreDC14X8vH3-PCbFGWQ6MNAHNsvm1F1V0X-qrX1l8NK_DzRhTGEnmiGoPzR6RUlYIINB4ZnudfnPRmIKqmIOty-nYzSFtJjvF38KHeIiGk0vgWGeq6M2jbn9dbmVnmAfeySWwub_fkrRv6vFrZqN4FIi-4XoIDc4tnXgrAQg",
+    "token_type": "Bearer",
+    "expires_in": 600
+   }
+  },
+  {
+   "label": "token",
+   "status": 400,
+   "body": {
+    "error": "invalid_grant",
+    "error_description": "Pre-authorized code has already been used  or invalid"
+   }
+  },
+  {
+   "label": "nonce",
+   "status": 200,
+   "body": {
+    "c_nonce": "1d0f2839-a171-4b0a-b557-5ecf8f6e6238"
+   }
+  },
+  {
+   "label": "credential",
+   "status": 200,
+   "body": {
+    "credentials": [
+     {
+      "credential": "eyJ4NXQjUzI1NiI6IkZIdmdKZGY0QXdxaExPdHhjVlBEX0txYmVQMXE3VkZFODNUY3FBOFNtN0UiLCJ4NWMiOlsiTUlJREVEQ0NBZmlnQXdJQkFnSUk4NVg5QnE2UEhGQXdEUVlKS29aSWh2Y05BUUVMQlFBd2VERUxNQWtHQTFVRUJoTUNTVTR4Q3pBSkJnTlZCQWdNQWt0Qk1SSXdFQVlEVlFRSERBbENRVTVIUVV4UFVrVXhEakFNQmdOVkJBb01CVWxKU1ZSQ01SY3dGUVlEVlFRTERBNUZXRUZOVUV4RkxVTkZUbFJGVWpFZk1CMEdBMVVFQXd3V2QzZDNMbVY0WVcxd2JHVXVZMjl0SUNoU1QwOVVLVEFlRncweU5qRXdNRFV4TlRJNU5UQmFGdzB5T1RFd01EUXhOVEk1TlRCYU1JR2JNUXN3Q1FZRFZRUUdFd0pKVGpFTE1Ba0dBMVVFQ0F3Q1MwRXhFakFRQmdOVkJBY01DVUpCVGtkQlRFOVNSVEVPTUF3R0ExVUVDZ3dGU1VsSlZFSXhGekFWQmdOVkJBc01Ea1ZZUVUxUVRFVXRRMFZPVkVWU01VSXdRQVlEVlFRREREbDNkM2N1WlhoaGJYQnNaUzVqYjIwZ0tFTkZVbFJKUmxsZlZrTmZVMGxIVGw5RlExOVNNUzFGUTE5VFJVTlFNalUyVWpGZlUwbEhUaWt3V1RBVEJnY3Foa2pPUFFJQkJnZ3Foa2pPUFFNQkJ3TkNBQVRRQTM5OWZ6SVFsNkJxd1o4bXRHTXNlOElzcVRBMTJKWFNiN0FrQ243WG9xeEViK2VsS0hYVXFkMVAzc2Q3SXZxMmRKb0VwZXJxc1F5MEp1SkVEd0o3bzBVd1F6QVNCZ05WSFJNQkFmOEVDREFHQVFIL0FnRUJNQjBHQTFVZERnUVdCQlJDSmJJZ0l6NG1nUlpSR1QxVU53M0ZEdGVQTWpBT0JnTlZIUThCQWY4RUJBTUNBb1F3RFFZSktvWklodmNOQVFFTEJRQURnZ0VCQUZRWHF0YTRJTnJ3Q0dMZDFqL2YwTy85R2tzbVk3YmpMbWI3a3dhM3IwVlBYZTNuVUZ2QVNDN2pIZ3haVXVYVnhuQ25QRldWMVNDbHZBaGZtYzEzYWFrbFd3SXExaWZsZ25hM0VMam9UUzhGeDQ0MitZNUxCUWtsa0hlWXdwNk1PVnBqSlMvZ3NpWHZ0QjNvKzNZL0Q5Q1NDR3F2cmpBbFFBMEZXaVBkR3oyT0twTGhyMVROb0lleWlXbnFwQXFCMU9QdHdUWmdoMFh1cnBFc2J3dlNvN3h2cGZFZk90S2FjSHVxbnpqbk9GYnNyQjhyWlppVU9Jamg3dGs3OHdvZ2I3RFp3NjZxUmVnbTZXT0NITmp5ZkFEekRqYy9ZbjVXTXl1ZGlvSnBXNjhjYjhkdFNHQkljM3BUNkVqbld2MlJwSnZlNDJxZGNpSms2OTdFL3cvVGE5OD0iLCJNSUlEdHpDQ0FwK2dBd0lCQWdJSU1MZGYrc0szemhrd0RRWUpLb1pJaHZjTkFRRUxCUUF3ZURFTE1Ba0dBMVVFQmhNQ1NVNHhDekFKQmdOVkJBZ01Ba3RCTVJJd0VBWURWUVFIREFsQ1FVNUhRVXhQVWtVeERqQU1CZ05WQkFvTUJVbEpTVlJDTVJjd0ZRWURWUVFMREE1RldFRk5VRXhGTFVORlRsUkZVakVmTUIwR0ExVUVBd3dXZDNkM0xtVjRZVzF3YkdVdVkyOXRJQ2hTVDA5VUtUQWVGdzB5TmpFd01EVXhOVEk1TkRsYUZ3MHpOREV3TURNeE5USTVORGxhTUhneEN6QUpCZ05WQkFZVEFrbE9NUXN3Q1FZRFZRUUlEQUpMUVRFU01CQUdBMVVFQnd3SlFrRk9SMEZNVDFKRk1RNHdEQVlEVlFRS0RBVkpTVWxVUWpFWE1CVUdBMVVFQ3d3T1JWaEJUVkJNUlMxRFJVNVVSVkl4SHpBZEJnTlZCQU1NRm5kM2R5NWxlR0Z0Y0d4bExtTnZiU0FvVWs5UFZDa3dnZ0VpTUEwR0NTcUdTSWIzRFFFQkFRVUFBNElCRHdBd2dnRUtBb0lCQVFDZ3NGWkFGWGcwWGc3NDI5QUtQVTEvMFhuYytZQTh5eTRMU3ljRzBJT0o4dzJEYUlpL0VtRnByMHFSMzhXWXB0cHVpWTZUM0ZlRUV5TGczR1lSSEtaaWhxVHczaHRvQXR4bHp1NnRZMmNvNFNLSXB2eWRNYzZIL2lqdmRSK1V3bXFjOE82b3U1cXdmT29FNUVZM1pTdnQySnhWOC9rU0MrK0Fkajhlc0V6aUx2T3o5V3JLakRyRmx3Q1dSbUJ1bjhjcGFMSVZsbHcrWktUYUMzeXR3Z00yTGUrK0ZlWUJqNU13OS9uTVdSQ1lZYzBQQzdMWHpvaVNZa0cxcjhYcDBpUG9weHBFRmRVLzBTUkxpcHEyZnJOZm1ZWWFSWFhSdlBuVzlCVDZSblVWS1FvM2pVQUMxS05lbC9nVnRvRWM5bWJlMzRNUGxnMVBWaXpkcTFER0ltUjFBZ01CQUFHalJUQkRNQklHQTFVZEV3RUIvd1FJTUFZQkFmOENBUUl3SFFZRFZSME9CQllFRktyeGZDZFJCZTAvZGY3M1Q4TWtsTy9talhwdk1BNEdBMVVkRHdFQi93UUVBd0lDaERBTkJna3Foa2lHOXcwQkFRc0ZBQU9DQVFFQURVV1VyTllISHNOellrdWQ5dDRDZWExNDNDYTdmUmFVbHhTczdVOGZSYVVOMHRyVXZvMEhMK3BuTDNZanEzSHVPM08vRXdKenR4ek5yY0d3cW1RR3UzRVdacjdyUVRXakdnU056YW5iK0FKSktSSmk0azk5aVFISDVTRmNXMlFsMEkrTjdnbm8veVgvZGljdm43aEFKTUpmSFRoMkU1MWtSbzR4TzdWOUYvemkxNzh3dHZXSW8zOU93MmlaczZkc3orNFpFR2NDVzBsN2gwQTNKSHJzekUxZzhXM084VkYwZDA0L2xWRm9sUXZEdlYxeGFnelBqVElrMHRHc094dHpvc2ZXRkJRYVpiN29Ub0t1MnF4L0R4VzJHQUQ2cHZtTnRVeUFqYkJyYWtHM2ZLZHEyVkJNZm96VUJyQkVJY1g2Z2F2R3lLcSt2djJ2bGltWU1ncHpCdz09Il0sImtpZCI6ImQ2V3hWVU9mY2hUQWJvSmg5cDI3NnU1Rkp4bDFIazI4REtkNS1TNDI2bzQiLCJ0eXAiOiJkYytzZC1qd3QiLCJhbGciOiJFUzI1NiJ9.eyJnZW5kZXIiOiJGZW1hbGUiLCJ2Y3QiOiJQbGF5Z3JvdW5kU2RKd3QiLCJpc3MiOiJodHRwczovLzE3Mi4xNi4xMzQuMzciLCJmdWxsTmFtZSI6IkFzaGEgVGVzdCIsImRhdGVPZkJpcnRoIjoiMTk5MC0wMS0wMSIsImNuZiI6eyJraWQiOiJkaWQ6andrOmV5SnJkSGtpT2lKRlF5SXNJbmdpT2lKQk1XTkdaMmhZTkY5a2FVbFpPWEZuWjNCV2RWUm5aMGRTVnpaNFNtdFVOakExYzA1S1NYQm9lRlYzSWl3aWVTSTZJa2xIUlVKaVh6bDJSbTkzVUhodGIwTmxlalo1U21Gb1VubEhiblp1UkVOVlJXbE5WSGQzWlcxSkxVa2lMQ0pqY25ZaU9pSlFMVEkxTmlKOSMwIn0sImlkIjoiaHR0cHM6Ly9tb3NpcC5pby9jcmVkZW50aWFsL2Q1ODVlODZjLTM4NDctNDI0Zi04MzM1LTkzYmI2ZDMwMDllZCIsImVtYWlsIjoiYXNoYUBleGFtcGxlLm9yZyJ9.ETHsD0Q8UyzjHRwyLrxVFHXNn32p4ziE-4Afxbr4HJ_98q1I4liAGPNoov4blkJY8mmdvk0gLhm5-R6QmXZcOQ~"
+     }
+    ]
+   }
+  },
+  {
+   "label": "token",
+   "status": 400,
+   "body": {
+    "error": "invalid_grant",
+    "error_description": "Pre-authorized code has already been used  or invalid"
+   }
+  },
+  {
+   "label": "mint",
+   "status": 200,
+   "body": {
+    "credential_offer_uri": "openid-credential-offer://?credential_offer_uri=https%3A%2F%2F172.16.134.37%2Fv1%2Fcertify%2Fcredential-offer-data%2F4117e9f7-f14b-48c4-8239-1afeefa86eeb"
+   }
+  },
+  {
+   "label": "offer",
+   "status": 200,
+   "body": {
+    "credential_issuer": "https://172.16.134.37",
+    "credential_configuration_ids": [
+     "PlaygroundSdJwt"
+    ],
+    "grants": {
+     "urn:ietf:params:oauth:grant-type:pre-authorized_code": {
+      "pre-authorized_code": "3Cd59xoTlMTrnFAScN6vdAQdDBRXKFok"
+     }
+    }
+   }
+  },
+  {
+   "label": "token",
+   "status": 400,
+   "body": {
+    "error": "invalid_request",
+    "error_description": "code is required"
+   }
+  },
+  {
+   "label": "token",
+   "status": 200,
+   "body": {
+    "access_token": "eyJraWQiOiJBOUd4Tno3VUlhLXdsXzFTZ0hCM1hVOWFNUlIwQlNnbi1KakFXR3BXNTE4IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJ7XCJmdWxsTmFtZVwiOlwiQXNoYSBUZXN0XCIsXCJkYXRlT2ZCaXJ0aFwiOlwiMTk5MC0wMS0wMVwiLFwiZ2VuZGVyXCI6XCJGZW1hbGVcIixcImVtYWlsXCI6XCJhc2hhQGV4YW1wbGUub3JnXCJ9IiwiYXVkIjoiaHR0cHM6Ly8xNzIuMTYuMTM0LjM3L3YxL2NlcnRpZnkvaXNzdWFuY2UvY3JlZGVudGlhbCIsInNjb3BlIjoicGxheWdyb3VuZF9zZGp3dCIsImlzcyI6Imh0dHBzOi8vMTcyLjE2LjEzNC4zNyIsImV4cCI6MTc5MTIxNDgyOSwiaWF0IjoxNzkxMjE0MjI5LCJjbGllbnRfaWQiOiIifQ.NpQe30FDwgkAdFNpCdA8zK3ZdDjHDf0J3vtid79DjqCSE0_a6yZbzBZUSgEpzDKzGSphEq4siHLgX6XPtB9d_-bhO2xf7c7fTiPru8sM4wYm3CDnBZAMrZNqnFH5f-xsMgnFrZ4W3UB3Nm_geFt2MkxVCo4nF5XVFuJArBhPJC9PSfreDC14X8vH3-PCbFGWQ6MNAHNsvm1F1V0X-qrX1l8NK_DzRhTGEnmiGoPzR6RUlYIINB4ZnudfnPRmIKqmIOty-nYzSFtJjvF38KHeIiGk0vgWGeq6M2jbn9dbmVnmAfeySWwub_fkrRv6vFrZqN4FIi-4XoIDc4tnXgrAQg",
+    "token_type": "Bearer",
+    "expires_in": 600
+   }
+  },
+  {
+   "label": "mint",
+   "status": 200,
+   "body": {
+    "credential_offer_uri": "openid-credential-offer://?credential_offer_uri=https%3A%2F%2F172.16.134.37%2Fv1%2Fcertify%2Fcredential-offer-data%2Fb31e6ff4-86c0-4227-9d78-9134e6a051c7"
+   }
+  },
+  {
+   "label": "offer",
+   "status": 200,
+   "body": {
+    "credential_issuer": "https://172.16.134.37",
+    "credential_configuration_ids": [
+     "PlaygroundSdJwt"
+    ],
+    "grants": {
+     "urn:ietf:params:oauth:grant-type:pre-authorized_code": {
+      "pre-authorized_code": "9lCMU4KqW2rjbguwxbncJnLQigeKqmfV"
+     }
+    }
+   }
+  },
+  {
+   "label": "token",
+   "status": 500,
+   "body": {
+    "error": "server_error",
+    "error_description": "Internal server error"
+   }
+  },
+  {
+   "label": "nonce",
+   "status": 200,
+   "body": {
+    "c_nonce": "bd5caaf9-dbdf-4c6b-967b-51a69fa66f8f"
+   }
+  },
+  {
+   "label": "credential",
+   "status": 401,
+   "body": ""
+  }
+ ]
+}

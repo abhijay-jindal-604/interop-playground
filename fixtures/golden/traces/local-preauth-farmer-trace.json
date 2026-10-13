@@ -1,0 +1,322 @@
+[
+  {
+    "method": "GET",
+    "url": "http://localhost:8090/.well-known/openid-credential-issuer",
+    "reqHeaders": {},
+    "status": 404,
+    "resHeaders": {
+      "connection": "keep-alive",
+      "content-type": "application/json",
+      "date": "Sun, 27 Sep 2026 13:18:33 GMT",
+      "keep-alive": "timeout=60",
+      "transfer-encoding": "chunked"
+    },
+    "resBody": {
+      "timestamp": 1790515113294,
+      "status": 404,
+      "error": "Not Found",
+      "path": "/.well-known/openid-credential-issuer"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "http://localhost:8090/v1/certify/.well-known/openid-credential-issuer",
+    "reqHeaders": {},
+    "status": 200,
+    "resHeaders": {
+      "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+      "connection": "keep-alive",
+      "content-type": "application/json",
+      "date": "Sun, 27 Sep 2026 13:18:33 GMT",
+      "expires": "0",
+      "keep-alive": "timeout=60",
+      "pragma": "no-cache",
+      "transfer-encoding": "chunked",
+      "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "x-xss-protection": "0"
+    },
+    "resBody": {
+      "display": [
+        {
+          "name": "Farmer Issuer",
+          "locale": "en"
+        }
+      ],
+      "credential_issuer": "http://localhost:8090",
+      "authorization_servers": [
+        "http://localhost:8090"
+      ],
+      "credential_endpoint": "http://localhost:8090/v1/certify/issuance/credential",
+      "nonce_endpoint": "http://localhost:8090/v1/certify/nonce",
+      "credential_configurations_supported": {
+        "FarmerCredential": {
+          "format": "ldp_vc",
+          "scope": "mock_identity_vc_ldp",
+          "cryptographic_binding_methods_supported": [
+            "did:jwk"
+          ],
+          "credential_signing_alg_values_supported": [
+            "EdDSA"
+          ],
+          "proof_types_supported": {
+            "jwt": {
+              "proof_signing_alg_values_supported": [
+                "RS256",
+                "ES256"
+              ]
+            }
+          },
+          "credential_definition": {
+            "type": [
+              "FarmerCredential",
+              "VerifiableCredential"
+            ],
+            "@context": [
+              "https://www.w3.org/2018/credentials/v1"
+            ]
+          },
+          "credential_metadata": {
+            "display": [
+              {
+                "logo": {
+                  "uri": "https://mosip.github.io/inji-config/logos/agro-vertias-logo.png",
+                  "alt_text": "Farmer Credential Logo"
+                },
+                "name": "Farmer Verifiable Credential",
+                "locale": "en",
+                "text_color": "#FFFFFF",
+                "background_color": "#12107c",
+                "background_image": {
+                  "uri": "https://mosip.github.io/inji-config/logos/agro-vertias-logo.png"
+                }
+              }
+            ],
+            "claims": [
+              {
+                "path": [
+                  "phone"
+                ],
+                "display": [
+                  {
+                    "name": "Phone Number",
+                    "locale": "en"
+                  }
+                ]
+              },
+              {
+                "path": [
+                  "gender"
+                ],
+                "display": [
+                  {
+                    "name": "Gender",
+                    "locale": "en"
+                  }
+                ]
+              },
+              {
+                "path": [
+                  "fullName"
+                ],
+                "display": [
+                  {
+                    "name": "Full Name",
+                    "locale": "en"
+                  }
+                ]
+              },
+              {
+                "path": [
+                  "dateOfBirth"
+                ],
+                "display": [
+                  {
+                    "name": "Date of Birth",
+                    "locale": "en"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  {
+    "method": "POST",
+    "url": "http://localhost:8090/v1/certify/pre-authorized-data",
+    "reqHeaders": {
+      "Content-Type": "application/json"
+    },
+    "reqBody": "{\"credential_configuration_id\":\"FarmerCredential\",\"claims\":{\"fullName\":\"Playground Farmer\",\"phone\":\"9999999999\",\"dateOfBirth\":\"1990-01-01\",\"gender\":\"Female\"},\"expires_in\":600}",
+    "status": 200,
+    "resHeaders": {
+      "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+      "connection": "keep-alive",
+      "content-type": "application/json",
+      "date": "Sun, 27 Sep 2026 13:18:33 GMT",
+      "expires": "0",
+      "keep-alive": "timeout=60",
+      "pragma": "no-cache",
+      "transfer-encoding": "chunked",
+      "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "x-xss-protection": "0"
+    },
+    "resBody": {
+      "credential_offer_uri": "openid-credential-offer://?credential_offer_uri=http%3A%2F%2Flocalhost%3A8090%2Fv1%2Fcertify%2Fcredential-offer-data%2F7ccae5ed-bd42-455b-bfc0-06b60f25a7ac"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "http://localhost:8090/v1/certify/credential-offer-data/7ccae5ed-bd42-455b-bfc0-06b60f25a7ac",
+    "reqHeaders": {},
+    "status": 200,
+    "resHeaders": {
+      "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+      "connection": "keep-alive",
+      "content-type": "application/json",
+      "date": "Sun, 27 Sep 2026 13:18:33 GMT",
+      "expires": "0",
+      "keep-alive": "timeout=60",
+      "pragma": "no-cache",
+      "transfer-encoding": "chunked",
+      "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "x-xss-protection": "0"
+    },
+    "resBody": {
+      "credential_issuer": "http://localhost:8090",
+      "credential_configuration_ids": [
+        "FarmerCredential"
+      ],
+      "grants": {
+        "urn:ietf:params:oauth:grant-type:pre-authorized_code": {
+          "pre-authorized_code": "6mMHkJLEkLWyQzIuXL1Wsgx8lquK5o1h"
+        }
+      }
+    }
+  },
+  {
+    "method": "POST",
+    "url": "http://localhost:8090/v1/certify/oauth/token",
+    "reqHeaders": {
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    "reqBody": "grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Apre-authorized_code&pre-authorized_code=6mMHkJLEkLWyQzIuXL1Wsgx8lquK5o1h",
+    "status": 200,
+    "resHeaders": {
+      "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+      "connection": "keep-alive",
+      "content-type": "application/json",
+      "date": "Sun, 27 Sep 2026 13:18:33 GMT",
+      "expires": "0",
+      "keep-alive": "timeout=60",
+      "pragma": "no-cache",
+      "transfer-encoding": "chunked",
+      "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "x-xss-protection": "0"
+    },
+    "resBody": {
+      "access_token": "eyJraWQiOiJDQkJsRllKS0gwcXpxQ294YkYtbERVX280bUFjSDZUSHpxcno4RmJzZzU4IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJ7XCJmdWxsTmFtZVwiOlwiUGxheWdyb3VuZCBGYXJtZXJcIixcInBob25lXCI6XCI5OTk5OTk5OTk5XCIsXCJkYXRlT2ZCaXJ0aFwiOlwiMTk5MC0wMS0wMVwiLFwiZ2VuZGVyXCI6XCJGZW1hbGVcIn0iLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjgwOTAvdjEvY2VydGlmeS9pc3N1YW5jZS9jcmVkZW50aWFsIiwic2NvcGUiOiJtb2NrX2lkZW50aXR5X3ZjX2xkcCIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA5MCIsImV4cCI6MTc5MDUxNTcxMywiaWF0IjoxNzkwNTE1MTEzLCJjbGllbnRfaWQiOiIifQ.ZvkOOLmMNnwIzwW7iwZugwA_e6xn5_Rnaayj-UX70EEkOf5vDmS4cuNGWus1eZ8AIJDGdCtRl5evMSIAqkrTLmN1qLbLr3V1VG43IsCbPOxdi4PL3gJeWnMrLn3l9tigpCZDx-IO4X-1CpIz7vnooO4NN9nEmcNMhx1vl7s_dFgrbDJhw24uJZxw8zkzN49LaBt-iJdFSXpEHwezPhqKUCm8ZHz5dom3mopf2KAAXmT8-QESqliQXTkRJyZlt6ZhGRAZ9VIesLZEMjEclQdtcjW-qdmtZhTsI59AkELues6UKTd5fOdqJl-aTOoZz_oU26iUWHNrwKW0x2P8JcbnKA",
+      "token_type": "Bearer",
+      "expires_in": 600
+    }
+  },
+  {
+    "method": "POST",
+    "url": "http://localhost:8090/v1/certify/nonce",
+    "reqHeaders": {},
+    "status": 200,
+    "resHeaders": {
+      "cache-control": "no-store",
+      "connection": "keep-alive",
+      "content-type": "application/json",
+      "date": "Sun, 27 Sep 2026 13:18:33 GMT",
+      "keep-alive": "timeout=60",
+      "transfer-encoding": "chunked",
+      "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "x-xss-protection": "0"
+    },
+    "resBody": {
+      "c_nonce": "7c2c211d-e3e0-4617-9543-d53113a2156f"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "http://localhost:8090/v1/certify/issuance/credential",
+    "reqHeaders": {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer eyJraWQiOiJDQkJsRllKS0gwcXpxQ294YkYtbERVX280bUFjSDZUSHpxcno4RmJzZzU4IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJ7XCJmdWxsTmFtZVwiOlwiUGxheWdyb3VuZCBGYXJtZXJcIixcInBob25lXCI6XCI5OTk5OTk5OTk5XCIsXCJkYXRlT2ZCaXJ0aFwiOlwiMTk5MC0wMS0wMVwiLFwiZ2VuZGVyXCI6XCJGZW1hbGVcIn0iLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjgwOTAvdjEvY2VydGlmeS9pc3N1YW5jZS9jcmVkZW50aWFsIiwic2NvcGUiOiJtb2NrX2lkZW50aXR5X3ZjX2xkcCIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA5MCIsImV4cCI6MTc5MDUxNTcxMywiaWF0IjoxNzkwNTE1MTEzLCJjbGllbnRfaWQiOiIifQ.ZvkOOLmMNnwIzwW7iwZugwA_e6xn5_Rnaayj-UX70EEkOf5vDmS4cuNGWus1eZ8AIJDGdCtRl5evMSIAqkrTLmN1qLbLr3V1VG43IsCbPOxdi4PL3gJeWnMrLn3l9tigpCZDx-IO4X-1CpIz7vnooO4NN9nEmcNMhx1vl7s_dFgrbDJhw24uJZxw8zkzN49LaBt-iJdFSXpEHwezPhqKUCm8ZHz5dom3mopf2KAAXmT8-QESqliQXTkRJyZlt6ZhGRAZ9VIesLZEMjEclQdtcjW-qdmtZhTsI59AkELues6UKTd5fOdqJl-aTOoZz_oU26iUWHNrwKW0x2P8JcbnKA"
+    },
+    "reqBody": "{\"credential_configuration_id\":\"FarmerCredential\",\"proofs\":{\"jwt\":[\"eyJhbGciOiJFUzI1NiIsInR5cCI6Im9wZW5pZDR2Y2ktcHJvb2Yrand0Iiwia2lkIjoiZGlkOmp3azpleUpyZEhraU9pSkZReUlzSW5naU9pSXRVbEpYYUVOUk0xWk1SM1ZsYlhGWGMyOWlWblJWWjNoT1NXSkxNMmMxUjFoSlh6WjZOVmg2TWs5M0lpd2llU0k2SWpKVFQxbFVlVXQ1UjNoTFdWWXRSVVJXV21sRWMxZENWMHQyUkdoWFpGVkZiVUpGT1dvMVVEaEZaalFpTENKamNuWWlPaUpRTFRJMU5pSjkjMCJ9.eyJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjgwOTAiLCJpYXQiOjE3OTA1MTUxMTMsIm5vbmNlIjoiN2MyYzIxMWQtZTNlMC00NjE3LTk1NDMtZDUzMTEzYTIxNTZmIn0.kk5IXAspS77LaiuRuLgb7OQwn9vwtn8drUt95ThA-mmrAfFkeh5qeWalhfBLv8iIXoVWxzZ3iVoxcJyRnpEdhg\"]}}",
+    "status": 200,
+    "resHeaders": {
+      "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+      "connection": "keep-alive",
+      "content-type": "application/json",
+      "date": "Sun, 27 Sep 2026 13:18:34 GMT",
+      "expires": "0",
+      "keep-alive": "timeout=60",
+      "pragma": "no-cache",
+      "transfer-encoding": "chunked",
+      "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "x-xss-protection": "0"
+    },
+    "resBody": {
+      "credentials": [
+        {
+          "credential": {
+            "issuanceDate": "2026-09-27T13:18:33.547Z",
+            "credentialSubject": {
+              "gender": "Female",
+              "primaryCropType": "${primaryCropType}",
+              "mobileNumber": "${mobileNumber}",
+              "postalCode": "${postalCode}",
+              "landArea": "${landArea}",
+              "fullName": "Playground Farmer",
+              "secondaryCropType": "${secondaryCropType}",
+              "dateOfBirth": "1990-01-01",
+              "face": "${face}",
+              "farmerID": "${farmerID}",
+              "villageOrTown": "${villageOrTown}",
+              "district": "${district}",
+              "id": "did:jwk:eyJrdHkiOiJFQyIsIngiOiItUlJXaENRM1ZMR3VlbXFXc29iVnRVZ3hOSWJLM2c1R1hJXzZ6NVh6Mk93IiwieSI6IjJTT1lUeUt5R3hLWVYtRURWWmlEc1dCV0t2RGhXZFVFbUJFOWo1UDhFZjQiLCJjcnYiOiJQLTI1NiJ9#0",
+              "state": "${state}",
+              "landOwnershipType": "${landOwnershipType}"
+            },
+            "id": "https://mosip.io/credential/f1b9d2c0-4f06-48e1-8b86-4cecf586cbbb",
+            "type": [
+              "VerifiableCredential",
+              "FarmerCredential"
+            ],
+            "@context": [
+              "https://www.w3.org/2018/credentials/v1",
+              "https://inji.github.io/inji-config/contexts/farmer.json",
+              "https://w3id.org/security/suites/ed25519-2020/v1"
+            ],
+            "issuer": "did:web:8398-2405-201-1029-3025-e142-9ad3-e1f2-f543.ngrok-free.app",
+            "expirationDate": "2028-09-26T13:18:33.547Z",
+            "proof": {
+              "type": "Ed25519Signature2020",
+              "created": "2026-09-27T13:18:33Z",
+              "proofPurpose": "assertionMethod",
+              "verificationMethod": "did:web:8398-2405-201-1029-3025-e142-9ad3-e1f2-f543.ngrok-free.app#pjEZsqKzo-FScSiqK5-YshMpMLJTtvoe6CsD5bBBTtY",
+              "proofValue": "z4XG6jNpLm7SpphnY3cX5rC7DEx74xhb5wL2cYzXoSzHAnHGQSj4mv94Z8Rt467S9fNpgeiyavfRDLcHusedTHxVS"
+            }
+          }
+        }
+      ]
+    }
+  }
+]

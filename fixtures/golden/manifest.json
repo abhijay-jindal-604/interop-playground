@@ -1,0 +1,808 @@
+{
+  "note": "Copied from research/spikes/ (plan/11 section 3.2). TEST-ONLY evidence from throwaway local stacks and public Collab well-knowns; no private keys. Regenerate with make-manifest.mjs.",
+  "files": [
+    {
+      "file": "collab/certify-mock-wk.json",
+      "sids": [
+        "S-005"
+      ],
+      "sha256": "6b42cdf6e1be29cc13c851cfd73084d6b7c870473299132a1d410a2af748a294"
+    },
+    {
+      "file": "collab/collab-mimoto-issuers.json",
+      "sids": [
+        "S-005"
+      ],
+      "sha256": "c18cc22bc73bfc1511ccae519db7b9f3b3da8483141c17b3984a4c5a8f9c0de0"
+    },
+    {
+      "file": "collab/wk/Farmer.json",
+      "sids": [
+        "S-005"
+      ],
+      "sha256": "206b3da9f1a22eae111d30ab9b392e201a2da119656bfb135265040597a40196"
+    },
+    {
+      "file": "collab/wk/GlobalIDPass.json",
+      "sids": [
+        "S-005"
+      ],
+      "sha256": "5ac0aecf8a845bdb3072128a857db23594f7e932fb665dfefd6e84a48260ca07"
+    },
+    {
+      "file": "collab/wk/Land.json",
+      "sids": [
+        "S-005"
+      ],
+      "sha256": "babef4ba8e767fd0d159812f95582411ed17bb4b24e871b8faff7e76a6087998"
+    },
+    {
+      "file": "collab/wk/MockMdl.json",
+      "sids": [
+        "S-005"
+      ],
+      "sha256": "babef4ba8e767fd0d159812f95582411ed17bb4b24e871b8faff7e76a6087998"
+    },
+    {
+      "file": "collab/wk/Mosip.json",
+      "sids": [
+        "S-005"
+      ],
+      "sha256": "babef4ba8e767fd0d159812f95582411ed17bb4b24e871b8faff7e76a6087998"
+    },
+    {
+      "file": "collab/wk/MosipTAN.json",
+      "sids": [
+        "S-005"
+      ],
+      "sha256": "e1b12bceefed6d9e587d46d9851e7f005bd6aa7a2cfcd1cbe67aeed140b09733"
+    },
+    {
+      "file": "collab/wk/StayProtected.json",
+      "sids": [
+        "S-005"
+      ],
+      "sha256": "babef4ba8e767fd0d159812f95582411ed17bb4b24e871b8faff7e76a6087998"
+    },
+    {
+      "file": "collab/wk/TruckPass.json",
+      "sids": [
+        "S-005"
+      ],
+      "sha256": "cc67cac63b5be1306611d63308c629e81d166f357e68bd1bd78d4ee181179e5d"
+    },
+    {
+      "file": "collab/wk/alt-injicertify-insurance.json",
+      "sids": [
+        "S-005"
+      ],
+      "sha256": "4304609ea042ed5b440115d2d846e457405ea5bf26fe87459ca442bffe4b99e7"
+    },
+    {
+      "file": "collab/wk/alt-injicertify-landregistry.json",
+      "sids": [
+        "S-005"
+      ],
+      "sha256": "6777054c9a85f19d1b1cefaf3f417bcc3b8fd99c32bf15049f6d74c7b4c44b08"
+    },
+    {
+      "file": "collab/wk/alt-injicertify-mdl.json",
+      "sids": [
+        "S-005"
+      ],
+      "sha256": "7ae29c9c35c8d8367739afa4a329d78f5db896b4dfa18431567af574c2f2b2d8"
+    },
+    {
+      "file": "collab/wk/alt-injicertify-mock.json",
+      "sids": [
+        "S-005"
+      ],
+      "sha256": "6b42cdf6e1be29cc13c851cfd73084d6b7c870473299132a1d410a2af748a294"
+    },
+    {
+      "file": "collab/wk/alt-injicertify-mosipid.json",
+      "sids": [
+        "S-005"
+      ],
+      "sha256": "32cf31a57b7d74dcfe5d70930e651e34631278e1a2beec88781c193c66e97e00"
+    },
+    {
+      "file": "collab/wk/alt-injicertify-tan.json",
+      "sids": [
+        "S-005"
+      ],
+      "sha256": "e1b12bceefed6d9e587d46d9851e7f005bd6aa7a2cfcd1cbe67aeed140b09733"
+    },
+    {
+      "file": "collab/wk/iiit-dharwad.json",
+      "sids": [
+        "S-005"
+      ],
+      "sha256": "d43c3aa83c5d35914b78be2264b151b032e0958dff87122c2adb314b9ea3a19e"
+    },
+    {
+      "file": "peers/S-195-eudi-jar-by_reference.txt",
+      "sids": [
+        "S-195"
+      ],
+      "sha256": "2b9df5995a8d95446c62e4a495aa6c5b9d5f8514a0517d27a303a7019f47f0f4"
+    },
+    {
+      "file": "peers/S-195-eudi-jar-by_value.txt",
+      "sids": [
+        "S-195"
+      ],
+      "sha256": "7cf8cb52a2b3fad1867197474ae4140ba6dd9e058629fee761115a515b4a9c26"
+    },
+    {
+      "file": "peers/S-195-eudi-ts-certify.txt",
+      "sids": [
+        "S-195"
+      ],
+      "sha256": "1402b214b2d66b872aabfb14068c8f9a5a8aba6ebe6758be57e314306fad2682"
+    },
+    {
+      "file": "peers/S-195-eudi-ts-walt-novct.txt",
+      "sids": [
+        "S-195"
+      ],
+      "sha256": "e7c28c8ca42153641bfb5561dd92a34f56c5fab0102253f2facc4859b2f24f14"
+    },
+    {
+      "file": "peers/S-195-eudi-ts-walt.txt",
+      "sids": [
+        "S-195"
+      ],
+      "sha256": "12188b916fcc99b5ae1a85ca05ca35379285528c019c5e93efa23d64179d128b"
+    },
+    {
+      "file": "peers/S-195-walt-jar-redirecturi.txt",
+      "sids": [
+        "S-195"
+      ],
+      "sha256": "fc4c3432b0246f306cafb5a0dff1d268c26d0f5fd0880a87d51bd45006a584e9"
+    },
+    {
+      "file": "peers/S-195-walt-jar-signed.txt",
+      "sids": [
+        "S-195"
+      ],
+      "sha256": "f595c75e4b2b4b0d36da0e035489547dbf03e4f321ffa60d08916c0d643bfda7"
+    },
+    {
+      "file": "peers/S-195-walt-jar.txt",
+      "sids": [
+        "S-195"
+      ],
+      "sha256": "44517a172d56e4f08f53169500e4d27cc18199d8a66c392ae753685ecc2bae42"
+    },
+    {
+      "file": "peers/S-195-walt-ts.txt",
+      "sids": [
+        "S-195"
+      ],
+      "sha256": "7223bae1bea44ea36fa049fd44b46e422f250285be272f182379d838b977f023"
+    },
+    {
+      "file": "peers/S-196-ldp-path.txt",
+      "sids": [
+        "S-196"
+      ],
+      "sha256": "b1653ae4c457c5919d395aee6f249c6132abef013d66736a0d47738766e2e42e"
+    },
+    {
+      "file": "peers/S-196-ldp1.txt",
+      "sids": [
+        "S-196"
+      ],
+      "sha256": "ca0cb51acd9956cc1f1f42f65f3698ff555b5fbfebc578def60db3baee21cc79"
+    },
+    {
+      "file": "peers/S-196-result-ldp-path.json",
+      "sids": [
+        "S-196"
+      ],
+      "sha256": "3df31cc6b856581f2102be5a8b113ecc59d26350de1dcd7689e132ae6ffff042"
+    },
+    {
+      "file": "peers/S-196-result-ldp1.json",
+      "sids": [
+        "S-196"
+      ],
+      "sha256": "0050507250e9e13eca025edc301cd01ac4e4d035db55bc6deb4c3823ea86a589"
+    },
+    {
+      "file": "peers/S-196-result-sdjwt1.json",
+      "sids": [
+        "S-196"
+      ],
+      "sha256": "279b26ef77fb8f3be5c3a1af10e4fc32be2e59153b20a1aaa29eddf6f11862d6"
+    },
+    {
+      "file": "peers/S-196-sdjwt.txt",
+      "sids": [
+        "S-196"
+      ],
+      "sha256": "4aec94d97f5a0598ac906c0f975e7bcd20b6c02297eb00c63bb92e45e689b93a"
+    },
+    {
+      "file": "s060/local-sdjwt-savekey.txt",
+      "sids": [
+        "S-060"
+      ],
+      "sha256": "a0afeb08958690abc37fc0cff112449feef7694a3d24a16c59fafd654ea88746"
+    },
+    {
+      "file": "s060/openid4vp-uri.txt",
+      "sids": [
+        "S-060"
+      ],
+      "sha256": "ba00665992ca6f7c43102e399332ae15dc56c4f9c6fd7666a87d59a3575d5e84"
+    },
+    {
+      "file": "s060/sdjwt-raw.txt",
+      "sids": [
+        "S-060"
+      ],
+      "sha256": "e76e1b7ed2fe5e054615af2ce66e25d1db8a01ab2d6705d9045a6ffc0ef0bc3f"
+    },
+    {
+      "file": "s060/vp-request-resp.json",
+      "sids": [
+        "S-060"
+      ],
+      "sha256": "e4f4adab5c228a35098494876ec118fb6986cfc206279f4987ce859b098183c4"
+    },
+    {
+      "file": "s060/vp-results-1.json",
+      "sids": [
+        "S-060"
+      ],
+      "sha256": "48ec9f093cea74c9a49b6ea27554b216108ee153423309ed2dd9c60454779850"
+    },
+    {
+      "file": "sessions/S-200-issue.txt",
+      "sids": [
+        "S-200"
+      ],
+      "sha256": "1df4a65009aded7c6bf0b91424d34a28b5d46f74e661c7fb0c52f3f10ed9d79a"
+    },
+    {
+      "file": "sessions/S-200-listener-browser.log",
+      "sids": [
+        "S-200"
+      ],
+      "sha256": "b8219771f29f3d01aec7b30535c0148ba5fa30901d0367bec4fd3bf67ef538ce"
+    },
+    {
+      "file": "sessions/S-200-run1.txt",
+      "sids": [
+        "S-200"
+      ],
+      "sha256": "515bccf30867914d929a0e879863580b9964da2b6c027156569d2783658b24f3"
+    },
+    {
+      "file": "sessions/S-200-run2.txt",
+      "sids": [
+        "S-200"
+      ],
+      "sha256": "df155c2ce8c7864a87d007d0c6d972e02216ecce6d2e0b1c1052c6e497adb0bf"
+    },
+    {
+      "file": "sessions/S-200-run3.txt",
+      "sids": [
+        "S-200"
+      ],
+      "sha256": "41cc70549f8fad3fdd9216a4242a30cb2b4a935131b151fde9252a40ab821a2b"
+    },
+    {
+      "file": "sessions/S-200-run4-pre.txt",
+      "sids": [
+        "S-200"
+      ],
+      "sha256": "36d20ec466078f308220209564bb98ef2c9b6912da1819199b441593d9cab5e0"
+    },
+    {
+      "file": "sessions/S-200-run4-result.txt",
+      "sids": [
+        "S-200"
+      ],
+      "sha256": "8ae99e6c03a16b276e059b120a04d5f17dd75bef75d6e16511a3dd67523fd729"
+    },
+    {
+      "file": "sessions/S-200-run5-rcv-false.txt",
+      "sids": [
+        "S-200"
+      ],
+      "sha256": "1bffa3a370c8a2deb37421c3727fd294f58d108ebdb45b17cb685443d570601c"
+    },
+    {
+      "file": "sessions/S-201-eudi-by_reference-walt.txt",
+      "sids": [
+        "S-201"
+      ],
+      "sha256": "0c403e812fb470f7bbc4a20e467aa98e2dfe2931af2ccb11bde8a12ded8d2426"
+    },
+    {
+      "file": "sessions/S-201-request-uri-fetch.txt",
+      "sids": [
+        "S-201"
+      ],
+      "sha256": "27da69929e284de03de2ff9f2f99fa88c3f07c97dbb769ae77d518a6c52cfe47"
+    },
+    {
+      "file": "sessions/S-202-proxy-off.log",
+      "sids": [
+        "S-202"
+      ],
+      "sha256": "6ea383c1f0a0b9883916eb7d3239b87b960f01e012895e2a13be4777497567bb"
+    },
+    {
+      "file": "sessions/S-202-proxy-passthrough.log",
+      "sids": [
+        "S-202"
+      ],
+      "sha256": "370badef55a8af48c9d76865e50d26336152b1038d573431fe0dc0f02b204abe"
+    },
+    {
+      "file": "sessions/S-202-run-jar-off.txt",
+      "sids": [
+        "S-202"
+      ],
+      "sha256": "799a822853457df16fcc618bbb0f889a037b6c37ca78a2d35a2469a278457ab2"
+    },
+    {
+      "file": "sessions/S-202-run-jar-on.txt",
+      "sids": [
+        "S-202"
+      ],
+      "sha256": "b2843bd0fb21be387012b83c8e6cb3ebb97e5b60c870119c4f8a4b7e5e3a07ec"
+    },
+    {
+      "file": "sessions/S-202-run-jar-passthrough.txt",
+      "sids": [
+        "S-202"
+      ],
+      "sha256": "e09e7385bfbd10806653edc0513e25765494e20254288b949d392aee7c37b947"
+    },
+    {
+      "file": "sessions/S-202-run-premature-honor0.txt",
+      "sids": [
+        "S-202"
+      ],
+      "sha256": "ce9b3a353110b226e518e99b71a0a2f4d9e0603b05a3e568d81d7fe094202f2f"
+    },
+    {
+      "file": "sessions/S-202-run-premature-honor1.txt",
+      "sids": [
+        "S-202"
+      ],
+      "sha256": "5a13cd334d41f028938533bdfacc17fa342415691b4c6dbf3279963bd64d56d9"
+    },
+    {
+      "file": "sidecar/S-184-as-metadata.json",
+      "sids": [
+        "S-184"
+      ],
+      "sha256": "2ff08b97d6c61a35bfb2c2328dc15673bf1e5dadd9deccdb8c06e09235a10dc7"
+    },
+    {
+      "file": "sidecar/S-185-sdjwt-run-443.txt",
+      "sids": [
+        "S-185"
+      ],
+      "sha256": "c9c85989ee1fbcc788dc681c80b46b2cf9909cad3e1affdcbc9ec69dc6592436"
+    },
+    {
+      "file": "sidecar/S-185-sdjwt-run.txt",
+      "sids": [
+        "S-185"
+      ],
+      "sha256": "693bcf70aaaea87c6d0290954ea72e950b122c92ccf0c9815fc9e9abe5851891"
+    },
+    {
+      "file": "sidecar/S-186-ldp-run-443.txt",
+      "sids": [
+        "S-186"
+      ],
+      "sha256": "8c1f29a68ebce3e8f23aa0c50c28a8264dde79dc7d321d61572030c421c54457"
+    },
+    {
+      "file": "sidecar/S-186-ldp-run.txt",
+      "sids": [
+        "S-186"
+      ],
+      "sha256": "f9676c0cc6b6a2505fc3a9e5a2b98d78e247487bab518b0a2e76c50382685b25"
+    },
+    {
+      "file": "sidecar/S-193-conflicts.txt",
+      "sids": [
+        "S-193"
+      ],
+      "sha256": "e3184534135136c1115041a46aad31cbcaff41d1ea422102f648ce11d3e84586"
+    },
+    {
+      "file": "sidecar/S-193-dedup-run-1.txt",
+      "sids": [
+        "S-193"
+      ],
+      "sha256": "d1f3ce499da0ee3f3edfda7adb470928987429e085082076c459245b12dc24ac"
+    },
+    {
+      "file": "sidecar/S-193-run-1.txt",
+      "sids": [
+        "S-193"
+      ],
+      "sha256": "e96400f733ba37c6dea98b72acb005df6aefb2430c7bcd3f87dc325309b595b0"
+    },
+    {
+      "file": "sidecar/S-193-serve.txt",
+      "sids": [
+        "S-193"
+      ],
+      "sha256": "027b646b1ea758be13b1d85f6ac7ca2f22e3fdb9eee4dc09e60fd4ad98d8c688"
+    },
+    {
+      "file": "sidecar/issued-FarmerCredential.txt",
+      "sids": [
+        "S-185",
+        "S-186"
+      ],
+      "sha256": "31d4be458a465741af721a3ca61d88ada5360ab061e7845bd5d7f1977c1511c1"
+    },
+    {
+      "file": "sidecar/issued-PlaygroundSdJwt.txt",
+      "sids": [
+        "S-185",
+        "S-186"
+      ],
+      "sha256": "8612047ca5a135521021c5c08065695e620c391314d8bfc47c14f858906f3bf8"
+    },
+    {
+      "file": "tamper/S-189-matrix.json",
+      "sids": [
+        "S-189"
+      ],
+      "sha256": "4e5a848195742a9d8cd5ae4d276702fa0af47d48d632fca5ac33097781bafece"
+    },
+    {
+      "file": "tamper/S-189b-matrix.json",
+      "sids": [
+        "S-189"
+      ],
+      "sha256": "9dc7dd7198696ba4c394c8918c5370d1195f99e0c8549081782e4bc6f9697f0b"
+    },
+    {
+      "file": "tamper/S-190-tamper-run.txt",
+      "sids": [
+        "S-190"
+      ],
+      "sha256": "fef4661710ee277cceef2d61139ebfe3ff662b8cc642c2f76bbe28295d34b894"
+    },
+    {
+      "file": "tamper/local-farmer-vc-tunnel.json",
+      "sids": [
+        "S-018"
+      ],
+      "sha256": "534c075058af33569b9eb55f86dbb56a5f3d1baa7226e248e2f396a150a5e354"
+    },
+    {
+      "file": "tamper/local-farmer-vc.json",
+      "sids": [
+        "S-018"
+      ],
+      "sha256": "6c757a8e881f3165911b7d554219f6d7bc1819691813b4c686ce764335ce626a"
+    },
+    {
+      "file": "tamper/sample-vc-0.json",
+      "sids": [
+        "S-014"
+      ],
+      "sha256": "fba29da0b39aec32061e26dab3e605bcc2e8c1b8843927e51670c5eb048b9ae8"
+    },
+    {
+      "file": "tamper/sample-vc-1.json",
+      "sids": [
+        "S-014"
+      ],
+      "sha256": "d1fca24a8dadf118c72a0393e817c036782a3f10ebab7aec200ba752b19fb5e1"
+    },
+    {
+      "file": "tamper/sample-vc-2.json",
+      "sids": [
+        "S-014"
+      ],
+      "sha256": "35b8baa04f02c1625209acc49cf7616edf989284eb9793e18106494930b52739"
+    },
+    {
+      "file": "tamper/sample-vc-3.json",
+      "sids": [
+        "S-014"
+      ],
+      "sha256": "fdf041f7f488016ab485b37ea3d45f39dacf832b5b1ba084d3c29d2a8533cb67"
+    },
+    {
+      "file": "traces/local-preauth-farmer-trace.json",
+      "sids": [
+        "S-018"
+      ],
+      "sha256": "e886cafa028fe06e26646a25fcd9bc3d140c8ca31e92705d315e6ee57066df44"
+    },
+    {
+      "file": "traces/local-preauth-sdjwt-trace.json",
+      "sids": [
+        "S-019"
+      ],
+      "sha256": "4f4a9048a25444211ab2999ca3626c90c990bd12bb8bf422a89cc6421f706c41"
+    },
+    {
+      "file": "traces/trace-DrivingLicenseCredential-1790522678935.json",
+      "sids": [
+        "S-026"
+      ],
+      "sha256": "dda4480e266ea4bf67cf48f65d088a66619376c7fa1826cccfc394ef5b5699fa"
+    },
+    {
+      "file": "traces/trace-DrivingLicenseCredential-1790522716731.json",
+      "sids": [
+        "S-026"
+      ],
+      "sha256": "5c490c62fc86b36effaba09701132257dd1a19510e501fca87745556616c1e32"
+    },
+    {
+      "file": "traces/trace-DrivingLicenseCredential-1790522716949.json",
+      "sids": [
+        "S-026"
+      ],
+      "sha256": "9f9a5c7edadbbaa077751cf3298e1b1c0632473a218e3f739af5cf5cab007446"
+    },
+    {
+      "file": "traces/trace-DrivingLicenseCredential-1790522842812.json",
+      "sids": [
+        "S-026"
+      ],
+      "sha256": "f53bb634e435d23f86881d390638dc5021ff9e91deda1bbf149aa52d913fd307"
+    },
+    {
+      "file": "traces/trace-DrivingLicenseCredential-1790522988364.json",
+      "sids": [
+        "S-026"
+      ],
+      "sha256": "8b946845a20cfe4ef3233864b921d878fa42914a678c28dbca11ebb82a7aa6e1"
+    },
+    {
+      "file": "traces/trace-DrivingLicenseCredential-1790522988538.json",
+      "sids": [
+        "S-026"
+      ],
+      "sha256": "b45a8254c02bfce433690c3f2a9069f6f05c8a2213e56d3cdf6703146caaf7a9"
+    },
+    {
+      "file": "traces/trace-FarmerCredential-1790515057464.json",
+      "sids": [
+        "S-018"
+      ],
+      "sha256": "8996132938ae7fe03a23e0fa321af7b86447ec6ef12ac32f1f5eb7d49d65ad06"
+    },
+    {
+      "file": "traces/trace-FarmerCredential-1790515068900.json",
+      "sids": [
+        "S-018"
+      ],
+      "sha256": "9b2d3745c2c3704e2ad53a626e4a7b3277438be39acfdd3765dc5e22580d62b6"
+    },
+    {
+      "file": "traces/trace-FarmerCredential-1790515114311.json",
+      "sids": [
+        "S-018"
+      ],
+      "sha256": "e886cafa028fe06e26646a25fcd9bc3d140c8ca31e92705d315e6ee57066df44"
+    },
+    {
+      "file": "traces/trace-FarmerCredential-1790515382909.json",
+      "sids": [
+        "S-018"
+      ],
+      "sha256": "6e14242cdbffd047f3a85e11ba7c6d741fd7f633502bd109c7c90f80de4a60d4"
+    },
+    {
+      "file": "traces/trace-FarmerCredential-1790515394344.json",
+      "sids": [
+        "S-018"
+      ],
+      "sha256": "c1c4739a78ac1795b5eb8b7f068761ade9d7b17b8577c5e03acb849dde0ad0b6"
+    },
+    {
+      "file": "traces/trace-MockVerifiableCredential_SD_JWT-1790514362345.json",
+      "sids": [
+        "S-019"
+      ],
+      "sha256": "0e8c92e4cb6934e3d59eb63c47e097816e283b4d3ed52257f786c3f3f773d9fb"
+    },
+    {
+      "file": "traces/trace-PlaygroundSdJwt-1790515191780.json",
+      "sids": [
+        "S-019",
+        "S-060"
+      ],
+      "sha256": "4f4a9048a25444211ab2999ca3626c90c990bd12bb8bf422a89cc6421f706c41"
+    },
+    {
+      "file": "traces/trace-PlaygroundSdJwt-1790515220806.json",
+      "sids": [
+        "S-019",
+        "S-060"
+      ],
+      "sha256": "279da7d10a0bdedaa21a99f3e9a9c32b2bd306f3797c99ac3c8f39779e278935"
+    },
+    {
+      "file": "traces/trace-PlaygroundSdJwt-1790582888444.json",
+      "sids": [
+        "S-019",
+        "S-060"
+      ],
+      "sha256": "55b267451092f7244f8d1ef505dbaf78c17636d2e1f6d70984b99f4b65853b0f"
+    },
+    {
+      "file": "traces/trace-esignet-authcode-mock_identity_vc_ldp-1790521773585.json",
+      "sids": [
+        "S-024"
+      ],
+      "sha256": "a82e89be158fec06246a95c566c4266fd692ede023edb6133edea36ae607b68b"
+    },
+    {
+      "file": "traces/trace-esignet-authcode-mock_identity_vc_ldp-1790522002155.json",
+      "sids": [
+        "S-024"
+      ],
+      "sha256": "74db0e790a13dee991960b7c8bebbed131c6cc6e113bb6ece23d9e9dfbdd8be5"
+    },
+    {
+      "file": "traces/trace-esignet-authcode-mock_identity_vc_ldp-1790523372553.json",
+      "sids": [
+        "S-024"
+      ],
+      "sha256": "0997808108332b5fecf31f101d88878892ec04837ef3c0b6db95e9285c8c6b85"
+    },
+    {
+      "file": "traces/trace-esignet-authcode-mock_identity_vc_ldp-1790582526277.json",
+      "sids": [
+        "S-024"
+      ],
+      "sha256": "31580e30c98de5515ab97bec5121abc67da8073bfc1b4d97d7230d1b561b5cee"
+    },
+    {
+      "file": "traces/trace-esignet-authcode-mock_identity_vc_ldp-1790602314909.json",
+      "sids": [
+        "S-024"
+      ],
+      "sha256": "b53184ca8c4355a4e54aca34751541358631614e5d8a15e0c220bec402a18f04"
+    },
+    {
+      "file": "traces/trace-localverify-certdevelop-vp-ok.json",
+      "sids": [
+        "S-026"
+      ],
+      "sha256": "097b4130830130cb2ef24b8eb409b07e2e2c25e904b398d196690ca481c65953"
+    },
+    {
+      "file": "traces/trace-localverify-ui-vp-ok.json",
+      "sids": [
+        "S-022"
+      ],
+      "sha256": "bb6e28777bb6bbbccf7387bd900d096f02745f111e0eb2445622708c292dc0ea"
+    },
+    {
+      "file": "traces/trace-localverify-vp-bad-aud.json",
+      "sids": [
+        "S-022"
+      ],
+      "sha256": "ff55352144c1ed0058b47e7e41cd0cf95a256496d1aa1c0ed458c73146a12839"
+    },
+    {
+      "file": "traces/trace-localverify-vp-bad-nonce.json",
+      "sids": [
+        "S-022"
+      ],
+      "sha256": "ab6c89d0b8575a53c3f136192b3411a9ae1c36ecdcecf61621ba8f3e10b126d3"
+    },
+    {
+      "file": "traces/trace-localverify-vp-expired-kb.json",
+      "sids": [
+        "S-022"
+      ],
+      "sha256": "b335a4fa5624aadbe6a4dbc6916c9aea126108eb89a38b871b28f311688cfded"
+    },
+    {
+      "file": "traces/trace-localverify-vp-no-kb.json",
+      "sids": [
+        "S-022"
+      ],
+      "sha256": "828158314ee7c72c27f3ca3170942c1cb174b222b00acff8b3b54a73bd81b602"
+    },
+    {
+      "file": "traces/trace-localverify-vp-ok.json",
+      "sids": [
+        "S-022"
+      ],
+      "sha256": "7cbc67c24961e2604782ae5bda860912855c87d8d5ce0f0912ca0b82d81829ce"
+    },
+    {
+      "file": "traces/trace-localverify-vp-replay.json",
+      "sids": [
+        "S-022"
+      ],
+      "sha256": "9e3fba01aa8344d2d73ba826f1b9a2c8fc073e5ee275e04fba895090bf7e83a9"
+    },
+    {
+      "file": "traces/trace-localverify-vp-tamper-disclosure.json",
+      "sids": [
+        "S-022"
+      ],
+      "sha256": "06e6f0b50fba1019fa8dca6e9a566c319801ede5c4c4b79b95aa6bb81689fa5c"
+    },
+    {
+      "file": "traces/trace-localverify-vp-wrong-vct.json",
+      "sids": [
+        "S-022"
+      ],
+      "sha256": "0471afa4bcc56aeee8b8fb261d76f947a395e7556112dc4d6a3a3fa1acbd88aa"
+    },
+    {
+      "file": "traces/trace-vp-bad-aud.json",
+      "sids": [
+        "S-020"
+      ],
+      "sha256": "0dd62aaca69b5e65b94ce32076fa9c3bbc81d44ccc4ff5322ff4b70fc9a24222"
+    },
+    {
+      "file": "traces/trace-vp-bad-nonce.json",
+      "sids": [
+        "S-020"
+      ],
+      "sha256": "c56b8ecf378de8a9e72458eeb7e1167fd03cab73d3ab5493df55817ab526c0eb"
+    },
+    {
+      "file": "traces/trace-vp-expired-kb.json",
+      "sids": [
+        "S-020"
+      ],
+      "sha256": "e6023affbe28f34319e4fde95feaadda7abbf6141128c71e41318aa927e213d6"
+    },
+    {
+      "file": "traces/trace-vp-no-kb.json",
+      "sids": [
+        "S-020"
+      ],
+      "sha256": "16c8b9b648ad596207f44e932037dc696b55238bb51fc4db3eb00a7abfa95b51"
+    },
+    {
+      "file": "traces/trace-vp-ok.json",
+      "sids": [
+        "S-020"
+      ],
+      "sha256": "47518486df065ece9fe431d93e82f3451d81d340432e63333489f5d082db7641"
+    },
+    {
+      "file": "traces/trace-vp-replay.json",
+      "sids": [
+        "S-020"
+      ],
+      "sha256": "4e1f04fc2db1fb7448eabb8c2576db0ac7c221b259c6c88fb1c075eec1000b59"
+    },
+    {
+      "file": "traces/trace-vp-tamper-disclosure.json",
+      "sids": [
+        "S-020"
+      ],
+      "sha256": "c3cf5c1d5c9d037e0c38d0222a29e477099ade67a6c2138b4dfe2d1686153ee8"
+    },
+    {
+      "file": "traces/trace-vp-wrong-vct.json",
+      "sids": [
+        "S-020"
+      ],
+      "sha256": "955a30d2c10f57c5a052771ff425fb7974c4cd6307d57f3d12efcc73a6ca661b"
+    }
+  ]
+}

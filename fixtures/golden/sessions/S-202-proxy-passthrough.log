@@ -1,0 +1,8 @@
+{"runId":"runpassthrough","req":"POST v2/vp-session-request","upstreamCookieSent":false,"status":201,"setCookie":["transaction_id=<v>; Path=/v1/verify; Max-Age=300; Expires=Mo"],"note":"","bodyIn":292,"bodyOut":658}
+{"runId":"runpassthrough","req":"GET vp-request/req_ce89e26d-51d6-4141-826f-0d3b469f0a7f/status","upstreamCookieSent":false,"status":200,"setCookie":[],"note":"","bodyIn":0,"bodyOut":25}
+{"runId":"runpassthrough","req":"GET vp-request/req_ce89e26d-51d6-4141-826f-0d3b469f0a7f/status","upstreamCookieSent":false,"status":200,"setCookie":[],"note":"","bodyIn":0,"bodyOut":25}
+{"runId":"runpassthrough","req":"POST vp-session-results","upstreamCookieSent":false,"status":401,"setCookie":[],"note":"","bodyIn":72,"bodyOut":133}
+{"runId":"runpassthrough","req":"POST vp-session-results","upstreamCookieSent":false,"status":401,"setCookie":[],"note":"","bodyIn":72,"bodyOut":133}
+{"deny":"POST /proxy/verify/runpassthrough/v1/verify/v2/vp-session-results"}
+{"deny":"POST /proxy/verify/runpassthrough/v1/verify/actuator/health"}
+{"deny":"POST /proxy/verify/runpassthrough/v1/verify/v2/vp-request/req_ce89e26d-51d6-4141-826f-0d3b469f0a7f"}

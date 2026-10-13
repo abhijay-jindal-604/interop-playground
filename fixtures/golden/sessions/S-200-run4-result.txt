@@ -1,0 +1,2 @@
+{"transactionId":"txn_f1c07a8e-4cbf-4454-812d-3f6a0a8d0033","allChecksSuccessful":true,"credentialResults":[{"allChecksSuccessful":true,"schemaAndSignatureCheck":{"valid":true,"error":null},"expiryCheck":{"valid":true},"statusCheck":[],"claims":{},"verifiableCredential":"{\"issuanceDate\":\"2026-10-05T19:40:11.324Z\",\"credentialSubject\":{\"gender\":\"Female\",\"primaryCropType\":\"${primaryCropT
+[status 200]

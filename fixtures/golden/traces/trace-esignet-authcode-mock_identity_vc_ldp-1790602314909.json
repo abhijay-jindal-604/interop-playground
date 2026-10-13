@@ -1,0 +1,583 @@
+[
+  {
+    "method": "GET",
+    "url": "http://172.16.134.37:3005/.well-known/oauth-authorization-server",
+    "reqHeaders": {},
+    "status": 200,
+    "ms": 31,
+    "resHeaders": {
+      "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+      "connection": "keep-alive",
+      "content-encoding": "gzip",
+      "content-type": "application/json",
+      "date": "Mon, 28 Sep 2026 13:31:54 GMT",
+      "expires": "0",
+      "pragma": "no-cache",
+      "server": "nginx/1.28.0",
+      "transfer-encoding": "chunked",
+      "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "x-xss-protection": "0"
+    },
+    "resBody": {
+      "issuer": "http://172.16.134.37:3005",
+      "authorization_endpoint": "http://172.16.134.37:3005/authorize",
+      "token_endpoint": "http://172.16.134.37:3005/v1/esignet/oauth/v2/token",
+      "jwks_uri": "http://172.16.134.37:3005/.well-known/jwks.json",
+      "pushed_authorization_request_endpoint": "http://172.16.134.37:3005/v1/esignet/oauth/par",
+      "token_endpoint_auth_methods_supported": [
+        "private_key_jwt"
+      ],
+      "token_endpoint_auth_signing_alg_values_supported": [
+        "RS256",
+        "PS256",
+        "ES256"
+      ],
+      "scopes_supported": [
+        "openid",
+        "profile",
+        "email",
+        "phone",
+        "address"
+      ],
+      "response_modes_supported": [
+        "query"
+      ],
+      "grant_types_supported": [
+        "authorization_code"
+      ],
+      "response_types_supported": [
+        "code"
+      ],
+      "authorization_response_iss_parameter_supported": true
+    }
+  },
+  {
+    "method": "GET",
+    "url": "http://172.16.134.37:3005/v1/esignet/csrf/token",
+    "reqHeaders": {},
+    "status": 200,
+    "ms": 8,
+    "resHeaders": {
+      "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+      "connection": "keep-alive",
+      "content-encoding": "gzip",
+      "content-type": "application/json",
+      "date": "Mon, 28 Sep 2026 13:31:54 GMT",
+      "expires": "0",
+      "pragma": "no-cache",
+      "server": "nginx/1.28.0",
+      "set-cookie": "XSRF-TOKEN=98063262-6b47-4bba-b317-af352985ce86; Path=/; HttpOnly",
+      "transfer-encoding": "chunked",
+      "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "x-xss-protection": "0"
+    },
+    "resBody": {
+      "parameterName": "_csrf",
+      "token": "KHs4a4WXv4GM1SQRLZWeD-EGyS_pnFwIL3EvkgH9Vi0fJGEWEUMIXbalibOh40YlGriqbYNn5E3arWslThccpzPEbhh8QVkg",
+      "headerName": "X-XSRF-TOKEN"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "http://172.16.134.37:3005/v1/esignet/authorization/v3/oauth-details",
+    "reqHeaders": {
+      "Content-Type": "application/json",
+      "X-XSRF-TOKEN": "KHs4a4WXv4GM1SQRLZWeD-EGyS_pnFwIL3EvkgH9Vi0fJGEWEUMIXbalibOh40YlGriqbYNn5E3arWslThccpzPEbhh8QVkg"
+    },
+    "reqBody": "{\"requestTime\":\"2026-09-28T13:31:54.680Z\",\"request\":{\"clientId\":\"playground-mimoto\",\"scope\":\"mock_identity_vc_ldp\",\"responseType\":\"code\",\"redirectUri\":\"http://localhost:3004/redirect\",\"display\":\"popup\",\"prompt\":\"login\",\"acrValues\":\"mosip:idp:acr:generated-code\",\"nonce\":\"ksoD8VFohCa2Bsxx\",\"state\":\"st1790602314680\",\"claimsLocales\":\"en\",\"codeChallenge\":\"w9i-vCodCBi5WRK5tmQ8hBs3-ivbgOaOg8CUeg28Gto\",\"codeChallengeMethod\":\"S256\"}}",
+    "status": 200,
+    "ms": 17,
+    "resHeaders": {
+      "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+      "connection": "keep-alive",
+      "content-encoding": "gzip",
+      "content-type": "application/json",
+      "date": "Mon, 28 Sep 2026 13:31:54 GMT",
+      "expires": "0",
+      "pragma": "no-cache",
+      "server": "nginx/1.28.0",
+      "transfer-encoding": "chunked",
+      "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "x-xss-protection": "0"
+    },
+    "resBody": {
+      "responseTime": "2026-09-28T13:31:54.694Z",
+      "response": {
+        "transactionId": "a4zV-9b0GGnRvBNLjqFGt4lU5wdzkiyvyGDhfrQZmWQ",
+        "logoUrl": "https://mosip.github.io/inji-config/logos/agro-vertias-logo.png",
+        "authFactors": [
+          [
+            {
+              "type": "OTP",
+              "count": 0,
+              "subTypes": null
+            }
+          ]
+        ],
+        "authorizeScopes": [],
+        "essentialClaims": [],
+        "voluntaryClaims": [],
+        "configs": {
+          "wallet.qr-code-buffer-in-secs": 10,
+          "wallet.config": [
+            {
+              "wallet.name": "walletName",
+              "wallet.logo-url": "/images/qr_code.png",
+              "wallet.download-uri": "#",
+              "wallet.deep-link-uri": "io.mosip.residentapp.inji://wla-auth?linkCode=LINK_CODE&linkExpireDateTime=LINK_EXPIRE_DT",
+              "wallet.footer": true
+            }
+          ],
+          "otp.length": 6,
+          "password.regex": "^.{8,20}$",
+          "captcha.sitekey": "test-site-key",
+          "captcha.enable": "",
+          "password.max-length": 20,
+          "auth.factor.kbi.field-details": null,
+          "issuer": "http://172.16.134.37:3005",
+          "sbi.capture.score.finger": 70,
+          "sbi.timeout.CAPTURE": 30,
+          "send.otp.channels": "email,phone",
+          "linked-transaction-expire-in-secs": 240,
+          "username.prefix": "",
+          "sbi.port.range": "4501-4600",
+          "consent.screen.timeout-in-secs": 120,
+          "sbi.capture.count.finger": 1,
+          "sbi.capture.score.face": 70,
+          "consent.screen.timeout-buffer-in-secs": 5,
+          "username.regex": ".*",
+          "sbi.capture.count.face": 1,
+          "username.input-type": "text",
+          "auth.factor.kbi.individual-id-field": "",
+          "preauth-screen-timeout-in-secs": 300,
+          "username.postfix": "",
+          "login-id.options": [
+            {
+              "id": "vid",
+              "svg": "vid_icon",
+              "prefixes": "",
+              "postfix": "",
+              "maxLength": 16,
+              "regex": ".*"
+            }
+          ],
+          "sbi.bio.subtypes.iris": "UNKNOWN",
+          "signup.config": {
+            "signup.banner": true,
+            "signup.url": "http://localhost:8089/signup"
+          },
+          "sbi.timeout.DINFO": 30,
+          "sbi.capture.count.iris": 1,
+          "sbi.bio.subtypes.finger": "UNKNOWN",
+          "error.banner.close-timer": 10,
+          "sbi.capture.score.iris": 70,
+          "resend.otp.delay.secs": 180,
+          "clientAdditionalConfig": {
+            "userinfo_response_type": "JWS",
+            "purpose": {
+              "type": "verify"
+            },
+            "signup_banner_required": false,
+            "forgot_pwd_link_required": false,
+            "consent_expire_in_mins": 20
+          },
+          "username.max-length": 16,
+          "forgot-password.config": {
+            "forgot-password": true,
+            "forgot-password.url": "http://localhost:8089/reset-password"
+          },
+          "sbi.timeout.DISC": 30,
+          "auth.txnid.length": "10",
+          "sbi.env": "Developer",
+          "eKYC-steps.config": "http://localhost:8089/identity-verification"
+        },
+        "redirectUri": "http://localhost:3004/redirect",
+        "clientName": {
+          "@none": "Interop Playground (Mimoto)"
+        },
+        "credentialScopes": [
+          "mock_identity_vc_ldp"
+        ]
+      },
+      "errors": []
+    }
+  },
+  {
+    "method": "POST",
+    "url": "http://172.16.134.37:3005/v1/esignet/authorization/send-otp",
+    "reqHeaders": {
+      "Content-Type": "application/json",
+      "X-XSRF-TOKEN": "KHs4a4WXv4GM1SQRLZWeD-EGyS_pnFwIL3EvkgH9Vi0fJGEWEUMIXbalibOh40YlGriqbYNn5E3arWslThccpzPEbhh8QVkg",
+      "oauth-details-key": "a4zV-9b0GGnRvBNLjqFGt4lU5wdzkiyvyGDhfrQZmWQ",
+      "oauth-details-hash": "lsC6c63PU0_18YZfdhgnAe8F3HW64hp9VxHfZjOwiQs"
+    },
+    "reqBody": "{\"requestTime\":\"2026-09-28T13:31:54.697Z\",\"request\":{\"transactionId\":\"a4zV-9b0GGnRvBNLjqFGt4lU5wdzkiyvyGDhfrQZmWQ\",\"individualId\":\"2154189532\",\"otpChannels\":[\"email\"],\"captchaToken\":\"dummy\"}}",
+    "status": 200,
+    "ms": 35,
+    "resHeaders": {
+      "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+      "connection": "keep-alive",
+      "content-encoding": "gzip",
+      "content-type": "application/json",
+      "date": "Mon, 28 Sep 2026 13:31:54 GMT",
+      "expires": "0",
+      "pragma": "no-cache",
+      "server": "nginx/1.28.0",
+      "transfer-encoding": "chunked",
+      "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "x-xss-protection": "0"
+    },
+    "resBody": {
+      "responseTime": "2026-09-28T13:31:54.727Z",
+      "response": {
+        "transactionId": "a4zV-9b0GGnRvBNLjqFGt4lU5wdzkiyvyGDhfrQZmWQ",
+        "maskedEmail": "XX5XX8XX3X@example.org",
+        "maskedMobile": null
+      },
+      "errors": []
+    }
+  },
+  {
+    "method": "POST",
+    "url": "http://172.16.134.37:3005/v1/esignet/authorization/v3/authenticate",
+    "reqHeaders": {
+      "Content-Type": "application/json",
+      "X-XSRF-TOKEN": "KHs4a4WXv4GM1SQRLZWeD-EGyS_pnFwIL3EvkgH9Vi0fJGEWEUMIXbalibOh40YlGriqbYNn5E3arWslThccpzPEbhh8QVkg",
+      "oauth-details-key": "a4zV-9b0GGnRvBNLjqFGt4lU5wdzkiyvyGDhfrQZmWQ",
+      "oauth-details-hash": "lsC6c63PU0_18YZfdhgnAe8F3HW64hp9VxHfZjOwiQs"
+    },
+    "reqBody": "{\"requestTime\":\"2026-09-28T13:31:54.732Z\",\"request\":{\"transactionId\":\"a4zV-9b0GGnRvBNLjqFGt4lU5wdzkiyvyGDhfrQZmWQ\",\"individualId\":\"2154189532\",\"challengeList\":[{\"authFactorType\":\"OTP\",\"challenge\":\"111111\",\"format\":\"alpha-numeric\"}]}}",
+    "status": 200,
+    "ms": 46,
+    "resHeaders": {
+      "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+      "connection": "keep-alive",
+      "content-encoding": "gzip",
+      "content-type": "application/json",
+      "date": "Mon, 28 Sep 2026 13:31:54 GMT",
+      "expires": "0",
+      "pragma": "no-cache",
+      "server": "nginx/1.28.0",
+      "transfer-encoding": "chunked",
+      "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "x-xss-protection": "0"
+    },
+    "resBody": {
+      "responseTime": "2026-09-28T13:31:54.775Z",
+      "response": {
+        "transactionId": "a4zV-9b0GGnRvBNLjqFGt4lU5wdzkiyvyGDhfrQZmWQ",
+        "consentAction": "NOCAPTURE"
+      },
+      "errors": []
+    }
+  },
+  {
+    "method": "POST",
+    "url": "http://172.16.134.37:3005/v1/esignet/authorization/auth-code",
+    "reqHeaders": {
+      "Content-Type": "application/json",
+      "X-XSRF-TOKEN": "KHs4a4WXv4GM1SQRLZWeD-EGyS_pnFwIL3EvkgH9Vi0fJGEWEUMIXbalibOh40YlGriqbYNn5E3arWslThccpzPEbhh8QVkg",
+      "oauth-details-key": "a4zV-9b0GGnRvBNLjqFGt4lU5wdzkiyvyGDhfrQZmWQ",
+      "oauth-details-hash": "lsC6c63PU0_18YZfdhgnAe8F3HW64hp9VxHfZjOwiQs"
+    },
+    "reqBody": "{\"requestTime\":\"2026-09-28T13:31:54.778Z\",\"request\":{\"transactionId\":\"a4zV-9b0GGnRvBNLjqFGt4lU5wdzkiyvyGDhfrQZmWQ\",\"acceptedClaims\":[],\"permittedAuthorizeScopes\":[]}}",
+    "status": 200,
+    "ms": 21,
+    "resHeaders": {
+      "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+      "connection": "keep-alive",
+      "content-encoding": "gzip",
+      "content-type": "application/json",
+      "date": "Mon, 28 Sep 2026 13:31:54 GMT",
+      "expires": "0",
+      "pragma": "no-cache",
+      "server": "nginx/1.28.0",
+      "transfer-encoding": "chunked",
+      "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "x-xss-protection": "0"
+    },
+    "resBody": {
+      "responseTime": "2026-09-28T13:31:54.795Z",
+      "response": {
+        "nonce": "ksoD8VFohCa2Bsxx",
+        "state": "st1790602314680",
+        "code": "f4kPpGg_-ByS4rDwHaL72JKDeABoFR4rjsIxpK-AsbU",
+        "redirectUri": "http://localhost:3004/redirect"
+      },
+      "errors": []
+    }
+  },
+  {
+    "method": "POST",
+    "url": "http://172.16.134.37:3005/v1/esignet/oauth/v2/token",
+    "reqHeaders": {
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    "reqBody": "grant_type=authorization_code&code=f4kPpGg_-ByS4rDwHaL72JKDeABoFR4rjsIxpK-AsbU&redirect_uri=http%3A%2F%2Flocalhost%3A3004%2Fredirect&client_id=playground-mimoto&code_verifier=8W1gd60AFCKmb0GCtGa_3Fbkd4RwSov4aD07tXtWn_g&client_assertion_type=urn%3Aietf%3Aparams%3Aoauth%3Aclient-assertion-type%3Ajwt-bearer&client_assertion=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJwbGF5Z3JvdW5kLW1pbW90byIsInN1YiI6InBsYXlncm91bmQtbWltb3RvIiwiYXVkIjoiaHR0cDovLzE3Mi4xNi4xMzQuMzc6MzAwNS92MS9lc2lnbmV0L29hdXRoL3YyL3Rva2VuIiwiaWF0IjoxNzkwNjAyMzE0LCJleHAiOjE3OTA2MDI0MzQsImp0aSI6IktUZVdsM09RYlFNWFdpR2kifQ.MB0abafcr37wCSsZHx-yUPiAcJSJIrZmLYc7zVv17IREaGToFIhESv2MbpSEqqq9tykpWyUbxjLpbQO1PaYCQXknldF3Z6zGy_4cfBjxiZEL8d0TLyYXpvks_pztXEZch0eETUMn-euQmTeY2qukzP9anCnTalZbZAqCfAQ7qUqto9hHe_pUzimzfey4GR0emvsgD7fX20aYawL6z1vSj-8bXnn99AqQ48qLuRj393tXRW5-v2zN8gDNWO92Yxjb8DpBe550xAxisRauF_vONuEb07r_R6MLnjl4-RX6L-skm0roGk_3AUTjpQYJrmYde1sE8VPSPjG0OQQ0jL4k8g",
+    "status": 200,
+    "ms": 29,
+    "resHeaders": {
+      "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+      "connection": "keep-alive",
+      "content-encoding": "gzip",
+      "content-type": "application/json",
+      "date": "Mon, 28 Sep 2026 13:31:54 GMT",
+      "expires": "0",
+      "pragma": "no-cache",
+      "server": "nginx/1.28.0",
+      "transfer-encoding": "chunked",
+      "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "x-xss-protection": "0"
+    },
+    "resBody": {
+      "token_type": "Bearer",
+      "access_token": "eyJraWQiOiJPdDhRM3RKYjg5cGxNb1BTZzZxM1hNdExzVlBMSjFOS0p0eUNKT0RnckdZIiwiYWxnIjoiUFMyNTYifQ.eyJzdWIiOiIyMTU0MTg5NTMyIiwiYXVkIjoiaHR0cDpcL1wvMTcyLjE2LjEzNC4zNzo4MDkzXC92MVwvY2VydGlmeVwvaXNzdWFuY2VcL2NyZWRlbnRpYWwiLCJjX25vbmNlX2V4cGlyZXNfaW4iOjYwLCJjX25vbmNlIjoiTndyeGRYZ2doa1dYRVRZMXhnbWsiLCJhenAiOiJwbGF5Z3JvdW5kLW1pbW90byIsInNjb3BlIjoibW9ja19pZGVudGl0eV92Y19sZHAiLCJpc3MiOiJodHRwOlwvXC8xNzIuMTYuMTM0LjM3OjMwMDUiLCJleHAiOjE3OTA2MDM1MTQsImlhdCI6MTc5MDYwMjMxNCwiY2xpZW50X2lkIjoicGxheWdyb3VuZC1taW1vdG8ifQ.W1DwR5pY8N7ZjBz7uOMqLaM5K8tv77GhlzJBS8eWNtyQIGbD9kjRqMBJmUiDCy00h7LkVV4KKZ2b-W-0rI2bmeF89aYLIdcUiqehzmq2wkJNmsWXSyj3__imsP51wGY9ErgZMkPjvfzDSzm2Tpra6ARLqUGc5obGAtjYUBhW5bfPxiE4lLgENdEhc8SuhrNKCgNnfpx9RTWzbdlrpkPYqvQeCSupeeuGS4-fT7BXO1qcFH8fDuDYMW8c5ExuIxCeeb3R1gkcZCNdm_sSZ8KXsdGTggTZzU1grcP_mTwE61AiF_Q1FQlZjt24dyVbPvdWCrPuV8m2CUVxFbuuQxhfMA",
+      "expires_in": 3600,
+      "c_nonce": "NwrxdXgghkWXETY1xgmk",
+      "c_nonce_expires_in": 300
+    }
+  },
+  {
+    "method": "GET",
+    "url": "http://172.16.134.37:8093/.well-known/openid-credential-issuer",
+    "reqHeaders": {},
+    "status": 200,
+    "ms": 11,
+    "resHeaders": {
+      "access-control-allow-headers": "Content-Type, Authorization, Cache-Control",
+      "access-control-allow-methods": "GET, POST, OPTIONS",
+      "access-control-allow-origin": "*",
+      "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+      "connection": "keep-alive",
+      "content-type": "application/json",
+      "date": "Mon, 28 Sep 2026 13:31:54 GMT",
+      "expires": "0",
+      "pragma": "no-cache",
+      "server": "nginx/1.30.5",
+      "transfer-encoding": "chunked",
+      "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "x-xss-protection": "0"
+    },
+    "resBody": {
+      "display": [
+        {
+          "name": "Farmer Issuer",
+          "locale": "en"
+        }
+      ],
+      "credential_issuer": "http://172.16.134.37:8093",
+      "authorization_servers": [
+        "http://172.16.134.37:3005"
+      ],
+      "credential_endpoint": "http://172.16.134.37:8093/v1/certify/issuance/credential",
+      "nonce_endpoint": "http://172.16.134.37:8093/v1/certify/nonce",
+      "credential_configurations_supported": {
+        "FarmerCredential": {
+          "format": "ldp_vc",
+          "scope": "mock_identity_vc_ldp",
+          "cryptographic_binding_methods_supported": [
+            "did:jwk"
+          ],
+          "credential_signing_alg_values_supported": [
+            "EdDSA"
+          ],
+          "proof_types_supported": {
+            "jwt": {
+              "proof_signing_alg_values_supported": [
+                "RS256",
+                "ES256"
+              ]
+            }
+          },
+          "credential_definition": {
+            "type": [
+              "FarmerCredential",
+              "VerifiableCredential"
+            ],
+            "@context": [
+              "https://www.w3.org/2018/credentials/v1"
+            ]
+          },
+          "credential_metadata": {
+            "display": [
+              {
+                "logo": {
+                  "uri": "https://mosip.github.io/inji-config/logos/agro-vertias-logo.png",
+                  "alt_text": "Farmer Credential Logo"
+                },
+                "name": "Farmer Verifiable Credential",
+                "locale": "en",
+                "text_color": "#FFFFFF",
+                "background_color": "#12107c",
+                "background_image": {
+                  "uri": "https://mosip.github.io/inji-config/logos/agro-vertias-logo.png"
+                }
+              }
+            ],
+            "claims": [
+              {
+                "path": [
+                  "phone"
+                ],
+                "display": [
+                  {
+                    "name": "Phone Number",
+                    "locale": "en"
+                  }
+                ]
+              },
+              {
+                "path": [
+                  "gender"
+                ],
+                "display": [
+                  {
+                    "name": "Gender",
+                    "locale": "en"
+                  }
+                ]
+              },
+              {
+                "path": [
+                  "fullName"
+                ],
+                "display": [
+                  {
+                    "name": "Full Name",
+                    "locale": "en"
+                  }
+                ]
+              },
+              {
+                "path": [
+                  "dateOfBirth"
+                ],
+                "display": [
+                  {
+                    "name": "Date of Birth",
+                    "locale": "en"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  {
+    "method": "POST",
+    "url": "http://172.16.134.37:8093/v1/certify/nonce",
+    "reqHeaders": {},
+    "status": 200,
+    "ms": 6,
+    "resHeaders": {
+      "access-control-allow-headers": "Content-Type, Authorization, Cache-Control",
+      "access-control-allow-methods": "GET, POST, OPTIONS",
+      "access-control-allow-origin": "*",
+      "cache-control": "no-store",
+      "connection": "keep-alive",
+      "content-type": "application/json",
+      "date": "Mon, 28 Sep 2026 13:31:54 GMT",
+      "server": "nginx/1.30.5",
+      "transfer-encoding": "chunked",
+      "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "x-xss-protection": "0"
+    },
+    "resBody": {
+      "c_nonce": "3a2d0385-0ddf-4cbe-bee0-e7a0f02fc71f"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "http://172.16.134.37:8093/v1/certify/issuance/credential",
+    "reqHeaders": {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer eyJraWQiOiJPdDhRM3RKYjg5cGxNb1BTZzZxM1hNdExzVlBMSjFOS0p0eUNKT0RnckdZIiwiYWxnIjoiUFMyNTYifQ.eyJzdWIiOiIyMTU0MTg5NTMyIiwiYXVkIjoiaHR0cDpcL1wvMTcyLjE2LjEzNC4zNzo4MDkzXC92MVwvY2VydGlmeVwvaXNzdWFuY2VcL2NyZWRlbnRpYWwiLCJjX25vbmNlX2V4cGlyZXNfaW4iOjYwLCJjX25vbmNlIjoiTndyeGRYZ2doa1dYRVRZMXhnbWsiLCJhenAiOiJwbGF5Z3JvdW5kLW1pbW90byIsInNjb3BlIjoibW9ja19pZGVudGl0eV92Y19sZHAiLCJpc3MiOiJodHRwOlwvXC8xNzIuMTYuMTM0LjM3OjMwMDUiLCJleHAiOjE3OTA2MDM1MTQsImlhdCI6MTc5MDYwMjMxNCwiY2xpZW50X2lkIjoicGxheWdyb3VuZC1taW1vdG8ifQ.W1DwR5pY8N7ZjBz7uOMqLaM5K8tv77GhlzJBS8eWNtyQIGbD9kjRqMBJmUiDCy00h7LkVV4KKZ2b-W-0rI2bmeF89aYLIdcUiqehzmq2wkJNmsWXSyj3__imsP51wGY9ErgZMkPjvfzDSzm2Tpra6ARLqUGc5obGAtjYUBhW5bfPxiE4lLgENdEhc8SuhrNKCgNnfpx9RTWzbdlrpkPYqvQeCSupeeuGS4-fT7BXO1qcFH8fDuDYMW8c5ExuIxCeeb3R1gkcZCNdm_sSZ8KXsdGTggTZzU1grcP_mTwE61AiF_Q1FQlZjt24dyVbPvdWCrPuV8m2CUVxFbuuQxhfMA"
+    },
+    "reqBody": "{\"credential_configuration_id\":\"FarmerCredential\",\"proofs\":{\"jwt\":[\"eyJhbGciOiJFUzI1NiIsInR5cCI6Im9wZW5pZDR2Y2ktcHJvb2Yrand0IiwiandrIjp7Imt0eSI6IkVDIiwieCI6Imd3YldNUC1CWG1IN2F0M2FkV2dJWGR2cGEydFlIc1FDN01SMG5MQnh4U0UiLCJ5Ijoic0pWczlZWjJ4TnNSeEJXemx0N0sxTlVEcDZ1NlNZQTJJU3ZUM2VkOGNRVSIsImNydiI6IlAtMjU2In19.eyJpc3MiOiJwbGF5Z3JvdW5kLW1pbW90byIsImF1ZCI6Imh0dHA6Ly8xNzIuMTYuMTM0LjM3OjgwOTMiLCJpYXQiOjE3OTA2MDIzMTQsIm5vbmNlIjoiM2EyZDAzODUtMGRkZi00Y2JlLWJlZTAtZTdhMGYwMmZjNzFmIn0.kSfApAxIrom6FQHcuH9_BZL4Vdpm3uJ6wLe4bserfYR3c0oHqIMquAEW-g41JR-Ub73bvOYvzyfRLHYole5crg\"]}}",
+    "status": 200,
+    "ms": 56,
+    "resHeaders": {
+      "access-control-allow-headers": "Content-Type, Authorization, Cache-Control",
+      "access-control-allow-methods": "GET, POST, OPTIONS",
+      "access-control-allow-origin": "*",
+      "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+      "connection": "keep-alive",
+      "content-type": "application/json",
+      "date": "Mon, 28 Sep 2026 13:31:54 GMT",
+      "expires": "0",
+      "pragma": "no-cache",
+      "server": "nginx/1.30.5",
+      "set-cookie": "XSRF-TOKEN=; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:10 GMT; Path=/",
+      "transfer-encoding": "chunked",
+      "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "x-xss-protection": "0"
+    },
+    "resBody": {
+      "credentials": [
+        {
+          "credential": {
+            "issuanceDate": "2026-09-28T13:31:54.875Z",
+            "credentialSubject": {
+              "gender": "Male",
+              "primaryCropType": "Maize",
+              "mobileNumber": "9876543210",
+              "postalCode": "453000",
+              "landArea": "3 hectares",
+              "fullName": "Gorge Cooper",
+              "secondaryCropType": "Rice",
+              "dateOfBirth": "25-05-1990",
+              "face": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAFCAYAAABW1IzHAAAAHklEQVQokWNgGPaAkZHxPyMj439sYrSQo51PBgsAALa0ECF30JSdAAAAAElFTkSuQmCC",
+              "farmerID": "987654321",
+              "villageOrTown": "Koramangala",
+              "district": "Bangalore",
+              "id": "did:jwk:eyJrdHkiOiJFQyIsImNydiI6IlAtMjU2IiwieCI6Imd3YldNUC1CWG1IN2F0M2FkV2dJWGR2cGEydFlIc1FDN01SMG5MQnh4U0UiLCJ5Ijoic0pWczlZWjJ4TnNSeEJXemx0N0sxTlVEcDZ1NlNZQTJJU3ZUM2VkOGNRVSJ9",
+              "state": "Karnataka",
+              "landOwnershipType": "Owner"
+            },
+            "id": "https://mosip.io/credential/f8975fc0-a89f-45ab-bb60-436db6ef488a",
+            "type": [
+              "VerifiableCredential",
+              "FarmerCredential"
+            ],
+            "@context": [
+              "https://www.w3.org/2018/credentials/v1",
+              "https://inji.github.io/inji-config/contexts/farmer.json",
+              "https://w3id.org/security/suites/ed25519-2020/v1"
+            ],
+            "issuer": "did:web:luggage-foundations-atmospheric-vienna.trycloudflare.com",
+            "expirationDate": "2028-09-27T13:31:54.875Z",
+            "proof": {
+              "type": "Ed25519Signature2020",
+              "created": "2026-09-28T13:31:54Z",
+              "proofPurpose": "assertionMethod",
+              "verificationMethod": "did:web:luggage-foundations-atmospheric-vienna.trycloudflare.com#bQSVQEnCj599B4J5asw0bCxcBZR_d-Tx8u0S9wHJyUw",
+              "proofValue": "z3SczKZLrTzTfDtyKWxEaA8eoUNzPpjfrw8G1C9vdXL1dm3buxCZnPNodUEUdJNczbcwfJdD9wGAnniDiBspxJ5Lj"
+            }
+          }
+        }
+      ]
+    }
+  }
+]

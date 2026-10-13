@@ -1,0 +1,4 @@
+init 200 {"transaction_id":"QCmZL9vM3kUkRd7YgY6McOUATGQnpmkDjBK3nDEB0tzYGRyzMJIuIPLEEzg1daZKmFqss5Z9stnjBZXfHlQinA","client_id":"Verifier","request":"eyJraWQiOiJhY2Nlc3NfY2VydGlmaWNhdGUiLCJ0eXAiOiJvYXV0aC1hdXRoei1yZXErand0IiwiYWxnIjoiRVM1MTIifQ.eyJyZXNwb25zZV91cmkiOiJodHRwczovLzE3Mi4xNi4xMzQuMzc6MTg0NDQvd2Fs
+request object: {"client_id":"Verifier","response_uri":"https://172.16.134.37:18444/wallet/direct_post/mhqTHlGzC1AA-PlQk7dYsC04e4e7hVg6Hgz9Dyex6nvE_b0WZqR1ofBEbZZoG1qGBDFMoVgWaLEcAjzsgz3AEA","response_mode":"direct_post","nonce":"r5d7-1791226158481"}
+submit 400 {"error":"InvalidVpToken","description":"[{\"error\":\"UnexpectedError\",\"description\":\"an unexpected error occurred: Could not find Attestation Classification for vct 'http://localhost:18103/openid4vci/identity_credential'\",\"cause\":\"Could not find Attestation Classification for vct 'http://localhost:18103/openid4vci/identity_credential'\"}]"}
+info 400 ""

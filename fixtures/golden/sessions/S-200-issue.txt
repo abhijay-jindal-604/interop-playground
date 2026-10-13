@@ -1,0 +1,5 @@
+POST http://127.0.0.1:18090/v1/certify/pre-authorized-data 200 {"credential_offer_uri":"openid-credential-offer://?credential_offer_uri=https%3A%2F%2F172.16.134
+GET /v1/certify/credential-offer-data/b6a1246f-f681-4164-a844-e28f411532f8 200 {"credential_issuer":"https://172.16.134.37","credential_configuration_ids":["Far
+POST /v1/certify/oauth/token 200 {"access_token":"eyJraWQiOiJBOUd4Tno3VUlhLXdsXzFTZ0hCM1hVOWFNUlIwQlNnbi1KakFXR3BXNTE4IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJ7XCJmdWx
+POST /v1/certify/nonce 200 {"c_nonce":"4132f971-53ce-4a10-9e42-89ccd6e20574"}
+POST /v1/certify/issuance/credential 200 {"credentials":[{"credential":{"issuanceDate":"2026-10-05T19:40:11.324Z","credentialSubject":{"gender":"Female","primar

@@ -1,0 +1,4 @@
+verify: {"verified":true,"errorCode":"","ms":303}
+verify tampered: {"verified":false,"errorCode":"ERR_SIGNATURE_VERIFICATION_FAILED","ms":6}
+VCIClient traceId: r5d5-smoke
+0.89 s wall, 120276 KB

@@ -1,0 +1,6 @@
+create 200 e93652a7-b718-4fcf-8632-610078b2c637
+request_uri https://172.16.134.37:18443/verification-session/e93652a7-b718-4fcf-8632-610078b2c637/request
+request fetch 200
+request object: {"client_id":"x509_san_dns:verifier.example.com","response_uri":"https://172.16.134.37:18443/verification-session/e93652a7-b718-4fcf-8632-610078b2c637/response","response_mode":"direct_post","nonce":"af329a6d-0479-42fb-93a1-8a607b057aaa"}
+submit 200 {"status":"received","message":"Presentation received and is being processed."}
+info 200 {"status":"SUCCESSFUL","policies":["vp_policies","vc_policies","specific_vc_policies","overallSuccess"]}

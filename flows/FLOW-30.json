@@ -1,0 +1,263 @@
+{
+  "flowId": "FLOW-30",
+  "kind": "presentation",
+  "title": "Cross-device QR, Inji Verify local, dc+sd-jwt, wallet.playground-ts",
+  "targetStepKey": "vp.verdict.evaluate",
+  "lifelines": [
+    "VUI",
+    "V",
+    "W",
+    "L"
+  ],
+  "steps": [
+    {
+      "stepKey": "vp.request.create",
+      "order": 1,
+      "from": "VUI",
+      "to": "V",
+      "label": "POST /v2/vp-request",
+      "kind": "http",
+      "messages": 2
+    },
+    {
+      "stepKey": "vp.request.deliver",
+      "order": 2,
+      "from": "VUI",
+      "to": "W",
+      "label": "{channel}: openid4vp://authorize?...",
+      "kind": "ui",
+      "messages": 1
+    },
+    {
+      "stepKey": "vp.request.fetch",
+      "order": 3,
+      "from": "W",
+      "to": "V",
+      "label": "GET request_uri",
+      "kind": "http",
+      "messages": 2,
+      "appliesTo": {
+        "clientIdSchemes": [
+          "decentralized_identifier",
+          "x509_san_dns"
+        ]
+      },
+      "skipReason": "request carried by value"
+    },
+    {
+      "stepKey": "vp.request.validate",
+      "order": 4,
+      "from": "W",
+      "to": "L",
+      "label": "validate request",
+      "kind": "engine",
+      "messages": 1
+    },
+    {
+      "stepKey": "vp.credential.match",
+      "order": 5,
+      "from": "W",
+      "to": "L",
+      "label": "DCQL match, select disclosures",
+      "kind": "engine",
+      "messages": 1
+    },
+    {
+      "stepKey": "vp.token.build",
+      "order": 6,
+      "from": "L",
+      "to": "L",
+      "label": "KB-JWT, sign",
+      "kind": "engine",
+      "messages": 1
+    },
+    {
+      "stepKey": "vp.response.post",
+      "order": 7,
+      "from": "W",
+      "to": "V",
+      "label": "POST response_uri vp_token",
+      "kind": "http",
+      "messages": 2
+    },
+    {
+      "stepKey": "vp.error.dispatch",
+      "order": 8,
+      "from": "W",
+      "to": "V",
+      "label": "POST error={error}",
+      "kind": "http",
+      "messages": 2,
+      "skipReason": "wallet raised no error"
+    },
+    {
+      "stepKey": "vp.response.redirect",
+      "order": 9,
+      "from": "V",
+      "to": "VUI",
+      "label": "redirect_uri#response_code",
+      "kind": "ui",
+      "messages": 1,
+      "appliesTo": {
+        "deliveries": [
+          "web-wallet-redirect"
+        ]
+      },
+      "skipReason": "not a web-wallet delivery"
+    },
+    {
+      "stepKey": "vp.result.poll",
+      "order": 10,
+      "from": "VUI",
+      "to": "V",
+      "label": "POST vp-results",
+      "kind": "http",
+      "messages": 2
+    },
+    {
+      "stepKey": "vp.result.fetch",
+      "order": 11,
+      "from": "VUI",
+      "to": "V",
+      "label": "POST vp-session-results",
+      "kind": "http",
+      "messages": 2,
+      "appliesTo": {
+        "modes": [
+          "same-device"
+        ]
+      },
+      "skipReason": "cross-device flow reads the result by poll"
+    },
+    {
+      "stepKey": "vp.vc.verify",
+      "order": 12,
+      "from": "VUI",
+      "to": "V",
+      "label": "verify credential",
+      "kind": "http",
+      "messages": 2,
+      "appliesTo": {
+        "adapters": [
+          "verifier.vcverifier-offline",
+          "verifier.credo"
+        ]
+      },
+      "skipReason": "credential-level verification is not part of an OID4VP flow"
+    },
+    {
+      "stepKey": "vp.verdict.evaluate",
+      "order": 13,
+      "from": "VUI",
+      "to": "VUI",
+      "label": "normalise to checks",
+      "kind": "engine",
+      "messages": 1
+    },
+    {
+      "stepKey": "vp.wallet.observe",
+      "order": 14,
+      "from": "W",
+      "to": "VUI",
+      "label": "phone showed: {shown}",
+      "kind": "manual",
+      "messages": 1,
+      "appliesTo": {
+        "adapters": [
+          "wallet.inji-mobile"
+        ]
+      },
+      "skipReason": "automated wallet, nothing to observe"
+    },
+    {
+      "stepKey": "vp.dcapi.probe",
+      "order": 15,
+      "from": "VUI",
+      "to": "VUI",
+      "label": "probe DC API",
+      "kind": "engine",
+      "messages": 1,
+      "appliesTo": {
+        "modes": [
+          "dc-api"
+        ]
+      },
+      "skipReason": "not a DC API run"
+    },
+    {
+      "stepKey": "vp.dcapi.request.create",
+      "order": 16,
+      "from": "VUI",
+      "to": "V",
+      "label": "POST vp-session-request (dc_api)",
+      "kind": "http",
+      "messages": 2,
+      "appliesTo": {
+        "modes": [
+          "dc-api"
+        ]
+      },
+      "skipReason": "not a DC API run"
+    },
+    {
+      "stepKey": "vp.dcapi.request.fetch",
+      "order": 17,
+      "from": "VUI",
+      "to": "V",
+      "label": "GET request object",
+      "kind": "http",
+      "messages": 2,
+      "appliesTo": {
+        "modes": [
+          "dc-api"
+        ]
+      },
+      "skipReason": "not a DC API run"
+    },
+    {
+      "stepKey": "vp.dcapi.invoke",
+      "order": 18,
+      "from": "VUI",
+      "to": "W",
+      "label": "navigator.credentials.get",
+      "kind": "engine",
+      "messages": 1,
+      "appliesTo": {
+        "modes": [
+          "dc-api"
+        ]
+      },
+      "skipReason": "not a DC API run"
+    },
+    {
+      "stepKey": "vp.dcapi.response.post",
+      "order": 19,
+      "from": "W",
+      "to": "V",
+      "label": "POST vp-submission/dc-api",
+      "kind": "http",
+      "messages": 2,
+      "appliesTo": {
+        "modes": [
+          "dc-api"
+        ]
+      },
+      "skipReason": "not a DC API run"
+    },
+    {
+      "stepKey": "vp.dcapi.holder",
+      "order": 20,
+      "from": "W",
+      "to": "VUI",
+      "label": "holder attribution",
+      "kind": "manual",
+      "messages": 1,
+      "appliesTo": {
+        "modes": [
+          "dc-api"
+        ]
+      },
+      "skipReason": "not a DC API run"
+    }
+  ]
+}

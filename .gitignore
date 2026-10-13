@@ -1,0 +1,28 @@
+# dependencies and build output
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+*.log
+
+# runtime material, host only (plan/10 §1, 02 §6.2)
+certs/
+data/
+.env
+.env.local
+.generated/
+
+# sidecar (Gradle)
+sidecar/build/
+sidecar/.gradle/
+
+# key material (fixtures/ test keys are covered by scripts/check-secrets.allow)
+*.p12
+*.jks
+*.pem
+*.key
+!fixtures/**
+
+# Playwright
+test-results/
+playwright-report/

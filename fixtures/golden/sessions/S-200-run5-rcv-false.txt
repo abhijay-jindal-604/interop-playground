@@ -1,0 +1,28 @@
+== 1 vp-session-request (responseCodeValidationRequired=false)
+[status 201]
+Set-Cookie: transaction_id=<v>; Path=/v1/verify; Max-Age=300; Expires=Mon, 05 Oct 2026 19:45:44 GMT; Secure; HttpOnly; SameSite=Lax
+{"transactionId":"txn_dfede09d-1160-4de5-bb3a-908a632fc4e6","requestId":"req_8c83bfa8-ae2e-4ed3-860a-42cca4026f64","ad":{"clientId":"redirect_uri:https://172.16.134.37:8443/v1/verify/v2/vp-submission/direct-post","responseUri":"https://172.16.134.37:8443/v1/verify/v2/vp-submission/direct-post","responseMode":"direct_post","responseCodeValidationRequired":false,"nonce":"F_7Y4fKPC69a2XYu3ZVsJCWHL82SmhF7"}}
+== 2 wallet builds VP (JsonWebSignature2020/ES256, domain=redirect_uri:https://172.16.134.37:8443/v1/verify/v2/vp-submission/direct-post)
+VP written ../vp-s200.json holder did:jwk:eyJjcnYiOiJQLTI1NiIsIm... proof type JsonWebSignature2020
+== 3 wallet direct_post
+[status 200]
+HTTP/1.1 200 
+{}
+== 4 result BEFORE response_code (cookie, body {})
+{"transactionId":"txn_dfede09d-1160-4de5-bb3a-908a632fc4e6","allChecksSuccessful":true,"credentialResults":[{"allChecksSuccessful":true,"schemaAndSignatureCheck":{"valid":true,"error":null},"expiryCheck":{"valid":true},"statusCheck":[],"claims":{},"verifiableCredential":"{\"issuanceDate\":\"2026-10-05T19:40:11.324Z\",\"credentialSubject\":{\"gender\":\"Female\",\"primaryCropType\":\"${primaryCropType}\",\"mobileNumber\":\"${mobileNumber}\",\"postalCode\":\"${postalCode}\",\"landArea\":\"${landAr
+[status 200]
+== 5 browser returns to redirect_uri (curl, fragment not sent)
+[status 000] null
+== 6 result with responseCode WITHOUT cookie
+{"errorCode":"VP_SESSION_INVALID","errorMessage":"Your VP verification session is invalid. Please restart the process and try again"}
+[status 401]
+== 7 result with wrong responseCode + cookie
+{"transactionId":"txn_dfede09d-1160-4de5-bb3a-908a632fc4e6","allChecksSuccessful":true,"credentialResults":[{"allChecksSuccessful":true,"schemaAndSignatureCheck":{"valid":true,"error":null},"expiryCheck":{"valid":true},"statusCheck":[],"claims":{},"verifiableCredential":"{\"issuanceDate\":\"2026-10-05T19:40:11.324Z\",\"credentialSubject\":{\"gender\":\"Female\",\"primaryCropType\":\"${primaryCropT
+[status 200]
+== 8 result with right responseCode + cookie
+[status 200]
+Set-Cookie: transaction_id=; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:10 GMT; Path=/v1/verify; Secure; HttpOnly
+{"allChecksSuccessful":true,"transactionId":"txn_dfede09d-1160-4de5-bb3a-908a632fc4e6","credentialResults":[{"holderProofCheck":{"valid":true,"error":null},"schemaAndSignatureCheck":{"valid":true,"error":null},"expiryCheck":{"valid":true}}]}
+== 9 replay of same responseCode (cookie jar re-used)
+{"transactionId":"txn_dfede09d-1160-4de5-bb3a-908a632fc4e6","allChecksSuccessful":true,"credentialResults":[{"allChecksSuccessful":true,"schemaAndSignatureCheck":{"valid":true,"error":null},"expiryCheck":{"valid":true},"statusCheck":[],"claims":{},"verifiableCredential":"{\"issuanceDate\":\"2026-10-05T19:40:11.324Z\",\"credentialSubject\":{\"gender\":\"Female\",\"primaryCropType\":\"${primaryCropT
+[status 200]

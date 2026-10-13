@@ -1,0 +1,20 @@
+-- create via proxy (browser-side jar: curl -c bjar)
+[status 201]
+set-cookie seen by SDK/browser: 0
+{"transactionId":"txn_be9ca792-9267-43af-8a72-6bc3f9b5d78a","requestId":"req_4a125057-d4b0-43a1-8c1a-260f428b7f11","nonce":"sdkgeneratednonce2202425108"}
+-- status poll via proxy
+ [status 000]
+-- wallet direct_post (to Verify via front)
+{} [status 200]
+-- status after submit
+{"status":"VP_SUBMITTED"} [status 200]
+-- results via proxy (1st; browser cookie jar forwarded by curl if path matches)
+{"transactionId":"txn_be9ca792-9267-43af-8a72-6bc3f9b5d78a","allChecksSuccessful":true,"credentialResults":[{"allChecksSuccessful":true,"schemaAndSignatureCheck":{"valid":true,"error":null},"expiryCheck":{"valid":true},"statusCheck":[],"claims":{},"verifiableCredential":"{\"issuanceDate\":\"2026-10-
+[status 200]
+-- results via proxy (2nd, same run)
+{"errorCode":"VP_SESSION_INVALID","errorMessage":"Your VP verification session is invalid. Please restart the process and try again"}
+[status 401]
+-- denied paths
+v2/vp-session-results -> 403
+actuator/health -> 403
+v2/vp-request/req_4a125057-d4b0-43a1-8c1a-260f428b7f11 -> 403

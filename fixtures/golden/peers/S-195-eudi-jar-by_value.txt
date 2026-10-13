@@ -1,0 +1,8 @@
+=== authenticateVerifier ===
+Oct 06, 2026 12:21:18 AM io.mosip.openID4VP.exceptions.OpenID4VPExceptions <init>
+SEVERE: ERROR [invalid_request] - Request URI response validation failed No enum constant io.mosip.openID4VP.constants.SignatureAlgorithm.ES512 | Class: ClientIdPrefixBasedAuthorizationRequestHandler
+Oct 06, 2026 12:21:18 AM io.mosip.openID4VP.exceptions.OpenID4VPExceptions <init>
+SEVERE: ERROR [error_dispatch_failure] - Failed to send error to verifier: Response URI is not set. Cannot send error to verifier. | Class: AuthorizationResponseHandler
+Oct 06, 2026 12:21:18 AM io.mosip.openID4VP.exceptions.OpenID4VPExceptions$Companion error
+SEVERE: ERROR : Failed to send error to verifier: Response URI is not set. Cannot send error to verifier. | Class: OpenID4VP
+Exception in thread "main" io.mosip.openID4VP.exceptions.OpenID4VPExceptions$VerificationFailure: Request URI response validation failed No enum constant io.mosip.openID4VP.constants.SignatureAlgorithm.ES512

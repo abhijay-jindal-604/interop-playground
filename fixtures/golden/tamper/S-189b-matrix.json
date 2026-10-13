@@ -1,0 +1,100 @@
+{
+ "res": [
+  {
+   "id": "C3d",
+   "mutation": "stale nonce (65 s old; cnonce-expire-seconds=40)",
+   "status": 400,
+   "body": {
+    "error": "invalid_nonce",
+    "error_description": "c_nonce is invalid or expired"
+   }
+  },
+  {
+   "id": "C6d",
+   "mutation": "pre-auth code redeemed 65 s after minting with expires_in=60",
+   "status": 400,
+   "body": {
+    "error": "invalid_grant",
+    "error_description": "Pre-authorized code has already been used  or invalid"
+   }
+  }
+ ],
+ "raw": [
+  {
+   "label": "mint",
+   "status": 200,
+   "body": {
+    "credential_offer_uri": "openid-credential-offer://?credential_offer_uri=https%3A%2F%2F172.16.134.37%2Fv1%2Fcertify%2Fcredential-offer-data%2F1dc4e568-d378-4cd6-a322-79e020dc1162"
+   }
+  },
+  {
+   "label": "offer",
+   "status": 200,
+   "body": {
+    "credential_issuer": "https://172.16.134.37",
+    "credential_configuration_ids": [
+     "PlaygroundSdJwt"
+    ],
+    "grants": {
+     "urn:ietf:params:oauth:grant-type:pre-authorized_code": {
+      "pre-authorized_code": "XZHnjhFExgVpjNFPuphn3pxlPKxtSvIU"
+     }
+    }
+   }
+  },
+  {
+   "label": "mint",
+   "status": 200,
+   "body": {
+    "credential_offer_uri": "openid-credential-offer://?credential_offer_uri=https%3A%2F%2F172.16.134.37%2Fv1%2Fcertify%2Fcredential-offer-data%2F0dcfde87-3d3b-47bb-b60a-7e38d887fcbe"
+   }
+  },
+  {
+   "label": "offer",
+   "status": 200,
+   "body": {
+    "credential_issuer": "https://172.16.134.37",
+    "credential_configuration_ids": [
+     "PlaygroundSdJwt"
+    ],
+    "grants": {
+     "urn:ietf:params:oauth:grant-type:pre-authorized_code": {
+      "pre-authorized_code": "o1LEQTQwAlwoVERTox0BNoYIVaXFw2os"
+     }
+    }
+   }
+  },
+  {
+   "label": "token",
+   "status": 200,
+   "body": {
+    "access_token": "eyJraWQiOiJBOUd4Tno3VUlhLXdsXzFTZ0hCM1hVOWFNUlIwQlNnbi1KakFXR3BXNTE4IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJ7XCJmdWxsTmFtZVwiOlwiQXNoYSBUZXN0XCIsXCJkYXRlT2ZCaXJ0aFwiOlwiMTk5MC0wMS0wMVwiLFwiZ2VuZGVyXCI6XCJGZW1hbGVcIixcImVtYWlsXCI6XCJhc2hhQGV4YW1wbGUub3JnXCJ9IiwiYXVkIjoiaHR0cHM6Ly8xNzIuMTYuMTM0LjM3L3YxL2NlcnRpZnkvaXNzdWFuY2UvY3JlZGVudGlhbCIsInNjb3BlIjoicGxheWdyb3VuZF9zZGp3dCIsImlzcyI6Imh0dHBzOi8vMTcyLjE2LjEzNC4zNyIsImV4cCI6MTc5MTIxNDg0NiwiaWF0IjoxNzkxMjE0MjQ2LCJjbGllbnRfaWQiOiIifQ.NpyVanOrDwdPJFZTYg-t6OQp5_GMZGbC_LRzkdp6BXP5P_e3pON4f4LgSIGRVRv0Ol-jLoE3gwYL5607aViie9onMGqUEkyAoDd9IteDek-dS_B2WJPBe-gWWlpoZ3FslhHIxrwUvJnpQZob1TpM2nHIkxLphR6bX7iL5LIvemc79qHfFr6LJx0-b3YuSJYh_04zLumoY14L-s_lPRjbBoacOZEGbKgMnI4Ff2Cwlz4-IfIzKGbyPayhDI6B_E-kVGrSW3FrHhRPeKEPBt6xoIA8MJ_03Z8uSQ2LzIET2PKPYhnPW04V-GxMSEVWvy5rQt85KTLLUOJf4kx7cEVxWA",
+    "token_type": "Bearer",
+    "expires_in": 600
+   }
+  },
+  {
+   "label": "nonce",
+   "status": 200,
+   "body": {
+    "c_nonce": "b703740d-fc1a-4fa9-a4e4-4b96d7bb00a3"
+   }
+  },
+  {
+   "label": "credential",
+   "status": 400,
+   "body": {
+    "error": "invalid_nonce",
+    "error_description": "c_nonce is invalid or expired"
+   }
+  },
+  {
+   "label": "token",
+   "status": 400,
+   "body": {
+    "error": "invalid_grant",
+    "error_description": "Pre-authorized code has already been used  or invalid"
+   }
+  }
+ ]
+}

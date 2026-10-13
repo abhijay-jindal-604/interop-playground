@@ -1,0 +1,4 @@
+init 200 {"transaction_id":"22PcK3lnDracrc-NydTGsZkPOZ62mC9heKoJP55xCu7zNAzZTOTtsdnpDG--9DIEkMm5cqyUUmv4KOsrw2q2wQ","client_id":"Verifier","request":"eyJraWQiOiJhY2Nlc3NfY2VydGlmaWNhdGUiLCJ0eXAiOiJvYXV0aC1hdXRoei1yZXErand0IiwiYWxnIjoiRVM1MTIifQ.eyJyZXNwb25zZV91cmkiOiJodHRwczovLzE3Mi4xNi4xMzQuMzc6MTg0NDQvd2Fs
+request object: {"client_id":"Verifier","response_uri":"https://172.16.134.37:18444/wallet/direct_post/aW0qgK4Dx-9s61-7iUAw7fa5QFWfA4OMPcVHKRidF5PGxG9WknyNR6NJkCrhK6AebFY3bBxZRbIuD6iMkzRNxA","response_mode":"direct_post","nonce":"r5d7-1791226158000"}
+submit 400 {"error":"InvalidVpToken","description":"[{\"error\":\"IsMissingHolderPublicKey\",\"description\":\"missing holder public key (cnf)\"}]"}
+info 400 ""

@@ -1,0 +1,1460 @@
+# Hand-written route skeleton of plan/04-api-contracts.md §11 (paths, parameters, responses).
+# `npm run contracts:generate` merges it with components.schemas generated from
+# packages/api/src/api.ts and writes packages/api/openapi.yaml. Edit paths here, types in api.ts.
+# Fixes against the 04 §11 sketch (YAML flow-style commas split two descriptions into extra keys;
+# `allowReserved` is not allowed on a path parameter): quoted those descriptions, dropped allowReserved;
+# top-level tags are Tag Objects ({name}), not strings.
+openapi: 3.1.0
+info:
+  title: Interop Playground BFF API
+  version: 1.0.0
+  description: UI and script API of the Interop Playground (plan/04-api-contracts.md). Local single-user tool.
+servers:
+  - url: http://127.0.0.1:3100
+    description: BFF (UI, REST, SSE, SDK proxy, return page)
+  - url: https://{publicHost}:8443
+    description: Gateway listener of the Inji Verify base (relay routes only)
+    variables: { publicHost: { default: 192.168.0.10 } }
+  - url: http://sidecar:7070
+    description: Inji JVM sidecar (BFF-only, playground_net)
+tags:
+  [
+    { name: catalog },
+    { name: env },
+    { name: streams },
+    { name: runs },
+    { name: suites },
+    { name: reports },
+    { name: tamper },
+    { name: proxy },
+    { name: relay },
+    { name: sidecar },
+  ]
+paths:
+  /api/v1/health:
+    get:
+      {
+        operationId: getHealth,
+        tags: [catalog],
+        x-api-id: API-01,
+        responses:
+          {
+            '200':
+              {
+                description: ok,
+                content: { application/json: { schema: { $ref: '#/components/schemas/Health' } } },
+              },
+          },
+      }
+  /api/v1/adapters:
+    get:
+      {
+        operationId: listAdapters,
+        tags: [catalog],
+        x-api-id: API-02,
+        responses:
+          {
+            '200':
+              {
+                description: ok,
+                content:
+                  {
+                    application/json:
+                      { schema: { $ref: '#/components/schemas/AdapterListResponse' } },
+                  },
+              },
+          },
+      }
+  /api/v1/runs/preview:
+    post:
+      operationId: previewRun
+      tags: [runs]
+      x-api-id: API-03
+      requestBody: { $ref: '#/components/requestBodies/CreateRun' }
+      responses:
+        '200':
+          {
+            description: 'resolved spec, else the incompatibility',
+            content:
+              { application/json: { schema: { $ref: '#/components/schemas/PreviewResponse' } } },
+          }
+        default: { $ref: '#/components/responses/Error' }
+  /api/v1/knobs:
+    get:
+      operationId: listKnobs
+      tags: [catalog]
+      x-api-id: API-04
+      parameters:
+        [
+          { name: adapter, in: query, schema: { $ref: '#/components/schemas/AdapterId' } },
+          { name: format, in: query, schema: { $ref: '#/components/schemas/CredentialFormat' } },
+        ]
+      responses:
+        {
+          '200':
+            {
+              description: ok,
+              content:
+                {
+                  application/json:
+                    { schema: { $ref: '#/components/schemas/KnobCatalogResponse' } },
+                },
+            },
+        }
+  /api/v1/flows:
+    get:
+      operationId: listFlows
+      tags: [catalog]
+      x-api-id: API-05
+      parameters: [{ name: kind, in: query, schema: { enum: [issuance, presentation] } }]
+      responses:
+        {
+          '200':
+            {
+              description: ok,
+              content:
+                {
+                  application/json: { schema: { $ref: '#/components/schemas/FlowIndexResponse' } },
+                },
+            },
+        }
+  /api/v1/flows/{flowId}:
+    get:
+      operationId: getFlow
+      tags: [catalog]
+      x-api-id: API-06
+      parameters: [{ $ref: '#/components/parameters/FlowId' }]
+      responses:
+        {
+          '200':
+            {
+              description: ok,
+              content:
+                { application/json: { schema: { $ref: '#/components/schemas/FlowDefinition' } } },
+            },
+          default: { $ref: '#/components/responses/Error' },
+        }
+  /api/v1/presets:
+    get:
+      {
+        operationId: listPresets,
+        tags: [catalog],
+        x-api-id: API-07,
+        responses:
+          {
+            '200':
+              {
+                description: ok,
+                content:
+                  {
+                    application/json:
+                      { schema: { $ref: '#/components/schemas/PresetListResponse' } },
+                  },
+              },
+          },
+      }
+  /api/v1/configurations:
+    get:
+      operationId: listConfigurations
+      tags: [catalog]
+      x-api-id: API-08
+      parameters:
+        [
+          { name: issuer, in: query, schema: { $ref: '#/components/schemas/AdapterId' } },
+          { name: format, in: query, schema: { $ref: '#/components/schemas/CredentialFormat' } },
+        ]
+      responses:
+        {
+          '200':
+            {
+              description: ok,
+              content:
+                {
+                  application/json:
+                    { schema: { $ref: '#/components/schemas/ConfigurationListResponse' } },
+                },
+            },
+        }
+  /api/v1/incompatibilities:
+    get:
+      {
+        operationId: listIncompatibilities,
+        tags: [catalog],
+        x-api-id: API-09,
+        responses:
+          {
+            '200':
+              {
+                description: ok,
+                content:
+                  {
+                    application/json:
+                      { schema: { $ref: '#/components/schemas/IncompatibilityListResponse' } },
+                  },
+              },
+          },
+      }
+  /api/v1/env:
+    get:
+      {
+        operationId: getEnv,
+        tags: [env],
+        x-api-id: API-10,
+        responses:
+          {
+            '200':
+              {
+                description: ok,
+                content:
+                  { application/json: { schema: { $ref: '#/components/schemas/EnvSnapshot' } } },
+              },
+          },
+      }
+  /api/v1/env/probe:
+    post:
+      operationId: probeEnv
+      tags: [env]
+      x-api-id: API-11
+      requestBody:
+        {
+          required: true,
+          content: { application/json: { schema: { type: object, additionalProperties: false } } },
+        }
+      responses:
+        {
+          '200':
+            {
+              description: ok,
+              content:
+                { application/json: { schema: { $ref: '#/components/schemas/EnvSnapshot' } } },
+            },
+          default: { $ref: '#/components/responses/Error' },
+        }
+  /api/v1/internal/tunnel:
+    post:
+      operationId: registerTunnel
+      tags: [env]
+      x-api-id: API-12
+      security: [{ adminToken: [] }]
+      requestBody:
+        {
+          required: true,
+          content:
+            { application/json: { schema: { $ref: '#/components/schemas/TunnelRegistration' } } },
+        }
+      responses:
+        {
+          '200':
+            {
+              description: ok,
+              content:
+                { application/json: { schema: { $ref: '#/components/schemas/EnvSnapshot' } } },
+            },
+          default: { $ref: '#/components/responses/Error' },
+        }
+  /api/v1/streams/{streamId}/events:
+    get:
+      operationId: streamEvents
+      tags: [streams]
+      x-api-id: API-15
+      description: SSE (default; `Last-Event-ID` resumes); JSON page with `format=json`. Frames and control frame `stream.end` per section 7.1.
+      parameters:
+        - {
+            name: streamId,
+            in: path,
+            required: true,
+            schema: { type: string, description: 'run ULID | env | unattributed' },
+          }
+        - { name: format, in: query, schema: { enum: [sse, json], default: sse } }
+        - { name: after, in: query, schema: { type: integer, minimum: 0 } }
+        - {
+            name: limit,
+            in: query,
+            schema: { type: integer, minimum: 1, maximum: 1000, default: 500 },
+          }
+        - {
+            name: type,
+            in: query,
+            schema: { type: string, description: comma separated EventType list },
+          }
+        - { name: Last-Event-ID, in: header, schema: { type: integer } }
+      responses:
+        '200':
+          description: event stream (SSE), JSON page with format=json
+          content:
+            text/event-stream: { schema: { type: string } }
+            application/json: { schema: { $ref: '#/components/schemas/EventPage' } }
+        default: { $ref: '#/components/responses/Error' }
+  /api/v1/runs:
+    post:
+      operationId: createRun
+      tags: [runs]
+      x-api-id: API-20
+      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }]
+      requestBody: { $ref: '#/components/requestBodies/CreateRun' }
+      responses:
+        '201':
+          {
+            description: queued,
+            headers: { Location: { schema: { type: string } } },
+            content: { application/json: { schema: { $ref: '#/components/schemas/Run' } } },
+          }
+        '200':
+          {
+            description: idempotent replay,
+            content: { application/json: { schema: { $ref: '#/components/schemas/Run' } } },
+          }
+        default: { $ref: '#/components/responses/Error' }
+    get:
+      operationId: listRuns
+      tags: [runs]
+      x-api-id: API-21
+      parameters:
+        - { $ref: '#/components/parameters/Limit' }
+        - { $ref: '#/components/parameters/Cursor' }
+        - { name: issuer, in: query, schema: { $ref: '#/components/schemas/AdapterId' } }
+        - { name: wallet, in: query, schema: { $ref: '#/components/schemas/AdapterId' } }
+        - { name: verifier, in: query, schema: { $ref: '#/components/schemas/AdapterId' } }
+        - { name: format, in: query, schema: { $ref: '#/components/schemas/CredentialFormat' } }
+        - { name: grant, in: query, schema: { $ref: '#/components/schemas/Grant' } }
+        - { name: mode, in: query, schema: { $ref: '#/components/schemas/PresentationMode' } }
+        - { name: env, in: query, schema: { enum: [local, collab] } }
+        - {
+            name: state,
+            in: query,
+            schema: { enum: [queued, running, completed, failed, cancelled] },
+          }
+        - {
+            name: outcome,
+            in: query,
+            schema: { enum: [pass, fail, no-submission, lenient, inconclusive] },
+          }
+        - { name: kind, in: query, schema: { enum: [interop, tamper, probe] } }
+        - { name: version, in: query, schema: { type: string } }
+        - { name: tamperCase, in: query, schema: { type: string, pattern: '^TMP-[0-9]{2}$' } }
+        - { name: hasTamper, in: query, schema: { type: boolean } }
+        - { name: suiteId, in: query, schema: { type: string } }
+        - { name: parentRunId, in: query, schema: { type: string } }
+        - { name: derived, in: query, schema: { type: boolean } }
+        - { name: from, in: query, schema: { type: string, format: date-time } }
+        - { name: to, in: query, schema: { type: string, format: date-time } }
+      responses:
+        {
+          '200':
+            {
+              description: page,
+              content:
+                { application/json: { schema: { $ref: '#/components/schemas/RunListResponse' } } },
+            },
+          default: { $ref: '#/components/responses/Error' },
+        }
+  /api/v1/runs/import:
+    post:
+      operationId: importRunBundle
+      tags: [runs]
+      x-api-id: API-37
+      requestBody:
+        {
+          required: true,
+          content: { application/gzip: { schema: { type: string, format: binary } } },
+        }
+      responses:
+        '201':
+          {
+            description: imported,
+            content:
+              { application/json: { schema: { $ref: '#/components/schemas/ImportResponse' } } },
+          }
+        default: { $ref: '#/components/responses/Error' }
+  /api/v1/runs/{runId}:
+    parameters: [{ $ref: '#/components/parameters/RunId' }]
+    get:
+      {
+        operationId: getRun,
+        tags: [runs],
+        x-api-id: API-22,
+        responses:
+          {
+            '200':
+              {
+                description: ok,
+                content: { application/json: { schema: { $ref: '#/components/schemas/Run' } } },
+              },
+            default: { $ref: '#/components/responses/Error' },
+          },
+      }
+    patch:
+      {
+        operationId: patchRun,
+        tags: [runs],
+        x-api-id: API-36,
+        requestBody:
+          {
+            required: true,
+            content: { application/json: { schema: { $ref: '#/components/schemas/RunPatch' } } },
+          },
+        responses:
+          {
+            '200':
+              {
+                description: ok,
+                content: { application/json: { schema: { $ref: '#/components/schemas/Run' } } },
+              },
+            default: { $ref: '#/components/responses/Error' },
+          },
+      }
+    delete:
+      {
+        operationId: deleteRun,
+        tags: [runs],
+        x-api-id: API-25,
+        parameters: [{ $ref: '#/components/parameters/Cascade' }],
+        responses:
+          { '204': { description: deleted }, default: { $ref: '#/components/responses/Error' } },
+      }
+  /api/v1/runs/{runId}/cancel:
+    post:
+      operationId: cancelRun
+      tags: [runs]
+      x-api-id: API-23
+      parameters: [{ $ref: '#/components/parameters/RunId' }]
+      requestBody:
+        {
+          required: true,
+          content: { application/json: { schema: { type: object, additionalProperties: false } } },
+        }
+      responses:
+        {
+          '200':
+            {
+              description: ok,
+              content: { application/json: { schema: { $ref: '#/components/schemas/Run' } } },
+            },
+          default: { $ref: '#/components/responses/Error' },
+        }
+  /api/v1/runs/{runId}/derive:
+    post:
+      operationId: deriveRun
+      tags: [runs]
+      x-api-id: API-24
+      parameters: [{ $ref: '#/components/parameters/RunId' }]
+      requestBody:
+        {
+          required: true,
+          content: { application/json: { schema: { $ref: '#/components/schemas/DeriveRequest' } } },
+        }
+      responses:
+        {
+          '201':
+            {
+              description: child queued,
+              content: { application/json: { schema: { $ref: '#/components/schemas/Run' } } },
+            },
+          default: { $ref: '#/components/responses/Error' },
+        }
+  /api/v1/runs/{runId}/steps:
+    get:
+      {
+        operationId: listSteps,
+        tags: [runs],
+        x-api-id: API-26,
+        parameters: [{ $ref: '#/components/parameters/RunId' }],
+        responses:
+          {
+            '200':
+              {
+                description: ok,
+                content:
+                  {
+                    application/json: { schema: { $ref: '#/components/schemas/StepListResponse' } },
+                  },
+              },
+            default: { $ref: '#/components/responses/Error' },
+          },
+      }
+  /api/v1/runs/{runId}/exchanges/{exchangeId}:
+    get:
+      operationId: getExchange
+      tags: [runs]
+      x-api-id: API-27
+      parameters:
+        [
+          { $ref: '#/components/parameters/RunId' },
+          { name: exchangeId, in: path, required: true, schema: { type: string } },
+        ]
+      responses:
+        {
+          '200':
+            {
+              description: ok,
+              content:
+                { application/json: { schema: { $ref: '#/components/schemas/CapturedMessage' } } },
+            },
+          default: { $ref: '#/components/responses/Error' },
+        }
+  /api/v1/runs/{runId}/artifacts/{artifactId}:
+    get:
+      operationId: getArtifact
+      tags: [runs]
+      x-api-id: API-28
+      parameters:
+        [
+          { $ref: '#/components/parameters/RunId' },
+          { name: artifactId, in: path, required: true, schema: { type: string } },
+        ]
+      responses:
+        {
+          '200':
+            {
+              description: ok,
+              content: { application/json: { schema: { $ref: '#/components/schemas/Artifact' } } },
+            },
+          default: { $ref: '#/components/responses/Error' },
+        }
+  /api/v1/runs/{runId}/observations:
+    post:
+      operationId: recordObservation
+      tags: [runs]
+      x-api-id: API-29
+      parameters: [{ $ref: '#/components/parameters/RunId' }]
+      requestBody:
+        {
+          required: true,
+          content:
+            { application/json: { schema: { $ref: '#/components/schemas/ObservationRequest' } } },
+        }
+      responses:
+        {
+          '200':
+            {
+              description: accepted,
+              content:
+                { application/json: { schema: { $ref: '#/components/schemas/ObservationAck' } } },
+            },
+          default: { $ref: '#/components/responses/Error' },
+        }
+  /api/v1/runs/{runId}/diagnosis:
+    get:
+      {
+        operationId: getDiagnosis,
+        tags: [runs],
+        x-api-id: API-30,
+        parameters: [{ $ref: '#/components/parameters/RunId' }],
+        responses:
+          {
+            '200':
+              {
+                description: ok,
+                content:
+                  {
+                    application/json:
+                      { schema: { $ref: '#/components/schemas/DiagnosisResponse' } },
+                  },
+              },
+            default: { $ref: '#/components/responses/Error' },
+          },
+      }
+  /api/v1/runs/{runId}/compare/{otherRunId}:
+    get:
+      operationId: compareRuns
+      tags: [runs]
+      x-api-id: API-31
+      parameters:
+        [
+          { $ref: '#/components/parameters/RunId' },
+          { name: otherRunId, in: path, required: true, schema: { type: string } },
+          { name: includeVolatile, in: query, schema: { type: boolean, default: false } },
+        ]
+      responses:
+        {
+          '200':
+            {
+              description: ok,
+              content:
+                { application/json: { schema: { $ref: '#/components/schemas/CompareResponse' } } },
+            },
+          default: { $ref: '#/components/responses/Error' },
+        }
+  /api/v1/runs/{runId}/export:
+    get:
+      operationId: exportRun
+      tags: [runs]
+      x-api-id: API-32
+      parameters:
+        [
+          { $ref: '#/components/parameters/RunId' },
+          { name: format, in: query, schema: { enum: [json, ndjson, bundle], default: json } },
+        ]
+      responses:
+        '200':
+          {
+            description: redacted export; gzip run bundle with format=bundle,
+            content:
+              {
+                application/json: { schema: { $ref: '#/components/schemas/RunExport' } },
+                application/x-ndjson: { schema: { type: string } },
+                application/gzip: { schema: { type: string, format: binary } },
+              },
+          }
+        default: { $ref: '#/components/responses/Error' }
+  /api/v1/runs/{runId}/lineage:
+    get:
+      {
+        operationId: getLineage,
+        tags: [runs],
+        x-api-id: API-33,
+        parameters: [{ $ref: '#/components/parameters/RunId' }],
+        responses:
+          {
+            '200':
+              {
+                description: ok,
+                content:
+                  {
+                    application/json: { schema: { $ref: '#/components/schemas/LineageResponse' } },
+                  },
+              },
+            default: { $ref: '#/components/responses/Error' },
+          },
+      }
+  /api/v1/return/vp:
+    post:
+      operationId: returnVp
+      tags: [runs]
+      x-api-id: API-34
+      requestBody:
+        {
+          required: true,
+          content:
+            { application/json: { schema: { $ref: '#/components/schemas/ReturnVpRequest' } } },
+        }
+      responses:
+        {
+          '200':
+            {
+              description: ok,
+              content:
+                { application/json: { schema: { $ref: '#/components/schemas/ReturnVpAck' } } },
+            },
+          default: { $ref: '#/components/responses/Error' },
+        }
+  /return/vp:
+    get:
+      {
+        operationId: returnVpPage,
+        tags: [runs],
+        x-api-id: API-35,
+        responses:
+          {
+            '200':
+              { description: static page, content: { text/html: { schema: { type: string } } } },
+          },
+      }
+  /api/v1/suites:
+    post:
+      operationId: createSuite
+      tags: [suites]
+      x-api-id: API-40
+      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }]
+      requestBody:
+        {
+          required: true,
+          content:
+            { application/json: { schema: { $ref: '#/components/schemas/CreateSuiteRequest' } } },
+        }
+      responses:
+        {
+          '201':
+            {
+              description: queued,
+              content: { application/json: { schema: { $ref: '#/components/schemas/Suite' } } },
+            },
+          default: { $ref: '#/components/responses/Error' },
+        }
+    get:
+      operationId: listSuites
+      tags: [suites]
+      x-api-id: API-41
+      parameters:
+        [
+          { $ref: '#/components/parameters/Limit' },
+          { $ref: '#/components/parameters/Cursor' },
+          { name: trigger, in: query, schema: { enum: [manual, nightly, ci] } },
+        ]
+      responses:
+        {
+          '200':
+            {
+              description: page,
+              content:
+                {
+                  application/json: { schema: { $ref: '#/components/schemas/SuiteListResponse' } },
+                },
+            },
+        }
+  /api/v1/suites/{suiteId}/export:
+    get:
+      {
+        operationId: exportSuiteBundle,
+        tags: [suites],
+        x-api-id: API-59,
+        parameters: [{ $ref: '#/components/parameters/SuiteId' }],
+        responses:
+          {
+            '200':
+              {
+                description: gzip suite bundle,
+                content: { application/gzip: { schema: { type: string, format: binary } } },
+              },
+            default: { $ref: '#/components/responses/Error' },
+          },
+      }
+  /api/v1/suites/{suiteId}:
+    delete:
+      {
+        operationId: deleteSuite,
+        tags: [suites],
+        x-api-id: API-38,
+        parameters:
+          [
+            { $ref: '#/components/parameters/SuiteId' },
+            { $ref: '#/components/parameters/Cascade' },
+          ],
+        responses:
+          { '204': { description: deleted }, default: { $ref: '#/components/responses/Error' } },
+      }
+    get:
+      {
+        operationId: getSuite,
+        tags: [suites],
+        x-api-id: API-42,
+        parameters: [{ $ref: '#/components/parameters/SuiteId' }],
+        responses:
+          {
+            '200':
+              {
+                description: ok,
+                content: { application/json: { schema: { $ref: '#/components/schemas/Suite' } } },
+              },
+            default: { $ref: '#/components/responses/Error' },
+          },
+      }
+  /api/v1/suites/{suiteId}/cancel:
+    post:
+      operationId: cancelSuite
+      tags: [suites]
+      x-api-id: API-43
+      parameters: [{ $ref: '#/components/parameters/SuiteId' }]
+      requestBody:
+        {
+          required: true,
+          content: { application/json: { schema: { type: object, additionalProperties: false } } },
+        }
+      responses:
+        {
+          '200':
+            {
+              description: ok,
+              content: { application/json: { schema: { $ref: '#/components/schemas/Suite' } } },
+            },
+          default: { $ref: '#/components/responses/Error' },
+        }
+  /api/v1/matrix:
+    get:
+      operationId: getMatrix
+      tags: [reports]
+      x-api-id: API-44
+      parameters:
+        - {
+            name: issuer,
+            in: query,
+            style: form,
+            explode: true,
+            schema: { type: array, items: { $ref: '#/components/schemas/AdapterId' } },
+          }
+        - {
+            name: wallet,
+            in: query,
+            style: form,
+            explode: true,
+            schema: { type: array, items: { $ref: '#/components/schemas/AdapterId' } },
+          }
+        - {
+            name: verifier,
+            in: query,
+            style: form,
+            explode: true,
+            schema: { type: array, items: { $ref: '#/components/schemas/AdapterId' } },
+          }
+        - {
+            name: format,
+            in: query,
+            style: form,
+            explode: true,
+            schema: { type: array, items: { $ref: '#/components/schemas/CredentialFormat' } },
+          }
+        - { name: env, in: query, schema: { enum: [local, collab] } }
+        - { name: version, in: query, schema: { type: string } }
+        - { name: kind, in: query, schema: { enum: [interop, tamper] } }
+      responses:
+        {
+          '200':
+            {
+              description: ok,
+              content:
+                { application/json: { schema: { $ref: '#/components/schemas/MatrixResponse' } } },
+            },
+          default: { $ref: '#/components/responses/Error' },
+        }
+  /api/v1/matrix/snapshots:
+    get:
+      {
+        operationId: listMatrixSnapshots,
+        tags: [reports],
+        x-api-id: API-56,
+        parameters:
+          [
+            { $ref: '#/components/parameters/Limit' },
+            { $ref: '#/components/parameters/Cursor' },
+            { name: suiteId, in: query, schema: { type: string } },
+          ],
+        responses:
+          {
+            '200':
+              {
+                description: ok,
+                content:
+                  {
+                    application/json:
+                      { schema: { $ref: '#/components/schemas/MatrixSnapshotListResponse' } },
+                  },
+              },
+          },
+      }
+    post:
+      {
+        operationId: createMatrixSnapshot,
+        tags: [reports],
+        x-api-id: API-39,
+        requestBody:
+          {
+            required: true,
+            content:
+              {
+                application/json:
+                  { schema: { $ref: '#/components/schemas/SnapshotCreateRequest' } },
+              },
+          },
+        responses:
+          {
+            '201':
+              {
+                description: created,
+                content:
+                  { application/json: { schema: { $ref: '#/components/schemas/MatrixSnapshot' } } },
+              },
+            default: { $ref: '#/components/responses/Error' },
+          },
+      }
+  /api/v1/matrix/snapshots/{snapshotId}:
+    get:
+      {
+        operationId: getMatrixSnapshot,
+        tags: [reports],
+        x-api-id: API-57,
+        parameters: [{ name: snapshotId, in: path, required: true, schema: { type: string } }],
+        responses:
+          {
+            '200':
+              {
+                description: ok,
+                content:
+                  { application/json: { schema: { $ref: '#/components/schemas/MatrixSnapshot' } } },
+              },
+            default: { $ref: '#/components/responses/Error' },
+          },
+      }
+  /api/v1/reports/runs/{runId}:
+    get:
+      operationId: getRunReport
+      tags: [reports]
+      x-api-id: API-45
+      parameters:
+        [
+          { $ref: '#/components/parameters/RunId' },
+          { name: format, in: query, schema: { enum: [json, markdown], default: json } },
+        ]
+      responses:
+        '200':
+          {
+            description: report,
+            content:
+              {
+                application/json: { schema: { $ref: '#/components/schemas/RunReport' } },
+                text/markdown: { schema: { type: string } },
+              },
+          }
+        default: { $ref: '#/components/responses/Error' }
+  /api/v1/reports/suites/{suiteId}:
+    get:
+      operationId: getSuiteReport
+      tags: [reports]
+      x-api-id: API-46
+      parameters:
+        [
+          { $ref: '#/components/parameters/SuiteId' },
+          { name: format, in: query, schema: { enum: [json, markdown], default: json } },
+        ]
+      responses:
+        '200':
+          {
+            description: report,
+            content:
+              {
+                application/json: { schema: { $ref: '#/components/schemas/SuiteReport' } },
+                text/markdown: { schema: { type: string } },
+              },
+          }
+        default: { $ref: '#/components/responses/Error' }
+  /api/v1/stats:
+    get:
+      operationId: getStats
+      tags: [reports]
+      x-api-id: API-47
+      parameters:
+        - {
+            name: groupBy,
+            in: query,
+            required: true,
+            schema: { enum: [adapter, format, flow, version, day] },
+          }
+        - { name: from, in: query, schema: { type: string, format: date-time } }
+        - { name: to, in: query, schema: { type: string, format: date-time } }
+        - { name: kind, in: query, schema: { enum: [interop, tamper] } }
+      responses:
+        {
+          '200':
+            {
+              description: ok,
+              content:
+                { application/json: { schema: { $ref: '#/components/schemas/StatsResponse' } } },
+            },
+          default: { $ref: '#/components/responses/Error' },
+        }
+  /api/v1/versions:
+    get:
+      operationId: listVersions
+      tags: [runs]
+      x-api-id: API-80
+      parameters: [{ name: role, in: query, schema: { enum: [issuer, wallet, verifier] } }]
+      responses:
+        {
+          '200':
+            {
+              description: ok,
+              content:
+                {
+                  application/json:
+                    { schema: { $ref: '#/components/schemas/VersionListResponse' } },
+                },
+            },
+          default: { $ref: '#/components/responses/Error' },
+        }
+  /api/v1/issue-drafts:
+    get:
+      operationId: listIssueDrafts
+      tags: [reports]
+      x-api-id: API-48
+      parameters:
+        [
+          { $ref: '#/components/parameters/Limit' },
+          { $ref: '#/components/parameters/Cursor' },
+          {
+            name: status,
+            in: query,
+            schema: { enum: [pending, approved, rejected, filed-by-human] },
+          },
+        ]
+      responses:
+        {
+          '200':
+            {
+              description: page,
+              content:
+                {
+                  application/json:
+                    { schema: { $ref: '#/components/schemas/IssueDraftListResponse' } },
+                },
+            },
+        }
+  /api/v1/issue-drafts/{draftId}:
+    patch:
+      operationId: reviewIssueDraft
+      tags: [reports]
+      x-api-id: API-49
+      parameters: [{ name: draftId, in: path, required: true, schema: { type: string } }]
+      requestBody:
+        {
+          required: true,
+          content:
+            { application/json: { schema: { $ref: '#/components/schemas/IssueDraftPatch' } } },
+        }
+      responses:
+        {
+          '200':
+            {
+              description: ok,
+              content:
+                { application/json: { schema: { $ref: '#/components/schemas/IssueDraft' } } },
+            },
+          default: { $ref: '#/components/responses/Error' },
+        }
+  /api/v1/tamper/cases:
+    get:
+      operationId: listTamperCases
+      tags: [tamper]
+      x-api-id: API-50
+      parameters:
+        - { name: block, in: query, schema: { type: string } }
+        - { name: target, in: query, schema: { type: string } }
+        - { name: format, in: query, schema: { $ref: '#/components/schemas/CredentialFormat' } }
+        - { name: issuer, in: query, schema: { $ref: '#/components/schemas/AdapterId' } }
+        - { name: wallet, in: query, schema: { $ref: '#/components/schemas/AdapterId' } }
+        - { name: verifier, in: query, schema: { $ref: '#/components/schemas/AdapterId' } }
+        - { name: observed, in: query, schema: { enum: [observed, untested] } }
+      responses:
+        {
+          '200':
+            {
+              description: ok,
+              content:
+                {
+                  application/json:
+                    { schema: { $ref: '#/components/schemas/TamperCaseListResponse' } },
+                },
+            },
+        }
+  /api/v1/tamper/cases/{tmpId}:
+    get:
+      operationId: getTamperCase
+      tags: [tamper]
+      x-api-id: API-51
+      parameters:
+        [
+          {
+            name: tmpId,
+            in: path,
+            required: true,
+            schema: { type: string, pattern: '^TMP-[0-9]{2}$' },
+          },
+        ]
+      responses:
+        {
+          '200':
+            {
+              description: ok,
+              content:
+                { application/json: { schema: { $ref: '#/components/schemas/TamperCase' } } },
+            },
+          default: { $ref: '#/components/responses/Error' },
+        }
+  /api/v1/tamper/baselines:
+    get:
+      operationId: listTamperBaselines
+      tags: [tamper]
+      x-api-id: API-52
+      parameters:
+        [
+          { name: tmpId, in: query, schema: { type: string } },
+          { name: adapter, in: query, schema: { $ref: '#/components/schemas/AdapterId' } },
+        ]
+      responses:
+        {
+          '200':
+            {
+              description: ok,
+              content:
+                {
+                  application/json:
+                    { schema: { $ref: '#/components/schemas/TamperBaselineListResponse' } },
+                },
+            },
+        }
+  /api/v1/tamper/baselines/confirm:
+    post:
+      {
+        operationId: confirmTamperBaseline,
+        tags: [tamper],
+        x-api-id: API-58,
+        requestBody:
+          {
+            required: true,
+            content:
+              {
+                application/json:
+                  { schema: { $ref: '#/components/schemas/TamperBaselineConfirm' } },
+              },
+          },
+        responses:
+          {
+            '200':
+              {
+                description: ok,
+                content:
+                  { application/json: { schema: { $ref: '#/components/schemas/TamperBaseline' } } },
+              },
+            default: { $ref: '#/components/responses/Error' },
+          },
+      }
+  /proxy/verify/{runId}/{path}:
+    parameters:
+      - { $ref: '#/components/parameters/RunId' }
+      - {
+          name: path,
+          in: path,
+          required: true,
+          schema: { type: string },
+          description: 'v1/verify/<sdk path>, allowlist in section 8.5',
+        }
+    get:
+      {
+        operationId: proxyVerifyGet,
+        tags: [proxy],
+        x-api-id: API-55,
+        responses:
+          {
+            default:
+              {
+                description: upstream status and body unchanged; proxy errors use the Error envelope,
+              },
+          },
+      }
+    post:
+      operationId: proxyVerifyPost
+      tags: [proxy]
+      x-api-id: API-55
+      requestBody: { required: false, content: { application/json: { schema: {} } } }
+      responses:
+        {
+          default:
+            {
+              description: upstream status and body unchanged; proxy errors use the Error envelope,
+            },
+        }
+  /tamper/request/{runId}:
+    parameters: [{ $ref: '#/components/parameters/RunId' }]
+    get:
+      operationId: relayRequestObject
+      tags: [relay]
+      x-api-id: API-53
+      servers:
+        [{ url: 'https://{publicHost}:8443', variables: { publicHost: { default: 192.168.0.10 } } }]
+      responses:
+        '200':
+          {
+            description: mutated request object,
+            content:
+              {
+                application/oauth-authz-req+jwt: { schema: { type: string } },
+                application/json: { schema: { type: object } },
+              },
+          }
+        default: { $ref: '#/components/responses/Error' }
+    post:
+      operationId: relayRequestObjectPost
+      tags: [relay]
+      x-api-id: API-54
+      servers:
+        [{ url: 'https://{publicHost}:8443', variables: { publicHost: { default: 192.168.0.10 } } }]
+      requestBody:
+        {
+          content:
+            {
+              application/x-www-form-urlencoded:
+                {
+                  schema:
+                    {
+                      type: object,
+                      properties:
+                        { wallet_metadata: { type: string }, wallet_nonce: { type: string } },
+                    },
+                },
+            },
+        }
+      responses:
+        '200':
+          {
+            description: mutated request object,
+            content:
+              {
+                application/oauth-authz-req+jwt: { schema: { type: string } },
+                application/json: { schema: { type: object } },
+              },
+          }
+        default: { $ref: '#/components/responses/Error' }
+  /health:
+    get:
+      {
+        operationId: sidecarHealth,
+        tags: [sidecar],
+        x-api-id: API-60,
+        servers: [{ url: 'http://sidecar:7070' }],
+        responses:
+          {
+            '200':
+              {
+                description: ok,
+                content:
+                  { application/json: { schema: { $ref: '#/components/schemas/SidecarHealth' } } },
+              },
+          },
+      }
+  /vci/sessions:
+    post:
+      operationId: vciSessionCreate
+      tags: [sidecar]
+      x-api-id: API-61
+      servers: [{ url: 'http://sidecar:7070' }]
+      requestBody:
+        {
+          required: true,
+          content:
+            { application/json: { schema: { $ref: '#/components/schemas/VciSessionCreate' } } },
+        }
+      responses:
+        {
+          '201':
+            {
+              description: created,
+              content:
+                {
+                  application/json: { schema: { $ref: '#/components/schemas/VciSessionCreated' } },
+                },
+            },
+          default: { $ref: '#/components/responses/Error' },
+        }
+  /vci/sessions/{id}/pending:
+    get:
+      operationId: vciPending
+      tags: [sidecar]
+      x-api-id: API-62
+      servers: [{ url: 'http://sidecar:7070' }]
+      parameters:
+        [
+          { name: id, in: path, required: true, schema: { type: string } },
+          { name: after, in: query, schema: { type: integer, minimum: 0, default: 0 } },
+        ]
+      responses:
+        {
+          '200':
+            {
+              description: long poll up to 25 s,
+              content:
+                {
+                  application/json: { schema: { $ref: '#/components/schemas/VciPendingResponse' } },
+                },
+            },
+          default: { $ref: '#/components/responses/Error' },
+        }
+  /vci/sessions/{id}/answers/{cbId}:
+    post:
+      operationId: vciAnswer
+      tags: [sidecar]
+      x-api-id: API-63
+      servers: [{ url: 'http://sidecar:7070' }]
+      parameters:
+        [
+          { name: id, in: path, required: true, schema: { type: string } },
+          { name: cbId, in: path, required: true, schema: { type: string } },
+        ]
+      requestBody:
+        {
+          required: true,
+          content: { application/json: { schema: { $ref: '#/components/schemas/VciAnswer' } } },
+        }
+      responses:
+        { '204': { description: answered }, default: { $ref: '#/components/responses/Error' } }
+  /vci/sessions/{id}/result:
+    get:
+      operationId: vciResult
+      tags: [sidecar]
+      x-api-id: API-64
+      servers: [{ url: 'http://sidecar:7070' }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      responses:
+        '200':
+          {
+            description: 'done, failed',
+            content: { application/json: { schema: { $ref: '#/components/schemas/VciResult' } } },
+          }
+        '202':
+          {
+            description: still running,
+            content: { application/json: { schema: { $ref: '#/components/schemas/VciResult' } } },
+          }
+        default: { $ref: '#/components/responses/Error' }
+  /vci/sessions/{id}:
+    delete:
+      operationId: vciSessionDelete
+      tags: [sidecar]
+      x-api-id: API-65
+      servers: [{ url: 'http://sidecar:7070' }]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      responses: { '204': { description: deleted } }
+  /vp/authenticate:
+    post:
+      {
+        operationId: vpAuthenticate,
+        tags: [sidecar],
+        x-api-id: API-66,
+        servers: [{ url: 'http://sidecar:7070' }],
+        requestBody:
+          {
+            required: true,
+            content:
+              {
+                application/json:
+                  { schema: { $ref: '#/components/schemas/VpAuthenticateRequest' } },
+              },
+          },
+        responses:
+          {
+            '200':
+              {
+                description: ok,
+                content:
+                  {
+                    application/json:
+                      { schema: { $ref: '#/components/schemas/VpAuthenticateResponse' } },
+                  },
+              },
+            default: { $ref: '#/components/responses/Error' },
+          },
+      }
+  /vp/unsigned-token:
+    post:
+      {
+        operationId: vpUnsignedToken,
+        tags: [sidecar],
+        x-api-id: API-67,
+        servers: [{ url: 'http://sidecar:7070' }],
+        requestBody:
+          {
+            required: true,
+            content:
+              {
+                application/json:
+                  { schema: { $ref: '#/components/schemas/VpUnsignedTokenRequest' } },
+              },
+          },
+        responses:
+          {
+            '200':
+              {
+                description: ok,
+                content:
+                  {
+                    application/json:
+                      { schema: { $ref: '#/components/schemas/VpUnsignedTokenResponse' } },
+                  },
+              },
+            default: { $ref: '#/components/responses/Error' },
+          },
+      }
+  /vp/response:
+    post:
+      {
+        operationId: vpResponse,
+        tags: [sidecar],
+        x-api-id: API-68,
+        servers: [{ url: 'http://sidecar:7070' }],
+        requestBody:
+          {
+            required: true,
+            content:
+              { application/json: { schema: { $ref: '#/components/schemas/VpResponseRequest' } } },
+          },
+        responses:
+          {
+            '200':
+              {
+                description: ok,
+                content:
+                  {
+                    application/json:
+                      { schema: { $ref: '#/components/schemas/VpResponseResponse' } },
+                  },
+              },
+            default: { $ref: '#/components/responses/Error' },
+          },
+      }
+  /vc/verify:
+    post:
+      {
+        operationId: vcVerify,
+        tags: [sidecar],
+        x-api-id: API-69,
+        servers: [{ url: 'http://sidecar:7070' }],
+        requestBody:
+          {
+            required: true,
+            content:
+              { application/json: { schema: { $ref: '#/components/schemas/VcVerifyRequest' } } },
+          },
+        responses:
+          {
+            '200':
+              {
+                description: ok,
+                content:
+                  {
+                    application/json: { schema: { $ref: '#/components/schemas/VcVerifyResponse' } },
+                  },
+              },
+            default: { $ref: '#/components/responses/Error' },
+          },
+      }
+components:
+  securitySchemes:
+    adminToken: { type: apiKey, in: header, name: X-Admin-Token }
+  parameters:
+    RunId:
+      {
+        name: runId,
+        in: path,
+        required: true,
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' },
+      }
+    SuiteId:
+      {
+        name: suiteId,
+        in: path,
+        required: true,
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' },
+      }
+    Cascade: { name: cascade, in: query, schema: { type: boolean, default: false } }
+    FlowId:
+      {
+        name: flowId,
+        in: path,
+        required: true,
+        schema: { type: string, pattern: '^FLOW-[0-9]{2}$' },
+      }
+    Limit:
+      { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
+    Cursor: { name: cursor, in: query, schema: { type: string } }
+    IdempotencyKey:
+      { name: Idempotency-Key, in: header, schema: { type: string, minLength: 1, maxLength: 64 } }
+  requestBodies:
+    CreateRun:
+      {
+        required: true,
+        content:
+          { application/json: { schema: { $ref: '#/components/schemas/CreateRunRequest' } } },
+      }
+  responses:
+    Error:
+      description: error envelope (section 6)
+      headers:
+        { X-Request-Id: { schema: { type: string } }, Retry-After: { schema: { type: integer } } }
+      content: { application/json: { schema: { $ref: '#/components/schemas/ErrorEnvelope' } } }

@@ -1,0 +1,5 @@
+-- results BEFORE the wallet posts
+{"errorCode":"NO_VP_SUBMISSION","errorMessage":"No VP submission found for given transaction ID."} [status 404]
+{} [wallet post 200]
+-- results AFTER the post (retry)
+{"transactionId":"txn_90d33a61-8d42-4689-b9c0-9017ebfc9714","allChecksSuccessful":true,"credentialResults":[{"allChecksSuccessful":true,"schemaAndSignatureCheck":{"valid":true,"error":null},"expiryCheck":{"valid":true},"statusCheck":[],"claims":{},"v

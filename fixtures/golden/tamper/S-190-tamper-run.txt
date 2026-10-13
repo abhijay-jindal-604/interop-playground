@@ -1,0 +1,16 @@
+parts=6 disclosures=4
+  disclosure 1: ["2zszbAl2K7f-iTW7cfiL9w","gender","Female"]
+  disclosure 2: ["QzzOVmRKpWTMQyGGoI5b5A","fullName","Asha Test"]
+  disclosure 3: ["pqdJlfiaeiChEE7S2BqJAg","dateOfBirth","1990-01-01"]
+  disclosure 4: ["84iOjXofJDwPgC4rjvVPWQ","email","asha@example.org"]
+T0 baseline -> VerificationResult(verificationStatus=true, verificationMessage=, verificationErrorCode=) (709 ms)
+T1 issuer signature one byte flipped -> VerificationResult(verificationStatus=false, verificationMessage=Verification Failed, verificationErrorCode=ERR_SIGNATURE_VERIFICATION_FAILED) (5 ms)
+T1b issuer signature truncated to 63 bytes -> VerificationResult(verificationStatus=false, verificationMessage=Exception during Verification: Signature verification failed: Invalid signature length: Expected 64 bytes for R || S format, verificationErrorCode=ERR_SIGNATURE_VERIFICATION_FAILED) (3 ms)
+T2.1 disclosure 1 value altered (["2zszbAl2K7f-iTW7cfiL9w","gender","Female"] -> ["2zszbAl2K7f-iTW7cfiL9w","gender","FemaleX"]) -> VerificationResult(verificationStatus=false, verificationMessage=Digest value of all disclosures must be present in the '_sd' claim of payload, verificationErrorCode=ERR_INVALID_DISCLOSURE) (1 ms)
+T2.2 disclosure 2 value altered (["QzzOVmRKpWTMQyGGoI5b5A","fullName","Asha Test"] -> ["QzzOVmRKpWTMQyGGoI5b5A","fullName","Asha TestX"]) -> VerificationResult(verificationStatus=false, verificationMessage=Digest value of all disclosures must be present in the '_sd' claim of payload, verificationErrorCode=ERR_INVALID_DISCLOSURE) (2 ms)
+T3 disclosure swapped for unreferenced one (digest not in _sd) -> VerificationResult(verificationStatus=false, verificationMessage=Digest value of all disclosures must be present in the '_sd' claim of payload, verificationErrorCode=ERR_INVALID_DISCLOSURE) (2 ms)
+T4 extra unreferenced disclosure appended -> VerificationResult(verificationStatus=false, verificationMessage=Digest value of all disclosures must be present in the '_sd' claim of payload, verificationErrorCode=ERR_INVALID_DISCLOSURE) (3 ms)
+T5 one disclosure dropped (legit selective disclosure) -> VerificationResult(verificationStatus=true, verificationMessage=, verificationErrorCode=) (4 ms)
+T6 payload plain claim vct altered, signature kept -> VerificationResult(verificationStatus=false, verificationMessage=Verification Failed, verificationErrorCode=ERR_SIGNATURE_VERIFICATION_FAILED) (3 ms)
+T7 header alg=none -> VerificationResult(verificationStatus=false, verificationMessage=Missing or invalid 'alg' in JWT header, verificationErrorCode=ERR_INVALID_ALG) (1 ms)
+T8 duplicate disclosure appended -> VerificationResult(verificationStatus=true, verificationMessage=, verificationErrorCode=) (3 ms)

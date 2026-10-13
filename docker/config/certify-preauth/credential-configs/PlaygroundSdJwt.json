@@ -1,0 +1,65 @@
+{
+  "vcTemplate": "eyJmdWxsTmFtZSI6ICIke2Z1bGxOYW1lfSIsICJkYXRlT2ZCaXJ0aCI6ICIke2RhdGVPZkJpcnRofSIsICJnZW5kZXIiOiAiJHtnZW5kZXJ9IiwgImVtYWlsIjogIiR7ZW1haWx9In0=",
+  "credentialConfigKeyId": "PlaygroundSdJwt",
+  "contextURLs": [],
+  "credentialTypes": [],
+  "credentialFormat": "dc+sd-jwt",
+  "sdJwtVct": "PlaygroundSdJwt",
+  "keyManagerAppId": "CERTIFY_VC_SIGN_EC_R1",
+  "keyManagerRefId": "EC_SECP256R1_SIGN",
+  "signatureAlgo": "ES256",
+  "metaDataDisplay": [
+    {
+      "name": "Playground SD-JWT",
+      "locale": "en",
+      "text_color": "#FFFFFF",
+      "background_color": "#12107c",
+      "logo": {
+        "uri": "https://inji.github.io/inji-config/logos/mosipid-logo.png",
+        "alt_text": "logo"
+      }
+    }
+  ],
+  "displayOrder": [
+    "fullName",
+    "dateOfBirth",
+    "gender",
+    "email"
+  ],
+  "scope": "playground_sdjwt",
+  "sdJwtClaims": {
+    "fullName": {
+      "display": [
+        {
+          "name": "fullName",
+          "locale": "en"
+        }
+      ]
+    },
+    "dateOfBirth": {
+      "display": [
+        {
+          "name": "dateOfBirth",
+          "locale": "en"
+        }
+      ]
+    },
+    "gender": {
+      "display": [
+        {
+          "name": "gender",
+          "locale": "en"
+        }
+      ]
+    },
+    "email": {
+      "display": [
+        {
+          "name": "email",
+          "locale": "en"
+        }
+      ]
+    }
+  },
+  "sdClaim": "$.fullName,$.dateOfBirth,$.gender,$.email"
+}

@@ -1,0 +1,12 @@
+  [http] POST https://172.16.134.37/v1/certify/pre-authorized-data -> 200
+  pre-authorized-data -> {"credential_offer_uri":"openid-credential-offer://?credential_offer_uri=https%3A%2F%2F172.16.134.37%2Fv1%2Fcertify%2Fcredential-offer-data%2F2f7317d2-ccb4-4a02-8ac2-aff847aa8f72"}
+offer passed to VCIClient: openid-credential-offer://?credential_offer_uri=https%3A%2F%2F172.16.134.37%2Fv1%2Fcertify%2Fcredential-offer-data%2F2f7317d2-ccb4-4a02-8ac2-aff847aa8f72
+  token cb: grant=PRE_AUTHORIZED endpoint=https://172.16.134.37/v1/certify/oauth/token preAuth=true
+  [http] POST https://172.16.134.37/v1/certify/oauth/token -> 200
+  token resp -> {"access_token":"<redacted>","token_type":"Bearer","expires_in":600}
+  proof cb: aud=https://172.16.134.37 nonce=5d7bae1f-8bd2-43c9-8ba1-d5a09bbea2d9 algs=[RS256, PS256, ES256, EdDSA]
+Oct 05, 2026 8:04:15 PM io.mosip.vciclient.credential.request.CredentialRequestExecutor requestCredential
+INFO: Credential downloaded successfully
+VCIClient -> configId=PlaygroundSdJwt issuer=https://172.16.134.37 n=1
+credential (string) head: eyJ4NXQjUzI1NiI6ImJPZG9yM0tkemZ4eWlVdkJkeTQtTHE0MEI0SGJtODNZY200ZlUwSGp2T3ciLCJ4NWMiOlsiTU
+vcverifier(DC_SD_JWT) -> VerificationResult(verificationStatus=true, verificationMessage=, verificationErrorCode=) in 453 ms

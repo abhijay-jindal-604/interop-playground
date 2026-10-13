@@ -1,0 +1,16 @@
+{
+  "verifiers": [
+    {
+      "client_id": "inji-verify-ui",
+      "redirect_uri": ["https://${PUBLIC_HOST}:8443/", "https://${PUBLIC_HOST}:8443/*"],
+      "response_uris": ["https://${PUBLIC_HOST}:8443/v1/verify/v2/vp-submission/direct-post"],
+      "allow_unsigned_request": true
+    },
+    {
+      "client_id": "redirect_uri:https://${PUBLIC_HOST}:8443/v1/verify/v2/vp-submission/direct-post",
+      "redirect_uri": ["http://127.0.0.1:3100/return/vp"],
+      "response_uris": ["https://${PUBLIC_HOST}:8443/v1/verify/v2/vp-submission/direct-post"],
+      "allow_unsigned_request": true
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+  [http] POST https://172.16.134.37:8453/v1/certify/pre-authorized-data -> 200
+  pre-authorized-data -> {"credential_offer_uri":"openid-credential-offer://?credential_offer_uri=https%3A%2F%2F172.16.134.37%3A8453%2Fv1%2Fcertify%2Fcredential-offer-data%2Ffecc5f84-028a-4b9c-93b2-0ecd3c9b7653"}
+offer passed to VCIClient: openid-credential-offer://?credential_offer_uri=https%3A%2F%2F172.16.134.37%3A8453%2Fv1%2Fcertify%2Fcredential-offer-data%2Ffecc5f84-028a-4b9c-93b2-0ecd3c9b7653
+  token cb: grant=PRE_AUTHORIZED endpoint=https://172.16.134.37:8453/v1/certify/oauth/token preAuth=true
+  [http] POST https://172.16.134.37:8453/v1/certify/oauth/token -> 200
+  token resp -> {"access_token":"<redacted>","token_type":"Bearer","expires_in":600}
+  proof cb: aud=https://172.16.134.37:8453 nonce=e61adc1f-ff9a-463a-9b49-786c7fd3bafa algs=[RS256, ES256]
+Oct 05, 2026 8:03:04 PM io.mosip.vciclient.credential.request.CredentialRequestExecutor requestCredential
+INFO: Credential downloaded successfully
+VCIClient -> configId=FarmerCredential issuer=https://172.16.134.37:8453 n=1
+credential (json object) head: {"issuanceDate":"2026-10-05T14:33:04.054Z","credentialSubject":{"gender":"Female","primary
+Oct 05, 2026 8:03:04 PM io.mosip.vercred.vcverifier.credentialverifier.verifier.LdpVerifier verify
+INFO: Received Credentials Verification - Start
+Oct 05, 2026 8:03:07 PM io.mosip.vercred.vcverifier.keyResolver.types.did.DidWebPublicKeyResolver resolveDidDocument
+SEVERE: Error fetching DID document: Network request failed with error response - Invalid URL host: "172.16.134.37%3A8453"
+Oct 05, 2026 8:03:07 PM io.mosip.vercred.vcverifier.keyResolver.types.did.DidWebPublicKeyResolver extractPublicKey
+SEVERE: Error fetching public key: Network request failed with error response - Invalid URL host: "172.16.134.37%3A8453"
+vcverifier(LDP_VC) -> VerificationResult(verificationStatus=false, verificationMessage=Exception during Verification: Error while doing verification of verifiable credential: io.mosip.vercred.vcverifier.exception.PublicKeyResolutionFailedException: Network request failed with error response - Invalid URL host: "172.16.134.37%3A8453", verificationErrorCode=ERR_SIGNATURE_VERIFICATION_FAILED) in 2673 ms

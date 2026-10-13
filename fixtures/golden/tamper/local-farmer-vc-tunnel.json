@@ -1,0 +1,39 @@
+{
+  "issuanceDate": "2026-09-27T13:23:14.309Z",
+  "credentialSubject": {
+    "gender": "Female",
+    "primaryCropType": "${primaryCropType}",
+    "mobileNumber": "${mobileNumber}",
+    "postalCode": "${postalCode}",
+    "landArea": "${landArea}",
+    "fullName": "Playground Farmer",
+    "secondaryCropType": "${secondaryCropType}",
+    "dateOfBirth": "1990-01-01",
+    "face": "${face}",
+    "farmerID": "${farmerID}",
+    "villageOrTown": "${villageOrTown}",
+    "district": "${district}",
+    "id": "did:jwk:eyJrdHkiOiJFQyIsIngiOiIxNmdFQTZtMkpOdnNfdWxuRllTSWVCY2Q2Q05Cd3NIQ2xYRmh0elkzcHVnIiwieSI6IkVvYU5zUk1SUnRIYk5PVWZ2ZG9VUkNyOXM0QUFoQkFTajBnUk9GUWx4NkUiLCJjcnYiOiJQLTI1NiJ9#0",
+    "state": "${state}",
+    "landOwnershipType": "${landOwnershipType}"
+  },
+  "id": "https://mosip.io/credential/0d25ff58-49e8-4523-927c-25b0af5f1048",
+  "type": [
+    "VerifiableCredential",
+    "FarmerCredential"
+  ],
+  "@context": [
+    "https://www.w3.org/2018/credentials/v1",
+    "https://inji.github.io/inji-config/contexts/farmer.json",
+    "https://w3id.org/security/suites/ed25519-2020/v1"
+  ],
+  "issuer": "did:web:soc-radios-arise-devel.trycloudflare.com",
+  "expirationDate": "2028-09-26T13:23:14.309Z",
+  "proof": {
+    "type": "Ed25519Signature2020",
+    "created": "2026-09-27T13:23:14Z",
+    "proofPurpose": "assertionMethod",
+    "verificationMethod": "did:web:soc-radios-arise-devel.trycloudflare.com#pjEZsqKzo-FScSiqK5-YshMpMLJTtvoe6CsD5bBBTtY",
+    "proofValue": "z2KhB3bSeeiUR1RL4UVNxRk52TvBM1spx1wTaFN3Jvpi2zmJN882wLrUfWLgAQiXycsCsxs8hNCdvmki89jPkAjHa"
+  }
+}

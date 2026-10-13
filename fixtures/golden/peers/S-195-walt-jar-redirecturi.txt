@@ -1,0 +1,9 @@
+=== authenticateVerifier ===
+OK clientId=redirect_uri:https://172.16.134.37:18443/verification-session/45a9328d-ba43-4dce-8666-5b7672a39cd2/response responseMode=direct_post responseUri=https://172.16.134.37:18443/verification-session/45a9328d-ba43-4dce-8666-5b7672a39cd2/response nonce=325a3eca-4322-4dc2-b61e-c9e7389a2531 state=56f0523d-e927-40dd-aa91-8ed39addbdd6
+=== constructUnsignedVPToken ===
+id=urn:uuid:9ba4c5dc-75d5-4b19-976b-07b1ba8b9001 format=DC_SD_JWT holderKeyReference=did:jwk:eyJjcnYiOiJQLTI1NiIsImt0eSI6IkVDIiwieCI6IkExY0ZnaFg0X2RpSVk5cWdncFZ1VGdnR1JXNnhKa1Q2MDVzTkpJcGh4VXciLCJ5IjoiSUdFQmJfOXZGb3dQeG1vQ2V6NnlKYWhSeUdudm5EQ1VFaU1Ud3dlbUktSSJ9#0 sigAlg=ES256 dataToSign.len=357
+dataToSign(utf8)=eyJhbGciOiJFUzI1NiIsInR5cCI6ImtiK2p3dCJ9.eyJpYXQiOjE3OTEyMjYyNjUsImF1ZCI6InJlZGlyZWN0X3VyaTpodHRwczovLzE3Mi4xNi4xMzQuMzc6MTg0NDMvdmVyaWZpY2F0aW9uLXNlc3Npb24vNDVhOTMyOGQtYmE0My00ZGNlLTg2NjYtNWI3NjcyYTM5Y2QyL3Jlc3BvbnNlIiwibm9uY2UiOiIzMjVhM2VjYS00MzIyLTRkYzItYjYxZS1jOWU3Mzg5YTI1MzEiLCJzZF9oYXNoIjoiTC0zcG13SnJaZkJRTlAxTG1HZ3VpMW5fdnBUaWpDWHFTaXNpMVpvNkZySSJ9
+signed id=urn:uuid:9ba4c5dc-75d5-4b19-976b-07b1ba8b9001 sigBytes.len=64
+=== sendVPResponseToVerifier ===
+statusCode=200 isOk=true redirectUri=null headers={connection=[keep-alive], content-length=[79], content-type=[application/json], date=[Mon, 05 Oct 2026 18:51:06 GMT], server=[nginx/1.30.5], vary=[Origin]}
+body={"status":"received","message":"Presentation received and is being processed."}
