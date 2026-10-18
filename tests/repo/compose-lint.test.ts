@@ -272,6 +272,35 @@ describe('compose-lint', () => {
     }
   });
 
+  it('every Dockerfile FROM is digest-pinned and that digest is in versions.lock (ADR-17)', () => {
+    const lock = JSON.parse(readFileSync(join(root, 'versions.lock'), 'utf8')) as {
+      images: Record<string, string>;
+    };
+    const files = [
+      'docker/bff.Dockerfile',
+      'docker/sidecar.Dockerfile',
+      'docker/oauth2-mock/Dockerfile',
+    ];
+    let froms = 0;
+    for (const f of files) {
+      const text = readFileSync(join(root, f), 'utf8');
+      const args = Object.fromEntries(
+        [...text.matchAll(/^ARG (\w+)=(\S+)$/gm)].map((m) => [m[1] ?? '', m[2] ?? '']),
+      );
+      for (const m of text.matchAll(/^FROM (\S+)/gm)) {
+        const image = (m[1] ?? '').replace(/^\$\{(\w+)\}$/, (_x, a: string) => args[a] ?? '');
+        const [ref, digest] = image.split('@');
+        expect(digest, `${f}: ${image}`).toMatch(/^sha256:[0-9a-f]{64}$/);
+        const pinned = Object.entries(lock.images)
+          .filter(([k]) => k.split('#')[0] === ref)
+          .map(([, v]) => v);
+        expect(pinned, `${f}: ${image} not in versions.lock`).toContain(digest);
+        froms++;
+      }
+    }
+    expect(froms).toBe(5);
+  });
+
   it('certify-mdoc and the iae services are digest-locked in compose.yaml (RISK-19, RISK-39)', () => {
     for (const n of ['certify-mdoc', 'certify-iae', 'certify-iae-mint']) {
       expect(project.services[n]?.image, n).toMatch(/@sha256:[0-9a-f]{64}$/);

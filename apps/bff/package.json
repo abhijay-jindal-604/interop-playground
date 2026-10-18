@@ -9,6 +9,10 @@
       "default": "./src/index.ts"
     }
   },
+  "scripts": {
+    "start": "tsx src/server.ts",
+    "cli": "tsx src/cli.ts"
+  },
   "dependencies": {
     "@fastify/static": "10.1.5",
     "@interop-playground/adapters": "*",

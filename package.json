@@ -28,12 +28,13 @@
     "test:contract": "vitest run --project contract",
     "test:integration": "vitest run --project integration --passWithNoTests",
     "test:repo": "vitest run --project repo",
-    "test:ui": "vitest run --project unit apps/ui",
+    "test:ui": "vitest run --project ui",
     "e2e": "playwright test",
     "contrast": "node scripts/contrast.mjs",
     "contracts:generate": "node scripts/contracts-generate.mjs",
     "contracts:check": "npm run contracts:generate && git diff --exit-code -- packages/api/openapi.yaml packages/api/api.schema.json packages/api/src/client.gen.ts",
     "bff:cli": "tsx apps/bff/src/cli.ts",
+    "store:scan": "npm run bff:cli -- store scan-store",
     "ci:fast": "npm run bff:cli -- suite run --profile ci-fast"
   },
   "devDependencies": {

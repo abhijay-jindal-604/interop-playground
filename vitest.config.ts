@@ -3,7 +3,7 @@ import { defineConfig } from 'vitest/config';
 const networkGuard = './packages/testkit/src/setup-network-guard.ts';
 const common = ['**/node_modules/**', '**/dist/**', 'sidecar/**', 'e2e/**'];
 
-/** plan/11 §2: projects unit, contract, integration, repo. */
+/** plan/11 §2: projects unit, contract, integration, repo; `ui` runs apps/ui in jsdom (T-13). */
 export default defineConfig({
   test: {
     projects: [
@@ -12,7 +12,16 @@ export default defineConfig({
           name: 'unit',
           environment: 'node',
           include: ['apps/**/*.test.ts', 'packages/**/*.test.ts'],
-          exclude: [...common, '**/*.contract.test.ts', '**/*.int.test.ts'],
+          exclude: [...common, 'apps/ui/**', '**/*.contract.test.ts', '**/*.int.test.ts'],
+          setupFiles: [networkGuard],
+        },
+      },
+      {
+        test: {
+          name: 'ui',
+          environment: 'jsdom',
+          include: ['apps/ui/src/**/*.test.ts', 'apps/ui/src/**/*.test.tsx'],
+          exclude: common,
           setupFiles: [networkGuard],
         },
       },

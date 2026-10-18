@@ -5,15 +5,18 @@
 #                 [--rotate-ca] [--reset] [--reset-history] [--update-lock] [--no-build]
 #
 # Idempotent: a second run on a healthy bundle changes nothing and recreates no container.
-# Needs only bash, docker (+ compose plugin), openssl and ss. Never passes -v to compose.
+# Needs only bash, docker (+ compose plugin), openssl, ss and curl. Never passes -v to compose.
 #
-# Interim behaviour until the BFF CLI exists (T-07; ADR-54 in plan/_parts/B.adrs.md):
-#  - config is rendered by docker/render-config.sh (same rules as `playground render-config`);
-#  - the chain steps esignet-onboard, certify-didurl and guest-smoke run only when the bff image
-#    exists; otherwise they are reported as skipped, and mimoto-p12 uses the openssl fallback
-#    below (the p12 always wraps the existing key, never a new one: S-105, S-150);
-#  - readiness is probed through the internal service names with `docker compose exec`; the
-#    gateway-URL probes and the bff probe run once the bff image is built.
+# BFF CLI (T-07, ADR-54, ADR-60):
+#  - config is rendered by docker/render-config.sh (`playground render-config` in the bff image
+#    implements the same rules and is tested byte-for-byte against it);
+#  - the chain steps esignet-onboard, certify-didurl and guest-smoke run in a throw-away bff
+#    container (`docker compose run --rm --no-deps bff playground ...`) when the bff image
+#    exists; without it they are reported as skipped. The Mimoto p12 is always built here with
+#    openssl around the existing client key, never a new key (S-105, S-150, ADR-60);
+#  - readiness: internal service names via `docker compose exec`, then `playground wait-ready`,
+#    then the bff probe GET http://127.0.0.1:3100/api/v1/health from the host. Gateway-URL
+#    probes arrive with the gateway (T-11).
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -88,6 +91,7 @@ docker info >/dev/null 2>&1 || die "cannot talk to the docker daemon (permission
 docker compose version >/dev/null 2>&1 || die "docker compose plugin not found"
 command -v openssl >/dev/null || die "openssl not found"
 command -v ss >/dev/null || die "ss (iproute2) not found"
+command -v curl >/dev/null || die "curl not found (the bff probe uses it)"
 log "docker $(docker version --format '{{.Server.Version}}'), $(docker compose version --short 2>/dev/null || true), $(openssl version | cut -d' ' -f1-2)"
 if docker info --format '{{.SecurityOptions}}' | grep -q rootless; then
   start="$(sysctl -n net.ipv4.ip_unprivileged_port_start 2>/dev/null || echo 1024)"
@@ -112,6 +116,10 @@ if [[ -z "$PUBLIC_HOST" ]]; then
   log "PUBLIC_HOST=$PUBLIC_HOST (detected, written to .env)"
 fi
 [[ "$PUBLIC_HOST" != 127.* ]] || die "PUBLIC_HOST must not be a loopback address (containers must reach it, ADR-06)"
+# a DHCP lease change leaves a stale address in .env; docker would fail later binding it (443)
+if command -v ip >/dev/null && ! ip -4 -o addr show 2>/dev/null | grep -q " inet ${PUBLIC_HOST//./\\.}/"; then
+  die "PUBLIC_HOST=$PUBLIC_HOST (from .env) is not an address of this machine; set PUBLIC_HOST= (empty) in .env to re-detect it"
+fi
 export PUBLIC_HOST
 set_env .env COMPOSE_PROFILES "$COMPOSE_PROFILES"
 set_env .env PLAYGROUND_MODE "$mode"
@@ -286,8 +294,10 @@ chmod -R a+rX .generated/config
 
 # --------------------------------------------------------- ADR-14 chain ----
 bff_cli=0
-image_present "$BFF_IMAGE" && [[ $no_build -eq 0 ]] && bff_cli=1
-run_cli() { dc run --rm --no-deps bff playground "$@"; }
+image_present "$BFF_IMAGE" && bff_cli=1
+run_cli() { dc run --rm --no-deps -T bff playground "$@"; }
+# esignet-onboard reads (or creates) the Mimoto client key; only this one-shot run mounts it
+run_cli_esignet() { dc run --rm --no-deps -T -v "$ROOT/certs/esignet:/certs/esignet" bff playground "$@"; }
 chain_diagnosis() {
   cat >&2 <<'EOF'
 [up] The ADR-14 chain failed. Diagnose in this order (plan/01 §3.8 step 9):
@@ -299,7 +309,7 @@ chain_diagnosis() {
   Logs: docker compose -p interop-playground logs mimoto certify-authcode esignet
 EOF
 }
-mimoto_p12_fallback() {
+mimoto_p12() {
   local pw key=certs/esignet/playground-mimoto.key.pem
   pw="$(get_env .env.local ESIGNET_KEYSTORE_PASSWORD)"
   umask 077
@@ -323,6 +333,12 @@ if [[ "$mode" == local ]]; then
     warn "Inji state was created for another PUBLIC_HOST/CA (or the chain never finished): wiping it (10 §7.6)"
     remove_state
     state_present=0
+  elif [[ $state_present -eq 1 && $bff_cli -eq 1 && "$(sed -n 's/^onboard=//p' "$MARKER" 2>/dev/null)" == skipped ]]; then
+    # ADR-54 (3): state from a bring-up without the bff CLI has no onboarding; it is wiped and
+    # rebuilt together (10 §7.6 invariant), history (playground-data) is never touched
+    warn "Inji state was created without eSignet onboarding (onboard=skipped): rebuilding it with the bff CLI"
+    remove_state
+    state_present=0
   fi
   if [[ $state_present -eq 0 || ! -s certs/esignet/oidckeystore.p12 ]]; then
     log "ADR-14 chain: eSignet up"
@@ -330,14 +346,14 @@ if [[ "$mode" == local ]]; then
       || { chain_diagnosis; die "eSignet did not become healthy"; }
     if [[ $bff_cli -eq 1 ]]; then
       log "ADR-14 chain: playground esignet-onboard"
-      run_cli esignet-onboard || { chain_diagnosis; die "esignet-onboard failed"; }
-      log "ADR-14 chain: playground mimoto-p12"
-      run_cli mimoto-p12 || { chain_diagnosis; die "mimoto-p12 failed"; }
+      run_cli_esignet esignet-onboard || { chain_diagnosis; die "esignet-onboard failed"; }
+      log "ADR-14 chain: mimoto-p12 (openssl, around the key esignet-onboard registered)"
+      mimoto_p12
       onboard_state=done
     else
       log "ADR-14 chain: esignet-onboard SKIPPED (bff image not built; deferred: T-07)"
-      log "ADR-14 chain: mimoto-p12 via the openssl fallback (key kept, p12 rebuilt around it)"
-      mimoto_p12_fallback
+      log "ADR-14 chain: mimoto-p12 via openssl (key kept, p12 rebuilt around it)"
+      mimoto_p12
       onboard_state=skipped
     fi
     log "ADR-14 chain: down certify-authcode certify-authcode-nginx mimoto inji-web (never restart)"
@@ -389,7 +405,14 @@ if [[ "$mode" == local && "${chain_ran:-0}" -eq 1 && $bff_cli -eq 1 ]]; then
   log "ADR-14 chain: playground certify-didurl"
   run_cli certify-didurl || { chain_diagnosis; die "certify-didurl failed"; }
   log "ADR-14 chain: playground guest-smoke"
-  run_cli guest-smoke || { chain_diagnosis; die "guest-smoke failed"; }
+  set +e; run_cli guest-smoke; rc=$?; set -e
+  if [[ $rc -eq 3 ]]; then
+    # Mimoto reaches Certify through http://${PUBLIC_HOST}:8093 and resolves the issuer's
+    # did:web on 443; both are gateway listeners (T-11, G-131), so the download cannot pass yet
+    warn "guest-smoke: blocked until the gateway serves ${PUBLIC_HOST}:8093 and :443 (T-11, G-131)"
+  elif [[ $rc -ne 0 ]]; then
+    chain_diagnosis; die "guest-smoke failed"
+  fi
 elif [[ "$mode" == local && "${chain_ran:-0}" -eq 1 ]]; then
   log "ADR-14 chain: certify-didurl SKIPPED (per-config did_url is rendered into the init SQL, G-20); guest-smoke SKIPPED (deferred: T-07)"
 fi
@@ -446,7 +469,6 @@ declare -A PROBES=(
   [waltid-verifier-api2-signed]="http://waltid-verifier-api2-signed:8080/"
   [eudi-verifier]="http://eudi-verifier:8080/wallet/public-keys.json"
   [sidecar]="http://sidecar:7070/health"
-  [bff]="http://bff:3100/api/v1/environment"
 )
 # expected status: 200 everywhere except where the probe only proves the server answers
 declare -A EXPECT=([datashare-service]=404 [waltid-verifier-api2]=any [waltid-verifier-api2-signed]=any)
@@ -468,9 +490,20 @@ for s in "${services[@]}"; do
   done
 done
 if printf '%s\n' "${services[@]}" | grep -qx bff; then
-  if [[ $bff_cli -eq 1 ]]; then
-    run_cli wait-ready || failed=1
-  fi
+  run_cli wait-ready --timeout 60 "${services[@]}" | sed 's/^/[up]   /' || failed=1
+  # the bff probe goes through the published loopback port, so the request guard sees the
+  # Host the browser sends (02 §6.3: a container-to-container probe with Host bff:3100 is refused)
+  deadline=$((SECONDS + 120))
+  while :; do
+    code="$(curl -s -o /dev/null -m 5 -w '%{http_code}' http://127.0.0.1:3100/api/v1/health 2>/dev/null || true)"
+    if [[ "$code" == 200 ]]; then
+      printf '[up]   %-28s %s  %s\n' bff "$code" "http://127.0.0.1:3100/api/v1/health"; break
+    fi
+    if [[ $SECONDS -ge $deadline ]]; then
+      printf '[up]   %-28s FAIL (%s)  %s\n' bff "${code:-no answer}" "http://127.0.0.1:3100/api/v1/health"; failed=1; break
+    fi
+    sleep 2
+  done
 else
   log "  bff probe (gateway URLs, http://127.0.0.1:3100): SKIPPED, bff image not built (deferred: T-07)"
 fi

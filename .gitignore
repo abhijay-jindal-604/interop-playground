@@ -26,3 +26,6 @@ sidecar/.gradle/
 # Playwright
 test-results/
 playwright-report/
+
+# IDE (VS Code Java) build output
+sidecar/bin/

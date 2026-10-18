@@ -84,8 +84,12 @@ services:
       COLLAB_ESIGNET_MOCK_UIN: ${COLLAB_ESIGNET_MOCK_UIN:-}
       COLLAB_ESIGNET_MOCK_OTP: ${COLLAB_ESIGNET_MOCK_OTP:-}
       INJI_VERIFY_REDIRECT_URI: http://127.0.0.1:3100/return/vp
+      # binds 0.0.0.0 inside the container; published on 127.0.0.1:3100 only (10 §7.3)
+      BFF_LISTEN_HOST: 0.0.0.0
+      SIDECAR_URL: http://sidecar:7070
       DATA_DIR: /data
       FLOWS_DIR: /app/flows
+      FINGERPRINTS_DIR: /app/fingerprints
       CONFIG_DIR: /config
       DATASHARE_DIR: /datashare
     volumes:
@@ -128,7 +132,7 @@ services:
       - "127.0.0.1:18445:18445"
       - "${PUBLIC_HOST:?set PUBLIC_HOST in .env}:18445:18445"
     healthcheck:
-      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3100/api/v1/environment').then(r=>process.exit(r.status===200?0:1),()=>process.exit(1))"]
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3100/api/v1/health').then(r=>process.exit(r.status===200?0:1),()=>process.exit(1))"]
       interval: 10s
       timeout: 5s
       retries: 30
