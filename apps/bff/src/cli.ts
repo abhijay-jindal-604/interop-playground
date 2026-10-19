@@ -23,11 +23,11 @@ import type { Http, Log } from './config/bringup.js';
 import { RenderError, renderConfig, renderEnvFrom } from './config/render.js';
 
 const USAGE = `usage: playground <command>
-  serve                                 start the BFF on 3100
+  serve                                 start the BFF on 3100 and the gateway listeners
   render-config [--src DIR] [--out DIR] render docker/config/** (ADR-54 rules)
   esignet-onboard                       create-or-update the Mimoto OIDC client + personas
   certify-didurl                        re-assert FarmerCredential didUrl on both Certify (G-20)
-  guest-smoke                           Mimoto guest download (S-025); exit 3 = gateway URLs missing (T-11)
+  guest-smoke                           Mimoto guest download (S-025); exit 3 = gateway URLs missing
   wait-ready [--timeout S] SERVICE...   backend well-known probes (ADR-05)
   store rebuild-projections|scan-store  store maintenance (05 §10)
 not in this image yet: mimoto-p12 (scripts/up.sh builds the p12 with openssl, ADR-60),
@@ -86,8 +86,9 @@ export async function runCli(argvIn: string[], io: CliIo): Promise<number> {
   const e = bringupEnv(io.env);
   switch (cmd) {
     case 'serve': {
-      const { startServer } = await import('./server.js');
-      await startServer(io.env);
+      // process entry = API/UI server + edge gateway (T-11)
+      const { main } = await import('./main.js');
+      await main(io.env);
       return 0;
     }
     case 'render-config': {

@@ -516,6 +516,6 @@ export async function waitReady(http: Http, opts: WaitReadyOptions, log: Log): P
       await sleep(opts.intervalMs);
     }
   }
-  log('wait-ready: gateway-URL probes SKIPPED (the gateway listeners arrive with T-11)');
+  log('wait-ready: gateway-URL probes run by scripts/up.sh (T-11)');
   return failed;
 }

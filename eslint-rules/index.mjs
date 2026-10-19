@@ -46,6 +46,8 @@ export const NO_RAW_HTTP_ALLOWED = [
   // the testkit network guard wraps global fetch / net to block it (plan/11 §2)
   'packages/testkit/src/network-guard.ts',
   'packages/testkit/src/network-guard.test.ts',
+  // loopback fake upstreams for tests, not product egress (plan/11 §3.1, ADR-68)
+  'packages/testkit/src/fakes/**',
 ];
 
 // ---------- helpers ----------

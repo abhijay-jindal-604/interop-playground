@@ -1,0 +1,2122 @@
+{
+  "fixtureId": "FLOW-30-pass",
+  "description": "FLOW-04 + FLOW-30: PlaygroundSdJwt issued, presented cross-device to local Inji Verify, Valid (S-022 ok).",
+  "sources": [
+    {
+      "file": "traces/trace-localverify-vp-ok.json",
+      "sids": [
+        "S-022"
+      ]
+    },
+    {
+      "file": "traces/trace-PlaygroundSdJwt-1790515220806.json",
+      "sids": [
+        "S-019",
+        "S-060"
+      ]
+    }
+  ],
+  "runId": "01K7X0F1XA0000000000000030",
+  "run": {
+    "flowId": "FLOW-30",
+    "targetStepKey": "vp.verdict.evaluate",
+    "evidenceTier": "automated",
+    "knobsAllDefault": true
+  },
+  "flows": [
+    "FLOW-04",
+    "FLOW-30"
+  ],
+  "events": [
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 1,
+      "ts": "2026-10-19T10:00:00.003Z",
+      "type": "run.created",
+      "payload": {
+        "spec": {
+          "issuer": "issuer.certify-preauth",
+          "wallet": "wallet.playground-ts",
+          "verifier": "verifier.inji-verify-local",
+          "grant": "pre-authorized_code",
+          "presentationMode": "cross-device",
+          "format": "dc+sd-jwt",
+          "configurationId": "PlaygroundSdJwt",
+          "env": {
+            "issuer": "local",
+            "wallet": "local",
+            "verifier": "local"
+          },
+          "versions": {
+            "issuer": "certify@0.12.0-alpha.1",
+            "wallet": "playground-ts@0.0.0",
+            "verifier": "inji-verify@1.0.0-alpha.1"
+          },
+          "tamperCase": null,
+          "knobs": {},
+          "parentRunId": null,
+          "knobDelta": null,
+          "tunnelHost": null,
+          "scope": "full",
+          "issuanceFlowId": "FLOW-04",
+          "presentationFlowId": "FLOW-30",
+          "delivery": "in-process",
+          "withTxCode": false,
+          "withIae": false,
+          "disclosure": {
+            "claimPaths": [
+              [
+                "fullName"
+              ]
+            ]
+          },
+          "clientIdScheme": "plain",
+          "suiteId": null,
+          "controlRunId": null,
+          "causeFingerprintId": null
+        },
+        "label": null,
+        "queuePosition": 0
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 2,
+      "ts": "2026-10-19T10:00:00.010Z",
+      "type": "run.started",
+      "payload": {
+        "startedAt": "2026-10-19T10:00:00.010Z"
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 3,
+      "ts": "2026-10-19T10:00:00.013Z",
+      "type": "step.started",
+      "stepKey": "vci.setup.variant",
+      "payload": {
+        "flowId": "FLOW-04",
+        "order": 1,
+        "kind": "http",
+        "label": "ensure variant (sdClaim syntax)"
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 4,
+      "ts": "2026-10-19T10:00:00.016Z",
+      "type": "step.completed",
+      "stepKey": "vci.setup.variant",
+      "payload": {
+        "outcome": "skipped",
+        "capture": "none",
+        "skipReason": "no issuer-side knob differs from its default",
+        "coverageNote": null,
+        "durationMs": 0
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 5,
+      "ts": "2026-10-19T10:00:00.019Z",
+      "type": "step.started",
+      "stepKey": "vci.setup.config-read",
+      "payload": {
+        "flowId": "FLOW-04",
+        "order": 2,
+        "kind": "http",
+        "label": "GET credential-configurations/{id} (sdClaim)"
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 6,
+      "ts": "2026-10-19T10:00:00.020Z",
+      "type": "exchange.request",
+      "stepKey": "vci.setup.config-read",
+      "payload": {
+        "exchangeId": "01K7X0F1XA0000000000000030:1",
+        "direction": "outbound",
+        "actor": "playground",
+        "counterpart": "certify-preauth",
+        "method": "GET",
+        "url": "https://192.0.2.10/v1/certify/credential-configurations/PlaygroundSdJwt",
+        "headers": [],
+        "body": null,
+        "bodyState": "none",
+        "poll": null
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 7,
+      "ts": "2026-10-19T10:00:00.029Z",
+      "type": "exchange.response",
+      "stepKey": "vci.setup.config-read",
+      "payload": {
+        "exchangeId": "01K7X0F1XA0000000000000030:1",
+        "status": 200,
+        "statusText": null,
+        "headers": [
+          [
+            "content-type",
+            "application/json"
+          ]
+        ],
+        "body": {
+          "encoding": "utf8",
+          "text": "{\"credentialConfigurationId\":\"PlaygroundSdJwt\",\"format\":\"dc+sd-jwt\",\"scope\":\"playground_sdjwt\",\"vct\":\"PlaygroundSdJwt\",\"cryptographic_binding_methods_supported\":[\"did:jwk\",\"did:key\"],\"credential_signing_alg_values_supported\":[\"ES256\"],\"proof_types_supported\":{\"jwt\":{\"proof_signing_alg_values_supported\":[\"RS256\",\"PS256\",\"ES256\",\"EdDSA\"]}},\"credential_metadata\":{\"display\":[{\"logo\":{\"uri\":\"https://inji.github.io/inji-config/logos/mosipid-logo.png\",\"alt_text\":\"logo\"},\"name\":\"Playground SD-JWT\",\"locale\":\"en\",\"text_color\":\"#FFFFFF\",\"background_color\":\"#12107c\",\"background_image\":null}],\"claims\":[{\"path\":[\"email\"],\"display\":[{\"name\":\"email\",\"locale\":\"en\"}]},{\"path\":[\"gender\"],\"display\":[{\"name\":\"gender\",\"locale\":\"en\"}]},{\"path\":[\"fullName\"],\"display\":[{\"name\":\"fullName\",\"locale\":\"en\"}]},{\"path\":[\"dateOfBirth\"],\"display\":[{\"name\":\"dateOfBirth\",\"locale\":\"en\"}]}]}}",
+          "size": 867,
+          "truncated": false,
+          "sha256": "1069972c72aee9f6d0b83866db8f8f4ae9ff1041678d766dd792f8dbac6fbbaa"
+        },
+        "bodyState": "stored",
+        "durationMs": 9,
+        "poll": null
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 8,
+      "ts": "2026-10-19T10:00:00.032Z",
+      "type": "step.completed",
+      "stepKey": "vci.setup.config-read",
+      "payload": {
+        "outcome": "pass",
+        "capture": "full",
+        "skipReason": null,
+        "coverageNote": null,
+        "durationMs": 9
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 9,
+      "ts": "2026-10-19T10:00:00.035Z",
+      "type": "step.started",
+      "stepKey": "vci.offer.mint",
+      "payload": {
+        "flowId": "FLOW-04",
+        "order": 3,
+        "kind": "http",
+        "label": "POST /pre-authorized-data"
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 10,
+      "ts": "2026-10-19T10:00:00.036Z",
+      "type": "exchange.request",
+      "stepKey": "vci.offer.mint",
+      "payload": {
+        "exchangeId": "01K7X0F1XA0000000000000030:2",
+        "direction": "outbound",
+        "actor": "playground",
+        "counterpart": "certify-preauth",
+        "method": "POST",
+        "url": "https://192.0.2.10/v1/certify/pre-authorized-data",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": {
+          "encoding": "utf8",
+          "text": "{\"credential_configuration_id\":\"PlaygroundSdJwt\",\"claims\":{\"fullName\":\"Asha Rao\",\"dateOfBirth\":\"1994-03-12\",\"gender\":\"Female\",\"email\":\"asha@example.org\"}}",
+          "size": 154,
+          "truncated": false,
+          "sha256": "90675fdcde534aa77180249f2b7d16a9816546c760dd6780ad25bde6b3180b93"
+        },
+        "bodyState": "stored",
+        "poll": null
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 11,
+      "ts": "2026-10-19T10:00:00.087Z",
+      "type": "exchange.response",
+      "stepKey": "vci.offer.mint",
+      "payload": {
+        "exchangeId": "01K7X0F1XA0000000000000030:2",
+        "status": 200,
+        "statusText": null,
+        "headers": [
+          [
+            "cache-control",
+            "no-cache, no-store, max-age=0, must-revalidate"
+          ],
+          [
+            "connection",
+            "keep-alive"
+          ],
+          [
+            "content-type",
+            "application/json"
+          ],
+          [
+            "date",
+            "Sun, 27 Sep 2026 14:55:19 GMT"
+          ],
+          [
+            "expires",
+            "0"
+          ],
+          [
+            "keep-alive",
+            "timeout=60"
+          ],
+          [
+            "pragma",
+            "no-cache"
+          ],
+          [
+            "transfer-encoding",
+            "chunked"
+          ],
+          [
+            "vary",
+            "Origin, Access-Control-Request-Method, Access-Control-Request-Headers"
+          ],
+          [
+            "x-content-type-options",
+            "nosniff"
+          ],
+          [
+            "x-frame-options",
+            "DENY"
+          ],
+          [
+            "x-xss-protection",
+            "0"
+          ]
+        ],
+        "body": {
+          "encoding": "utf8",
+          "text": "{\"credential_offer_uri\":\"openid-credential-offer://?credential_offer_uri=https%3A%2F%2F192.0.2.10%2Fv1%2Fcertify%2Fcredential-offer-data%2Fb504b46f-a5b4-42bf-8fde-c49e4b66c27c\"}",
+          "size": 177,
+          "truncated": false,
+          "sha256": "70bd0d8842ad98071502071b90e59d84591ad5cdbe0e451eeb1abb22efbfdc43"
+        },
+        "bodyState": "stored",
+        "durationMs": 51,
+        "poll": null
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 12,
+      "ts": "2026-10-19T10:00:00.090Z",
+      "type": "step.completed",
+      "stepKey": "vci.offer.mint",
+      "payload": {
+        "outcome": "pass",
+        "capture": "full",
+        "skipReason": null,
+        "coverageNote": null,
+        "durationMs": 51
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 13,
+      "ts": "2026-10-19T10:00:00.093Z",
+      "type": "step.started",
+      "stepKey": "vci.offer.fetch",
+      "payload": {
+        "flowId": "FLOW-04",
+        "order": 4,
+        "kind": "http",
+        "label": "GET credential-offer-data/{uuid}"
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 14,
+      "ts": "2026-10-19T10:00:00.094Z",
+      "type": "exchange.request",
+      "stepKey": "vci.offer.fetch",
+      "payload": {
+        "exchangeId": "01K7X0F1XA0000000000000030:3",
+        "direction": "outbound",
+        "actor": "wallet.playground-ts",
+        "counterpart": "certify-preauth",
+        "method": "GET",
+        "url": "https://192.0.2.10/v1/certify/credential-offer-data/b504b46f-a5b4-42bf-8fde-c49e4b66c27c",
+        "headers": [],
+        "body": null,
+        "bodyState": "none",
+        "poll": null
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 15,
+      "ts": "2026-10-19T10:00:00.099Z",
+      "type": "exchange.response",
+      "stepKey": "vci.offer.fetch",
+      "payload": {
+        "exchangeId": "01K7X0F1XA0000000000000030:3",
+        "status": 200,
+        "statusText": null,
+        "headers": [
+          [
+            "cache-control",
+            "no-cache, no-store, max-age=0, must-revalidate"
+          ],
+          [
+            "connection",
+            "keep-alive"
+          ],
+          [
+            "content-type",
+            "application/json"
+          ],
+          [
+            "date",
+            "Sun, 27 Sep 2026 14:55:19 GMT"
+          ],
+          [
+            "expires",
+            "0"
+          ],
+          [
+            "keep-alive",
+            "timeout=60"
+          ],
+          [
+            "pragma",
+            "no-cache"
+          ],
+          [
+            "transfer-encoding",
+            "chunked"
+          ],
+          [
+            "vary",
+            "Origin, Access-Control-Request-Method, Access-Control-Request-Headers"
+          ],
+          [
+            "x-content-type-options",
+            "nosniff"
+          ],
+          [
+            "x-frame-options",
+            "DENY"
+          ],
+          [
+            "x-xss-protection",
+            "0"
+          ]
+        ],
+        "body": {
+          "encoding": "utf8",
+          "text": "{\"credential_issuer\":\"https://192.0.2.10\",\"credential_configuration_ids\":[\"PlaygroundSdJwt\"],\"grants\":{\"urn:ietf:params:oauth:grant-type:pre-authorized_code\":{\"pre-authorized_code\":\"V8J2Tjz5z30BbkSXuNt9Bta6XzhadHaP\"}}}",
+          "size": 218,
+          "truncated": false,
+          "sha256": "9e7a3e33c9a7e91d22cde0291a9819c1fa3bd8fb736bc22375db6e2c07054307"
+        },
+        "bodyState": "stored",
+        "durationMs": 5,
+        "poll": null
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 16,
+      "ts": "2026-10-19T10:00:00.102Z",
+      "type": "step.completed",
+      "stepKey": "vci.offer.fetch",
+      "payload": {
+        "outcome": "pass",
+        "capture": "full",
+        "skipReason": null,
+        "coverageNote": null,
+        "durationMs": 5
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 17,
+      "ts": "2026-10-19T10:00:00.105Z",
+      "type": "step.started",
+      "stepKey": "vci.metadata.issuer",
+      "payload": {
+        "flowId": "FLOW-04",
+        "order": 5,
+        "kind": "http",
+        "label": "GET /.well-known/openid-credential-issuer"
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 18,
+      "ts": "2026-10-19T10:00:00.106Z",
+      "type": "exchange.request",
+      "stepKey": "vci.metadata.issuer",
+      "payload": {
+        "exchangeId": "01K7X0F1XA0000000000000030:4",
+        "direction": "outbound",
+        "actor": "wallet.playground-ts",
+        "counterpart": "certify-preauth",
+        "method": "GET",
+        "url": "https://192.0.2.10/v1/certify/.well-known/openid-credential-issuer",
+        "headers": [],
+        "body": null,
+        "bodyState": "none",
+        "poll": null
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 19,
+      "ts": "2026-10-19T10:00:00.118Z",
+      "type": "exchange.response",
+      "stepKey": "vci.metadata.issuer",
+      "payload": {
+        "exchangeId": "01K7X0F1XA0000000000000030:4",
+        "status": 200,
+        "statusText": null,
+        "headers": [
+          [
+            "cache-control",
+            "no-cache, no-store, max-age=0, must-revalidate"
+          ],
+          [
+            "connection",
+            "keep-alive"
+          ],
+          [
+            "content-type",
+            "application/json"
+          ],
+          [
+            "date",
+            "Sun, 27 Sep 2026 13:20:20 GMT"
+          ],
+          [
+            "expires",
+            "0"
+          ],
+          [
+            "keep-alive",
+            "timeout=60"
+          ],
+          [
+            "pragma",
+            "no-cache"
+          ],
+          [
+            "transfer-encoding",
+            "chunked"
+          ],
+          [
+            "vary",
+            "Origin, Access-Control-Request-Method, Access-Control-Request-Headers"
+          ],
+          [
+            "x-content-type-options",
+            "nosniff"
+          ],
+          [
+            "x-frame-options",
+            "DENY"
+          ],
+          [
+            "x-xss-protection",
+            "0"
+          ]
+        ],
+        "body": {
+          "encoding": "utf8",
+          "text": "{\"display\":[{\"name\":\"Farmer Issuer\",\"locale\":\"en\"}],\"credential_issuer\":\"https://192.0.2.10\",\"authorization_servers\":[\"https://192.0.2.10\"],\"credential_endpoint\":\"https://192.0.2.10/v1/certify/issuance/credential\",\"nonce_endpoint\":\"https://192.0.2.10/v1/certify/nonce\",\"credential_configurations_supported\":{\"PlaygroundSdJwt\":{\"format\":\"dc+sd-jwt\",\"scope\":\"playground_sdjwt\",\"vct\":\"PlaygroundSdJwt\",\"cryptographic_binding_methods_supported\":[\"did:jwk\",\"did:key\"],\"credential_signing_alg_values_supported\":[\"ES256\"],\"proof_types_supported\":{\"jwt\":{\"proof_signing_alg_values_supported\":[\"RS256\",\"PS256\",\"ES256\",\"EdDSA\"]}},\"credential_metadata\":{\"display\":[{\"logo\":{\"uri\":\"https://inji.github.io/inji-config/logos/mosipid-logo.png\",\"alt_text\":\"logo\"},\"name\":\"Playground SD-JWT\",\"locale\":\"en\",\"text_color\":\"#FFFFFF\",\"background_color\":\"#12107c\",\"background_image\":null}],\"claims\":[{\"path\":[\"email\"],\"display\":[{\"name\":\"email\",\"locale\":\"en\"}]},{\"path\":[\"gender\"],\"display\":[{\"name\":\"gender\",\"locale\":\"en\"}]},{\"path\":[\"fullName\"],\"display\":[{\"name\":\"fullName\",\"locale\":\"en\"}]},{\"path\":[\"dateOfBirth\"],\"display\":[{\"name\":\"dateOfBirth\",\"locale\":\"en\"}]}]}},\"FarmerCredential\":{\"format\":\"ldp_vc\",\"scope\":\"mock_identity_vc_ldp\",\"cryptographic_binding_methods_supported\":[\"did:jwk\"],\"credential_signing_alg_values_supported\":[\"EdDSA\"],\"proof_types_supported\":{\"jwt\":{\"proof_signing_alg_values_supported\":[\"RS256\",\"ES256\"]}},\"credential_definition\":{\"type\":[\"FarmerCredential\",\"VerifiableCredential\"],\"@context\":[\"https://www.w3.org/2018/credentials/v1\"]},\"credential_metadata\":{\"display\":[{\"logo\":{\"uri\":\"https://mosip.github.io/inji-config/logos/agro-vertias-logo.png\",\"alt_text\":\"Farmer Credential Logo\"},\"name\":\"Farmer Verifiable Credential\",\"locale\":\"en\",\"text_color\":\"#FFFFFF\",\"background_color\":\"#12107c\",\"background_image\":{\"uri\":\"https://mosip.github.io/inji-config/logos/agro-vertias-logo.png\"}}],\"claims\":[{\"path\":[\"phone\"],\"display\":[{\"name\":\"Phone Number\",\"locale\":\"en\"}]},{\"path\":[\"gender\"],\"display\":[{\"name\":\"Gender\",\"locale\":\"en\"}]},{\"path\":[\"fullName\"],\"display\":[{\"name\":\"Full Name\",\"locale\":\"en\"}]},{\"path\":[\"dateOfBirth\"],\"display\":[{\"name\":\"Date of Birth\",\"locale\":\"en\"}]}]}}}}",
+          "size": 2186,
+          "truncated": false,
+          "sha256": "c4bc1d46cffa5126fecce5e449845652b68d54b4319d150b4b300b13f403ad92"
+        },
+        "bodyState": "stored",
+        "durationMs": 12,
+        "poll": null
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 20,
+      "ts": "2026-10-19T10:00:00.121Z",
+      "type": "step.completed",
+      "stepKey": "vci.metadata.issuer",
+      "payload": {
+        "outcome": "pass",
+        "capture": "full",
+        "skipReason": null,
+        "coverageNote": null,
+        "durationMs": 12
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 21,
+      "ts": "2026-10-19T10:00:00.124Z",
+      "type": "step.started",
+      "stepKey": "vci.metadata.as",
+      "payload": {
+        "flowId": "FLOW-04",
+        "order": 6,
+        "kind": "http",
+        "label": "GET /.well-known/oauth-authorization-server"
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 22,
+      "ts": "2026-10-19T10:00:00.125Z",
+      "type": "exchange.request",
+      "stepKey": "vci.metadata.as",
+      "payload": {
+        "exchangeId": "01K7X0F1XA0000000000000030:5",
+        "direction": "outbound",
+        "actor": "wallet.playground-ts",
+        "counterpart": "certify-preauth",
+        "method": "GET",
+        "url": "https://192.0.2.10/v1/certify/.well-known/oauth-authorization-server",
+        "headers": [],
+        "body": null,
+        "bodyState": "none",
+        "poll": null
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 23,
+      "ts": "2026-10-19T10:00:00.132Z",
+      "type": "exchange.response",
+      "stepKey": "vci.metadata.as",
+      "payload": {
+        "exchangeId": "01K7X0F1XA0000000000000030:5",
+        "status": 200,
+        "statusText": null,
+        "headers": [
+          [
+            "content-type",
+            "application/json"
+          ]
+        ],
+        "body": {
+          "encoding": "utf8",
+          "text": "{\"issuer\":\"https://192.0.2.10\",\"token_endpoint\":\"https://192.0.2.10/v1/certify/oauth/token\",\"grant_types_supported\":[\"urn:ietf:params:oauth:grant-type:pre-authorized_code\"],\"pre-authorized_grant_anonymous_access_supported\":true}",
+          "size": 228,
+          "truncated": false,
+          "sha256": "36cb5ff476f95f7a95862ee3fd3a99a86d3de72efc20c570dd58c1e271a45e6a"
+        },
+        "bodyState": "stored",
+        "durationMs": 7,
+        "poll": null
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 24,
+      "ts": "2026-10-19T10:00:00.135Z",
+      "type": "step.completed",
+      "stepKey": "vci.metadata.as",
+      "payload": {
+        "outcome": "pass",
+        "capture": "full",
+        "skipReason": null,
+        "coverageNote": null,
+        "durationMs": 7
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 25,
+      "ts": "2026-10-19T10:00:00.138Z",
+      "type": "step.started",
+      "stepKey": "vci.token",
+      "payload": {
+        "flowId": "FLOW-04",
+        "order": 7,
+        "kind": "http",
+        "label": "POST /oauth/token"
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 26,
+      "ts": "2026-10-19T10:00:00.139Z",
+      "type": "exchange.request",
+      "stepKey": "vci.token",
+      "payload": {
+        "exchangeId": "01K7X0F1XA0000000000000030:6",
+        "direction": "outbound",
+        "actor": "wallet.playground-ts",
+        "counterpart": "certify-preauth",
+        "method": "POST",
+        "url": "https://192.0.2.10/v1/certify/oauth/token",
+        "headers": [
+          [
+            "Content-Type",
+            "application/x-www-form-urlencoded"
+          ]
+        ],
+        "body": {
+          "encoding": "utf8",
+          "text": "grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Apre-authorized_code&pre-authorized_code=V8J2Tjz5z30BbkSXuNt9Bta6XzhadHaP",
+          "size": 126,
+          "truncated": false,
+          "sha256": "3149c8e154572bce5fc1445d8d3a91e636fddb68aae752ef97209840673ebd77"
+        },
+        "bodyState": "stored",
+        "poll": null
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 27,
+      "ts": "2026-10-19T10:00:00.150Z",
+      "type": "exchange.response",
+      "stepKey": "vci.token",
+      "payload": {
+        "exchangeId": "01K7X0F1XA0000000000000030:6",
+        "status": 200,
+        "statusText": null,
+        "headers": [
+          [
+            "cache-control",
+            "no-cache, no-store, max-age=0, must-revalidate"
+          ],
+          [
+            "connection",
+            "keep-alive"
+          ],
+          [
+            "content-type",
+            "application/json"
+          ],
+          [
+            "date",
+            "Sun, 27 Sep 2026 14:55:19 GMT"
+          ],
+          [
+            "expires",
+            "0"
+          ],
+          [
+            "keep-alive",
+            "timeout=60"
+          ],
+          [
+            "pragma",
+            "no-cache"
+          ],
+          [
+            "transfer-encoding",
+            "chunked"
+          ],
+          [
+            "vary",
+            "Origin, Access-Control-Request-Method, Access-Control-Request-Headers"
+          ],
+          [
+            "x-content-type-options",
+            "nosniff"
+          ],
+          [
+            "x-frame-options",
+            "DENY"
+          ],
+          [
+            "x-xss-protection",
+            "0"
+          ]
+        ],
+        "body": {
+          "encoding": "utf8",
+          "text": "{\"access_token\":\"eyJraWQiOiJDQkJsRllKS0gwcXpxQ294YkYtbERVX280bUFjSDZUSHpxcno4RmJzZzU4IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJ7XCJmdWxsTmFtZVwiOlwiQXNoYSBSYW9cIixcImRhdGVPZkJpcnRoXCI6XCIxOTk0LTAzLTEyXCIsXCJnZW5kZXJcIjpcIkZlbWFsZVwiLFwiZW1haWxcIjpcImFzaGFAZXhhbXBsZS5vcmdcIn0iLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjgwOTAvdjEvY2VydGlmeS9pc3N1YW5jZS9jcmVkZW50aWFsIiwic2NvcGUiOiJwbGF5Z3JvdW5kX3Nkand0IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDkwIiwiZXhwIjoxNzkwNTIxNTE5LCJpYXQiOjE3OTA1MjA5MTksImNsaWVudF9pZCI6IiJ9.gh2tbw-uBRl7y_kuAXr8EXeTKqBNs6QrCcqmI85VEEhK_B92Ua2CxlXD292X8-PcSM3XRslx0ZXiPkPagKyBusAxPCnq0_Djy9zXQpm9NUfl5Ua3dJlP9FwZ0at7o963VLacCd2T-RGBikOwyMj_mbUeJbOV9DpemGhWymm-1XsC72elnD4iP2Vw8r3W5zZa6F_ESlyWJEFN7vtUgiTMn1uG8EItquGiqw1_2vEDJdhIo9oDKO0EZvhvEUcELB-bEalim0UediIf4jbygRZ9J9R_5vr_jY5dsTcU92bd3Voy5u9U_Gn3hyKXpyddBYkW9eUuTa7SA8MxXQSaCvfPBA\",\"token_type\":\"Bearer\",\"expires_in\":600}",
+          "size": 876,
+          "truncated": false,
+          "sha256": "cbf61fba3d4ed8d7b17f853f6b2577989d029a20644233ad1699eccde87c3ec3"
+        },
+        "bodyState": "stored",
+        "durationMs": 11,
+        "poll": null
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 28,
+      "ts": "2026-10-19T10:00:00.153Z",
+      "type": "step.completed",
+      "stepKey": "vci.token",
+      "payload": {
+        "outcome": "pass",
+        "capture": "full",
+        "skipReason": null,
+        "coverageNote": null,
+        "durationMs": 11
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 29,
+      "ts": "2026-10-19T10:00:00.156Z",
+      "type": "step.started",
+      "stepKey": "vci.nonce",
+      "payload": {
+        "flowId": "FLOW-04",
+        "order": 8,
+        "kind": "http",
+        "label": "POST /nonce"
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 30,
+      "ts": "2026-10-19T10:00:00.157Z",
+      "type": "exchange.request",
+      "stepKey": "vci.nonce",
+      "payload": {
+        "exchangeId": "01K7X0F1XA0000000000000030:7",
+        "direction": "outbound",
+        "actor": "wallet.playground-ts",
+        "counterpart": "certify-preauth",
+        "method": "POST",
+        "url": "https://192.0.2.10/v1/certify/nonce",
+        "headers": [],
+        "body": null,
+        "bodyState": "none",
+        "poll": null
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 31,
+      "ts": "2026-10-19T10:00:00.163Z",
+      "type": "exchange.response",
+      "stepKey": "vci.nonce",
+      "payload": {
+        "exchangeId": "01K7X0F1XA0000000000000030:7",
+        "status": 200,
+        "statusText": null,
+        "headers": [
+          [
+            "cache-control",
+            "no-store"
+          ],
+          [
+            "connection",
+            "keep-alive"
+          ],
+          [
+            "content-type",
+            "application/json"
+          ],
+          [
+            "date",
+            "Sun, 27 Sep 2026 14:55:19 GMT"
+          ],
+          [
+            "keep-alive",
+            "timeout=60"
+          ],
+          [
+            "transfer-encoding",
+            "chunked"
+          ],
+          [
+            "vary",
+            "Origin, Access-Control-Request-Method, Access-Control-Request-Headers"
+          ],
+          [
+            "x-content-type-options",
+            "nosniff"
+          ],
+          [
+            "x-frame-options",
+            "DENY"
+          ],
+          [
+            "x-xss-protection",
+            "0"
+          ]
+        ],
+        "body": {
+          "encoding": "utf8",
+          "text": "{\"c_nonce\":\"eb45b6a2-4787-4d7d-9158-e64655d0c19f\"}",
+          "size": 50,
+          "truncated": false,
+          "sha256": "0bdce5cb854e2bd3c2405739f9945a6753043bc60ebadda99d471949128671a6"
+        },
+        "bodyState": "stored",
+        "durationMs": 6,
+        "poll": null
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 32,
+      "ts": "2026-10-19T10:00:00.166Z",
+      "type": "step.completed",
+      "stepKey": "vci.nonce",
+      "payload": {
+        "outcome": "pass",
+        "capture": "full",
+        "skipReason": null,
+        "coverageNote": null,
+        "durationMs": 6
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 33,
+      "ts": "2026-10-19T10:00:00.169Z",
+      "type": "step.started",
+      "stepKey": "vci.proof.sign",
+      "payload": {
+        "flowId": "FLOW-04",
+        "order": 9,
+        "kind": "engine",
+        "label": "sign proof JWT (ES256, P1363)"
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 34,
+      "ts": "2026-10-19T10:00:00.171Z",
+      "type": "engine.call",
+      "stepKey": "vci.proof.sign",
+      "payload": {
+        "engine": "playground-ts",
+        "op": "sign-proof",
+        "inputSummary": {
+          "aud": "https://192.0.2.10",
+          "typ": "openid4vci-proof+jwt"
+        },
+        "outputSummary": {
+          "alg": "ES256",
+          "kid": "did:jwk:fixture-holder#0",
+          "jwsSha256": "eca6758ea3d5c7a0c552a549eb89bef3beca03094f0511a7dab1494fae44cf28"
+        },
+        "durationMs": 2
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 35,
+      "ts": "2026-10-19T10:00:00.174Z",
+      "type": "step.completed",
+      "stepKey": "vci.proof.sign",
+      "payload": {
+        "outcome": "pass",
+        "capture": "none",
+        "skipReason": null,
+        "coverageNote": null,
+        "durationMs": 2
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 36,
+      "ts": "2026-10-19T10:00:00.177Z",
+      "type": "step.started",
+      "stepKey": "vci.credential",
+      "payload": {
+        "flowId": "FLOW-04",
+        "order": 10,
+        "kind": "http",
+        "label": "POST /issuance/credential"
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 37,
+      "ts": "2026-10-19T10:00:00.178Z",
+      "type": "exchange.request",
+      "stepKey": "vci.credential",
+      "payload": {
+        "exchangeId": "01K7X0F1XA0000000000000030:8",
+        "direction": "outbound",
+        "actor": "wallet.playground-ts",
+        "counterpart": "certify-preauth",
+        "method": "POST",
+        "url": "https://192.0.2.10/v1/certify/issuance/credential",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Authorization",
+            "Bearer eyJraWQiOiJDQkJsRllKS0gwcXpxQ294YkYtbERVX280bUFjSDZUSHpxcno4RmJzZzU4IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJ7XCJmdWxsTmFtZVwiOlwiQXNoYSBSYW9cIixcImRhdGVPZkJpcnRoXCI6XCIxOTk0LTAzLTEyXCIsXCJnZW5kZXJcIjpcIkZlbWFsZVwiLFwiZW1haWxcIjpcImFzaGFAZXhhbXBsZS5vcmdcIn0iLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjgwOTAvdjEvY2VydGlmeS9pc3N1YW5jZS9jcmVkZW50aWFsIiwic2NvcGUiOiJwbGF5Z3JvdW5kX3Nkand0IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDkwIiwiZXhwIjoxNzkwNTIxNTE5LCJpYXQiOjE3OTA1MjA5MTksImNsaWVudF9pZCI6IiJ9.gh2tbw-uBRl7y_kuAXr8EXeTKqBNs6QrCcqmI85VEEhK_B92Ua2CxlXD292X8-PcSM3XRslx0ZXiPkPagKyBusAxPCnq0_Djy9zXQpm9NUfl5Ua3dJlP9FwZ0at7o963VLacCd2T-RGBikOwyMj_mbUeJbOV9DpemGhWymm-1XsC72elnD4iP2Vw8r3W5zZa6F_ESlyWJEFN7vtUgiTMn1uG8EItquGiqw1_2vEDJdhIo9oDKO0EZvhvEUcELB-bEalim0UediIf4jbygRZ9J9R_5vr_jY5dsTcU92bd3Voy5u9U_Gn3hyKXpyddBYkW9eUuTa7SA8MxXQSaCvfPBA"
+          ]
+        ],
+        "body": {
+          "encoding": "utf8",
+          "text": "{\"credential_configuration_id\":\"PlaygroundSdJwt\",\"proofs\":{\"jwt\":[\"eyJhbGciOiJFUzI1NiIsInR5cCI6Im9wZW5pZDR2Y2ktcHJvb2Yrand0Iiwia2lkIjoiZGlkOmp3azpleUpyZEhraU9pSkZReUlzSW5naU9pSTBlRXhQYjFack5XNVhSWFl6VWkxRlJrMU5NRmh3VDBoTE1tVXlkVXRGTWs5VVMwZFdkSHBWVGtvMElpd2llU0k2SWtGRlpHUkROMFpmYmtGYVZ6aFNSamRPVURCNmNIbGFRVzgyZDJGb1NFOUpSRk5OUTNabmJVNW9ORmtpTENKamNuWWlPaUpRTFRJMU5pSjkjMCJ9.eyJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjgwOTAiLCJpYXQiOjE3OTA1MjA5MTksIm5vbmNlIjoiZWI0NWI2YTItNDc4Ny00ZDdkLTkxNTgtZTY0NjU1ZDBjMTlmIn0.mNknY4BEB04X1Cyl-ohTVmAC5vGwSbk5Qc4fXdOH9crPog-0xi7aCkTLc9_TNPNJ2YKkFatXweOg0M6qfU4o6A\"]}}",
+          "size": 594,
+          "truncated": false,
+          "sha256": "125193967f6224c0d643ba4350fda0feef5fa87a14f24b6b32112ca16df9c8d3"
+        },
+        "bodyState": "stored",
+        "poll": null
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 38,
+      "ts": "2026-10-19T10:00:00.214Z",
+      "type": "exchange.response",
+      "stepKey": "vci.credential",
+      "payload": {
+        "exchangeId": "01K7X0F1XA0000000000000030:8",
+        "status": 200,
+        "statusText": null,
+        "headers": [
+          [
+            "cache-control",
+            "no-cache, no-store, max-age=0, must-revalidate"
+          ],
+          [
+            "connection",
+            "keep-alive"
+          ],
+          [
+            "content-type",
+            "application/json"
+          ],
+          [
+            "date",
+            "Sun, 27 Sep 2026 14:55:19 GMT"
+          ],
+          [
+            "expires",
+            "0"
+          ],
+          [
+            "keep-alive",
+            "timeout=60"
+          ],
+          [
+            "pragma",
+            "no-cache"
+          ],
+          [
+            "transfer-encoding",
+            "chunked"
+          ],
+          [
+            "vary",
+            "Origin, Access-Control-Request-Method, Access-Control-Request-Headers"
+          ],
+          [
+            "x-content-type-options",
+            "nosniff"
+          ],
+          [
+            "x-frame-options",
+            "DENY"
+          ],
+          [
+            "x-xss-protection",
+            "0"
+          ]
+        ],
+        "body": {
+          "encoding": "utf8",
+          "text": "{\"credentials\":[{\"credential\":\"eyJ4NXQjUzI1NiI6InVMYmFieEpsaklIdkdWRWNyUWtINDJob0dPMUlSSzVtRUwtYk53VGMtV0UiLCJ4NWMiOlsiTUlJREVEQ0NBZmlnQXdJQkFnSUlRQTR4ZXkzamdjUXdEUVlKS29aSWh2Y05BUUVMQlFBd2VERUxNQWtHQTFVRUJoTUNTVTR4Q3pBSkJnTlZCQWdNQWt0Qk1SSXdFQVlEVlFRSERBbENRVTVIUVV4UFVrVXhEakFNQmdOVkJBb01CVWxKU1ZSQ01SY3dGUVlEVlFRTERBNUZXRUZOVUV4RkxVTkZUbFJGVWpFZk1CMEdBMVVFQXd3V2QzZDNMbVY0WVcxd2JHVXVZMjl0SUNoU1QwOVVLVEFlRncweU5qQTVNamN4TXpFM01UUmFGdzB5T1RBNU1qWXhNekUzTVRSYU1JR2JNUXN3Q1FZRFZRUUdFd0pKVGpFTE1Ba0dBMVVFQ0F3Q1MwRXhFakFRQmdOVkJBY01DVUpCVGtkQlRFOVNSVEVPTUF3R0ExVUVDZ3dGU1VsSlZFSXhGekFWQmdOVkJBc01Ea1ZZUVUxUVRFVXRRMFZPVkVWU01VSXdRQVlEVlFRREREbDNkM2N1WlhoaGJYQnNaUzVqYjIwZ0tFTkZVbFJKUmxsZlZrTmZVMGxIVGw5RlExOVNNUzFGUTE5VFJVTlFNalUyVWpGZlUwbEhUaWt3V1RBVEJnY3Foa2pPUFFJQkJnZ3Foa2pPUFFNQkJ3TkNBQVJoNmsvR0V5Z2FrS082dDhZTXA1TUFzSmxETks4aHIxYU1sK21yRDllT0Q2bnFHQmRnSllJbUFGSllZeGxZQnY5K2VRTWpKVU90S1E2QU04bHRyZUlvbzBVd1F6QVNCZ05WSFJNQkFmOEVDREFHQVFIL0FnRUJNQjBHQTFVZERnUVdCQlNtdmUxdHlodjJrYmpjVmFjd2pqL3lNTHF5VERBT0JnTlZIUThCQWY4RUJBTUNBb1F3RFFZSktvWklodmNOQVFFTEJRQURnZ0VCQUliaGtrdCtjL1cwaWM5cDZkYlhqL28rS05WRkZsUWk1cHlGN1pBM1ZkRWNxTUdFa1NtY2l4NGVlakM2SG81bGVmOUxENkYrenlJNUZMb2FRVElKRVhvTkV1Qi82NlFTajkyTkVBNkJ4VFh2MHhGblpDTHNIdzV2ajVWOWdRbFRlbnR1SzZhSzEzZE5uSTd3M1R2MURFLzVweWl0Sm1tMlZoL2ZUWHI4ZWlEbUlFZnlIZEN4bWYzcURoNTdsZzB6QURrNDYwTm1LelBGVXRBb052b2N3MDBzeUhIMGdhZ2I5eEpqU3RIc3o3NFJNKzhrekZ2NDFjQU5tbW1zQ0hIUFN5d0pDWHVuTFVvMnpMb2UzbEQ2cHN6dVVZdTBEWkhWaDc1b0VVeE9SenUvOUpycVhGdlhrNW1PNHJGQmViOWpERks1VGQ4d1R3dmtybVBwK2x0NGowOD0iLCJNSUlEdHpDQ0FwK2dBd0lCQWdJSXI1cWhYM2xsOFVRd0RRWUpLb1pJaHZjTkFRRUxCUUF3ZURFTE1Ba0dBMVVFQmhNQ1NVNHhDekFKQmdOVkJBZ01Ba3RCTVJJd0VBWURWUVFIREFsQ1FVNUhRVXhQVWtVeERqQU1CZ05WQkFvTUJVbEpTVlJDTVJjd0ZRWURWUVFMREE1RldFRk5VRXhGTFVORlRsUkZVakVmTUIwR0ExVUVBd3dXZDNkM0xtVjRZVzF3YkdVdVkyOXRJQ2hTVDA5VUtUQWVGdzB5TmpBNU1qY3hNekUzTVROYUZ3MHpOREE1TWpVeE16RTNNVE5hTUhneEN6QUpCZ05WQkFZVEFrbE9NUXN3Q1FZRFZRUUlEQUpMUVRFU01CQUdBMVVFQnd3SlFrRk9SMEZNVDFKRk1RNHdEQVlEVlFRS0RBVkpTVWxVUWpFWE1CVUdBMVVFQ3d3T1JWaEJUVkJNUlMxRFJVNVVSVkl4SHpBZEJnTlZCQU1NRm5kM2R5NWxlR0Z0Y0d4bExtTnZiU0FvVWs5UFZDa3dnZ0VpTUEwR0NTcUdTSWIzRFFFQkFRVUFBNElCRHdBd2dnRUtBb0lCQVFDenFKbnlwMTlsb2J6cVppVTFRNWMrSzZNVHBPbVlHZGtLbkhKTmNtSUFUSmFudEVOQW9BSk9hV2pVTU00YVZsUlJCZm54azY5QTZlaWp0NlM3TkxUUDc1K0xUK3ROVXhPZVl4RVRQLzRvcVdleHh6RzE4Zk5qeWZDNXFBM3ZWNXNha2xHek1GcEZFTWtmTXZydVEySUNMN1R6R3BSUld2MWNyS0dNak9SZWVCRzI1TGJ5eWh6blVoaGI1TktSd0hXYW9KckVtRm5memh2M3FCaC9LeGxWc3VNNVlYSWxXZmFXUEx6WW1CN0gyVTFsK0dOVzFWbTZHYm1vcGZHaTQwS1JTQ1NIa2dJNkg1ZlZxSGFpYmw4RjhmQ0ZyV25QQ1lYN3FKaHplSEZFem9idVNhL0Z0WG9MSkI3ZE9McTM3QlRpbjE1M1NLTi9hRlZxNzI3MWRwYW5BZ01CQUFHalJUQkRNQklHQTFVZEV3RUIvd1FJTUFZQkFmOENBUUl3SFFZRFZSME9CQllFRko4V2lEaHdFN3lyUVpMdStscFh3b0JmSWx5ck1BNEdBMVVkRHdFQi93UUVBd0lDaERBTkJna3Foa2lHOXcwQkFRc0ZBQU9DQVFFQUNKSWFUWDFvc093d1JDR21LQnVFbllmTVFCY05VNkRQMlB0dWViaHM0dUYvUlNRZ3FWYWZ2d3FlNTl3TVE4UlZRcE5mQUJlbnV5b080emc4VWZKU1crWDgvS2NpWTVhLys3UUtBeDAzeVFlTlIwc3B0RXNDa2FqR0JoVUJIN0Y3SnFTYW1aSS9iZGFxaGJhY2gxSG9YSEloY251cDRueUNSN3RQNk15OFdaNjhKcC9VQk9jM0oyNVd2WmdzY0labVNVT3FkbmZ2SHRUVzhlT01xQzA4RS9iU3FaNjNpTzk1ZjhpR0RCV3g1NUZGZEpVZ1IvR3ZqQ2Rib1Q5Z0IzYWpXbjcwK284Sk1VQ09ZUUQvK0lRdGFYaWVwTm83ajZiczRZQUNseXowUU9ObnBldTluWktuaWlNcEd6YUIybmIyL0tZT3FDK2FlMVF0VkNraDNyTEFvdz09Il0sImtpZCI6InNTT1BlQVJhMTFJWWl4Sk5KdFhUWkV6Qkp5QnRDazFsRUt5bHYzeFc1cWMiLCJ0eXAiOiJkYytzZC1qd3QiLCJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwOTAiLCJfc2QiOlsiTjcyRmtrRG9PQS1ZT2FzMzl4S0swcmRlSG5ycDdJeE5XYU9Ud19KMWpDayIsIlF1cl81a3BJMUtySWEwcUxaa3dwQXlGQ3pmY2RMM0FueGJZUDBBaHpuY0kiLCJTVEM3YzNWWlBFLWtGb1ZoZndoNDhVSkNWY2pjQm9TYVN1M1dnSmdMdGVRIiwiYlRsbnI1VndUbVFjNmpvZXpncllmdER0ZUpoLUl1Z0Nxa0M4ZmVGLUJjTSJdLCJjbmYiOnsia2lkIjoiZGlkOmp3azpleUpyZEhraU9pSkZReUlzSW5naU9pSTBlRXhQYjFack5XNVhSWFl6VWkxRlJrMU5NRmh3VDBoTE1tVXlkVXRGTWs5VVMwZFdkSHBWVGtvMElpd2llU0k2SWtGRlpHUkROMFpmYmtGYVZ6aFNSamRPVURCNmNIbGFRVzgyZDJGb1NFOUpSRk5OUTNabmJVNW9ORmtpTENKamNuWWlPaUpRTFRJMU5pSjkjMCJ9LCJpZCI6Imh0dHBzOi8vbW9zaXAuaW8vY3JlZGVudGlhbC9kM2UxZjE0My02ZDgyLTRhMjktYWMyNS0xM2RmNTEzZTcxNzciLCJ2Y3QiOiJQbGF5Z3JvdW5kU2RKd3QifQ.lD0OQxhTFD1Ha21iUEDTR7Utf1UXDgDurh1-QrWi3aj_5sAVAyCVOlCDP69C_gUfIQdn9KyrVrwv5-HeMpi73w~WyJDaTZmaVk5VDVBUndpMnVKOHFtRE93IiwiZ2VuZGVyIiwiRmVtYWxlIl0~WyJCbUotR0F5VWZNejlHYktraUdwNWNBIiwiZnVsbE5hbWUiLCJBc2hhIFJhbyJd~WyJMVXE3T0dtX2dkbU5Ma0NDVnFqNTdBIiwiZGF0ZU9mQmlydGgiLCIxOTk0LTAzLTEyIl0~WyJQODhjaXZuVjdmLXNRVDBVXzcxRjJRIiwiZW1haWwiLCJhc2hhQGV4YW1wbGUub3JnIl0~\"}]}",
+          "size": 4391,
+          "truncated": false,
+          "sha256": "8afacaf49b36c3382b48ac576b4f8ce8ee7c57951ffecada28f99d40793bb2ab"
+        },
+        "bodyState": "stored",
+        "durationMs": 36,
+        "poll": null
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 39,
+      "ts": "2026-10-19T10:00:00.215Z",
+      "type": "verdict.check",
+      "stepKey": "vci.credential",
+      "payload": {
+        "check": {
+          "checkId": "vci.credential.issued",
+          "outcome": "pass",
+          "source": "verifier-response",
+          "exchangeIds": [
+            "01K7X0F1XA0000000000000030:8"
+          ]
+        }
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 40,
+      "ts": "2026-10-19T10:00:00.218Z",
+      "type": "step.completed",
+      "stepKey": "vci.credential",
+      "payload": {
+        "outcome": "pass",
+        "capture": "full",
+        "skipReason": null,
+        "coverageNote": null,
+        "durationMs": 36
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 41,
+      "ts": "2026-10-19T10:00:00.221Z",
+      "type": "step.started",
+      "stepKey": "vci.credential.inspect",
+      "payload": {
+        "flowId": "FLOW-04",
+        "order": 11,
+        "kind": "engine",
+        "label": "decode SD-JWT, count disclosures, read cnf and x5c"
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 42,
+      "ts": "2026-10-19T10:00:00.222Z",
+      "type": "verdict.check",
+      "stepKey": "vci.credential.inspect",
+      "payload": {
+        "check": {
+          "checkId": "vci.credential.decode.dc+sd-jwt",
+          "outcome": "pass",
+          "source": "engine",
+          "message": "decoded 4358 characters of dc+sd-jwt",
+          "exchangeIds": []
+        }
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 43,
+      "ts": "2026-10-19T10:00:00.225Z",
+      "type": "step.completed",
+      "stepKey": "vci.credential.inspect",
+      "payload": {
+        "outcome": "pass",
+        "capture": "none",
+        "skipReason": null,
+        "coverageNote": null,
+        "durationMs": 0
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 44,
+      "ts": "2026-10-19T10:00:00.228Z",
+      "type": "step.started",
+      "stepKey": "vp.request.create",
+      "payload": {
+        "flowId": "FLOW-30",
+        "order": 1,
+        "kind": "http",
+        "label": "POST /v2/vp-request"
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 45,
+      "ts": "2026-10-19T10:00:00.229Z",
+      "type": "exchange.request",
+      "stepKey": "vp.request.create",
+      "payload": {
+        "exchangeId": "01K7X0F1XA0000000000000030:9",
+        "direction": "outbound",
+        "actor": "verifier.inji-verify-local",
+        "counterpart": "inji-verify",
+        "method": "POST",
+        "url": "https://192.0.2.10:8443/v1/verify/v2/vp-request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": {
+          "encoding": "utf8",
+          "text": "{\"clientId\":\"playground-spike\",\"dcqlQuery\":{\"credentials\":[{\"id\":\"pg\",\"format\":\"dc+sd-jwt\",\"meta\":{\"vct_values\":[\"PlaygroundSdJwt\"]},\"claims\":[{\"path\":[\"fullName\"]}]}]}}",
+          "size": 169,
+          "truncated": false,
+          "sha256": "e0923cf733e98295bb20d6c1a62dd3c343bc0915e18ef81de1c59997e4a1d249"
+        },
+        "bodyState": "stored",
+        "poll": null
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 46,
+      "ts": "2026-10-19T10:00:00.240Z",
+      "type": "exchange.response",
+      "stepKey": "vp.request.create",
+      "payload": {
+        "exchangeId": "01K7X0F1XA0000000000000030:9",
+        "status": 201,
+        "statusText": null,
+        "headers": [
+          [
+            "connection",
+            "keep-alive"
+          ],
+          [
+            "content-type",
+            "application/json"
+          ],
+          [
+            "date",
+            "Sun, 27 Sep 2026 14:55:19 GMT"
+          ],
+          [
+            "keep-alive",
+            "timeout=60"
+          ],
+          [
+            "transfer-encoding",
+            "chunked"
+          ]
+        ],
+        "body": {
+          "encoding": "utf8",
+          "text": "{\"transactionId\":\"txn_8178ec0c-6cd4-4a02-af30-ac0911f2db3f\",\"requestId\":\"req_0c4e6e1c-8af3-46c0-ab90-c7b1a8965e8b\",\"authorizationDetails\":{\"clientId\":\"playground-spike\",\"dcqlQuery\":{\"credentials\":[{\"id\":\"pg\",\"format\":\"dc+sd-jwt\",\"meta\":{\"vct_values\":[\"PlaygroundSdJwt\"]},\"claims\":[{\"path\":[\"fullName\"]}]}]},\"nonce\":\"EfEgO3ScUIh-xkrqeh4iN9BZUmzM24SY\",\"responseUri\":\"https://192.0.2.10:8443/v1/verify/v2/vp-submission/direct-post\",\"responseCodeValidationRequired\":false,\"responseType\":\"vp_token\",\"responseMode\":\"direct_post\",\"issuedAt\":1790520919636},\"expiresAt\":1790521219636}",
+          "size": 575,
+          "truncated": false,
+          "sha256": "307b9ca7b903244a6d5cdcfdea1ca2cd38dbfd6fefe95d39cfc5ba4751cba31f"
+        },
+        "bodyState": "stored",
+        "durationMs": 11,
+        "poll": null
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 47,
+      "ts": "2026-10-19T10:00:00.243Z",
+      "type": "step.completed",
+      "stepKey": "vp.request.create",
+      "payload": {
+        "outcome": "pass",
+        "capture": "full",
+        "skipReason": null,
+        "coverageNote": null,
+        "durationMs": 11
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 48,
+      "ts": "2026-10-19T10:00:00.246Z",
+      "type": "step.started",
+      "stepKey": "vp.request.deliver",
+      "payload": {
+        "flowId": "FLOW-30",
+        "order": 2,
+        "kind": "ui",
+        "label": "{channel}: openid4vp://authorize?..."
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 49,
+      "ts": "2026-10-19T10:00:00.248Z",
+      "type": "engine.call",
+      "stepKey": "vp.request.deliver",
+      "payload": {
+        "engine": "playground-ts",
+        "op": "deliver-request",
+        "inputSummary": {
+          "channel": "in-process"
+        },
+        "outputSummary": {
+          "channel": "in-process",
+          "uri": "openid4vp://authorize?client_id=playground-spike&request_uri=https%3A%2F%2F192.0.2.10%3A8443%2Fv1%2Fverify%2Fv2%2Fvp-request%2Freq_0c4e6e1c-8af3-46c0-ab90-c7b1a8965e8b",
+          "uriSha256": "2e3df0e8c574d39a0d30144f73d3b9646f683cadbe58b19e6fa86823a6b218bb"
+        },
+        "durationMs": 2
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 50,
+      "ts": "2026-10-19T10:00:00.251Z",
+      "type": "step.completed",
+      "stepKey": "vp.request.deliver",
+      "payload": {
+        "outcome": "pass",
+        "capture": "none",
+        "skipReason": null,
+        "coverageNote": null,
+        "durationMs": 2
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 51,
+      "ts": "2026-10-19T10:00:00.254Z",
+      "type": "step.started",
+      "stepKey": "vp.request.fetch",
+      "payload": {
+        "flowId": "FLOW-30",
+        "order": 3,
+        "kind": "http",
+        "label": "GET request_uri"
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 52,
+      "ts": "2026-10-19T10:00:00.257Z",
+      "type": "step.completed",
+      "stepKey": "vp.request.fetch",
+      "payload": {
+        "outcome": "skipped",
+        "capture": "none",
+        "skipReason": "request carried by value",
+        "coverageNote": null,
+        "durationMs": 0
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 53,
+      "ts": "2026-10-19T10:00:00.260Z",
+      "type": "step.started",
+      "stepKey": "vp.request.validate",
+      "payload": {
+        "flowId": "FLOW-30",
+        "order": 4,
+        "kind": "engine",
+        "label": "validate request"
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 54,
+      "ts": "2026-10-19T10:00:00.262Z",
+      "type": "engine.call",
+      "stepKey": "vp.request.validate",
+      "payload": {
+        "engine": "playground-ts",
+        "op": "resolve-request",
+        "inputSummary": {
+          "clientIdScheme": "plain"
+        },
+        "outputSummary": {
+          "clientId": "playground-spike",
+          "responseMode": "direct_post",
+          "nonce": "EfEgO3ScUIh-xkrqeh4iN9BZUmzM24SY"
+        },
+        "durationMs": 2
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 55,
+      "ts": "2026-10-19T10:00:00.265Z",
+      "type": "step.completed",
+      "stepKey": "vp.request.validate",
+      "payload": {
+        "outcome": "pass",
+        "capture": "none",
+        "skipReason": null,
+        "coverageNote": null,
+        "durationMs": 2
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 56,
+      "ts": "2026-10-19T10:00:00.268Z",
+      "type": "step.started",
+      "stepKey": "vp.credential.match",
+      "payload": {
+        "flowId": "FLOW-30",
+        "order": 5,
+        "kind": "engine",
+        "label": "DCQL match, select disclosures"
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 57,
+      "ts": "2026-10-19T10:00:00.269Z",
+      "type": "verdict.check",
+      "stepKey": "vp.credential.match",
+      "payload": {
+        "check": {
+          "checkId": "vp.dcql.match",
+          "outcome": "pass",
+          "source": "engine",
+          "message": "pg: PlaygroundSdJwt, disclose fullName",
+          "exchangeIds": []
+        }
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 58,
+      "ts": "2026-10-19T10:00:00.272Z",
+      "type": "step.completed",
+      "stepKey": "vp.credential.match",
+      "payload": {
+        "outcome": "pass",
+        "capture": "none",
+        "skipReason": null,
+        "coverageNote": null,
+        "durationMs": 0
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 59,
+      "ts": "2026-10-19T10:00:00.275Z",
+      "type": "step.started",
+      "stepKey": "vp.token.build",
+      "payload": {
+        "flowId": "FLOW-30",
+        "order": 6,
+        "kind": "engine",
+        "label": "KB-JWT, sign"
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 60,
+      "ts": "2026-10-19T10:00:00.277Z",
+      "type": "engine.call",
+      "stepKey": "vp.token.build",
+      "payload": {
+        "engine": "playground-ts",
+        "op": "sign-proof",
+        "inputSummary": {
+          "typ": "kb+jwt",
+          "aud": "playground-spike"
+        },
+        "outputSummary": {
+          "alg": "ES256",
+          "kid": "did:jwk:fixture-holder#0",
+          "jwsSha256": "76cf7a288222f9d89787e134287105cf67932b68f219168a6012bcf11d4c84cc"
+        },
+        "durationMs": 2
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 61,
+      "ts": "2026-10-19T10:00:00.280Z",
+      "type": "step.completed",
+      "stepKey": "vp.token.build",
+      "payload": {
+        "outcome": "pass",
+        "capture": "none",
+        "skipReason": null,
+        "coverageNote": null,
+        "durationMs": 2
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 62,
+      "ts": "2026-10-19T10:00:00.283Z",
+      "type": "step.started",
+      "stepKey": "vp.response.post",
+      "payload": {
+        "flowId": "FLOW-30",
+        "order": 7,
+        "kind": "http",
+        "label": "POST response_uri vp_token"
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 63,
+      "ts": "2026-10-19T10:00:00.284Z",
+      "type": "exchange.request",
+      "stepKey": "vp.response.post",
+      "payload": {
+        "exchangeId": "01K7X0F1XA0000000000000030:10",
+        "direction": "outbound",
+        "actor": "wallet.playground-ts",
+        "counterpart": "inji-verify",
+        "method": "POST",
+        "url": "https://192.0.2.10:8443/v1/verify/v2/vp-submission/direct-post",
+        "headers": [
+          [
+            "Content-Type",
+            "application/x-www-form-urlencoded"
+          ]
+        ],
+        "body": {
+          "encoding": "utf8",
+          "text": "vp_token=%7B%22pg%22%3A%5B%22eyJ4NXQjUzI1NiI6InVMYmFieEpsaklIdkdWRWNyUWtINDJob0dPMUlSSzVtRUwtYk53VGMtV0UiLCJ4NWMiOlsiTUlJREVEQ0NBZmlnQXdJQkFnSUlRQTR4ZXkzamdjUXdEUVlKS29aSWh2Y05BUUVMQlFBd2VERUxNQWtHQTFVRUJoTUNTVTR4Q3pBSkJnTlZCQWdNQWt0Qk1SSXdFQVlEVlFRSERBbENRVTVIUVV4UFVrVXhEakFNQmdOVkJBb01CVWxKU1ZSQ01SY3dGUVlEVlFRTERBNUZXRUZOVUV4RkxVTkZUbFJGVWpFZk1CMEdBMVVFQXd3V2QzZDNMbVY0WVcxd2JHVXVZMjl0SUNoU1QwOVVLVEFlRncweU5qQTVNamN4TXpFM01UUmFGdzB5T1RBNU1qWXhNekUzTVRSYU1JR2JNUXN3Q1FZRFZRUUdFd0pKVGpFTE1Ba0dBMVVFQ0F3Q1MwRXhFakFRQmdOVkJBY01DVUpCVGtkQlRFOVNSVEVPTUF3R0ExVUVDZ3dGU1VsSlZFSXhGekFWQmdOVkJBc01Ea1ZZUVUxUVRFVXRRMFZPVkVWU01VSXdRQVlEVlFRREREbDNkM2N1WlhoaGJYQnNaUzVqYjIwZ0tFTkZVbFJKUmxsZlZrTmZVMGxIVGw5RlExOVNNUzFGUTE5VFJVTlFNalUyVWpGZlUwbEhUaWt3V1RBVEJnY3Foa2pPUFFJQkJnZ3Foa2pPUFFNQkJ3TkNBQVJoNmsvR0V5Z2FrS082dDhZTXA1TUFzSmxETks4aHIxYU1sK21yRDllT0Q2bnFHQmRnSllJbUFGSllZeGxZQnY5K2VRTWpKVU90S1E2QU04bHRyZUlvbzBVd1F6QVNCZ05WSFJNQkFmOEVDREFHQVFIL0FnRUJNQjBHQTFVZERnUVdCQlNtdmUxdHlodjJrYmpjVmFjd2pqL3lNTHF5VERBT0JnTlZIUThCQWY4RUJBTUNBb1F3RFFZSktvWklodmNOQVFFTEJRQURnZ0VCQUliaGtrdCtjL1cwaWM5cDZkYlhqL28rS05WRkZsUWk1cHlGN1pBM1ZkRWNxTUdFa1NtY2l4NGVlakM2SG81bGVmOUxENkYrenlJNUZMb2FRVElKRVhvTkV1Qi82NlFTajkyTkVBNkJ4VFh2MHhGblpDTHNIdzV2ajVWOWdRbFRlbnR1SzZhSzEzZE5uSTd3M1R2MURFLzVweWl0Sm1tMlZoL2ZUWHI4ZWlEbUlFZnlIZEN4bWYzcURoNTdsZzB6QURrNDYwTm1LelBGVXRBb052b2N3MDBzeUhIMGdhZ2I5eEpqU3RIc3o3NFJNKzhrekZ2NDFjQU5tbW1zQ0hIUFN5d0pDWHVuTFVvMnpMb2UzbEQ2cHN6dVVZdTBEWkhWaDc1b0VVeE9SenUvOUpycVhGdlhrNW1PNHJGQmViOWpERks1VGQ4d1R3dmtybVBwK2x0NGowOD0iLCJNSUlEdHpDQ0FwK2dBd0lCQWdJSXI1cWhYM2xsOFVRd0RRWUpLb1pJaHZjTkFRRUxCUUF3ZURFTE1Ba0dBMVVFQmhNQ1NVNHhDekFKQmdOVkJBZ01Ba3RCTVJJd0VBWURWUVFIREFsQ1FVNUhRVXhQVWtVeERqQU1CZ05WQkFvTUJVbEpTVlJDTVJjd0ZRWURWUVFMREE1RldFRk5VRXhGTFVORlRsUkZVakVmTUIwR0ExVUVBd3dXZDNkM0xtVjRZVzF3YkdVdVkyOXRJQ2hTVDA5VUtUQWVGdzB5TmpBNU1qY3hNekUzTVROYUZ3MHpOREE1TWpVeE16RTNNVE5hTUhneEN6QUpCZ05WQkFZVEFrbE9NUXN3Q1FZRFZRUUlEQUpMUVRFU01CQUdBMVVFQnd3SlFrRk9SMEZNVDFKRk1RNHdEQVlEVlFRS0RBVkpTVWxVUWpFWE1CVUdBMVVFQ3d3T1JWaEJUVkJNUlMxRFJVNVVSVkl4SHpBZEJnTlZCQU1NRm5kM2R5NWxlR0Z0Y0d4bExtTnZiU0FvVWs5UFZDa3dnZ0VpTUEwR0NTcUdTSWIzRFFFQkFRVUFBNElCRHdBd2dnRUtBb0lCQVFDenFKbnlwMTlsb2J6cVppVTFRNWMrSzZNVHBPbVlHZGtLbkhKTmNtSUFUSmFudEVOQW9BSk9hV2pVTU00YVZsUlJCZm54azY5QTZlaWp0NlM3TkxUUDc1K0xUK3ROVXhPZVl4RVRQLzRvcVdleHh6RzE4Zk5qeWZDNXFBM3ZWNXNha2xHek1GcEZFTWtmTXZydVEySUNMN1R6R3BSUld2MWNyS0dNak9SZWVCRzI1TGJ5eWh6blVoaGI1TktSd0hXYW9KckVtRm5memh2M3FCaC9LeGxWc3VNNVlYSWxXZmFXUEx6WW1CN0gyVTFsK0dOVzFWbTZHYm1vcGZHaTQwS1JTQ1NIa2dJNkg1ZlZxSGFpYmw4RjhmQ0ZyV25QQ1lYN3FKaHplSEZFem9idVNhL0Z0WG9MSkI3ZE9McTM3QlRpbjE1M1NLTi9hRlZxNzI3MWRwYW5BZ01CQUFHalJUQkRNQklHQTFVZEV3RUIvd1FJTUFZQkFmOENBUUl3SFFZRFZSME9CQllFRko4V2lEaHdFN3lyUVpMdStscFh3b0JmSWx5ck1BNEdBMVVkRHdFQi93UUVBd0lDaERBTkJna3Foa2lHOXcwQkFRc0ZBQU9DQVFFQUNKSWFUWDFvc093d1JDR21LQnVFbllmTVFCY05VNkRQMlB0dWViaHM0dUYvUlNRZ3FWYWZ2d3FlNTl3TVE4UlZRcE5mQUJlbnV5b080emc4VWZKU1crWDgvS2NpWTVhLys3UUtBeDAzeVFlTlIwc3B0RXNDa2FqR0JoVUJIN0Y3SnFTYW1aSS9iZGFxaGJhY2gxSG9YSEloY251cDRueUNSN3RQNk15OFdaNjhKcC9VQk9jM0oyNVd2WmdzY0labVNVT3FkbmZ2SHRUVzhlT01xQzA4RS9iU3FaNjNpTzk1ZjhpR0RCV3g1NUZGZEpVZ1IvR3ZqQ2Rib1Q5Z0IzYWpXbjcwK284Sk1VQ09ZUUQvK0lRdGFYaWVwTm83ajZiczRZQUNseXowUU9ObnBldTluWktuaWlNcEd6YUIybmIyL0tZT3FDK2FlMVF0VkNraDNyTEFvdz09Il0sImtpZCI6InNTT1BlQVJhMTFJWWl4Sk5KdFhUWkV6Qkp5QnRDazFsRUt5bHYzeFc1cWMiLCJ0eXAiOiJkYytzZC1qd3QiLCJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwOTAiLCJfc2QiOlsiTjcyRmtrRG9PQS1ZT2FzMzl4S0swcmRlSG5ycDdJeE5XYU9Ud19KMWpDayIsIlF1cl81a3BJMUtySWEwcUxaa3dwQXlGQ3pmY2RMM0FueGJZUDBBaHpuY0kiLCJTVEM3YzNWWlBFLWtGb1ZoZndoNDhVSkNWY2pjQm9TYVN1M1dnSmdMdGVRIiwiYlRsbnI1VndUbVFjNmpvZXpncllmdER0ZUpoLUl1Z0Nxa0M4ZmVGLUJjTSJdLCJjbmYiOnsia2lkIjoiZGlkOmp3azpleUpyZEhraU9pSkZReUlzSW5naU9pSTBlRXhQYjFack5XNVhSWFl6VWkxRlJrMU5NRmh3VDBoTE1tVXlkVXRGTWs5VVMwZFdkSHBWVGtvMElpd2llU0k2SWtGRlpHUkROMFpmYmtGYVZ6aFNSamRPVURCNmNIbGFRVzgyZDJGb1NFOUpSRk5OUTNabmJVNW9ORmtpTENKamNuWWlPaUpRTFRJMU5pSjkjMCJ9LCJpZCI6Imh0dHBzOi8vbW9zaXAuaW8vY3JlZGVudGlhbC9kM2UxZjE0My02ZDgyLTRhMjktYWMyNS0xM2RmNTEzZTcxNzciLCJ2Y3QiOiJQbGF5Z3JvdW5kU2RKd3QifQ.lD0OQxhTFD1Ha21iUEDTR7Utf1UXDgDurh1-QrWi3aj_5sAVAyCVOlCDP69C_gUfIQdn9KyrVrwv5-HeMpi73w%7EWyJCbUotR0F5VWZNejlHYktraUdwNWNBIiwiZnVsbE5hbWUiLCJBc2hhIFJhbyJd%7EeyJhbGciOiJFUzI1NiIsInR5cCI6ImtiK2p3dCJ9.eyJpYXQiOjE3OTA1MjA5MTksImF1ZCI6InBsYXlncm91bmQtc3Bpa2UiLCJub25jZSI6IkVmRWdPM1NjVUloLXhrcnFlaDRpTjlCWlVtek0yNFNZIiwic2RfaGFzaCI6IjRkcUVwUlJKMzF4TjBtQWdCTkFQeC1jMDV5UnkyVW43aTJZMEFsT1FQd1UifQ.H9db8I5-eDUKYapMFj2qjQ3jHdii13AWG748yTw7R-oxyX5Q-dq7gwUEIoORmdy9mmZly4izPwcdmyVc6SiC8Q%22%5D%7D&state=req_0c4e6e1c-8af3-46c0-ab90-c7b1a8965e8b",
+          "size": 4559,
+          "truncated": false,
+          "sha256": "76cf7a288222f9d89787e134287105cf67932b68f219168a6012bcf11d4c84cc"
+        },
+        "bodyState": "stored",
+        "poll": null
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 64,
+      "ts": "2026-10-19T10:00:00.299Z",
+      "type": "exchange.response",
+      "stepKey": "vp.response.post",
+      "payload": {
+        "exchangeId": "01K7X0F1XA0000000000000030:10",
+        "status": 200,
+        "statusText": null,
+        "headers": [
+          [
+            "connection",
+            "keep-alive"
+          ],
+          [
+            "content-type",
+            "application/json"
+          ],
+          [
+            "date",
+            "Sun, 27 Sep 2026 14:55:19 GMT"
+          ],
+          [
+            "keep-alive",
+            "timeout=60"
+          ],
+          [
+            "transfer-encoding",
+            "chunked"
+          ]
+        ],
+        "body": {
+          "encoding": "utf8",
+          "text": "{}",
+          "size": 2,
+          "truncated": false,
+          "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+        },
+        "bodyState": "stored",
+        "durationMs": 15,
+        "poll": null
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 65,
+      "ts": "2026-10-19T10:00:00.302Z",
+      "type": "step.completed",
+      "stepKey": "vp.response.post",
+      "payload": {
+        "outcome": "pass",
+        "capture": "full",
+        "skipReason": null,
+        "coverageNote": null,
+        "durationMs": 15
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 66,
+      "ts": "2026-10-19T10:00:00.305Z",
+      "type": "step.started",
+      "stepKey": "vp.error.dispatch",
+      "payload": {
+        "flowId": "FLOW-30",
+        "order": 8,
+        "kind": "http",
+        "label": "POST error={error}"
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 67,
+      "ts": "2026-10-19T10:00:00.308Z",
+      "type": "step.completed",
+      "stepKey": "vp.error.dispatch",
+      "payload": {
+        "outcome": "skipped",
+        "capture": "none",
+        "skipReason": "wallet raised no error",
+        "coverageNote": null,
+        "durationMs": 0
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 68,
+      "ts": "2026-10-19T10:00:00.311Z",
+      "type": "step.started",
+      "stepKey": "vp.response.redirect",
+      "payload": {
+        "flowId": "FLOW-30",
+        "order": 9,
+        "kind": "ui",
+        "label": "redirect_uri#response_code"
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 69,
+      "ts": "2026-10-19T10:00:00.314Z",
+      "type": "step.completed",
+      "stepKey": "vp.response.redirect",
+      "payload": {
+        "outcome": "skipped",
+        "capture": "none",
+        "skipReason": "not a web-wallet delivery",
+        "coverageNote": null,
+        "durationMs": 0
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 70,
+      "ts": "2026-10-19T10:00:00.317Z",
+      "type": "step.started",
+      "stepKey": "vp.result.poll",
+      "payload": {
+        "flowId": "FLOW-30",
+        "order": 10,
+        "kind": "http",
+        "label": "POST vp-results"
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 71,
+      "ts": "2026-10-19T10:00:00.318Z",
+      "type": "exchange.request",
+      "stepKey": "vp.result.poll",
+      "payload": {
+        "exchangeId": "01K7X0F1XA0000000000000030:11",
+        "direction": "outbound",
+        "actor": "verifier.inji-verify-local",
+        "counterpart": "inji-verify",
+        "method": "POST",
+        "url": "https://192.0.2.10:8443/v1/verify/v2/vp-results/txn_8178ec0c-6cd4-4a02-af30-ac0911f2db3f",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": {
+          "encoding": "utf8",
+          "text": "{}",
+          "size": 2,
+          "truncated": false,
+          "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+        },
+        "bodyState": "stored",
+        "poll": null
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 72,
+      "ts": "2026-10-19T10:00:00.335Z",
+      "type": "exchange.response",
+      "stepKey": "vp.result.poll",
+      "payload": {
+        "exchangeId": "01K7X0F1XA0000000000000030:11",
+        "status": 200,
+        "statusText": null,
+        "headers": [
+          [
+            "connection",
+            "keep-alive"
+          ],
+          [
+            "content-type",
+            "application/json"
+          ],
+          [
+            "date",
+            "Sun, 27 Sep 2026 14:55:19 GMT"
+          ],
+          [
+            "keep-alive",
+            "timeout=60"
+          ],
+          [
+            "transfer-encoding",
+            "chunked"
+          ]
+        ],
+        "body": {
+          "encoding": "utf8",
+          "text": "{\"transactionId\":\"txn_8178ec0c-6cd4-4a02-af30-ac0911f2db3f\",\"allChecksSuccessful\":true,\"credentialResults\":[{\"allChecksSuccessful\":true,\"schemaAndSignatureCheck\":{\"valid\":true,\"error\":null},\"expiryCheck\":{\"valid\":true},\"statusCheck\":[],\"claims\":{},\"verifiableCredential\":\"eyJ4NXQjUzI1NiI6InVMYmFieEpsaklIdkdWRWNyUWtINDJob0dPMUlSSzVtRUwtYk53VGMtV0UiLCJ4NWMiOlsiTUlJREVEQ0NBZmlnQXdJQkFnSUlRQTR4ZXkzamdjUXdEUVlKS29aSWh2Y05BUUVMQlFBd2VERUxNQWtHQTFVRUJoTUNTVTR4Q3pBSkJnTlZCQWdNQWt0Qk1SSXdFQVlEVlFRSERBbENRVTVIUVV4UFVrVXhEakFNQmdOVkJBb01CVWxKU1ZSQ01SY3dGUVlEVlFRTERBNUZXRUZOVUV4RkxVTkZUbFJGVWpFZk1CMEdBMVVFQXd3V2QzZDNMbVY0WVcxd2JHVXVZMjl0SUNoU1QwOVVLVEFlRncweU5qQTVNamN4TXpFM01UUmFGdzB5T1RBNU1qWXhNekUzTVRSYU1JR2JNUXN3Q1FZRFZRUUdFd0pKVGpFTE1Ba0dBMVVFQ0F3Q1MwRXhFakFRQmdOVkJBY01DVUpCVGtkQlRFOVNSVEVPTUF3R0ExVUVDZ3dGU1VsSlZFSXhGekFWQmdOVkJBc01Ea1ZZUVUxUVRFVXRRMFZPVkVWU01VSXdRQVlEVlFRREREbDNkM2N1WlhoaGJYQnNaUzVqYjIwZ0tFTkZVbFJKUmxsZlZrTmZVMGxIVGw5RlExOVNNUzFGUTE5VFJVTlFNalUyVWpGZlUwbEhUaWt3V1RBVEJnY3Foa2pPUFFJQkJnZ3Foa2pPUFFNQkJ3TkNBQVJoNmsvR0V5Z2FrS082dDhZTXA1TUFzSmxETks4aHIxYU1sK21yRDllT0Q2bnFHQmRnSllJbUFGSllZeGxZQnY5K2VRTWpKVU90S1E2QU04bHRyZUlvbzBVd1F6QVNCZ05WSFJNQkFmOEVDREFHQVFIL0FnRUJNQjBHQTFVZERnUVdCQlNtdmUxdHlodjJrYmpjVmFjd2pqL3lNTHF5VERBT0JnTlZIUThCQWY4RUJBTUNBb1F3RFFZSktvWklodmNOQVFFTEJRQURnZ0VCQUliaGtrdCtjL1cwaWM5cDZkYlhqL28rS05WRkZsUWk1cHlGN1pBM1ZkRWNxTUdFa1NtY2l4NGVlakM2SG81bGVmOUxENkYrenlJNUZMb2FRVElKRVhvTkV1Qi82NlFTajkyTkVBNkJ4VFh2MHhGblpDTHNIdzV2ajVWOWdRbFRlbnR1SzZhSzEzZE5uSTd3M1R2MURFLzVweWl0Sm1tMlZoL2ZUWHI4ZWlEbUlFZnlIZEN4bWYzcURoNTdsZzB6QURrNDYwTm1LelBGVXRBb052b2N3MDBzeUhIMGdhZ2I5eEpqU3RIc3o3NFJNKzhrekZ2NDFjQU5tbW1zQ0hIUFN5d0pDWHVuTFVvMnpMb2UzbEQ2cHN6dVVZdTBEWkhWaDc1b0VVeE9SenUvOUpycVhGdlhrNW1PNHJGQmViOWpERks1VGQ4d1R3dmtybVBwK2x0NGowOD0iLCJNSUlEdHpDQ0FwK2dBd0lCQWdJSXI1cWhYM2xsOFVRd0RRWUpLb1pJaHZjTkFRRUxCUUF3ZURFTE1Ba0dBMVVFQmhNQ1NVNHhDekFKQmdOVkJBZ01Ba3RCTVJJd0VBWURWUVFIREFsQ1FVNUhRVXhQVWtVeERqQU1CZ05WQkFvTUJVbEpTVlJDTVJjd0ZRWURWUVFMREE1RldFRk5VRXhGTFVORlRsUkZVakVmTUIwR0ExVUVBd3dXZDNkM0xtVjRZVzF3YkdVdVkyOXRJQ2hTVDA5VUtUQWVGdzB5TmpBNU1qY3hNekUzTVROYUZ3MHpOREE1TWpVeE16RTNNVE5hTUhneEN6QUpCZ05WQkFZVEFrbE9NUXN3Q1FZRFZRUUlEQUpMUVRFU01CQUdBMVVFQnd3SlFrRk9SMEZNVDFKRk1RNHdEQVlEVlFRS0RBVkpTVWxVUWpFWE1CVUdBMVVFQ3d3T1JWaEJUVkJNUlMxRFJVNVVSVkl4SHpBZEJnTlZCQU1NRm5kM2R5NWxlR0Z0Y0d4bExtTnZiU0FvVWs5UFZDa3dnZ0VpTUEwR0NTcUdTSWIzRFFFQkFRVUFBNElCRHdBd2dnRUtBb0lCQVFDenFKbnlwMTlsb2J6cVppVTFRNWMrSzZNVHBPbVlHZGtLbkhKTmNtSUFUSmFudEVOQW9BSk9hV2pVTU00YVZsUlJCZm54azY5QTZlaWp0NlM3TkxUUDc1K0xUK3ROVXhPZVl4RVRQLzRvcVdleHh6RzE4Zk5qeWZDNXFBM3ZWNXNha2xHek1GcEZFTWtmTXZydVEySUNMN1R6R3BSUld2MWNyS0dNak9SZWVCRzI1TGJ5eWh6blVoaGI1TktSd0hXYW9KckVtRm5memh2M3FCaC9LeGxWc3VNNVlYSWxXZmFXUEx6WW1CN0gyVTFsK0dOVzFWbTZHYm1vcGZHaTQwS1JTQ1NIa2dJNkg1ZlZxSGFpYmw4RjhmQ0ZyV25QQ1lYN3FKaHplSEZFem9idVNhL0Z0WG9MSkI3ZE9McTM3QlRpbjE1M1NLTi9hRlZxNzI3MWRwYW5BZ01CQUFHalJUQkRNQklHQTFVZEV3RUIvd1FJTUFZQkFmOENBUUl3SFFZRFZSME9CQllFRko4V2lEaHdFN3lyUVpMdStscFh3b0JmSWx5ck1BNEdBMVVkRHdFQi93UUVBd0lDaERBTkJna3Foa2lHOXcwQkFRc0ZBQU9DQVFFQUNKSWFUWDFvc093d1JDR21LQnVFbllmTVFCY05VNkRQMlB0dWViaHM0dUYvUlNRZ3FWYWZ2d3FlNTl3TVE4UlZRcE5mQUJlbnV5b080emc4VWZKU1crWDgvS2NpWTVhLys3UUtBeDAzeVFlTlIwc3B0RXNDa2FqR0JoVUJIN0Y3SnFTYW1aSS9iZGFxaGJhY2gxSG9YSEloY251cDRueUNSN3RQNk15OFdaNjhKcC9VQk9jM0oyNVd2WmdzY0labVNVT3FkbmZ2SHRUVzhlT01xQzA4RS9iU3FaNjNpTzk1ZjhpR0RCV3g1NUZGZEpVZ1IvR3ZqQ2Rib1Q5Z0IzYWpXbjcwK284Sk1VQ09ZUUQvK0lRdGFYaWVwTm83ajZiczRZQUNseXowUU9ObnBldTluWktuaWlNcEd6YUIybmIyL0tZT3FDK2FlMVF0VkNraDNyTEFvdz09Il0sImtpZCI6InNTT1BlQVJhMTFJWWl4Sk5KdFhUWkV6Qkp5QnRDazFsRUt5bHYzeFc1cWMiLCJ0eXAiOiJkYytzZC1qd3QiLCJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwOTAiLCJfc2QiOlsiTjcyRmtrRG9PQS1ZT2FzMzl4S0swcmRlSG5ycDdJeE5XYU9Ud19KMWpDayIsIlF1cl81a3BJMUtySWEwcUxaa3dwQXlGQ3pmY2RMM0FueGJZUDBBaHpuY0kiLCJTVEM3YzNWWlBFLWtGb1ZoZndoNDhVSkNWY2pjQm9TYVN1M1dnSmdMdGVRIiwiYlRsbnI1VndUbVFjNmpvZXpncllmdER0ZUpoLUl1Z0Nxa0M4ZmVGLUJjTSJdLCJjbmYiOnsia2lkIjoiZGlkOmp3azpleUpyZEhraU9pSkZReUlzSW5naU9pSTBlRXhQYjFack5XNVhSWFl6VWkxRlJrMU5NRmh3VDBoTE1tVXlkVXRGTWs5VVMwZFdkSHBWVGtvMElpd2llU0k2SWtGRlpHUkROMFpmYmtGYVZ6aFNSamRPVURCNmNIbGFRVzgyZDJGb1NFOUpSRk5OUTNabmJVNW9ORmtpTENKamNuWWlPaUpRTFRJMU5pSjkjMCJ9LCJpZCI6Imh0dHBzOi8vbW9zaXAuaW8vY3JlZGVudGlhbC9kM2UxZjE0My02ZDgyLTRhMjktYWMyNS0xM2RmNTEzZTcxNzciLCJ2Y3QiOiJQbGF5Z3JvdW5kU2RKd3QifQ.lD0OQxhTFD1Ha21iUEDTR7Utf1UXDgDurh1-QrWi3aj_5sAVAyCVOlCDP69C_gUfIQdn9KyrVrwv5-HeMpi73w~WyJCbUotR0F5VWZNejlHYktraUdwNWNBIiwiZnVsbE5hbWUiLCJBc2hhIFJhbyJd~eyJhbGciOiJFUzI1NiIsInR5cCI6ImtiK2p3dCJ9.eyJpYXQiOjE3OTA1MjA5MTksImF1ZCI6InBsYXlncm91bmQtc3Bpa2UiLCJub25jZSI6IkVmRWdPM1NjVUloLXhrcnFlaDRpTjlCWlVtek0yNFNZIiwic2RfaGFzaCI6IjRkcUVwUlJKMzF4TjBtQWdCTkFQeC1jMDV5UnkyVW43aTJZMEFsT1FQd1UifQ.H9db8I5-eDUKYapMFj2qjQ3jHdii13AWG748yTw7R-oxyX5Q-dq7gwUEIoORmdy9mmZly4izPwcdmyVc6SiC8Q\",\"holderProofCheck\":{\"valid\":true,\"error\":null}}]}",
+          "size": 4793,
+          "truncated": false,
+          "sha256": "cfc3e4479f401aab7d87b6388475a670f420d19773367ec103d9db90aa79e804"
+        },
+        "bodyState": "stored",
+        "durationMs": 17,
+        "poll": null
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 73,
+      "ts": "2026-10-19T10:00:00.338Z",
+      "type": "step.completed",
+      "stepKey": "vp.result.poll",
+      "payload": {
+        "outcome": "pass",
+        "capture": "full",
+        "skipReason": null,
+        "coverageNote": null,
+        "durationMs": 17
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 74,
+      "ts": "2026-10-19T10:00:00.341Z",
+      "type": "step.started",
+      "stepKey": "vp.result.fetch",
+      "payload": {
+        "flowId": "FLOW-30",
+        "order": 11,
+        "kind": "http",
+        "label": "POST vp-session-results"
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 75,
+      "ts": "2026-10-19T10:00:00.344Z",
+      "type": "step.completed",
+      "stepKey": "vp.result.fetch",
+      "payload": {
+        "outcome": "skipped",
+        "capture": "none",
+        "skipReason": "cross-device flow reads the result by poll",
+        "coverageNote": null,
+        "durationMs": 0
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 76,
+      "ts": "2026-10-19T10:00:00.347Z",
+      "type": "step.started",
+      "stepKey": "vp.vc.verify",
+      "payload": {
+        "flowId": "FLOW-30",
+        "order": 12,
+        "kind": "http",
+        "label": "verify credential"
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 77,
+      "ts": "2026-10-19T10:00:00.350Z",
+      "type": "step.completed",
+      "stepKey": "vp.vc.verify",
+      "payload": {
+        "outcome": "skipped",
+        "capture": "none",
+        "skipReason": "credential-level verification is not part of an OID4VP flow",
+        "coverageNote": null,
+        "durationMs": 0
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 78,
+      "ts": "2026-10-19T10:00:00.353Z",
+      "type": "step.started",
+      "stepKey": "vp.verdict.evaluate",
+      "payload": {
+        "flowId": "FLOW-30",
+        "order": 13,
+        "kind": "engine",
+        "label": "normalise to checks"
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 79,
+      "ts": "2026-10-19T10:00:00.354Z",
+      "type": "verdict.check",
+      "stepKey": "vp.verdict.evaluate",
+      "payload": {
+        "check": {
+          "checkId": "vp.result.all-checks",
+          "outcome": "pass",
+          "source": "verifier-response",
+          "message": "allChecksSuccessful: true",
+          "exchangeIds": [
+            "01K7X0F1XA0000000000000030:11"
+          ]
+        }
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 80,
+      "ts": "2026-10-19T10:00:00.355Z",
+      "type": "verdict.check",
+      "stepKey": "vp.verdict.evaluate",
+      "payload": {
+        "check": {
+          "checkId": "vc.signature",
+          "outcome": "pass",
+          "source": "verifier-response",
+          "exchangeIds": [
+            "01K7X0F1XA0000000000000030:11"
+          ]
+        }
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 81,
+      "ts": "2026-10-19T10:00:00.356Z",
+      "type": "verdict.check",
+      "stepKey": "vp.verdict.evaluate",
+      "payload": {
+        "check": {
+          "checkId": "vc.expiry",
+          "outcome": "pass",
+          "source": "verifier-response",
+          "exchangeIds": [
+            "01K7X0F1XA0000000000000030:11"
+          ]
+        }
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 82,
+      "ts": "2026-10-19T10:00:00.359Z",
+      "type": "step.completed",
+      "stepKey": "vp.verdict.evaluate",
+      "payload": {
+        "outcome": "pass",
+        "capture": "none",
+        "skipReason": null,
+        "coverageNote": null,
+        "durationMs": 0
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 83,
+      "ts": "2026-10-19T10:00:00.362Z",
+      "type": "step.started",
+      "stepKey": "vp.wallet.observe",
+      "payload": {
+        "flowId": "FLOW-30",
+        "order": 14,
+        "kind": "manual",
+        "label": "phone showed: {shown}"
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 84,
+      "ts": "2026-10-19T10:00:00.365Z",
+      "type": "step.completed",
+      "stepKey": "vp.wallet.observe",
+      "payload": {
+        "outcome": "skipped",
+        "capture": "none",
+        "skipReason": "automated wallet, nothing to observe",
+        "coverageNote": null,
+        "durationMs": 0
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 85,
+      "ts": "2026-10-19T10:00:00.368Z",
+      "type": "step.started",
+      "stepKey": "vp.dcapi.probe",
+      "payload": {
+        "flowId": "FLOW-30",
+        "order": 15,
+        "kind": "engine",
+        "label": "probe DC API"
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 86,
+      "ts": "2026-10-19T10:00:00.371Z",
+      "type": "step.completed",
+      "stepKey": "vp.dcapi.probe",
+      "payload": {
+        "outcome": "skipped",
+        "capture": "none",
+        "skipReason": "not a DC API run",
+        "coverageNote": null,
+        "durationMs": 0
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 87,
+      "ts": "2026-10-19T10:00:00.374Z",
+      "type": "step.started",
+      "stepKey": "vp.dcapi.request.create",
+      "payload": {
+        "flowId": "FLOW-30",
+        "order": 16,
+        "kind": "http",
+        "label": "POST vp-session-request (dc_api)"
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 88,
+      "ts": "2026-10-19T10:00:00.377Z",
+      "type": "step.completed",
+      "stepKey": "vp.dcapi.request.create",
+      "payload": {
+        "outcome": "skipped",
+        "capture": "none",
+        "skipReason": "not a DC API run",
+        "coverageNote": null,
+        "durationMs": 0
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 89,
+      "ts": "2026-10-19T10:00:00.380Z",
+      "type": "step.started",
+      "stepKey": "vp.dcapi.request.fetch",
+      "payload": {
+        "flowId": "FLOW-30",
+        "order": 17,
+        "kind": "http",
+        "label": "GET request object"
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 90,
+      "ts": "2026-10-19T10:00:00.383Z",
+      "type": "step.completed",
+      "stepKey": "vp.dcapi.request.fetch",
+      "payload": {
+        "outcome": "skipped",
+        "capture": "none",
+        "skipReason": "not a DC API run",
+        "coverageNote": null,
+        "durationMs": 0
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 91,
+      "ts": "2026-10-19T10:00:00.386Z",
+      "type": "step.started",
+      "stepKey": "vp.dcapi.invoke",
+      "payload": {
+        "flowId": "FLOW-30",
+        "order": 18,
+        "kind": "engine",
+        "label": "navigator.credentials.get"
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 92,
+      "ts": "2026-10-19T10:00:00.389Z",
+      "type": "step.completed",
+      "stepKey": "vp.dcapi.invoke",
+      "payload": {
+        "outcome": "skipped",
+        "capture": "none",
+        "skipReason": "not a DC API run",
+        "coverageNote": null,
+        "durationMs": 0
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 93,
+      "ts": "2026-10-19T10:00:00.392Z",
+      "type": "step.started",
+      "stepKey": "vp.dcapi.response.post",
+      "payload": {
+        "flowId": "FLOW-30",
+        "order": 19,
+        "kind": "http",
+        "label": "POST vp-submission/dc-api"
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 94,
+      "ts": "2026-10-19T10:00:00.395Z",
+      "type": "step.completed",
+      "stepKey": "vp.dcapi.response.post",
+      "payload": {
+        "outcome": "skipped",
+        "capture": "none",
+        "skipReason": "not a DC API run",
+        "coverageNote": null,
+        "durationMs": 0
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 95,
+      "ts": "2026-10-19T10:00:00.398Z",
+      "type": "step.started",
+      "stepKey": "vp.dcapi.holder",
+      "payload": {
+        "flowId": "FLOW-30",
+        "order": 20,
+        "kind": "manual",
+        "label": "holder attribution"
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 96,
+      "ts": "2026-10-19T10:00:00.401Z",
+      "type": "step.completed",
+      "stepKey": "vp.dcapi.holder",
+      "payload": {
+        "outcome": "skipped",
+        "capture": "none",
+        "skipReason": "not a DC API run",
+        "coverageNote": null,
+        "durationMs": 0
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000030",
+      "seq": 97,
+      "ts": "2026-10-19T10:00:00.404Z",
+      "type": "run.completed",
+      "payload": {
+        "verdict": {
+          "kind": "interop",
+          "outcome": "pass",
+          "issuanceOk": true,
+          "verification": "valid",
+          "tamperVerdict": null,
+          "failedStepKey": null,
+          "countsTowardPassRate": true
+        },
+        "counterfactualResult": null
+      }
+    }
+  ],
+  "end": {
+    "reason": "terminal",
+    "lastSeq": 97
+  }
+}

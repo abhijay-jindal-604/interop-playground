@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { ROUTES, hasHorizontalScroll, serveApi } from './support.ts';
+import { ROUTES, RUN_ID, hasHorizontalScroll, serveApi } from './support.ts';
 
 test.describe('shell', () => {
   test.beforeEach(async ({ page }) => {
@@ -12,6 +12,8 @@ test.describe('shell', () => {
       for (const path of ROUTES) {
         await page.goto(path);
         await expect(page.locator('h1')).toHaveCount(1);
+        if (path === `/runs/${RUN_ID}`)
+          await expect(page.getByRole('region', { name: 'Result' })).toBeVisible();
         expect(await hasHorizontalScroll(page), `${path} at ${width}px`).toBe(false);
       }
     });
@@ -19,9 +21,11 @@ test.describe('shell', () => {
 
   test('reflows at 320 px (UI-72 reflow rule)', async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 740 });
-    for (const path of ['/', '/environment', '/runs/01J8ZZZZZZZZZZZZZZZZZZZZZZ']) {
+    for (const path of ['/', '/environment', `/runs/${RUN_ID}`]) {
       await page.goto(path);
       await expect(page.locator('h1')).toHaveCount(1);
+      if (path.startsWith('/runs/'))
+        await expect(page.getByRole('navigation', { name: 'Steps' })).toBeVisible();
       expect(await hasHorizontalScroll(page), path).toBe(false);
     }
   });
@@ -100,4 +104,28 @@ test('backend unreachable shows the full-page copy (UI-02)', async ({ page }) =>
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('The playground backend is not reachable.');
   await expect(page.getByRole('button', { name: 'Reload' })).toBeVisible();
+});
+
+test.describe('run screen (T-27, recorded FLOW-30 fail log)', () => {
+  test.beforeEach(async ({ page }) => {
+    await serveApi(page);
+  });
+
+  test('shows the result card, the step rail and selects the #step= deep link', async ({
+    page,
+  }) => {
+    await page.goto(`/runs/${RUN_ID}#step=vci.token`);
+    const result = page.getByRole('region', { name: 'Result' });
+    await expect(result).toContainText(
+      'Invalid. The verifier rejected the credential at POST response_uri vp_token: invalid_request Client id validation failed due to invalid client_id/domain.',
+    );
+    const rail = page.getByRole('navigation', { name: 'Steps' });
+    await expect(rail.locator('[aria-current="true"]')).toHaveAttribute('data-step', 'vci.token');
+    await rail.locator('[data-step="vp.response.post"]').click();
+    await expect(page).toHaveURL(/#step=vp\.response\.post$/);
+    await page.keyboard.press('ArrowDown');
+    await expect(rail.locator('[data-step="vp.error.dispatch"]')).toBeFocused();
+    await page.keyboard.press('Enter');
+    await expect(page.getByRole('region', { name: 'Inspector' })).toBeFocused();
+  });
 });

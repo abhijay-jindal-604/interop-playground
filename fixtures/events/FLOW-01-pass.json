@@ -1,0 +1,1166 @@
+{
+  "fixtureId": "FLOW-01-pass",
+  "description": "FLOW-01: certify-preauth issues FarmerCredential (ldp_vc) to wallet.playground-ts, issuance only, pass.",
+  "sources": [
+    {
+      "file": "traces/trace-FarmerCredential-1790515114311.json",
+      "sids": [
+        "S-018"
+      ]
+    }
+  ],
+  "runId": "01K7X0F1XA0000000000000001",
+  "run": {
+    "flowId": "FLOW-01",
+    "targetStepKey": "vci.credential",
+    "evidenceTier": "automated",
+    "knobsAllDefault": true
+  },
+  "flows": [
+    "FLOW-01"
+  ],
+  "events": [
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000001",
+      "seq": 1,
+      "ts": "2026-10-19T10:00:00.003Z",
+      "type": "run.created",
+      "payload": {
+        "spec": {
+          "issuer": "issuer.certify-preauth",
+          "wallet": "wallet.playground-ts",
+          "verifier": "verifier.inji-verify-local",
+          "grant": "pre-authorized_code",
+          "presentationMode": null,
+          "format": "ldp_vc",
+          "configurationId": "FarmerCredential",
+          "env": {
+            "issuer": "local",
+            "wallet": "local",
+            "verifier": "local"
+          },
+          "versions": {
+            "issuer": "certify@0.12.0-alpha.1",
+            "wallet": "playground-ts@0.0.0",
+            "verifier": "inji-verify@1.0.0-alpha.1"
+          },
+          "tamperCase": null,
+          "knobs": {},
+          "parentRunId": null,
+          "knobDelta": null,
+          "tunnelHost": null,
+          "scope": "issuance",
+          "issuanceFlowId": "FLOW-01",
+          "presentationFlowId": null,
+          "delivery": "in-process",
+          "withTxCode": false,
+          "withIae": false,
+          "disclosure": {
+            "claimPaths": []
+          },
+          "clientIdScheme": "plain",
+          "suiteId": null,
+          "controlRunId": null,
+          "causeFingerprintId": null
+        },
+        "label": "Farmer ldp_vc issuance",
+        "queuePosition": 0
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000001",
+      "seq": 2,
+      "ts": "2026-10-19T10:00:00.010Z",
+      "type": "run.started",
+      "payload": {
+        "startedAt": "2026-10-19T10:00:00.010Z"
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000001",
+      "seq": 3,
+      "ts": "2026-10-19T10:00:00.013Z",
+      "type": "step.started",
+      "stepKey": "vci.setup.variant",
+      "payload": {
+        "flowId": "FLOW-01",
+        "order": 1,
+        "kind": "http",
+        "label": "ensure variant credential configuration"
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000001",
+      "seq": 4,
+      "ts": "2026-10-19T10:00:00.016Z",
+      "type": "step.completed",
+      "stepKey": "vci.setup.variant",
+      "payload": {
+        "outcome": "skipped",
+        "capture": "none",
+        "skipReason": "no issuer-side knob differs from its default",
+        "coverageNote": null,
+        "durationMs": 0
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000001",
+      "seq": 5,
+      "ts": "2026-10-19T10:00:00.019Z",
+      "type": "step.started",
+      "stepKey": "vci.setup.config-read",
+      "payload": {
+        "flowId": "FLOW-01",
+        "order": 2,
+        "kind": "http",
+        "label": "GET credential-configurations/{id}"
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000001",
+      "seq": 6,
+      "ts": "2026-10-19T10:00:00.020Z",
+      "type": "exchange.request",
+      "stepKey": "vci.setup.config-read",
+      "payload": {
+        "exchangeId": "01K7X0F1XA0000000000000001:1",
+        "direction": "outbound",
+        "actor": "playground",
+        "counterpart": "certify-preauth",
+        "method": "GET",
+        "url": "https://192.0.2.10/v1/certify/credential-configurations/FarmerCredential",
+        "headers": [],
+        "body": null,
+        "bodyState": "none",
+        "poll": null
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000001",
+      "seq": 7,
+      "ts": "2026-10-19T10:00:00.029Z",
+      "type": "exchange.response",
+      "stepKey": "vci.setup.config-read",
+      "payload": {
+        "exchangeId": "01K7X0F1XA0000000000000001:1",
+        "status": 200,
+        "statusText": null,
+        "headers": [
+          [
+            "content-type",
+            "application/json"
+          ]
+        ],
+        "body": {
+          "encoding": "utf8",
+          "text": "{\"credentialConfigurationId\":\"FarmerCredential\",\"format\":\"ldp_vc\",\"scope\":\"mock_identity_vc_ldp\",\"cryptographic_binding_methods_supported\":[\"did:jwk\"],\"credential_signing_alg_values_supported\":[\"EdDSA\"],\"proof_types_supported\":{\"jwt\":{\"proof_signing_alg_values_supported\":[\"RS256\",\"ES256\"]}},\"credential_definition\":{\"type\":[\"FarmerCredential\",\"VerifiableCredential\"],\"@context\":[\"https://www.w3.org/2018/credentials/v1\"]},\"credential_metadata\":{\"display\":[{\"logo\":{\"uri\":\"https://mosip.github.io/inji-config/logos/agro-vertias-logo.png\",\"alt_text\":\"Farmer Credential Logo\"},\"name\":\"Farmer Verifiable Credential\",\"locale\":\"en\",\"text_color\":\"#FFFFFF\",\"background_color\":\"#12107c\",\"background_image\":{\"uri\":\"https://mosip.github.io/inji-config/logos/agro-vertias-logo.png\"}}],\"claims\":[{\"path\":[\"phone\"],\"display\":[{\"name\":\"Phone Number\",\"locale\":\"en\"}]},{\"path\":[\"gender\"],\"display\":[{\"name\":\"Gender\",\"locale\":\"en\"}]},{\"path\":[\"fullName\"],\"display\":[{\"name\":\"Full Name\",\"locale\":\"en\"}]},{\"path\":[\"dateOfBirth\"],\"display\":[{\"name\":\"Date of Birth\",\"locale\":\"en\"}]}]}}",
+          "size": 1064,
+          "truncated": false,
+          "sha256": "c5e6fe4da0118561d10191c37041f7b82e50fed3670d583ccb648549c1e5badd"
+        },
+        "bodyState": "stored",
+        "durationMs": 9,
+        "poll": null
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000001",
+      "seq": 8,
+      "ts": "2026-10-19T10:00:00.032Z",
+      "type": "step.completed",
+      "stepKey": "vci.setup.config-read",
+      "payload": {
+        "outcome": "pass",
+        "capture": "full",
+        "skipReason": null,
+        "coverageNote": null,
+        "durationMs": 9
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000001",
+      "seq": 9,
+      "ts": "2026-10-19T10:00:00.035Z",
+      "type": "step.started",
+      "stepKey": "vci.offer.mint",
+      "payload": {
+        "flowId": "FLOW-01",
+        "order": 3,
+        "kind": "http",
+        "label": "POST /pre-authorized-data"
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000001",
+      "seq": 10,
+      "ts": "2026-10-19T10:00:00.036Z",
+      "type": "exchange.request",
+      "stepKey": "vci.offer.mint",
+      "payload": {
+        "exchangeId": "01K7X0F1XA0000000000000001:2",
+        "direction": "outbound",
+        "actor": "playground",
+        "counterpart": "certify-preauth",
+        "method": "POST",
+        "url": "https://192.0.2.10/v1/certify/pre-authorized-data",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": {
+          "encoding": "utf8",
+          "text": "{\"credential_configuration_id\":\"FarmerCredential\",\"claims\":{\"fullName\":\"Playground Farmer\",\"phone\":\"9999999999\",\"dateOfBirth\":\"1990-01-01\",\"gender\":\"Female\"},\"expires_in\":600}",
+          "size": 175,
+          "truncated": false,
+          "sha256": "1a81ae007efd5d309d8fda2c6cb92217b46a5cce7fb778f73ca17b9e0d055837"
+        },
+        "bodyState": "stored",
+        "poll": null
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000001",
+      "seq": 11,
+      "ts": "2026-10-19T10:00:00.048Z",
+      "type": "exchange.response",
+      "stepKey": "vci.offer.mint",
+      "payload": {
+        "exchangeId": "01K7X0F1XA0000000000000001:2",
+        "status": 200,
+        "statusText": null,
+        "headers": [
+          [
+            "cache-control",
+            "no-cache, no-store, max-age=0, must-revalidate"
+          ],
+          [
+            "connection",
+            "keep-alive"
+          ],
+          [
+            "content-type",
+            "application/json"
+          ],
+          [
+            "date",
+            "Sun, 27 Sep 2026 13:18:33 GMT"
+          ],
+          [
+            "expires",
+            "0"
+          ],
+          [
+            "keep-alive",
+            "timeout=60"
+          ],
+          [
+            "pragma",
+            "no-cache"
+          ],
+          [
+            "transfer-encoding",
+            "chunked"
+          ],
+          [
+            "vary",
+            "Origin, Access-Control-Request-Method, Access-Control-Request-Headers"
+          ],
+          [
+            "x-content-type-options",
+            "nosniff"
+          ],
+          [
+            "x-frame-options",
+            "DENY"
+          ],
+          [
+            "x-xss-protection",
+            "0"
+          ]
+        ],
+        "body": {
+          "encoding": "utf8",
+          "text": "{\"credential_offer_uri\":\"openid-credential-offer://?credential_offer_uri=https%3A%2F%2F192.0.2.10%2Fv1%2Fcertify%2Fcredential-offer-data%2F7ccae5ed-bd42-455b-bfc0-06b60f25a7ac\"}",
+          "size": 177,
+          "truncated": false,
+          "sha256": "ee32b39b12480011ae3cfacdf659873b19f54c9b4e0b96e4f651869393eea2c2"
+        },
+        "bodyState": "stored",
+        "durationMs": 12,
+        "poll": null
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000001",
+      "seq": 12,
+      "ts": "2026-10-19T10:00:00.051Z",
+      "type": "step.completed",
+      "stepKey": "vci.offer.mint",
+      "payload": {
+        "outcome": "pass",
+        "capture": "full",
+        "skipReason": null,
+        "coverageNote": null,
+        "durationMs": 12
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000001",
+      "seq": 13,
+      "ts": "2026-10-19T10:00:00.054Z",
+      "type": "step.started",
+      "stepKey": "vci.offer.fetch",
+      "payload": {
+        "flowId": "FLOW-01",
+        "order": 4,
+        "kind": "http",
+        "label": "GET credential-offer-data/{uuid}"
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000001",
+      "seq": 14,
+      "ts": "2026-10-19T10:00:00.055Z",
+      "type": "exchange.request",
+      "stepKey": "vci.offer.fetch",
+      "payload": {
+        "exchangeId": "01K7X0F1XA0000000000000001:3",
+        "direction": "outbound",
+        "actor": "wallet.playground-ts",
+        "counterpart": "certify-preauth",
+        "method": "GET",
+        "url": "https://192.0.2.10/v1/certify/credential-offer-data/7ccae5ed-bd42-455b-bfc0-06b60f25a7ac",
+        "headers": [],
+        "body": null,
+        "bodyState": "none",
+        "poll": null
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000001",
+      "seq": 15,
+      "ts": "2026-10-19T10:00:00.067Z",
+      "type": "exchange.response",
+      "stepKey": "vci.offer.fetch",
+      "payload": {
+        "exchangeId": "01K7X0F1XA0000000000000001:3",
+        "status": 200,
+        "statusText": null,
+        "headers": [
+          [
+            "cache-control",
+            "no-cache, no-store, max-age=0, must-revalidate"
+          ],
+          [
+            "connection",
+            "keep-alive"
+          ],
+          [
+            "content-type",
+            "application/json"
+          ],
+          [
+            "date",
+            "Sun, 27 Sep 2026 13:18:33 GMT"
+          ],
+          [
+            "expires",
+            "0"
+          ],
+          [
+            "keep-alive",
+            "timeout=60"
+          ],
+          [
+            "pragma",
+            "no-cache"
+          ],
+          [
+            "transfer-encoding",
+            "chunked"
+          ],
+          [
+            "vary",
+            "Origin, Access-Control-Request-Method, Access-Control-Request-Headers"
+          ],
+          [
+            "x-content-type-options",
+            "nosniff"
+          ],
+          [
+            "x-frame-options",
+            "DENY"
+          ],
+          [
+            "x-xss-protection",
+            "0"
+          ]
+        ],
+        "body": {
+          "encoding": "utf8",
+          "text": "{\"credential_issuer\":\"https://192.0.2.10\",\"credential_configuration_ids\":[\"FarmerCredential\"],\"grants\":{\"urn:ietf:params:oauth:grant-type:pre-authorized_code\":{\"pre-authorized_code\":\"6mMHkJLEkLWyQzIuXL1Wsgx8lquK5o1h\"}}}",
+          "size": 219,
+          "truncated": false,
+          "sha256": "8c6a76e086ab7db86fe7ba6cb785fa4db85b9a3848fcc0e1d18feda7d1330b59"
+        },
+        "bodyState": "stored",
+        "durationMs": 12,
+        "poll": null
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000001",
+      "seq": 16,
+      "ts": "2026-10-19T10:00:00.070Z",
+      "type": "step.completed",
+      "stepKey": "vci.offer.fetch",
+      "payload": {
+        "outcome": "pass",
+        "capture": "full",
+        "skipReason": null,
+        "coverageNote": null,
+        "durationMs": 12
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000001",
+      "seq": 17,
+      "ts": "2026-10-19T10:00:00.073Z",
+      "type": "step.started",
+      "stepKey": "vci.metadata.issuer",
+      "payload": {
+        "flowId": "FLOW-01",
+        "order": 5,
+        "kind": "http",
+        "label": "GET /.well-known/openid-credential-issuer"
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000001",
+      "seq": 18,
+      "ts": "2026-10-19T10:00:00.074Z",
+      "type": "exchange.request",
+      "stepKey": "vci.metadata.issuer",
+      "payload": {
+        "exchangeId": "01K7X0F1XA0000000000000001:4",
+        "direction": "outbound",
+        "actor": "wallet.playground-ts",
+        "counterpart": "certify-preauth",
+        "method": "GET",
+        "url": "https://192.0.2.10/v1/certify/.well-known/openid-credential-issuer",
+        "headers": [],
+        "body": null,
+        "bodyState": "none",
+        "poll": null
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000001",
+      "seq": 19,
+      "ts": "2026-10-19T10:00:00.086Z",
+      "type": "exchange.response",
+      "stepKey": "vci.metadata.issuer",
+      "payload": {
+        "exchangeId": "01K7X0F1XA0000000000000001:4",
+        "status": 200,
+        "statusText": null,
+        "headers": [
+          [
+            "cache-control",
+            "no-cache, no-store, max-age=0, must-revalidate"
+          ],
+          [
+            "connection",
+            "keep-alive"
+          ],
+          [
+            "content-type",
+            "application/json"
+          ],
+          [
+            "date",
+            "Sun, 27 Sep 2026 13:18:33 GMT"
+          ],
+          [
+            "expires",
+            "0"
+          ],
+          [
+            "keep-alive",
+            "timeout=60"
+          ],
+          [
+            "pragma",
+            "no-cache"
+          ],
+          [
+            "transfer-encoding",
+            "chunked"
+          ],
+          [
+            "vary",
+            "Origin, Access-Control-Request-Method, Access-Control-Request-Headers"
+          ],
+          [
+            "x-content-type-options",
+            "nosniff"
+          ],
+          [
+            "x-frame-options",
+            "DENY"
+          ],
+          [
+            "x-xss-protection",
+            "0"
+          ]
+        ],
+        "body": {
+          "encoding": "utf8",
+          "text": "{\"display\":[{\"name\":\"Farmer Issuer\",\"locale\":\"en\"}],\"credential_issuer\":\"https://192.0.2.10\",\"authorization_servers\":[\"https://192.0.2.10\"],\"credential_endpoint\":\"https://192.0.2.10/v1/certify/issuance/credential\",\"nonce_endpoint\":\"https://192.0.2.10/v1/certify/nonce\",\"credential_configurations_supported\":{\"FarmerCredential\":{\"format\":\"ldp_vc\",\"scope\":\"mock_identity_vc_ldp\",\"cryptographic_binding_methods_supported\":[\"did:jwk\"],\"credential_signing_alg_values_supported\":[\"EdDSA\"],\"proof_types_supported\":{\"jwt\":{\"proof_signing_alg_values_supported\":[\"RS256\",\"ES256\"]}},\"credential_definition\":{\"type\":[\"FarmerCredential\",\"VerifiableCredential\"],\"@context\":[\"https://www.w3.org/2018/credentials/v1\"]},\"credential_metadata\":{\"display\":[{\"logo\":{\"uri\":\"https://mosip.github.io/inji-config/logos/agro-vertias-logo.png\",\"alt_text\":\"Farmer Credential Logo\"},\"name\":\"Farmer Verifiable Credential\",\"locale\":\"en\",\"text_color\":\"#FFFFFF\",\"background_color\":\"#12107c\",\"background_image\":{\"uri\":\"https://mosip.github.io/inji-config/logos/agro-vertias-logo.png\"}}],\"claims\":[{\"path\":[\"phone\"],\"display\":[{\"name\":\"Phone Number\",\"locale\":\"en\"}]},{\"path\":[\"gender\"],\"display\":[{\"name\":\"Gender\",\"locale\":\"en\"}]},{\"path\":[\"fullName\"],\"display\":[{\"name\":\"Full Name\",\"locale\":\"en\"}]},{\"path\":[\"dateOfBirth\"],\"display\":[{\"name\":\"Date of Birth\",\"locale\":\"en\"}]}]}}}}",
+          "size": 1346,
+          "truncated": false,
+          "sha256": "6d06f144709db56b8e50f1ce74c03a445501e28fe7612dc37aa7f4ac60ae57a4"
+        },
+        "bodyState": "stored",
+        "durationMs": 12,
+        "poll": null
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000001",
+      "seq": 20,
+      "ts": "2026-10-19T10:00:00.089Z",
+      "type": "step.completed",
+      "stepKey": "vci.metadata.issuer",
+      "payload": {
+        "outcome": "pass",
+        "capture": "full",
+        "skipReason": null,
+        "coverageNote": null,
+        "durationMs": 12
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000001",
+      "seq": 21,
+      "ts": "2026-10-19T10:00:00.092Z",
+      "type": "step.started",
+      "stepKey": "vci.metadata.as",
+      "payload": {
+        "flowId": "FLOW-01",
+        "order": 6,
+        "kind": "http",
+        "label": "GET /.well-known/oauth-authorization-server"
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000001",
+      "seq": 22,
+      "ts": "2026-10-19T10:00:00.093Z",
+      "type": "exchange.request",
+      "stepKey": "vci.metadata.as",
+      "payload": {
+        "exchangeId": "01K7X0F1XA0000000000000001:5",
+        "direction": "outbound",
+        "actor": "wallet.playground-ts",
+        "counterpart": "certify-preauth",
+        "method": "GET",
+        "url": "https://192.0.2.10/v1/certify/.well-known/oauth-authorization-server",
+        "headers": [],
+        "body": null,
+        "bodyState": "none",
+        "poll": null
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000001",
+      "seq": 23,
+      "ts": "2026-10-19T10:00:00.100Z",
+      "type": "exchange.response",
+      "stepKey": "vci.metadata.as",
+      "payload": {
+        "exchangeId": "01K7X0F1XA0000000000000001:5",
+        "status": 200,
+        "statusText": null,
+        "headers": [
+          [
+            "content-type",
+            "application/json"
+          ]
+        ],
+        "body": {
+          "encoding": "utf8",
+          "text": "{\"issuer\":\"https://192.0.2.10\",\"token_endpoint\":\"https://192.0.2.10/v1/certify/oauth/token\",\"grant_types_supported\":[\"urn:ietf:params:oauth:grant-type:pre-authorized_code\"],\"pre-authorized_grant_anonymous_access_supported\":true}",
+          "size": 228,
+          "truncated": false,
+          "sha256": "36cb5ff476f95f7a95862ee3fd3a99a86d3de72efc20c570dd58c1e271a45e6a"
+        },
+        "bodyState": "stored",
+        "durationMs": 7,
+        "poll": null
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000001",
+      "seq": 24,
+      "ts": "2026-10-19T10:00:00.103Z",
+      "type": "step.completed",
+      "stepKey": "vci.metadata.as",
+      "payload": {
+        "outcome": "pass",
+        "capture": "full",
+        "skipReason": null,
+        "coverageNote": null,
+        "durationMs": 7
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000001",
+      "seq": 25,
+      "ts": "2026-10-19T10:00:00.106Z",
+      "type": "step.started",
+      "stepKey": "vci.token",
+      "payload": {
+        "flowId": "FLOW-01",
+        "order": 7,
+        "kind": "http",
+        "label": "POST /oauth/token"
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000001",
+      "seq": 26,
+      "ts": "2026-10-19T10:00:00.107Z",
+      "type": "exchange.request",
+      "stepKey": "vci.token",
+      "payload": {
+        "exchangeId": "01K7X0F1XA0000000000000001:6",
+        "direction": "outbound",
+        "actor": "wallet.playground-ts",
+        "counterpart": "certify-preauth",
+        "method": "POST",
+        "url": "https://192.0.2.10/v1/certify/oauth/token",
+        "headers": [
+          [
+            "Content-Type",
+            "application/x-www-form-urlencoded"
+          ]
+        ],
+        "body": {
+          "encoding": "utf8",
+          "text": "grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Apre-authorized_code&pre-authorized_code=6mMHkJLEkLWyQzIuXL1Wsgx8lquK5o1h",
+          "size": 126,
+          "truncated": false,
+          "sha256": "93eeeb5851d9804483a4b11454d56f458ccdc8654d30469c60d0fdd2e81f70fa"
+        },
+        "bodyState": "stored",
+        "poll": null
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000001",
+      "seq": 27,
+      "ts": "2026-10-19T10:00:00.119Z",
+      "type": "exchange.response",
+      "stepKey": "vci.token",
+      "payload": {
+        "exchangeId": "01K7X0F1XA0000000000000001:6",
+        "status": 200,
+        "statusText": null,
+        "headers": [
+          [
+            "cache-control",
+            "no-cache, no-store, max-age=0, must-revalidate"
+          ],
+          [
+            "connection",
+            "keep-alive"
+          ],
+          [
+            "content-type",
+            "application/json"
+          ],
+          [
+            "date",
+            "Sun, 27 Sep 2026 13:18:33 GMT"
+          ],
+          [
+            "expires",
+            "0"
+          ],
+          [
+            "keep-alive",
+            "timeout=60"
+          ],
+          [
+            "pragma",
+            "no-cache"
+          ],
+          [
+            "transfer-encoding",
+            "chunked"
+          ],
+          [
+            "vary",
+            "Origin, Access-Control-Request-Method, Access-Control-Request-Headers"
+          ],
+          [
+            "x-content-type-options",
+            "nosniff"
+          ],
+          [
+            "x-frame-options",
+            "DENY"
+          ],
+          [
+            "x-xss-protection",
+            "0"
+          ]
+        ],
+        "body": {
+          "encoding": "utf8",
+          "text": "{\"access_token\":\"eyJraWQiOiJDQkJsRllKS0gwcXpxQ294YkYtbERVX280bUFjSDZUSHpxcno4RmJzZzU4IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJ7XCJmdWxsTmFtZVwiOlwiUGxheWdyb3VuZCBGYXJtZXJcIixcInBob25lXCI6XCI5OTk5OTk5OTk5XCIsXCJkYXRlT2ZCaXJ0aFwiOlwiMTk5MC0wMS0wMVwiLFwiZ2VuZGVyXCI6XCJGZW1hbGVcIn0iLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjgwOTAvdjEvY2VydGlmeS9pc3N1YW5jZS9jcmVkZW50aWFsIiwic2NvcGUiOiJtb2NrX2lkZW50aXR5X3ZjX2xkcCIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA5MCIsImV4cCI6MTc5MDUxNTcxMywiaWF0IjoxNzkwNTE1MTEzLCJjbGllbnRfaWQiOiIifQ.ZvkOOLmMNnwIzwW7iwZugwA_e6xn5_Rnaayj-UX70EEkOf5vDmS4cuNGWus1eZ8AIJDGdCtRl5evMSIAqkrTLmN1qLbLr3V1VG43IsCbPOxdi4PL3gJeWnMrLn3l9tigpCZDx-IO4X-1CpIz7vnooO4NN9nEmcNMhx1vl7s_dFgrbDJhw24uJZxw8zkzN49LaBt-iJdFSXpEHwezPhqKUCm8ZHz5dom3mopf2KAAXmT8-QESqliQXTkRJyZlt6ZhGRAZ9VIesLZEMjEclQdtcjW-qdmtZhTsI59AkELues6UKTd5fOdqJl-aTOoZz_oU26iUWHNrwKW0x2P8JcbnKA\",\"token_type\":\"Bearer\",\"expires_in\":600}",
+          "size": 886,
+          "truncated": false,
+          "sha256": "36a732c12da3e7a9e28a7a0ae1ebd95e653e4c05efb6c1a2ed2296a71c132a21"
+        },
+        "bodyState": "stored",
+        "durationMs": 12,
+        "poll": null
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000001",
+      "seq": 28,
+      "ts": "2026-10-19T10:00:00.122Z",
+      "type": "step.completed",
+      "stepKey": "vci.token",
+      "payload": {
+        "outcome": "pass",
+        "capture": "full",
+        "skipReason": null,
+        "coverageNote": null,
+        "durationMs": 12
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000001",
+      "seq": 29,
+      "ts": "2026-10-19T10:00:00.125Z",
+      "type": "step.started",
+      "stepKey": "vci.nonce",
+      "payload": {
+        "flowId": "FLOW-01",
+        "order": 8,
+        "kind": "http",
+        "label": "POST /nonce"
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000001",
+      "seq": 30,
+      "ts": "2026-10-19T10:00:00.126Z",
+      "type": "exchange.request",
+      "stepKey": "vci.nonce",
+      "payload": {
+        "exchangeId": "01K7X0F1XA0000000000000001:7",
+        "direction": "outbound",
+        "actor": "wallet.playground-ts",
+        "counterpart": "certify-preauth",
+        "method": "POST",
+        "url": "https://192.0.2.10/v1/certify/nonce",
+        "headers": [],
+        "body": null,
+        "bodyState": "none",
+        "poll": null
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000001",
+      "seq": 31,
+      "ts": "2026-10-19T10:00:00.138Z",
+      "type": "exchange.response",
+      "stepKey": "vci.nonce",
+      "payload": {
+        "exchangeId": "01K7X0F1XA0000000000000001:7",
+        "status": 200,
+        "statusText": null,
+        "headers": [
+          [
+            "cache-control",
+            "no-store"
+          ],
+          [
+            "connection",
+            "keep-alive"
+          ],
+          [
+            "content-type",
+            "application/json"
+          ],
+          [
+            "date",
+            "Sun, 27 Sep 2026 13:18:33 GMT"
+          ],
+          [
+            "keep-alive",
+            "timeout=60"
+          ],
+          [
+            "transfer-encoding",
+            "chunked"
+          ],
+          [
+            "vary",
+            "Origin, Access-Control-Request-Method, Access-Control-Request-Headers"
+          ],
+          [
+            "x-content-type-options",
+            "nosniff"
+          ],
+          [
+            "x-frame-options",
+            "DENY"
+          ],
+          [
+            "x-xss-protection",
+            "0"
+          ]
+        ],
+        "body": {
+          "encoding": "utf8",
+          "text": "{\"c_nonce\":\"7c2c211d-e3e0-4617-9543-d53113a2156f\"}",
+          "size": 50,
+          "truncated": false,
+          "sha256": "44d815ac4a38c926b6507aec1464c6e02f124b660a63b7e721b78daa4ed248a1"
+        },
+        "bodyState": "stored",
+        "durationMs": 12,
+        "poll": null
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000001",
+      "seq": 32,
+      "ts": "2026-10-19T10:00:00.141Z",
+      "type": "step.completed",
+      "stepKey": "vci.nonce",
+      "payload": {
+        "outcome": "pass",
+        "capture": "full",
+        "skipReason": null,
+        "coverageNote": null,
+        "durationMs": 12
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000001",
+      "seq": 33,
+      "ts": "2026-10-19T10:00:00.144Z",
+      "type": "step.started",
+      "stepKey": "vci.proof.sign",
+      "payload": {
+        "flowId": "FLOW-01",
+        "order": 9,
+        "kind": "engine",
+        "label": "sign proof JWT (ES256, P1363)"
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000001",
+      "seq": 34,
+      "ts": "2026-10-19T10:00:00.146Z",
+      "type": "engine.call",
+      "stepKey": "vci.proof.sign",
+      "payload": {
+        "engine": "playground-ts",
+        "op": "sign-proof",
+        "inputSummary": {
+          "aud": "https://192.0.2.10",
+          "typ": "openid4vci-proof+jwt"
+        },
+        "outputSummary": {
+          "alg": "ES256",
+          "kid": "did:jwk:fixture-holder#0",
+          "jwsSha256": "3c24d88c0026272c97001bbd2bff41cf0b8bb0764d435b985fe0c891b23f00ed"
+        },
+        "durationMs": 2
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000001",
+      "seq": 35,
+      "ts": "2026-10-19T10:00:00.149Z",
+      "type": "step.completed",
+      "stepKey": "vci.proof.sign",
+      "payload": {
+        "outcome": "pass",
+        "capture": "none",
+        "skipReason": null,
+        "coverageNote": null,
+        "durationMs": 2
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000001",
+      "seq": 36,
+      "ts": "2026-10-19T10:00:00.152Z",
+      "type": "step.started",
+      "stepKey": "vci.credential",
+      "payload": {
+        "flowId": "FLOW-01",
+        "order": 10,
+        "kind": "http",
+        "label": "POST /issuance/credential"
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000001",
+      "seq": 37,
+      "ts": "2026-10-19T10:00:00.153Z",
+      "type": "exchange.request",
+      "stepKey": "vci.credential",
+      "payload": {
+        "exchangeId": "01K7X0F1XA0000000000000001:8",
+        "direction": "outbound",
+        "actor": "wallet.playground-ts",
+        "counterpart": "certify-preauth",
+        "method": "POST",
+        "url": "https://192.0.2.10/v1/certify/issuance/credential",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Authorization",
+            "Bearer eyJraWQiOiJDQkJsRllKS0gwcXpxQ294YkYtbERVX280bUFjSDZUSHpxcno4RmJzZzU4IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJ7XCJmdWxsTmFtZVwiOlwiUGxheWdyb3VuZCBGYXJtZXJcIixcInBob25lXCI6XCI5OTk5OTk5OTk5XCIsXCJkYXRlT2ZCaXJ0aFwiOlwiMTk5MC0wMS0wMVwiLFwiZ2VuZGVyXCI6XCJGZW1hbGVcIn0iLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjgwOTAvdjEvY2VydGlmeS9pc3N1YW5jZS9jcmVkZW50aWFsIiwic2NvcGUiOiJtb2NrX2lkZW50aXR5X3ZjX2xkcCIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA5MCIsImV4cCI6MTc5MDUxNTcxMywiaWF0IjoxNzkwNTE1MTEzLCJjbGllbnRfaWQiOiIifQ.ZvkOOLmMNnwIzwW7iwZugwA_e6xn5_Rnaayj-UX70EEkOf5vDmS4cuNGWus1eZ8AIJDGdCtRl5evMSIAqkrTLmN1qLbLr3V1VG43IsCbPOxdi4PL3gJeWnMrLn3l9tigpCZDx-IO4X-1CpIz7vnooO4NN9nEmcNMhx1vl7s_dFgrbDJhw24uJZxw8zkzN49LaBt-iJdFSXpEHwezPhqKUCm8ZHz5dom3mopf2KAAXmT8-QESqliQXTkRJyZlt6ZhGRAZ9VIesLZEMjEclQdtcjW-qdmtZhTsI59AkELues6UKTd5fOdqJl-aTOoZz_oU26iUWHNrwKW0x2P8JcbnKA"
+          ]
+        ],
+        "body": {
+          "encoding": "utf8",
+          "text": "{\"credential_configuration_id\":\"FarmerCredential\",\"proofs\":{\"jwt\":[\"eyJhbGciOiJFUzI1NiIsInR5cCI6Im9wZW5pZDR2Y2ktcHJvb2Yrand0Iiwia2lkIjoiZGlkOmp3azpleUpyZEhraU9pSkZReUlzSW5naU9pSXRVbEpYYUVOUk0xWk1SM1ZsYlhGWGMyOWlWblJWWjNoT1NXSkxNMmMxUjFoSlh6WjZOVmg2TWs5M0lpd2llU0k2SWpKVFQxbFVlVXQ1UjNoTFdWWXRSVVJXV21sRWMxZENWMHQyUkdoWFpGVkZiVUpGT1dvMVVEaEZaalFpTENKamNuWWlPaUpRTFRJMU5pSjkjMCJ9.eyJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjgwOTAiLCJpYXQiOjE3OTA1MTUxMTMsIm5vbmNlIjoiN2MyYzIxMWQtZTNlMC00NjE3LTk1NDMtZDUzMTEzYTIxNTZmIn0.kk5IXAspS77LaiuRuLgb7OQwn9vwtn8drUt95ThA-mmrAfFkeh5qeWalhfBLv8iIXoVWxzZ3iVoxcJyRnpEdhg\"]}}",
+          "size": 595,
+          "truncated": false,
+          "sha256": "7d6b4ad9ba02699469aee9e0c6395f04d6f6edf3b37492f0d1f552926b791d74"
+        },
+        "bodyState": "stored",
+        "poll": null
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000001",
+      "seq": 38,
+      "ts": "2026-10-19T10:00:00.165Z",
+      "type": "exchange.response",
+      "stepKey": "vci.credential",
+      "payload": {
+        "exchangeId": "01K7X0F1XA0000000000000001:8",
+        "status": 200,
+        "statusText": null,
+        "headers": [
+          [
+            "cache-control",
+            "no-cache, no-store, max-age=0, must-revalidate"
+          ],
+          [
+            "connection",
+            "keep-alive"
+          ],
+          [
+            "content-type",
+            "application/json"
+          ],
+          [
+            "date",
+            "Sun, 27 Sep 2026 13:18:34 GMT"
+          ],
+          [
+            "expires",
+            "0"
+          ],
+          [
+            "keep-alive",
+            "timeout=60"
+          ],
+          [
+            "pragma",
+            "no-cache"
+          ],
+          [
+            "transfer-encoding",
+            "chunked"
+          ],
+          [
+            "vary",
+            "Origin, Access-Control-Request-Method, Access-Control-Request-Headers"
+          ],
+          [
+            "x-content-type-options",
+            "nosniff"
+          ],
+          [
+            "x-frame-options",
+            "DENY"
+          ],
+          [
+            "x-xss-protection",
+            "0"
+          ]
+        ],
+        "body": {
+          "encoding": "utf8",
+          "text": "{\"credentials\":[{\"credential\":{\"issuanceDate\":\"2026-09-27T13:18:33.547Z\",\"credentialSubject\":{\"gender\":\"Female\",\"primaryCropType\":\"${primaryCropType}\",\"mobileNumber\":\"${mobileNumber}\",\"postalCode\":\"${postalCode}\",\"landArea\":\"${landArea}\",\"fullName\":\"Playground Farmer\",\"secondaryCropType\":\"${secondaryCropType}\",\"dateOfBirth\":\"1990-01-01\",\"face\":\"${face}\",\"farmerID\":\"${farmerID}\",\"villageOrTown\":\"${villageOrTown}\",\"district\":\"${district}\",\"id\":\"did:jwk:eyJrdHkiOiJFQyIsIngiOiItUlJXaENRM1ZMR3VlbXFXc29iVnRVZ3hOSWJLM2c1R1hJXzZ6NVh6Mk93IiwieSI6IjJTT1lUeUt5R3hLWVYtRURWWmlEc1dCV0t2RGhXZFVFbUJFOWo1UDhFZjQiLCJjcnYiOiJQLTI1NiJ9#0\",\"state\":\"${state}\",\"landOwnershipType\":\"${landOwnershipType}\"},\"id\":\"https://mosip.io/credential/f1b9d2c0-4f06-48e1-8b86-4cecf586cbbb\",\"type\":[\"VerifiableCredential\",\"FarmerCredential\"],\"@context\":[\"https://www.w3.org/2018/credentials/v1\",\"https://inji.github.io/inji-config/contexts/farmer.json\",\"https://w3id.org/security/suites/ed25519-2020/v1\"],\"issuer\":\"did:web:8398-2405-201-1029-3025-e142-9ad3-e1f2-f543.ngrok-free.app\",\"expirationDate\":\"2028-09-26T13:18:33.547Z\",\"proof\":{\"type\":\"Ed25519Signature2020\",\"created\":\"2026-09-27T13:18:33Z\",\"proofPurpose\":\"assertionMethod\",\"verificationMethod\":\"did:web:8398-2405-201-1029-3025-e142-9ad3-e1f2-f543.ngrok-free.app#pjEZsqKzo-FScSiqK5-YshMpMLJTtvoe6CsD5bBBTtY\",\"proofValue\":\"z4XG6jNpLm7SpphnY3cX5rC7DEx74xhb5wL2cYzXoSzHAnHGQSj4mv94Z8Rt467S9fNpgeiyavfRDLcHusedTHxVS\"}}}]}",
+          "size": 1446,
+          "truncated": false,
+          "sha256": "ee517d202bf10ae92724c9226a7fba49b2d119e9ac6d4c86db745edbac35b08a"
+        },
+        "bodyState": "stored",
+        "durationMs": 12,
+        "poll": null
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000001",
+      "seq": 39,
+      "ts": "2026-10-19T10:00:00.166Z",
+      "type": "verdict.check",
+      "stepKey": "vci.credential",
+      "payload": {
+        "check": {
+          "checkId": "vci.credential.issued",
+          "outcome": "pass",
+          "source": "verifier-response",
+          "exchangeIds": [
+            "01K7X0F1XA0000000000000001:8"
+          ]
+        }
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000001",
+      "seq": 40,
+      "ts": "2026-10-19T10:00:00.169Z",
+      "type": "step.completed",
+      "stepKey": "vci.credential",
+      "payload": {
+        "outcome": "pass",
+        "capture": "full",
+        "skipReason": null,
+        "coverageNote": null,
+        "durationMs": 12
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000001",
+      "seq": 41,
+      "ts": "2026-10-19T10:00:00.172Z",
+      "type": "step.started",
+      "stepKey": "vci.credential.inspect",
+      "payload": {
+        "flowId": "FLOW-01",
+        "order": 11,
+        "kind": "engine",
+        "label": "decode credential, extract artifacts"
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000001",
+      "seq": 42,
+      "ts": "2026-10-19T10:00:00.173Z",
+      "type": "verdict.check",
+      "stepKey": "vci.credential.inspect",
+      "payload": {
+        "check": {
+          "checkId": "vci.credential.decode.ldp_vc",
+          "outcome": "pass",
+          "source": "engine",
+          "message": "decoded 1413 characters of ldp_vc",
+          "exchangeIds": []
+        }
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000001",
+      "seq": 43,
+      "ts": "2026-10-19T10:00:00.176Z",
+      "type": "step.completed",
+      "stepKey": "vci.credential.inspect",
+      "payload": {
+        "outcome": "pass",
+        "capture": "none",
+        "skipReason": null,
+        "coverageNote": null,
+        "durationMs": 0
+      }
+    },
+    {
+      "v": 1,
+      "runId": "01K7X0F1XA0000000000000001",
+      "seq": 44,
+      "ts": "2026-10-19T10:00:00.179Z",
+      "type": "run.completed",
+      "payload": {
+        "verdict": {
+          "kind": "interop",
+          "outcome": "pass",
+          "issuanceOk": true,
+          "verification": null,
+          "tamperVerdict": null,
+          "failedStepKey": null,
+          "countsTowardPassRate": true
+        },
+        "counterfactualResult": null
+      }
+    }
+  ],
+  "end": {
+    "reason": "terminal",
+    "lastSeq": 44
+  }
+}

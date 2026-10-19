@@ -16,3 +16,4 @@ versions.lock
 .generated/
 certs/
 data/
+apps/ui/.impeccable/

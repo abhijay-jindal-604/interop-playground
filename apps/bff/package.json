@@ -10,7 +10,7 @@
     }
   },
   "scripts": {
-    "start": "tsx src/server.ts",
+    "start": "tsx src/main.ts",
     "cli": "tsx src/cli.ts"
   },
   "dependencies": {

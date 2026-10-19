@@ -4,6 +4,9 @@
  *
  *   createServer(opts)  -> a configured, not yet listening instance (tests use `inject`)
  *   startServer()       -> validates content, opens the store, listens (process entry)
+ *
+ * With a store (T-08/T-20): the sink is attached to the event bus, API-15 streams, the
+ * orchestrator (runs left open by an earlier process are failed `bff_restarted`) and the run routes.
  */
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
@@ -20,6 +23,15 @@ import { registerHealth } from './routes/health.js';
 import type { SidecarProbe } from './routes/health.js';
 import { registerStatic } from './routes/static.js';
 import { validateContent } from './validate/index.js';
+import { CaptureHttp, generateSelfToken } from './capture/index.js';
+import { Orchestrator } from './orchestrator/index.js';
+import type { AdapterSet, CaptureHooks, KeyService, ResolveEnv } from './orchestrator/index.js';
+import { registerRuns } from './routes/runs.js';
+import { registerStream } from './routes/stream.js';
+import { openStore } from './store/index.js';
+import type { Store } from './store/index.js';
+import { attachBus, defaultBus } from './stream/index.js';
+import type { EventBus } from './stream/index.js';
 import type { ContentFiles } from './validate/index.js';
 
 /** 04 §1 "Content": max request body 1 MiB (API-37's 64 MiB arrives with T-50). */
@@ -27,8 +39,25 @@ export const BODY_LIMIT = 1024 * 1024;
 
 export interface CreateServerOptions {
   config?: Partial<BffConfig>;
-  /** the run store (session A's `openStore(path)`); kept opaque until the run routes use it */
-  store?: unknown;
+  /** the run store (`openStore(path)`); without one only health, flows and static files are served */
+  store?: Store | null;
+  /** event bus the sink publishes to (default: the process-wide `defaultBus`) */
+  bus?: EventBus;
+  /** adapters by id (real ones arrive with T-23..T-26; none = every create answers adapter_unavailable) */
+  adapters?: AdapterSet;
+  /** CapturingHttp + flush hooks (default: a CaptureHttp over the store's sink) */
+  capture?: CaptureHooks;
+  /** X-Playground-Self token for the default CaptureHttp (main.ts shares the gateway's; default: fresh) */
+  selfToken?: string;
+  /** `host:port` of the gateway listeners; the default CaptureHttp sends the token to them */
+  gatewayOrigins?: Iterable<string>;
+  /** environment view for resolution (T-12); default: never probed, tunnel down */
+  resolveEnv?: ResolveEnv;
+  keys?: KeyService;
+  /** a ready orchestrator (tests); default: built from the options above */
+  orchestrator?: Orchestrator;
+  /** SSE heartbeat (default 15 s) */
+  heartbeatMs?: number;
   /** already validated content; default: validate `config.flowsDir` / `config.fingerprintsDir` */
   content?: ContentFiles;
   probeSidecar?: SidecarProbe;
@@ -57,6 +86,17 @@ function defaultSidecarProbe(baseUrl: string): SidecarProbe {
   };
 }
 
+/** the orchestrator's view of a CaptureHttp (T-09): the client plus its flush points */
+export function captureHooks(c: CaptureHttp): CaptureHooks {
+  return { http: c, flushStep: (r, k) => c.flushStep(r, k), endRun: (r) => c.endRun(r) };
+}
+
+const NO_ADAPTERS: AdapterSet = {
+  issuer: () => undefined,
+  wallet: () => undefined,
+  verifier: () => undefined,
+};
+
 export async function createServer(opts: CreateServerOptions = {}): Promise<FastifyInstance> {
   const config: BffConfig = { ...loadConfig(), ...opts.config };
   const content = opts.content ?? validateContent(config.flowsDir, config.fingerprintsDir);
@@ -78,27 +118,58 @@ export async function createServer(opts: CreateServerOptions = {}): Promise<Fast
     probeSidecar: opts.probeSidecar ?? defaultSidecarProbe(config.sidecarUrl),
   });
   registerFlows(app, content.flows);
+  const store = opts.store ?? null;
+  if (store !== null) {
+    const bus = opts.bus ?? defaultBus;
+    attachBus(store, bus);
+    registerStream(app, {
+      store,
+      bus,
+      ...(opts.heartbeatMs ? { heartbeatMs: opts.heartbeatMs } : {}),
+    });
+    const orchestrator =
+      opts.orchestrator ??
+      new Orchestrator({
+        store,
+        flows: content.flows,
+        adapters: opts.adapters ?? NO_ADAPTERS,
+        capture:
+          opts.capture ??
+          captureHooks(
+            new CaptureHttp({
+              sink: store.sink,
+              selfToken: opts.selfToken ?? generateSelfToken(),
+              ...(opts.gatewayOrigins ? { gatewayOrigins: opts.gatewayOrigins } : {}),
+            }),
+          ),
+        ...(opts.resolveEnv ? { env: opts.resolveEnv } : {}),
+        keys: opts.keys ?? null,
+        appVersion: bffVersion(),
+      });
+    if (opts.orchestrator === undefined) orchestrator.recover();
+    app.decorate('playgroundOrchestrator', orchestrator);
+    app.addHook('onClose', async () => orchestrator.stop());
+    registerRuns(app, { store, orchestrator });
+  }
   await registerStatic(app, config.uiDistDir);
   return app;
 }
 
-/** Opens session A's store when its module exists (wave 2 runs both in parallel). */
-async function openStoreIfPresent(dataDir: string): Promise<unknown> {
-  const specifier = './store/index.js';
-  try {
-    const mod = (await import(specifier)) as { openStore?: (p: string) => unknown };
-    if (typeof mod.openStore !== 'function') return null;
-    return await mod.openStore(path.join(dataDir, 'playground.db'));
-  } catch (e) {
-    if ((e as { code?: string }).code === 'ERR_MODULE_NOT_FOUND') return null;
-    throw e;
-  }
-}
-
-export async function startServer(env: NodeJS.ProcessEnv = process.env): Promise<FastifyInstance> {
+/**
+ * Process entry: opens `<DATA_DIR>/playground.db`, builds the server and listens. `extra` lets the
+ * process entry (main.ts) inject the gateway's CaptureHttp, adapters or a bus.
+ */
+export async function startServer(
+  env: NodeJS.ProcessEnv = process.env,
+  extra: Omit<CreateServerOptions, 'config' | 'store'> = {},
+): Promise<FastifyInstance> {
   const config = loadConfig(env);
-  const store = await openStoreIfPresent(config.dataDir);
-  const app = await createServer({ config, store, logger: { level: config.logLevel } });
+  const store = openStore(path.join(config.dataDir, 'playground.db'));
+  const app = await createServer({ logger: { level: config.logLevel }, ...extra, config, store });
+  app.addHook('onClose', () => {
+    store.close();
+    return Promise.resolve();
+  });
   await app.listen({ host: config.listenHost, port: config.port });
   return app;
 }

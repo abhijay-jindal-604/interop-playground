@@ -15,8 +15,8 @@
 #    exists; without it they are reported as skipped. The Mimoto p12 is always built here with
 #    openssl around the existing client key, never a new key (S-105, S-150, ADR-60);
 #  - readiness: internal service names via `docker compose exec`, then `playground wait-ready`,
-#    then the bff probe GET http://127.0.0.1:3100/api/v1/health from the host. Gateway-URL
-#    probes arrive with the gateway (T-11).
+#    then the bff probe GET http://127.0.0.1:3100/api/v1/health from the host, then the
+#    gateway-URL probes (T-11) from the host with the playground CA.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -407,9 +407,9 @@ if [[ "$mode" == local && "${chain_ran:-0}" -eq 1 && $bff_cli -eq 1 ]]; then
   log "ADR-14 chain: playground guest-smoke"
   set +e; run_cli guest-smoke; rc=$?; set -e
   if [[ $rc -eq 3 ]]; then
-    # Mimoto reaches Certify through http://${PUBLIC_HOST}:8093 and resolves the issuer's
-    # did:web on 443; both are gateway listeners (T-11, G-131), so the download cannot pass yet
-    warn "guest-smoke: blocked until the gateway serves ${PUBLIC_HOST}:8093 and :443 (T-11, G-131)"
+    # Mimoto reaches Certify through the gateway (http://${PUBLIC_HOST}:8093) and resolves the
+    # issuer's did:web on 443 (T-11 serves both since build wave 3; G-131 closed)
+    chain_diagnosis; die "guest-smoke: the gateway URLs ${PUBLIC_HOST}:8093 / :443 did not answer (bff gateway listeners)"
   elif [[ $rc -ne 0 ]]; then
     chain_diagnosis; die "guest-smoke failed"
   fi
@@ -506,6 +506,30 @@ if printf '%s\n' "${services[@]}" | grep -qx bff; then
   done
 else
   log "  bff probe (gateway URLs, http://127.0.0.1:3100): SKIPPED, bff image not built (deferred: T-07)"
+fi
+if printf '%s\n' "${services[@]}" | grep -qx bff; then
+  # ADR-05 through the gateway (T-11): the advertised URLs, from the host, with the playground CA
+  declare -A GW_PROBES=(
+    [certify-preauth]="https://${PUBLIC_HOST}/.well-known/openid-credential-issuer"
+    [certify-preauth-did]="https://${PUBLIC_HOST}/.well-known/did.json"
+  )
+  if [[ "$mode" == local ]]; then
+    GW_PROBES+=(
+      [certify-authcode]="http://${PUBLIC_HOST}:8093/.well-known/openid-credential-issuer"
+      [certify-authcode-did]="https://${PUBLIC_HOST}/authcode/did.json"
+      [mimoto]="http://${PUBLIC_HOST}:8099/v1/mimoto/issuers"
+      [inji-web]="http://${PUBLIC_HOST}:3004/"
+      [esignet]="http://${PUBLIC_HOST}:3005/.well-known/openid-configuration"
+      [oauth2-mock]="http://${PUBLIC_HOST}:8095/.well-known/openid-configuration"
+      [verify-service]="https://${PUBLIC_HOST}:8443/v1/verify/did.json"
+    )
+  fi
+  for k in $(printf '%s\n' "${!GW_PROBES[@]}" | sort); do
+    url="${GW_PROBES[$k]}"
+    code="$(curl -s --cacert certs/playground-ca.pem -o /dev/null -m 10 -w '%{http_code}' "$url" 2>/dev/null || true)"
+    if [[ "$code" == 200 ]]; then printf '[up]   gateway %-20s %s  %s\n' "$k" "$code" "$url"
+    else printf '[up]   gateway %-20s FAIL (%s)  %s\n' "$k" "${code:-no answer}" "$url"; failed=1; fi
+  done
 fi
 [[ $failed -eq 0 ]] || die "readiness probes failed"
 # The CA private key never leaves certs/ (02 §2.5): no container may mount it or the whole dir.

@@ -1,5 +1,5 @@
-# interop-playground/bff (10 §1, §2.4, §7.2): the BFF process (UI + REST + SSE on 3100, later the
-# gateway listeners) and the one-shot `playground` CLI (10 §8.2). Build context = repository root
+# interop-playground/bff (10 §1, §2.4, §7.2): the BFF process (UI + REST + SSE on 3100 and the
+# gateway listeners of 02 §2.3, apps/bff/src/main.ts) and the one-shot `playground` CLI (10 §8.2). Build context = repository root
 # (.dockerignore applies). The TypeScript sources run through tsx (ADR-60: the workspaces stay
 # declaration-only per ADR-52 and resolve each other's `src/*.ts`, so there is no JS emit step).
 # scripts/up.sh --no-build skips this image entirely.
@@ -36,7 +36,7 @@ RUN printf '#!/bin/sh\nexec node --import tsx /app/apps/bff/src/cli.ts "$@"\n' >
  && chown node:node /data /datashare
 USER node
 # inside the container the BFF binds 0.0.0.0:3100; compose publishes it on 127.0.0.1 only (10 §7.3)
-EXPOSE 3100
+EXPOSE 3100 443 3004 3005 8093 8095 8096 8097 8098 8099 8443 18103 18443 18444 18445
 HEALTHCHECK --interval=10s --timeout=5s --start-period=20s --retries=30 \
   CMD ["node", "-e", "fetch('http://127.0.0.1:3100/api/v1/health').then(r=>process.exit(r.status===200?0:1),()=>process.exit(1))"]
-CMD ["node", "--import", "tsx", "/app/apps/bff/src/server.ts"]
+CMD ["node", "--import", "tsx", "/app/apps/bff/src/main.ts"]

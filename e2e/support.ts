@@ -1,9 +1,48 @@
 /**
  * Shell e2e support: the API answered by the shared fixtures of apps/ui/src/test/fixtures.ts until
  * the testkit BFF of plan/11 §5 serves the built UI; the `env` stream answers one `retry` frame.
+ * The run route (`RUN_ID`) answers the recorded FLOW-30 fail log of fixtures/events (T-10): API-22,
+ * API-06 for its flow files, and its stream as SSE ending in `stream.end`.
  */
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import type { Page } from '@playwright/test';
 import { BOOT_FIXTURES } from '../apps/ui/src/test/fixtures.ts';
+
+export const RUN_ID = '01J8ZZZZZZZZZZZZZZZZZZZZZZ';
+const repo = path.resolve(import.meta.dirname, '..');
+const read = (p: string): string => readFileSync(path.join(repo, p), 'utf8');
+
+interface Fixture {
+  runId: string;
+  events: { seq: number; type: string; payload: { spec?: unknown; label?: string | null } }[];
+  end: unknown;
+}
+const fixture = JSON.parse(
+  read('fixtures/events/FLOW-30-fail.json').replaceAll(
+    (JSON.parse(read('fixtures/events/FLOW-30-fail.json')) as Fixture).runId,
+    RUN_ID,
+  ),
+) as Fixture;
+const runSse = [
+  'retry: 3000\n\n',
+  ...fixture.events.map((e) => `id: ${e.seq}\nevent: ${e.type}\ndata: ${JSON.stringify(e)}\n\n`),
+  `event: stream.end\ndata: ${JSON.stringify(fixture.end)}\n\n`,
+].join('');
+const RUN_FIXTURES: Record<string, unknown> = {
+  [`/api/v1/runs/${RUN_ID}`]: {
+    runId: RUN_ID,
+    spec: fixture.events[0]?.payload.spec,
+    label: fixture.events[0]?.payload.label ?? null,
+    state: 'completed',
+    pinned: false,
+    note: null,
+    origin: 'local',
+  },
+  '/api/v1/flows/FLOW-04': JSON.parse(read('flows/FLOW-04.json')) as unknown,
+  '/api/v1/flows/FLOW-01': JSON.parse(read('flows/FLOW-01.json')) as unknown,
+  '/api/v1/flows/FLOW-30': JSON.parse(read('flows/FLOW-30.json')) as unknown,
+};
 
 export const ROUTES = [
   '/',
@@ -25,6 +64,13 @@ export const ROUTES = [
 export async function serveApi(page: Page): Promise<void> {
   await page.route('**/api/v1/**', async (route) => {
     const url = new URL(route.request().url());
+    if (
+      url.pathname === `/api/v1/streams/${RUN_ID}/events` &&
+      url.searchParams.get('format') !== 'json'
+    ) {
+      await route.fulfill({ status: 200, contentType: 'text/event-stream', body: runSse });
+      return;
+    }
     if (url.pathname.endsWith('/events')) {
       if (url.searchParams.get('format') === 'json') {
         await route.fulfill({
@@ -39,7 +85,7 @@ export async function serveApi(page: Page): Promise<void> {
       });
       return;
     }
-    const body = BOOT_FIXTURES[url.pathname];
+    const body = BOOT_FIXTURES[url.pathname] ?? RUN_FIXTURES[url.pathname];
     if (body === undefined) {
       await route.fulfill({
         status: 404,

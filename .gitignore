@@ -29,3 +29,4 @@ playwright-report/
 
 # IDE (VS Code Java) build output
 sidecar/bin/
+apps/ui/.impeccable/

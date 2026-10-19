@@ -641,7 +641,9 @@ export class EventSink {
           `UPDATE runs SET state = 'failed', outcome = 'inconclusive', outcome_reason = ?, failed_step_key = ?,
              ended_at = ?, duration_ms = CAST(round((julianday(?) - julianday(started_at)) * 86400000) AS INTEGER)
            WHERE run_id = ?`,
-          p.errorCode === 'bff_restart' ? 'bff_restart' : 'environment',
+          p.errorCode === 'bff_restarted' || p.errorCode === 'bff_restart'
+            ? 'bff_restart'
+            : 'environment',
           str(p.stepKey),
           ts,
           ts,

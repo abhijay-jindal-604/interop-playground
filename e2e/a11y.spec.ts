@@ -2,7 +2,7 @@ import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
-import { ROUTES, serveApi, setTheme } from './support.ts';
+import { ROUTES, RUN_ID, serveApi, setTheme } from './support.ts';
 
 const TAGS = ['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'];
 
@@ -20,6 +20,11 @@ for (const theme of ['light', 'dark'] as const) {
       await page.goto(route);
       await expect(page.locator('h1')).toHaveCount(1);
       await expect(page.locator('main[aria-busy="true"]')).toHaveCount(0);
+      if (route === `/runs/${RUN_ID}`) {
+        // the run screen is fully rendered from the recorded log before axe runs
+        await expect(page.getByRole('region', { name: 'Result' })).toBeVisible();
+        await expect(page.getByRole('navigation', { name: 'Steps' })).toBeVisible();
+      }
       const result = await new AxeBuilder({ page }).withTags(TAGS).analyze();
       const blocking = result.violations.filter(
         (v) => v.impact === 'serious' || v.impact === 'critical',
