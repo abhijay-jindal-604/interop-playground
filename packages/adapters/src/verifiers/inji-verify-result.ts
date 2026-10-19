@@ -81,3 +81,57 @@ export function mapVerifyResult(
 export function isNoSubmission(status: number, body: unknown): boolean {
   return status === 404 && isRecord(body) && body.errorCode === 'NO_VP_SUBMISSION';
 }
+
+/** 08 §5: the designed VP-level check `chk.vp.sdjwt.expired-credential` (TMP-39 at VP level, RISK-31) */
+export const EXPIRED_CREDENTIAL_CHECK_ID = 'chk.vp.sdjwt.expired-credential';
+
+export interface ExpiredCredentialJudgement {
+  check: CheckResult;
+  /** `vp-collapses-expiry`: Verify rejected an expired credential as plain `invalid` (08 §5) */
+  finding: 'vp-collapses-expiry' | null;
+}
+
+const errorOf = (o: VerificationOutcome): { code: string; message: string } => {
+  for (const c of o.checks)
+    if (c.outcome === 'fail' && c.code) return { code: c.code, message: c.message ?? '' };
+  const raw = isRecord(o.rawResult) ? o.rawResult : {};
+  return { code: str(raw.errorCode) ?? '', message: str(raw.errorMessage) ?? '' };
+};
+
+/**
+ * Judges the verifier's answer to a presented, signature-valid, expired SD-JWT (08 §5 mapping):
+ *  - `valid-but-expired` (`expiryCheck.valid:false`)           → pass
+ *  - `invalid` with an expiry-specific code or message          → pass + finding `vp-collapses-expiry`
+ *  - `valid` (acceptance, `expiryCheck.valid:true`)             → fail
+ *  - `invalid` with a signature code, or any other rejection    → fail
+ *  - `no-submission`                                            → not-run
+ */
+export function judgeExpiredCredential(
+  outcome: VerificationOutcome,
+  exchangeIds: readonly string[] = [],
+): ExpiredCredentialJudgement {
+  const mk = (
+    o: CheckResult['outcome'],
+    extra: { code?: string; message?: string } = {},
+  ): CheckResult => ({
+    checkId: EXPIRED_CREDENTIAL_CHECK_ID,
+    outcome: o,
+    source: 'verifier-response',
+    ...extra,
+    specClause: 'SD-JWT VC, Registered JWT Claims (exp); RFC 7519 4.1.4',
+    exchangeIds,
+  });
+  if (outcome.verdict === 'valid-but-expired') return { check: mk('pass'), finding: null };
+  if (outcome.verdict === 'valid')
+    return { check: mk('fail', { message: 'expired credential accepted' }), finding: null };
+  if (outcome.verdict === 'no-submission') return { check: mk('not-run'), finding: null };
+  const e = errorOf(outcome);
+  const extra = {
+    ...(e.code ? { code: e.code } : {}),
+    ...(e.message ? { message: e.message } : {}),
+  };
+  if (/signature/i.test(e.code)) return { check: mk('fail', extra), finding: null };
+  if (/expir/i.test(`${e.code} ${e.message}`))
+    return { check: mk('pass', extra), finding: 'vp-collapses-expiry' };
+  return { check: mk('fail', extra), finding: null };
+}

@@ -43,6 +43,15 @@ function mermaid(): Promise<MermaidApi | null> {
   return loaded;
 }
 
+/**
+ * Starts loading the renderer ahead of the run screen (ADR-89): a live run finishes in ~2 s, which
+ * is less than the lazy chunk's load time, so without this the diagram first appears already
+ * terminal and never shows the run's progress. Same loader and cache as rendering.
+ */
+export function preloadMermaid(): void {
+  void mermaid().catch(() => undefined);
+}
+
 /** the integrity check failed: the SVG's message lines do not match the flow file (RISK-32) */
 export class DiagramIndexError extends Error {
   constructor(

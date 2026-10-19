@@ -142,7 +142,21 @@ const FLOW30 = [
 ];
 // FLOW-08: 03 FLOW-08 step table (9 keys; no variant/config-read, offer fetch skipped by value).
 const FLOW08 = FLOW01.filter(([k]) => k !== 'vci.setup.variant' && k !== 'vci.setup.config-read');
-const EXPECTED = { 'FLOW-01': FLOW01, 'FLOW-04': FLOW01, 'FLOW-08': FLOW08, 'FLOW-30': FLOW30 };
+// FLOW-14: 03 FLOW-14 (one engine step, no exchanges). FLOW-40: 03 FLOW-40 step table (the two
+// steps that replace section 2.0's chain; every other vp.* key is skipped "credential-level adapter").
+const FLOW14 = [['vci.fixture.load', 1]];
+const FLOW40 = [
+  ['vp.vc.verify', 2],
+  ['vp.verdict.evaluate', 1],
+];
+const EXPECTED = {
+  'FLOW-01': FLOW01,
+  'FLOW-04': FLOW01,
+  'FLOW-08': FLOW08,
+  'FLOW-14': FLOW14,
+  'FLOW-30': FLOW30,
+  'FLOW-40': FLOW40,
+};
 
 const messageIndex = (steps) => steps.flatMap((s) => Array(s.messages).fill(s.stepKey));
 

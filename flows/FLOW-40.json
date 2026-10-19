@@ -1,0 +1,27 @@
+{
+  "flowId": "FLOW-40",
+  "kind": "presentation",
+  "title": "Credential-level verification of dc+sd-jwt and ldp_vc, no OID4VP",
+  "targetStepKey": "vp.verdict.evaluate",
+  "lifelines": ["VUI", "V", "W", "L"],
+  "steps": [
+    {
+      "stepKey": "vp.vc.verify",
+      "order": 1,
+      "from": "VUI",
+      "to": "V",
+      "label": "POST /v2/vc-verification (VC as a string)",
+      "kind": "http",
+      "messages": 2
+    },
+    {
+      "stepKey": "vp.verdict.evaluate",
+      "order": 2,
+      "from": "VUI",
+      "to": "VUI",
+      "label": "normalise to checks",
+      "kind": "engine",
+      "messages": 1
+    }
+  ]
+}

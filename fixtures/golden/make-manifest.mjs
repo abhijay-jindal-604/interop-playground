@@ -22,6 +22,8 @@ const RULES = [
   [/^sessions\/S-200/, ['S-200']], [/^sessions\/S-201/, ['S-201']], [/^sessions\/S-202/, ['S-202']],
   [/^collab\//, ['S-005']],
   [/^diagnosis\/S-077/, ['S-077']], [/^diagnosis\/S-120/, ['S-120']],
+  // T-44: the live fix-it pair on the bundle reproduces S-077 (parent) and S-120 (child) locally
+  [/^fixit\/T-44-/, ['S-077', 'S-120']],
 ];
 function* walk(d) {
   for (const n of readdirSync(d).sort()) {

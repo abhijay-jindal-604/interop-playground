@@ -1,0 +1,18 @@
+{
+  "flowId": "FLOW-14",
+  "kind": "issuance",
+  "title": "Fixture issuance, issuer.fixture, no traffic",
+  "targetStepKey": "vci.fixture.load",
+  "lifelines": ["IUI", "I", "W", "L"],
+  "steps": [
+    {
+      "stepKey": "vci.fixture.load",
+      "order": 1,
+      "from": "IUI",
+      "to": "L",
+      "label": "load-fixture: saved credential and holder key",
+      "kind": "engine",
+      "messages": 1
+    }
+  ]
+}

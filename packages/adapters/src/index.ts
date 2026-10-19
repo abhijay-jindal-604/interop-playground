@@ -4,6 +4,8 @@ export * from './support.js';
 export * from './registry.js';
 export * from './issuers/certify-preauth.js';
 export * from './issuers/waltid.js';
+export * from './issuers/fixture.js';
+export * from './issuers/fixture-mint.js';
 export * from './verifiers/inji-verify-local.js';
 export * from './verifiers/inji-verify-result.js';
 export * from './wallets/keys.js';

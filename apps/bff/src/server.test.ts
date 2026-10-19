@@ -243,7 +243,9 @@ describe('bff.routes', () => {
   it('API-05/06 serve the validated flows', async () => {
     const idx = await app.inject({ method: 'GET', url: '/api/v1/flows?kind=issuance', headers: H });
     const ids = idx.json<{ flows: { flowId: string }[] }>().flows.map((f) => f.flowId);
-    expect(ids).toEqual(['FLOW-01', 'FLOW-04', 'FLOW-08']);
+    // the slice flows plus whatever issuance flows later waves add (FLOW-14 in wave 7), in order
+    expect(ids).toEqual(expect.arrayContaining(['FLOW-01', 'FLOW-04', 'FLOW-08']));
+    expect(ids).toEqual([...ids].sort());
     const one = await app.inject({ method: 'GET', url: '/api/v1/flows/FLOW-30', headers: H });
     expect(one.json()).toMatchObject({ flowId: 'FLOW-30', kind: 'presentation' });
     const missing = await app.inject({ method: 'GET', url: '/api/v1/flows/FLOW-99', headers: H });

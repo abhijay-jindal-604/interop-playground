@@ -135,6 +135,22 @@
       "sha256": "5dcfdb3d310ce9bc984e5855b7714fd61955b09c032994591601226a2e930f39"
     },
     {
+      "file": "fixit/T-44-child-events.json",
+      "sids": [
+        "S-077",
+        "S-120"
+      ],
+      "sha256": "4d14042fe429d096caa6c47ded621a33893196b48be4d356c2fb1a1ad62d647c"
+    },
+    {
+      "file": "fixit/T-44-parent-events.json",
+      "sids": [
+        "S-077",
+        "S-120"
+      ],
+      "sha256": "11513e4de940766f4ed95ab9e62913c7bbdf6f193fb535b7b86209c8cc1210cc"
+    },
+    {
       "file": "peers/S-195-eudi-jar-by_reference.txt",
       "sids": [
         "S-195"

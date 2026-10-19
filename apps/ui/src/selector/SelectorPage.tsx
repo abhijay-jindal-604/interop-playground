@@ -18,6 +18,7 @@ import type {
 import { apiSend } from '../api/client.js';
 import { applicableKnobs, changedKnobs, KnobsPanel, type KnobChoice } from '../angle/KnobsPanel.js';
 import { knobList } from '../angle/model.js';
+import { preloadMermaid } from '../diagram/render.js';
 import { EmptyState } from '../components/EmptyState.js';
 import { InlineError } from '../components/InlineError.js';
 import { Skeleton } from '../components/Skeleton.js';
@@ -346,6 +347,8 @@ export function SelectorPage() {
   const env = envLoad.status === 'ready' ? envLoad.data : null;
   const [params] = useSearchParams();
   const navigate = useNavigate();
+  // the run screen's diagram renderer, loaded while the user selects (ADR-89)
+  useEffect(() => preloadMermaid(), []);
   const [sel, setSel] = useState<Selection>(() => {
     const base = defaultSelection(env);
     return hasSelectionQuery(params) ? fromQuery(params, base) : loadStored(base);

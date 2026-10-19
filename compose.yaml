@@ -67,6 +67,9 @@ volumes:
   certify-iae-keys:
   verify-pg:
   esignet-pg:
+  # G-159: the PKCS12 keystores of mock-identity-system and esignet; their key aliases live in esignet-pg
+  mock-identity-keys:
+  esignet-keys:
 
 services:
   # ---------------------------------------------------------------- core ----
@@ -425,8 +428,12 @@ services:
       MOSIP_MOCK_IDA_KYC_TRANSACTION_TIMEOUT_SECS: "900"
       MOSIP_ESIGNET_HOST: localhost:8088
       MOSIP_MOCK_IDA_KYC_PSUT_FIELD: individualId
+      # G-159: the keystore (application-local `mock_local.p12`, relative to /home/mosip) was lost on
+      # every container recreate while esignet-pg kept its key alias -> KER-KMA-004 at start
+      MOSIP_KERNEL_KEYMANAGER_HSM_CONFIG_PATH: /keystore/mock_local.p12
     volumes:
       - ./certs/jvm-truststore.p12:/certs/jvm-truststore.p12:ro
+      - mock-identity-keys:/keystore
     depends_on:
       esignet-db:
         condition: service_healthy
@@ -462,8 +469,11 @@ services:
       MOSIP_ESIGNET_SUPPORTED_CREDENTIAL_SCOPES: "{'mosip_identity_vc_ldp','mock_identity_vc_ldp'}"
       MOSIP_ESIGNET_CREDENTIAL_SCOPE_RESOURCE_MAPPING: "{'mosip_identity_vc_ldp':'http://${PUBLIC_HOST:?set PUBLIC_HOST in .env}:3005/v1/esignet/vci/credential','mock_identity_vc_ldp':'http://${PUBLIC_HOST:?set PUBLIC_HOST in .env}:8093/v1/certify/issuance/credential'}"
       SPRING_AUTOCONFIGURE_EXCLUDE: org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration
+      # G-159: application-local `esignet_local.p12` sits in /home/mosip and was lost on recreate
+      MOSIP_KERNEL_KEYMANAGER_HSM_CONFIG_PATH: /keystore/esignet_local.p12
     volumes:
       - ./certs/jvm-truststore.p12:/certs/jvm-truststore.p12:ro
+      - esignet-keys:/keystore
     depends_on:
       esignet-db:
         condition: service_healthy

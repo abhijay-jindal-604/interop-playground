@@ -97,6 +97,22 @@ export function evidenceTierOf(spec: RunSpec): 'automated' | 'best-effort' | 'ma
   return tiers.reduce((lo, t) => (TIER_RANK[t] < TIER_RANK[lo] ? t : lo), 'automated');
 }
 
+/**
+ * The type the verifier's query names (ADR-88): for `dc+sd-jwt` the held credential's own `vct`
+ * (walt.id's is `http://<PUBLIC_HOST>:18103/openid4vci/identity_credential`, not its configuration
+ * id); otherwise, or when it cannot be read, the configuration id (Certify: vct = configuration id).
+ */
+export function queryTypeOf(held: HeldCredential, configurationId: string): string {
+  if (held.format !== 'dc+sd-jwt') return configurationId;
+  try {
+    const payload = held.raw.split('~')[0]?.split('.')[1] ?? '';
+    const vct = (JSON.parse(Buffer.from(payload, 'base64url').toString()) as { vct?: unknown }).vct;
+    return typeof vct === 'string' && vct !== '' ? vct : configurationId;
+  } catch {
+    return configurationId;
+  }
+}
+
 function safeMessage(e: unknown): string {
   const m = e instanceof Error ? e.message : String(e);
   return m.slice(0, 500);
@@ -360,7 +376,7 @@ export class RunExecution {
       const ref: PresentationRequestRef = await verifier.createRequest(ctx, {
         format: this.spec.format,
         configurationId: this.spec.configurationId,
-        vctOrDoctypeOrType: this.spec.configurationId,
+        vctOrDoctypeOrType: queryTypeOf(held, this.spec.configurationId),
         claimPaths: this.spec.disclosure.claimPaths,
         mode: this.spec.presentationMode ?? 'cross-device',
       });

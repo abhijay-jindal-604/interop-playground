@@ -16,7 +16,9 @@ import type {
   AdapterContext,
   AdapterDescriptor,
   Availability,
+  CheckResult,
   GatewayCorrelation,
+  HeldCredential,
   PresentationQuery,
   PresentationRequestRef,
   VerificationOutcome,
@@ -45,6 +47,8 @@ export interface InjiVerifyLocalOptions {
   /** `http://verify-service:8080/v1/verify` (service name; BFF-internal) */
   internalBase: string;
   gateway?: GatewayCorrelation;
+  /** send `skipStatusChecks:true` to `/v2/vc-verification` (S-014; default off) */
+  skipStatusChecks?: boolean;
   nonce?: () => string;
   /** injectable clock and sleep for tests */
   now?: () => number;
@@ -301,5 +305,59 @@ export class InjiVerifyLocalVerifier implements VerifierAdapter {
       this.txns.delete(ctx.runId);
       return { outcome: 'pass', value: outcome };
     });
+  }
+
+  /**
+   * Credential-level verification (03 FLOW-40, REQ-23): `POST /v2/vc-verification` with the VC as
+   * a string (G-10), then `vp.verdict.evaluate`. Valid / Invalid / Valid-but-Expired comes from
+   * `mapVerifyResult` (signature valid ∧ `expiryCheck.valid:false` = Valid-but-Expired, S-014).
+   */
+  async verifyCredential(ctx: AdapterContext, held: HeldCredential): Promise<VerificationOutcome> {
+    const outcome = await inStep(ctx, 'vp.vc.verify', async () => {
+      const res = await ctx.http.fetch(
+        this.cap(ctx, 'vp.vc.verify'),
+        `${this.base}/v2/vc-verification`,
+        {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            verifiableCredential: held.raw,
+            ...(this.opts.skipStatusChecks ? { skipStatusChecks: true } : {}),
+          }),
+          signal: callSignal(ctx, UPSTREAM_TIMEOUT_MS),
+        },
+      );
+      const body = await jsonBody(res);
+      if (res.status === 200 && isRecord(body)) {
+        const mapped = mapVerifyResult(body);
+        const value: VerificationOutcome = { ...mapped, rawResult: body, exchangeIds: [] };
+        return { outcome: 'pass' as const, value };
+      }
+      // a non-200 is data: the upstream code and message are copied verbatim (02 §5.1)
+      const e = isRecord(body) ? body : {};
+      const code = str(e.errorCode);
+      const message = str(e.errorMessage);
+      const check: CheckResult = {
+        checkId: 'vc.signature',
+        outcome: 'fail',
+        source: 'verifier-response',
+        ...(code ? { code } : {}),
+        ...(message ? { message } : {}),
+        exchangeIds: [],
+      };
+      const value: VerificationOutcome = {
+        verdict: 'invalid',
+        checks: [check],
+        rawResult: body,
+        exchangeIds: [],
+      };
+      return { outcome: 'fail' as const, value };
+    });
+    await inStep(ctx, 'vp.verdict.evaluate', async () => {
+      for (const check of outcome.checks)
+        await ctx.emit({ type: 'verdict.check', stepKey: 'vp.verdict.evaluate', check });
+      return { outcome: 'pass' as const, capture: 'none' as const, value: null };
+    });
+    return outcome;
   }
 }

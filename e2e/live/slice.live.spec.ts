@@ -65,10 +65,11 @@ test('slice: select → Start → Pass, diagram animates, key payloads, report',
   // UI-12/UI-13: the diagram drew the run (messages moved through drawn/active to pass)
   const diagram = page.getByRole('figure', { name: 'Sequence diagram' });
   await expect(diagram.locator('.dg-block')).toHaveCount(2);
-  await expect(diagram.locator('.dg-msg[data-state="pass"]').first()).toBeVisible();
-  await expect(
-    diagram.locator('.dg-msg[data-state="fail"], .dg-msg[data-state="error"]'),
-  ).toHaveCount(0);
+  // message marks of either renderer: Mermaid (the default, ADR-78) `[data-msg]`, built-in `.dg-msg`
+  const msg = (state: string): string =>
+    `.dg-msg[data-state="${state}"], [data-msg][data-state="${state}"]`;
+  await expect(diagram.locator(msg('pass')).first()).toBeAttached();
+  await expect(diagram.locator(`${msg('fail')}, ${msg('error')}`)).toHaveCount(0);
   const states = await page.evaluate(() => [
     ...(window as unknown as { __dgStates: Set<string> }).__dgStates,
   ]);

@@ -26,7 +26,7 @@ GATEWAY_PORTS=(443 8093 8096 8097 8098 8099 3004 3005 8095 8443 18103 18443 1844
 BFF_IMAGE=interop-playground/bff:local
 NODE_REF="node:22-bookworm-slim"
 JRE_REF="eclipse-temurin:21-jre-jammy"
-INVARIANT_VOLUMES=(esignet-pg certify-authcode-pg certify-preauth-keys certify-preauth-pg)
+INVARIANT_VOLUMES=(esignet-pg esignet-keys mock-identity-keys certify-authcode-pg certify-preauth-keys certify-preauth-pg)
 IAE_VOLUMES=(certify-iae-pg certify-iae-keys)
 MARKER=.generated/state/chain.done
 

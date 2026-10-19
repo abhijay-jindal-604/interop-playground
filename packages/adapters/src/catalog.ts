@@ -533,6 +533,20 @@ export const CREDENTIAL_CONFIGURATIONS: readonly CredentialConfigurationDef[] = 
   },
   {
     issuer: 'issuer.fixture',
+    format: 'dc+sd-jwt',
+    configurationId: 'PlaygroundSdJwtExpired',
+    default: false,
+    vctOrDoctypeOrType: 'PlaygroundSdJwt',
+  },
+  {
+    issuer: 'issuer.fixture',
+    format: 'dc+sd-jwt',
+    configurationId: 'PlaygroundSdJwtInvalid',
+    default: false,
+    vctOrDoctypeOrType: 'PlaygroundSdJwt',
+  },
+  {
+    issuer: 'issuer.fixture',
     format: 'mso_mdoc',
     configurationId: 'DrivingLicenseCredential',
     default: true,

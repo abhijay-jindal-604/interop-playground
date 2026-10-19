@@ -74,6 +74,15 @@ const DEFAULT_DISCLOSURE: Record<CredentialFormat, DisclosureSelection> = {
   jwt_vc_json: { claimPaths: [] },
 };
 
+/**
+ * Per-issuer default disclosure where the format default names a claim the issuer does not issue
+ * (ADR-88): walt.id's `identity_credential` has `birthdate` as its one selectively disclosable
+ * claim (S-077 / S-120 asked for it), no `fullName`.
+ */
+const ISSUER_DISCLOSURE: Partial<Record<AdapterId, DisclosureSelection>> = {
+  'issuer.waltid': { claimPaths: [['birthdate']] },
+};
+
 const CREDENTIAL_LEVEL: AdapterId[] = ['verifier.vcverifier-offline', 'verifier.credo'];
 
 function validationError(issues: { path: string; message: string }[]): ApiError {
@@ -395,7 +404,7 @@ export function resolveRunSpec(
     delivery,
     withTxCode,
     withIae,
-    disclosure: req.disclosure ?? DEFAULT_DISCLOSURE[req.format],
+    disclosure: req.disclosure ?? ISSUER_DISCLOSURE[req.issuer] ?? DEFAULT_DISCLOSURE[req.format],
     clientIdScheme,
     suiteId: req.suiteId ?? null,
     controlRunId: null,
