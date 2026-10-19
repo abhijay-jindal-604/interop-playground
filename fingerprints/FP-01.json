@@ -1,0 +1,43 @@
+{
+  "id": "FP-01",
+  "version": 1,
+  "gapIds": ["G-55"],
+  "title": "Inji Verify cannot verify an SD-JWT VC whose issuer key is not given as an x5c chain",
+  "appliesWhen": "run-failed",
+  "evidenceClass": "full",
+  "deviatingSide": "verifier",
+  "component": { "vendor": "inji", "name": "inji-verify (vc-verifier)", "versions": "1.0-alpha.1" },
+  "specClause": {
+    "spec": "IETF SD-JWT VC (draft-ietf-oauth-sd-jwt-vc-19)",
+    "section": "§2.5 Issuer Verification Key Discovery and Validation"
+  },
+  "scope": {
+    "verifiers": [
+      "verifier.inji-verify-local",
+      "verifier.inji-verify-collab",
+      "verifier.inji-verify-sdk"
+    ],
+    "formats": ["dc+sd-jwt"]
+  },
+  "stepKey": "vp.verdict.evaluate",
+  "match": [
+    [
+      {
+        "on": "check",
+        "checkId": "vc.signature",
+        "outcome": "fail",
+        "code": "ERR_SIGNATURE_VERIFICATION_FAILED",
+        "messageContains": "getX509CertChain"
+      },
+      { "on": "artifact", "kind": "credential-header", "path": "$.x5c", "op": "absent" }
+    ]
+  ],
+  "evidence": {
+    "sIds": ["S-077", "S-120"],
+    "artifact": "fixtures/golden/diagnosis/S-077-trace-waltid-to-collab.json",
+    "goldenTest": "apps/bff/src/diagnosis/diagnosis.golden.test.ts"
+  },
+  "fix": { "knobId": "KNOB-01", "from": "absent", "to": "present" },
+  "issue": { "repo": "inji/inji-verify", "privateDisclosure": false },
+  "status": "active"
+}

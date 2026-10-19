@@ -16,10 +16,10 @@ import type {
   AdapterDescriptor,
   Availability,
   CredentialOffer,
+  GatewayCorrelation,
   IssuerAdapter,
   KnobId,
 } from '../contracts.js';
-import type { GatewayCorrelation } from '../support.js';
 import { correlate, inStep, isRecord, jsonBody, str, trimSlash } from '../support.js';
 
 export const CERTIFY_PREAUTH_VERSION = 'inji-certify:1.0.0-alpha.1';

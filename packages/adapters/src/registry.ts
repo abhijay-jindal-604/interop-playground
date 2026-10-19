@@ -1,13 +1,19 @@
 /**
  * The real adapters the BFF registers (`main.ts` → `startServer(env, { adapters })`). Shape =
- * the orchestrator's `AdapterSet` (apps/bff/src/orchestrator/engine.ts). Adapters still to come
- * (T-24 wallet, T-26 …) answer `undefined`, which the runs API reports as `adapter_unavailable`.
+ * the orchestrator's `AdapterSet` (apps/bff/src/orchestrator/engine.ts): `issuer.certify-preauth`,
+ * `wallet.playground-ts`, `verifier.inji-verify-local`. Adapters still to come answer `undefined`,
+ * which the runs API reports as `adapter_unavailable`.
  */
 import path from 'node:path';
-import type { IssuerAdapter, VerifierAdapter, WalletAdapter } from './contracts.js';
+import type {
+  GatewayCorrelation,
+  IssuerAdapter,
+  VerifierAdapter,
+  WalletAdapter,
+} from './contracts.js';
 import { CertifyPreauthIssuer } from './issuers/certify-preauth.js';
-import type { GatewayCorrelation } from './support.js';
 import { InjiVerifyLocalVerifier } from './verifiers/inji-verify-local.js';
+import { PlaygroundTsWallet } from './wallets/playground-ts.js';
 
 export interface AdapterSetLike {
   issuer(id: string): IssuerAdapter | undefined;
@@ -24,13 +30,14 @@ export interface BundleAdapterOptions {
   /** rendered config root (`CONFIG_DIR`, /config in the bff container) */
   configDir?: string;
   gateway?: GatewayCorrelation;
-  /** wallets registered by later tasks or by tests */
+  /** extra wallets (later tasks, tests); an entry replaces the built-in one of the same id */
   wallets?: Readonly<Record<string, WalletAdapter>>;
 }
 
 export function bundleAdapters(o: BundleAdapterOptions): AdapterSetLike & {
   certifyPreauth: CertifyPreauthIssuer;
   injiVerifyLocal: InjiVerifyLocalVerifier;
+  playgroundTs: PlaygroundTsWallet;
 } {
   const certifyPreauth = new CertifyPreauthIssuer({
     internalBase: o.certifyPreauthBase ?? 'http://certify-preauth:8090',
@@ -48,10 +55,15 @@ export function bundleAdapters(o: BundleAdapterOptions): AdapterSetLike & {
   const verifiers: Record<string, VerifierAdapter> = {
     'verifier.inji-verify-local': injiVerifyLocal,
   };
-  const wallets = o.wallets ?? {};
+  const playgroundTs = new PlaygroundTsWallet(o.gateway ? { gateway: o.gateway } : {});
+  const wallets: Record<string, WalletAdapter> = {
+    'wallet.playground-ts': playgroundTs,
+    ...o.wallets,
+  };
   return {
     certifyPreauth,
     injiVerifyLocal,
+    playgroundTs,
     issuer: (id) => issuers[id],
     wallet: (id) => wallets[id],
     verifier: (id) => verifiers[id],

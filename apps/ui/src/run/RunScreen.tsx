@@ -4,18 +4,21 @@
  * (T-31) sits in the banners region. Pure over the reduced view; data wiring is in RunPage.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { EventEnvelope, Run } from '@interop-playground/api';
+import type { AdapterId, EventEnvelope, Run } from '@interop-playground/api';
 import { ConnectionBanner } from '../components/ConnectionBanner.js';
 import { InlineError } from '../components/InlineError.js';
 import { Skeleton } from '../components/Skeleton.js';
 import { runCopy } from '../copy.js';
 import type { StreamStatus } from '../state/stream.js';
 import { AwaitingPanel } from '../delivery/AwaitingPanel.js';
+import { DeliveryDialog } from '../delivery/Delivery.js';
+import { DiagramPane } from '../diagram/Diagram.js';
+import { lifelineNames } from '../diagram/model.js';
 import { Inspector } from '../inspector/Inspector.js';
-import { latestDelivery } from '../inspector/model.js';
+import { latestDelivery, type DeliveryOutput } from '../inspector/model.js';
 import { defaultStep, stepFromHash, targetStepKey } from './derive.js';
 import type { FlowLoad } from './flows.js';
-import { CoverageBanner, ResultCard, StatusBanner } from './parts.js';
+import { CoverageBanner, ResultCard, StatusBanner, useAdapterName } from './parts.js';
 import { isTerminal, viewStateOf, type RunView } from './reduce.js';
 import { StepRail, useStepAnnouncements } from './StepRail.js';
 
@@ -76,6 +79,14 @@ export function RunScreen({
 
   const target = flows.status === 'ready' ? targetStepKey(flows.flows) : null;
   const delivery = useMemo(() => latestDelivery(events), [events]);
+  const adapterName = useAdapterName();
+  const names = lifelineNames(view.spec, (id) => adapterName(id as AdapterId));
+  const [dialog, setDialog] = useState<DeliveryOutput | null>(null);
+  const opener = useRef<HTMLElement | null>(null);
+  const openDelivery = useCallback(() => {
+    opener.current = document.activeElement as HTMLElement | null;
+    setDialog(delivery);
+  }, [delivery]);
 
   return (
     <>
@@ -98,12 +109,32 @@ export function RunScreen({
       {flows.status === 'error' ? <InlineError error={flows.error} alert={false} /> : null}
       <div className="run-workspace" data-region="workspace">
         <div className="run-pane run-pane-diagram">
-          <div data-slot="diagram" className="diagram-slot" />
+          <div
+            data-slot="diagram"
+            className="diagram-slot"
+            role="figure"
+            aria-label={runCopy.diagram.region}
+          >
+            {flows.status === 'ready' ? (
+              <DiagramPane
+                flows={flows.flows}
+                view={view}
+                events={events}
+                names={names}
+                selected={selected}
+                deliveryStep={delivery?.stepKey ?? null}
+                onSelect={select}
+                onDelivery={openDelivery}
+              />
+            ) : null}
+          </div>
           {ready ? (
             <StepRail
               steps={steps}
               view={view}
               selected={selected}
+              deliveryStep={delivery?.stepKey ?? null}
+              onDelivery={openDelivery}
               onSelect={select}
               onActivate={(key) => {
                 select(key);
@@ -147,6 +178,13 @@ export function RunScreen({
           )}
         </section>
       </div>
+      <DeliveryDialog
+        delivery={dialog}
+        onClose={() => {
+          setDialog(null);
+          opener.current?.focus();
+        }}
+      />
     </>
   );
 }

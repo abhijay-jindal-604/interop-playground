@@ -4,23 +4,10 @@
  * gateway correlation hook. No raw HTTP here: every call goes through `CapturingHttp`.
  */
 import { randomBytes } from 'node:crypto';
-import type { AdapterContext, Coverage, CorrelationKey } from './contracts.js';
+import type { AdapterContext, Coverage, CorrelationKey, GatewayCorrelation } from './contracts.js';
 
 /** request timeout of every BFF-internal call that may long-poll (04 §8.5, ADR-66 (5)) */
 export const UPSTREAM_TIMEOUT_MS = 65_000;
-
-/**
- * The gateway's correlation index as the adapters see it (02 §3.3; structural copy of
- * `apps/bff/src/gateway/correlation.ts` so this package stays free of BFF imports).
- */
-export interface GatewayCorrelation {
-  register(runId: string, key: string, stepKey: string, actor?: string | null): void;
-  /** maps inbound `{method, path}` of the run to a stepKey (merged per run by the caller) */
-  addRoutes?(
-    runId: string,
-    routes: readonly { method: string; pattern: RegExp; stepKey: string }[],
-  ): void;
-}
 
 /** registers a key with the orchestrator (`ctx.correlate`) and, when wired, with the gateway */
 export function correlate(

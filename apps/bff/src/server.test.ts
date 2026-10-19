@@ -216,6 +216,19 @@ describe('bff.routes', () => {
     });
   });
 
+  it('API-01 lists every adapter from the env manager (G-143)', async () => {
+    const res = await app.inject({ method: 'GET', url: '/api/v1/health', headers: H });
+    const adapters = res.json<{
+      adapters: { id: string; available: boolean; reason: string | null }[];
+    }>().adapters;
+    expect(adapters.length).toBe(18);
+    expect(adapters.find((a) => a.id === 'issuer.certify-preauth')).toEqual({
+      id: 'issuer.certify-preauth',
+      available: false,
+      reason: 'not probed yet',
+    });
+  });
+
   it('API-01 is degraded, still 200, without the sidecar', async () => {
     const s = await createServer({
       config: { flowsDir, fingerprintsDir: fpDir, uiDistDir: noUi },

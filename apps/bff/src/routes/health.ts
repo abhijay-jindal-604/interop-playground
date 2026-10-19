@@ -1,6 +1,6 @@
 /**
- * API-01 `GET /api/v1/health` (04 §2.1): liveness of the BFF plus sidecar reachability. Adapter
- * probe summaries arrive with the env module (T-12); until then the list is empty. Always 200 while
+ * API-01 `GET /api/v1/health` (04 §2.1): liveness of the BFF plus sidecar reachability and the
+ * env manager's per-adapter availability summary (T-12, G-143). Always 200 while
  * the process serves requests (the compose healthcheck and `up.sh` probe rely on that); a missing
  * sidecar makes `status: degraded`.
  */
@@ -15,6 +15,8 @@ export interface HealthDeps {
   version: string;
   startedAt: number;
   probeSidecar: SidecarProbe;
+  /** per-adapter availability (G-143: `EnvManager.adapterSummary()`); default: none */
+  adapters?: () => Health['adapters'];
 }
 
 export function registerHealth(app: FastifyInstance, deps: HealthDeps): void {
@@ -24,7 +26,7 @@ export function registerHealth(app: FastifyInstance, deps: HealthDeps): void {
       status: sidecar.reachable ? 'ok' : 'degraded',
       bff: { version: deps.version, uptimeS: Math.floor((Date.now() - deps.startedAt) / 1000) },
       sidecar,
-      adapters: [],
+      adapters: deps.adapters?.() ?? [],
     };
     return reply.header('Cache-Control', 'no-cache').send(body);
   });

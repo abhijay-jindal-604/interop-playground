@@ -677,8 +677,10 @@ export interface RunReport {
     verifier: AdapterId;
     format: CredentialFormat;
     proofType: string;
-    grant: Grant;
-    mode: PresentationMode;
+    /** null when the run has no such step (as `RunSpec.grant`; ADR-81) */
+    grant: Grant | null;
+    /** null for issuance-only and credential-level runs (as `RunSpec.presentationMode`; ADR-81) */
+    mode: PresentationMode | null;
     env: RunSpec['env'];
     versions: RunSpec['versions'];
     knobs: KnobValues;
@@ -1126,7 +1128,11 @@ export type EngineOp =
   | 'verify'
   | 'resolve-request'
   | 'dcapi-invoke'
-  | 'dcapi-probe';
+  | 'dcapi-probe'
+  | 'inspect-credential'
+  | 'validate-request'
+  | 'match-credential'
+  | 'build-kb-jwt';
 export interface FingerprintMatchedPayload {
   fingerprintId: FingerprintId;
   gapIds: string[];

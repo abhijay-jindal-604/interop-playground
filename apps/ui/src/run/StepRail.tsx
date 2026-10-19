@@ -64,7 +64,10 @@ function Row({
   onSelect,
   onKey,
   buttonRef,
+  onDelivery,
 }: {
+  /** set on the row of the `…deliver` step once its delivery event exists (UI-16) */
+  onDelivery?: (() => void) | undefined;
   row: RailStep;
   step: StepView | undefined;
   selected: boolean;
@@ -120,6 +123,18 @@ function Row({
           {checks > 0 ? <span className="muted small">{runCopy.rail.checks(checks)}</span> : null}
         </span>
       </button>
+      {onDelivery ? (
+        <button
+          type="button"
+          className="btn btn-ghost btn-sm step-delivery"
+          title={runCopy.diagram.deliveryTip}
+          data-action="delivery"
+          onClick={onDelivery}
+        >
+          <Icon name="qr" size={16} />
+          <span>{runCopy.diagram.delivery}</span>
+        </button>
+      ) : null}
     </li>
   );
 }
@@ -130,10 +145,14 @@ export function StepRail({
   selected,
   onSelect,
   onActivate,
+  deliveryStep = null,
+  onDelivery,
 }: {
   steps: readonly RailStep[];
   view: RunView;
   selected: string | null;
+  deliveryStep?: string | null;
+  onDelivery?: () => void;
   onSelect: (stepKey: string) => void;
   /** Enter/Space: select and move focus to the inspector */
   onActivate: (stepKey: string) => void;
@@ -171,6 +190,7 @@ export function StepRail({
                   else refs.current.delete(row.stepKey);
                 }}
                 onSelect={() => onSelect(row.stepKey)}
+                onDelivery={row.stepKey === deliveryStep ? onDelivery : undefined}
                 onKey={(e) => {
                   if (e.key === 'ArrowDown') {
                     e.preventDefault();

@@ -2,12 +2,13 @@
  * Shell e2e support: the API answered by the shared fixtures of apps/ui/src/test/fixtures.ts until
  * the testkit BFF of plan/11 §5 serves the built UI; the `env` stream answers one `retry` frame.
  * The run route (`RUN_ID`) answers the recorded FLOW-30 fail log of fixtures/events (T-10): API-22,
- * API-06 for its flow files, and its stream as SSE ending in `stream.end`.
+ * API-06 for its flow files, its stream as SSE ending in `stream.end`, and API-45 its report.
  */
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import type { Page } from '@playwright/test';
 import { BOOT_FIXTURES } from '../apps/ui/src/test/fixtures.ts';
+import { FAIL_REPORT } from '../apps/ui/src/test/report-fixtures.ts';
 
 export const RUN_ID = '01J8ZZZZZZZZZZZZZZZZZZZZZZ';
 const repo = path.resolve(import.meta.dirname, '..');
@@ -42,6 +43,8 @@ const RUN_FIXTURES: Record<string, unknown> = {
   '/api/v1/flows/FLOW-04': JSON.parse(read('flows/FLOW-04.json')) as unknown,
   '/api/v1/flows/FLOW-01': JSON.parse(read('flows/FLOW-01.json')) as unknown,
   '/api/v1/flows/FLOW-30': JSON.parse(read('flows/FLOW-30.json')) as unknown,
+  // API-45 (UI-51): the forced-fail report fixture under the run's id
+  [`/api/v1/reports/runs/${RUN_ID}`]: { ...FAIL_REPORT, runId: RUN_ID },
 };
 
 export const ROUTES = [

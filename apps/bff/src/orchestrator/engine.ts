@@ -56,6 +56,12 @@ export interface EngineDeps {
   now(): number;
   /** presentation result wait (03 §2.0: request expiry 300 s) */
   resultTimeoutMs: number;
+  /**
+   * Diagnosis hook (T-41, ADR-80): called once after `endRun` and before the terminal
+   * `run.completed` / `run.failed`, so its events land in the log and the sink sees the matches
+   * when it sets `cause_fingerprint_id`. A throw is ignored (diagnosis never fails a run).
+   */
+  beforeTerminal?: (runId: string, terminal: 'completed' | 'failed') => void;
 }
 
 /** an error that carries a `Run.errorCode` (04 §6.2 closing paragraph) */
@@ -428,6 +434,14 @@ export class RunExecution {
     };
   }
 
+  private diagnose(terminal: 'completed' | 'failed'): void {
+    try {
+      this.deps.beforeTerminal?.(this.runId, terminal);
+    } catch {
+      // a diagnosis fault leaves the run without matches (unclassified), never without its end
+    }
+  }
+
   /** runs to exactly one terminal event; never throws */
   async run(): Promise<void> {
     const ctx = this.context();
@@ -443,6 +457,7 @@ export class RunExecution {
         this.firstFail !== null ? `blocked at ${this.firstFail}` : 'not performed by the adapter';
       this.skipBefore(this.plan.length, reason);
       await this.deps.capture.endRun(this.runId);
+      this.diagnose('completed');
       this.append({
         type: 'run.completed',
         payload: { verdict: this.verdict(), counterfactualResult: null },
@@ -478,6 +493,7 @@ export class RunExecution {
       if (at !== null) await this.completeStep(at, 'fail', 'partial', 'engine fault');
       this.skipBefore(this.plan.length, `blocked at ${at ?? this.firstFail ?? 'engine fault'}`);
       await this.deps.capture.endRun(this.runId);
+      this.diagnose('failed');
       this.append({
         type: 'run.failed',
         payload: {

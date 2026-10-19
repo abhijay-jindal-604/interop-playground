@@ -409,6 +409,11 @@ services:
     image: mosipid/mock-identity-system:0.13.0
     profiles: [local]
     user: root
+    # G-141: configure_start.sh unzips client.zip and moves it to hsm-client on every start; after a
+    # container restart (not recreate) the leftovers make unzip prompt without a TTY and exit 1
+    # (crash loop). Remove them first; command = the image's CMD (an entrypoint override clears it).
+    entrypoint: ["/bin/bash", "-c", "rm -rf /home/mosip/client /home/mosip/hsm-client && exec ./configure_start.sh \"$$@\"", "configure_start"]
+    command: ["/bin/sh", "-c", "java -jar -Dloader.path=\"$${loader_path_env}\" -Dspring.cloud.config.label=\"$${spring_config_label_env}\" -Dspring.profiles.active=\"$${active_profile_env}\" -Dspring.cloud.config.uri=\"$${spring_config_url_env}\" mock-identity-system.jar"]
     labels: *jvm-labels
     environment:
       <<: *jvm-env

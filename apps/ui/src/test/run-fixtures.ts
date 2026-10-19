@@ -45,7 +45,7 @@ export function fixtureFlows(f: LogFixture): RunFlows {
   const presentation = spec.presentationFlowId ? flowFile(spec.presentationFlowId) : null;
   const bases: Record<string, FlowDefinition> = {};
   for (const d of [issuance, presentation]) if (d?.extends) bases[d.extends] = flowFile(d.extends);
-  return { issuance, presentation, steps: railSteps(issuance, presentation, bases, spec) };
+  return { issuance, presentation, steps: railSteps(issuance, presentation, bases, spec), bases };
 }
 
 /** events up to (excluding) the terminal one */

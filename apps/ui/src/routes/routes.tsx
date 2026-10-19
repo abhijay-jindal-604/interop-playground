@@ -3,28 +3,14 @@
  * route. Screens that later tasks build render a placeholder with their purpose line.
  */
 import type { RouteObject } from 'react-router-dom';
-import { useParams } from 'react-router-dom';
 import { AppShell } from '../shell/AppShell.js';
 import { EnvironmentPage } from './EnvironmentPage.js';
-import { HomePage } from './HomePage.js';
+import { SelectorPage } from '../selector/SelectorPage.js';
 import { NotFoundPage } from './NotFoundPage.js';
 import { PlaceholderPage } from './PlaceholderPage.js';
+import { ReportPage } from '../report/ReportPage.js';
 import { RunPage } from './RunPage.js';
 
-function RunReport() {
-  const { runId = '' } = useParams();
-  return (
-    <PlaceholderPage
-      title="Run report"
-      purpose="The report of one run: verdict, every step and check, versions, and a Markdown and JSON export."
-      crumbs={[
-        { label: 'History', to: '/history' },
-        { label: `Run ${runId.slice(-8)}`, to: `/runs/${runId}` },
-        { label: 'Report' },
-      ]}
-    />
-  );
-}
 function Compare() {
   return (
     <PlaceholderPage
@@ -74,9 +60,9 @@ export const routes: RouteObject[] = [
     path: '/',
     element: <AppShell />,
     children: [
-      { index: true, element: <HomePage /> },
+      { index: true, element: <SelectorPage /> },
       { path: 'runs/:runId', element: <RunPage /> },
-      { path: 'runs/:runId/report', element: <RunReport /> },
+      { path: 'runs/:runId/report', element: <ReportPage /> },
       { path: 'runs/:runId/compare/:otherRunId', element: <Compare /> },
       { path: 'environment', element: <EnvironmentPage /> },
       {

@@ -16,12 +16,12 @@ import type {
   AdapterContext,
   AdapterDescriptor,
   Availability,
+  GatewayCorrelation,
   PresentationQuery,
   PresentationRequestRef,
   VerificationOutcome,
   VerifierAdapter,
 } from '../contracts.js';
-import type { GatewayCorrelation } from '../support.js';
 import {
   UPSTREAM_TIMEOUT_MS,
   callSignal,

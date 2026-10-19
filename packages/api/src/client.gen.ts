@@ -1207,7 +1207,7 @@ export interface components {
         /** @enum {string} */
         EngineId: "credo" | "mdoc-normaliser" | "playground-ts" | "sidecar.openid4vp" | "sidecar.vci-client" | "sidecar.vcverifier";
         /** @enum {string} */
-        EngineOp: "authenticateVerifier" | "await-observation" | "callback.proof" | "callback.trust" | "callback.txcode" | "cancelled" | "constructUnsignedVPToken" | "constructVPResponse" | "dcapi-invoke" | "dcapi-probe" | "deliver-offer" | "deliver-request" | "fetchCredentialsUsingCredentialOffer" | "load-fixture" | "manual-observation" | "normalise-mdoc" | "resolve-request" | "return-route" | "sign-proof" | "tamper-apply" | "verify";
+        EngineOp: "authenticateVerifier" | "await-observation" | "build-kb-jwt" | "callback.proof" | "callback.trust" | "callback.txcode" | "cancelled" | "constructUnsignedVPToken" | "constructVPResponse" | "dcapi-invoke" | "dcapi-probe" | "deliver-offer" | "deliver-request" | "fetchCredentialsUsingCredentialOffer" | "inspect-credential" | "load-fixture" | "manual-observation" | "match-credential" | "normalise-mdoc" | "resolve-request" | "return-route" | "sign-proof" | "tamper-apply" | "validate-request" | "verify";
         /** @description Typed `outputSummary` of the engine ops the UI and fingerprints rely on (04 §7.2 table). */
         EngineOpOutputSummaries: {
             "await-observation": {
@@ -2332,10 +2332,12 @@ export interface components {
                 failedStepKey: null | string;
                 failingChecks: components["schemas"]["CheckResult"][];
                 format: components["schemas"]["CredentialFormat"];
-                grant: components["schemas"]["Grant"];
+                /** @description null when the run has no such step (as `RunSpec.grant`; ADR-81) */
+                grant: ("authorization_code" | "pre-authorized_code") | null;
                 issuer: components["schemas"]["AdapterId"];
                 knobs: components["schemas"]["KnobValues"];
-                mode: components["schemas"]["PresentationMode"];
+                /** @description null for issuance-only and credential-level runs (as `RunSpec.presentationMode`; ADR-81) */
+                mode: ("cross-device" | "dc-api" | "same-device") | null;
                 nonDefaultKnobs: components["schemas"]["KnobId"][];
                 proofType: string;
                 verdict: components["schemas"]["RunVerdict"];

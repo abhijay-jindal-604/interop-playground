@@ -7,6 +7,7 @@
  *
  * With a store (T-08/T-20): the sink is attached to the event bus, API-15 streams, the
  * orchestrator (runs left open by an earlier process are failed `bff_restarted`) and the run routes.
+ * With a store also the C12 diagnosis hook (T-41) and API-45 run reports (T-32).
  * Always: the catalog routes (T-21: API-02/04/07/08/09) and the environment manager (T-12:
  * API-10..12), which is the orchestrator's `ResolveEnv`; `startServer` starts its probe loop.
  */
@@ -30,8 +31,10 @@ import type { SidecarProbe } from './routes/health.js';
 import { registerStatic } from './routes/static.js';
 import { validateContent } from './validate/index.js';
 import { CaptureHttp, generateSelfToken } from './capture/index.js';
+import { DiagnosisEngine, loadLibrary } from './diagnosis/index.js';
 import { Orchestrator } from './orchestrator/index.js';
 import type { AdapterSet, CaptureHooks, KeyService, ResolveEnv } from './orchestrator/index.js';
+import { registerReports } from './routes/reports.js';
 import { registerRuns } from './routes/runs.js';
 import { registerStream } from './routes/stream.js';
 import { openStore } from './store/index.js';
@@ -150,11 +153,6 @@ export async function createServer(opts: CreateServerOptions = {}): Promise<Fast
   });
   registerErrorHandling(app);
   registerGuard(app);
-  registerHealth(app, {
-    version: bffVersion(),
-    startedAt: Date.now(),
-    probeSidecar: opts.probeSidecar ?? defaultSidecarProbe(config.sidecarUrl),
-  });
   registerFlows(app, content.flows);
   const store = opts.store ?? null;
   const env =
@@ -169,6 +167,12 @@ export async function createServer(opts: CreateServerOptions = {}): Promise<Fast
       intervalMs: config.envProbeIntervalMs,
       ...(opts.onEnvReady ? { onReady: opts.onEnvReady } : {}),
     });
+  registerHealth(app, {
+    version: bffVersion(),
+    startedAt: Date.now(),
+    probeSidecar: opts.probeSidecar ?? defaultSidecarProbe(config.sidecarUrl),
+    adapters: () => env.adapterSummary(),
+  });
   app.decorate('playgroundEnv', env);
   app.addHook('onClose', () => {
     env.stop();
@@ -184,6 +188,7 @@ export async function createServer(opts: CreateServerOptions = {}): Promise<Fast
       bus,
       ...(opts.heartbeatMs ? { heartbeatMs: opts.heartbeatMs } : {}),
     });
+    const diagnosis = new DiagnosisEngine(store, loadLibrary(config.fingerprintsDir));
     const orchestrator =
       opts.orchestrator ??
       new Orchestrator({
@@ -202,11 +207,15 @@ export async function createServer(opts: CreateServerOptions = {}): Promise<Fast
         env: opts.resolveEnv ?? env,
         keys: opts.keys ?? null,
         appVersion: bffVersion(),
+        diagnose: (runId, terminal) => {
+          diagnosis.diagnoseRun(runId, terminal);
+        },
       });
     if (opts.orchestrator === undefined) orchestrator.recover();
     app.decorate('playgroundOrchestrator', orchestrator);
     app.addHook('onClose', async () => orchestrator.stop());
     registerRuns(app, { store, orchestrator });
+    registerReports(app, { store, flows: orchestrator.flows });
   }
   await registerStatic(app, config.uiDistDir);
   if (opts.startEnvProbes === true) env.start();

@@ -116,6 +116,19 @@ export type CorrelationKey =
   /** SHA-256 hex, never the raw token */
   | { kind: 'access-token-sha256'; value: string };
 
+/**
+ * The gateway's correlation index as the adapters see it (02 §3.3, ADR-70; structural copy of
+ * `apps/bff/src/gateway/correlation.ts` so this package stays free of BFF imports).
+ */
+export interface GatewayCorrelation {
+  register(runId: string, key: string, stepKey: string, actor?: string | null): void;
+  /** maps inbound `{method, path}` of the run to a stepKey (merged per run by the caller) */
+  addRoutes?(
+    runId: string,
+    routes: readonly { method: string; pattern: RegExp; stepKey: string }[],
+  ): void;
+}
+
 export interface AdapterContext {
   readonly runId: string;
   readonly spec: RunSpec;

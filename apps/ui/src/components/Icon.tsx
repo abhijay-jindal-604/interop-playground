@@ -122,6 +122,14 @@ const SYMBOLS: Record<string, ReactElement> = {
       <path d="M7.5 20v-7a4.5 4.5 0 0 1 9 0v7" />
     </g>
   ),
+  qr: (
+    <g {...S}>
+      <rect x="3.5" y="3.5" width="6" height="6" rx="1" />
+      <rect x="14.5" y="3.5" width="6" height="6" rx="1" />
+      <rect x="3.5" y="14.5" width="6" height="6" rx="1" />
+      <path d="M14.5 14.5h2v2h-2zM18.5 18.5h2v2h-2zM14.5 20.5v-2M20.5 14.5h-2" />
+    </g>
+  ),
   // ----- status glyphs (UI-74) -----
   'st-pass': (
     <g>

@@ -391,7 +391,19 @@ export const runCopy = {
     selectStep: 'Select a step in the diagram to see its messages.',
     noMessages: 'No messages yet. They appear here as the run makes requests.',
   },
-  diagram: { region: 'Sequence diagram' },
+  diagram: {
+    region: 'Sequence diagram',
+    issue: '1. Issue',
+    present: '2. Present and verify',
+    legend: 'Diagram legend',
+    pass: 'Pass',
+    fail: 'Fail',
+    skipped: 'Skipped',
+    pending: 'Pending',
+    builtin: 'Using the built-in diagram renderer.',
+    delivery: 'Delivery',
+    deliveryTip: 'Show the QR code and link sent to the wallet',
+  },
 } as const;
 
 /** UI-30 dialogs of the run screen, verbatim. */
@@ -616,4 +628,225 @@ export const deliveryCopy = {
     open: 'Delivery',
   },
   query: { param: 'Parameter', value: 'Value' },
+} as const;
+
+/** UI-03..UI-08 selector copy, verbatim. */
+export const selectorCopy = {
+  title: 'Pick who plays each role',
+  lead: 'Choose an issuer, a wallet and a verifier. The playground runs the whole credential journey and records every message.',
+  groupLabel: 'Issuer, wallet and verifier',
+  columns: { issuer: 'Issuer', wallet: 'Wallet', verifier: 'Verifier' },
+  options: (n: number) => `${n} option${n === 1 ? '' : 's'}`,
+  verifierUnused: 'not used when you only issue',
+  names: {
+    'issuer.certify-preauth': [
+      'Inji Certify (pre-authorized)',
+      'Local Inji Certify with a pre-authorized code. SD-JWT VC, JSON-LD and mDoc.',
+    ],
+    'issuer.certify-authcode': [
+      'Inji Certify (authorization code)',
+      'Local Inji Certify behind eSignet. JSON-LD and mock mDL.',
+    ],
+    'issuer.certify-mdoc': [
+      'Inji Certify (mDoc, spec profile)',
+      'Develop-class Certify that issues spec-shaped mDoc.',
+    ],
+    'issuer.certify-collab': [
+      'Inji Certify (Collab sandbox)',
+      'The MOSIP Collab Certify, reached through Inji Web. Read-only, best-effort.',
+    ],
+    'issuer.waltid': ['walt.id issuer', 'External issuer from another ecosystem. SD-JWT VC.'],
+    'issuer.fixture': ['Saved credential', 'Replays a saved credential. No issuing traffic.'],
+    'wallet.playground-ts': ['Playground wallet', 'The reference wallet. Records every message.'],
+    'wallet.inji-jvm': [
+      'Inji libraries (Kotlin)',
+      "Inji's VCI client and OpenID4VP libraries in a JVM sidecar.",
+    ],
+    'wallet.inji-web': ['Inji Web + Mimoto', 'The browser wallet, driven by the playground.'],
+    'wallet.inji-mobile': [
+      'Inji Wallet (your phone)',
+      'You scan QR codes with the phone. Needs the tunnel.',
+    ],
+    'wallet.credo': ['Credo wallet', 'Credo 0.7.1 holder with saved credentials.'],
+    'verifier.inji-verify-local': [
+      'Inji Verify (local)',
+      'The Inji Verify service running in this bundle.',
+    ],
+    'verifier.inji-verify-collab': [
+      'Inji Verify (Collab sandbox)',
+      'The MOSIP Collab Verify. Calls are capped at 20 per minute.',
+    ],
+    'verifier.inji-verify-sdk': [
+      'Inji Verify SDK (in this page)',
+      'The Verify SDK component, drawn here; the playground records its calls.',
+    ],
+    'verifier.vcverifier-offline': [
+      'Inji vc-verifier (library)',
+      'Checks a credential on its own, without a presentation.',
+    ],
+    'verifier.waltid': ['walt.id verifier', 'External verifier from another ecosystem.'],
+    'verifier.eudi': ['EUDI verifier', 'The EU reference verifier.'],
+    'verifier.credo': ['Credo verifier', 'Checks a credential on its own, without a presentation.'],
+  } as Record<string, [string, string]>,
+  env: { local: 'Local', collab: 'Collab sandbox' },
+  tier: {
+    automated: [
+      'Automated',
+      'Runs without anyone touching a phone or a browser. Counts toward pass rates.',
+    ],
+    'best-effort': [
+      'Best-effort',
+      'Depends on a service the playground does not control. Counts toward pass rates but can be inconclusive.',
+    ],
+    manual: [
+      'Manual',
+      'You operate the phone. The result is recorded as evidence and is not counted in pass rates.',
+    ],
+  } as Record<string, [string, string]>,
+  tierHint: {
+    manual: 'You will need your phone.',
+    'best-effort': 'Best-effort: may be inconclusive.',
+  } as Record<string, string>,
+  version: (v: string) => `version ${v}`,
+  available: 'Running',
+  notRunning: (reason: string) => `Not running: ${reason}`,
+  notAvailable: (reason: string, gap: string | null) =>
+    `Not available with this selection: ${reason}${gap ? ` (${gap})` : ''}`,
+  conflicts: (reason: string) => `Conflicts with the selection: ${reason}`,
+  whyNot: 'Why not?',
+  gap: (id: string) => `Gap ${id}`,
+  evidence: (list: string) => `Evidence: ${list}`,
+  details: 'Details',
+  partHop: (key: string, reason: string) => `Partly outside capture: ${key}: ${reason}`,
+  tunnel: {
+    phone: 'Needs the tunnel: The phone reaches the bundle only through the tunnel (G-105)',
+    'collab-ldp': "Needs the tunnel: Collab resolves the issuer's did:web publicly",
+    start: 'Start scripts/tunnel.sh first.',
+  },
+  checkFailed: 'Could not check compatibility. The playground will check again when you press Run.',
+  recipe: {
+    format: 'Format',
+    mode: 'Mode',
+    scope: 'Scope',
+    formats: {
+      'dc+sd-jwt': 'SD-JWT VC',
+      ldp_vc: 'JSON-LD',
+      mso_mdoc: 'mDoc',
+    } as Record<string, string>,
+    modes: {
+      'cross-device': 'Cross-device (QR)',
+      'same-device': 'Same-device (deep link)',
+      'dc-api': 'Digital Credentials API (probe)',
+    } as Record<string, string>,
+    modeHelp: {
+      'cross-device': 'A QR code or link goes to the wallet.',
+      'same-device': 'The wallet opens from a link on the same device.',
+      'dc-api':
+        'Only checks whether the browser and a wallet can answer. It never counts toward pass rates.',
+    } as Record<string, string>,
+    scopes: { full: 'Issue, present and verify', issuance: 'Issue only' } as Record<string, string>,
+    issueOnlyHelp: 'Stops after the credential is issued. The verifier is not used.',
+    grant: (g: string) =>
+      `Grant: ${g === 'authorization_code' ? 'authorization code' : 'pre-authorized code'}`,
+    delivery: (d: string) => `Delivery: ${d}`,
+  },
+  grantWord: {
+    'pre-authorized_code': 'pre-authorized code',
+    authorization_code: 'authorization code',
+  } as Record<string, string>,
+  issueOnly: 'Issue only',
+  run: 'Run',
+  starting: 'Starting…',
+  startBar: 'Start',
+} as const;
+
+/** UI-51 run report view copy, verbatim. */
+export const reportCopy = {
+  docTitle: (sid: string) => `Report ${sid}`,
+  title: (sid: string, verdict: string) => `Run ${sid}: ${verdict}`,
+  crumbRun: (sid: string) => `Run ${sid}`,
+  crumb: 'Report',
+  actions: {
+    open: 'Open run screen',
+    json: 'Download JSON',
+    markdown: 'Download Markdown',
+    copy: 'Copy Markdown',
+    copied: 'Copied',
+  },
+  tabs: { report: 'Report', markdown: 'Markdown', json: 'JSON' } as Record<string, string>,
+  tabsLabel: 'Report format',
+  markdownLabel: 'Report as Markdown',
+  jsonLabel: 'Report as JSON',
+  sections: {
+    combination: 'Combination',
+    failing: 'Failing checks',
+    diagnosis: 'Diagnosis',
+    fixit: 'Fix-it',
+    tamper: 'Tamper',
+    coverage: 'Coverage',
+    steps: 'Steps',
+  },
+  fields: {
+    issuer: 'Issuer',
+    wallet: 'Wallet',
+    verifier: 'Verifier',
+    format: 'Format',
+    proofType: 'Proof type',
+    grant: 'Grant',
+    mode: 'Presentation mode',
+    env: 'Environment',
+    versions: 'Versions',
+    knobs: 'Settings',
+    verdict: 'Outcome',
+    failedStep: 'Failed step',
+    errorDetail: 'Error detail',
+    none: 'None',
+    defaults: 'All defaults',
+  },
+  checkCols: ['Check', 'Source', 'Code', 'Spec clause', 'Message'],
+  noFailing: 'No failing checks.',
+  unclassified:
+    'Unclassified. No known fingerprint matched; the raw checks above are the evidence.',
+  findingsOnPass: 'Findings on a passing run',
+  noFindings: 'No findings.',
+  confidence: { exact: 'exact', possible: 'possible', observed: 'observed' } as Record<
+    string,
+    string
+  >,
+  match: {
+    gaps: 'Gaps',
+    side: 'Deviating side',
+    clause: 'Spec clause',
+    confidence: 'Confidence',
+    evidence: 'Evidence',
+    exchanges: 'Matched exchanges',
+  },
+  noFix: {
+    'no-proven-knob': 'No proven setting change fixes this. Diagnosis only.',
+    'several-causes': 'Several possible causes. No fix is offered until one is confirmed.',
+    unclassified: 'No fingerprint matched, so no fix is offered.',
+    'tamper-run': 'Tamper runs are never re-run with a changed setting.',
+    'observed-only': 'Observed on a manual leg only. No fix is offered.',
+    'version-drift': 'A component version changed since this run. Re-run first.',
+    'environment-changed': 'The environment changed since this run. Re-run first.',
+  } as Record<string, string>,
+  offer: (knob: string, from: string, to: string) => `${knob}: ${from} to ${to}`,
+  offerProven: (by: string) => `Proven by ${by}`,
+  noOffer: 'Nothing to fix.',
+  coverageAll: 'Every step was fully captured.',
+  coverageBanner: (hops: string) =>
+    `Part of this run is outside capture: ${hops}. Diagnosis uses fully captured exchanges only.`,
+  captureWord: { full: 'Full capture', partial: 'Partial capture', none: 'No capture (engine)' },
+  failedRun: (code: string) =>
+    `The run could not finish: ${code}. This is an environment fault, not a verdict on the combination.`,
+  notTerminal: {
+    title: 'This run is not finished',
+    body: (state: string) => `The report is available when the run ends. Current state: ${state}.`,
+  },
+  notFound: {
+    title: 'Run not found',
+    body: 'It may have been deleted. Check History.',
+    action: 'Go to History',
+  },
+  claim: 'Result of the change',
 } as const;

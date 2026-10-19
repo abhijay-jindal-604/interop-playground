@@ -66,11 +66,17 @@ export function withQuery(path: string, query?: Query): string {
   return s ? `${path}?${s}` : path;
 }
 
-async function request<T>(method: string, path: string, body?: unknown, signal?: AbortSignal) {
-  const init: RequestInit = { method, headers: { Accept: 'application/json' } };
+async function request<T>(
+  method: string,
+  path: string,
+  body?: unknown,
+  signal?: AbortSignal,
+  extra?: Record<string, string>,
+) {
+  const init: RequestInit = { method, headers: { Accept: 'application/json', ...extra } };
   if (signal) init.signal = signal;
   if (body !== undefined) {
-    init.headers = { Accept: 'application/json', 'Content-Type': 'application/json' };
+    init.headers = { Accept: 'application/json', 'Content-Type': 'application/json', ...extra };
     init.body = JSON.stringify(body);
   }
   let res: Response;
@@ -103,6 +109,28 @@ export function apiSend<T>(
   method: 'POST' | 'PATCH' | 'DELETE',
   path: string,
   body: unknown = {},
+  headers?: Record<string, string>,
 ): Promise<T> {
-  return request<T>(method, path, body);
+  return request<T>(method, path, body, undefined, headers);
+}
+
+/** a non-JSON representation (API-45 `?format=markdown`); errors still arrive as the JSON envelope */
+export async function apiGetText(path: string, query?: Query): Promise<string> {
+  let res: Response;
+  try {
+    res = await fetcher(`${API_BASE}${withQuery(path, query)}`, {
+      method: 'GET',
+      headers: { Accept: 'text/markdown, application/json' },
+    });
+  } catch (err) {
+    throw new NetworkError(err instanceof Error ? err.message : 'fetch failed');
+  }
+  const type = res.headers.get('content-type') ?? '';
+  if (!res.ok) {
+    const data: unknown = type.includes('json') ? await res.json().catch(() => null) : null;
+    if (isEnvelope(data)) throw new ApiError(data.error);
+    throw new NetworkError(`HTTP ${res.status} without an error envelope from ${path}`);
+  }
+  if (type.includes('text/html')) throw new NetworkError(`unexpected ${type} from ${path}`);
+  return res.text();
 }

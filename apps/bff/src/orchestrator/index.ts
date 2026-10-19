@@ -43,6 +43,8 @@ export interface OrchestratorOptions {
   appVersion?: string;
   now?: () => number;
   resultTimeoutMs?: number;
+  /** T-41 hook: the diagnosis engine, called before each run's terminal event (ADR-80) */
+  diagnose?: (runId: string, terminal: 'completed' | 'failed') => void;
 }
 
 interface Active {
@@ -266,6 +268,7 @@ export class Orchestrator {
         correlate: (id, key) => this.correlations.set(`${key.kind}:${key.value}`, id),
         now: this.now,
         resultTimeoutMs: this.opts.resultTimeoutMs ?? 300_000,
+        ...(this.opts.diagnose ? { beforeTerminal: this.opts.diagnose } : {}),
       },
       runId,
       spec,

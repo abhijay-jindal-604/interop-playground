@@ -1,0 +1,129 @@
+[
+  {
+    "method": "POST",
+    "url": "https://injiverify.collab.mosip.net/v1/verify/v2/vp-request",
+    "reqHeaders": {
+      "Content-Type": "application/json"
+    },
+    "reqBody": "{\"clientId\":\"playground-waltid-spike\",\"dcqlQuery\":{\"credentials\":[{\"id\":\"pg\",\"format\":\"dc+sd-jwt\",\"meta\":{\"vct_values\":[\"http://localhost:18103/openid4vci/identity_credential\"]},\"claims\":[{\"path\":[\"birthdate\"]}]}]}}",
+    "status": 201,
+    "ms": 684,
+    "resHeaders": {
+      "cache-control": "no-store",
+      "connection": "keep-alive",
+      "content-type": "application/json",
+      "date": "Mon, 28 Sep 2026 04:13:22 GMT",
+      "pragma": "no-cache",
+      "server": "nginx",
+      "strict-transport-security": "max-age=31536000; includeSubDomains",
+      "transfer-encoding": "chunked",
+      "x-content-type-options": "nosniff",
+      "x-envoy-upstream-service-time": "25",
+      "x-frame-options": "SAMEORIGIN"
+    },
+    "resBody": {
+      "transactionId": "txn_fc38ff2f-2998-4331-be94-683179f3a0ef",
+      "requestId": "req_a9f66c0f-70a5-42f0-b0d7-c3ede61f46b2",
+      "authorizationDetails": {
+        "clientId": "playground-waltid-spike",
+        "dcqlQuery": {
+          "credentials": [
+            {
+              "id": "pg",
+              "format": "dc+sd-jwt",
+              "meta": {
+                "vct_values": [
+                  "http://localhost:18103/openid4vci/identity_credential"
+                ]
+              },
+              "claims": [
+                {
+                  "path": [
+                    "birthdate"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "nonce": "0rAFGPTZZNGS5byqE06tzHUxIu4xlhto",
+        "responseUri": "https://injiverify.collab.mosip.net/v1/verify/v2/vp-submission/direct-post",
+        "responseCodeValidationRequired": false,
+        "responseType": "vp_token",
+        "responseMode": "direct_post",
+        "issuedAt": 1790568802332
+      },
+      "expiresAt": 1790569102332
+    }
+  },
+  {
+    "method": "POST",
+    "url": "https://injiverify.collab.mosip.net/v1/verify/v2/vp-submission/direct-post",
+    "reqHeaders": {
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    "reqBody": "vp_token=%7B%22pg%22%3A%5B%22eyJhbGciOiJFUzI1NiIsImtpZCI6ImRpZDpqd2s6ZXlKcmRIa2lPaUpGUXlJc0ltTnlkaUk2SWxBdE1qVTJJaXdpZUNJNklrY3dVa2xPUW1sR0xXOVJWVVF6WkRWRVIyNWxaMUYxV0dWdVNUSTVTa1JoVFVkdlRYWnBiMHRTUWswaUxDSjVJam9pWldRelpVWkhjekp3UlhSeWNEZDJRVm8zUWt4alluSlZkSEJMYTFsWFFWUXlTbEJWVVVzMGJFNDBSU0o5IzAiLCJ0eXAiOiJkYytzZC1qd3QifQ.eyJhZGRyZXNzIjp7InJlZ2lvbiI6IkFueXN0YXRlIiwic3RyZWV0X2FkZHJlc3MiOiIxMjMgTWFpbiBTdCIsImNvdW50cnkiOiJVUyIsImxvY2FsaXR5IjoiQW55dG93biJ9LCJpc19vdmVyXzE4Ijp0cnVlLCJwaG9uZV9udW1iZXIiOiIrMS0yMDItNTU1LTAxMDEiLCJnaXZlbl9uYW1lIjoiSm9obiIsImZhbWlseV9uYW1lIjoiRG9lIiwiaXNfb3Zlcl8yMSI6dHJ1ZSwiaXNfb3Zlcl82NSI6dHJ1ZSwiZW1haWwiOiJqb2huZG9lQGV4YW1wbGUuY29tIiwiZXhwIjoxODIyMTA0Nzc3LCJuYmYiOjE3OTA1Njg3NzcsImlkIjoidXJuOnV1aWQ6MDI0MDRlMDctNjY2NS00ZDk3LTg5MTYtZjZmOGY5NTE0YmQ5IiwiaWF0IjoxNzkwNTY4Nzc3LCJfc2RfYWxnIjoic2hhLTI1NiIsImlzcyI6ImRpZDpqd2s6ZXlKcmRIa2lPaUpGUXlJc0ltTnlkaUk2SWxBdE1qVTJJaXdpZUNJNklrY3dVa2xPUW1sR0xXOVJWVVF6WkRWRVIyNWxaMUYxV0dWdVNUSTVTa1JoVFVkdlRYWnBiMHRTUWswaUxDSjVJam9pWldRelpVWkhjekp3UlhSeWNEZDJRVm8zUWt4alluSlZkSEJMYTFsWFFWUXlTbEJWVVVzMGJFNDBSU0o5IiwiY25mIjp7Imp3ayI6eyJrdHkiOiJFQyIsImNydiI6IlAtMjU2IiwieCI6IjNGM0VudXZSYW5DX0QxcFhUWi1YWVVVYkpyWjVaX01KdDZsSlNhV3dONWciLCJ5IjoibHYxMWpmTzhNQ2JOY1NHVVVoXzNKX1ZqZ2Y5VlVtNGZpSVFFSWo5V3hWcyIsImtpZCI6ImRpZDpqd2s6ZXlKcmRIa2lPaUpGUXlJc0luZ2lPaUl6UmpORmJuVjJVbUZ1UTE5RU1YQllWRm90V0ZsVlZXSktjbG8xV2w5TlNuUTJiRXBUWVZkM1RqVm5JaXdpZVNJNklteDJNVEZxWms4NFRVTmlUbU5UUjFWVmFGOHpTbDlXYW1kbU9WWlZiVFJtYVVsUlJVbHFPVmQ0Vm5NaUxDSmpjbllpT2lKUUxUSTFOaUo5IzAifX0sInZjdCI6Imh0dHA6Ly9sb2NhbGhvc3Q6MTgxMDMvb3BlbmlkNHZjaS9pZGVudGl0eV9jcmVkZW50aWFsIiwiX3NkIjpbImpneWJYMUV4U0psX0lXLW9EcDVIa1lBbUVQLVlHblRmakhwVGNiSDU2QkEiXX0.W3wooGtYj-pP5zjEyJd40uWJm2w1otnQjYmEa8CuhiDmJ6WEBnb50QLO5CwhWHYJ2EbabFB3O4h42FVCGTHnZQ%7EWyItbDRzeS1wRzZXZXZHRC1iUEQ0dWRBIiwiYmlydGhkYXRlIiwiMTk0MC0wMS0wMSJd%7EeyJhbGciOiJFUzI1NiIsInR5cCI6ImtiK2p3dCJ9.eyJpYXQiOjE3OTA1Njg4MDIsImF1ZCI6InBsYXlncm91bmQtd2FsdGlkLXNwaWtlIiwibm9uY2UiOiIwckFGR1BUWlpOR1M1YnlxRTA2dHpIVXhJdTR4bGh0byIsInNkX2hhc2giOiJhLUVQRjA2cUZGMHJycEx2eFFUQmZRQmtIQUlpZ0NfczliNkVfTHJxNUlBIn0.lCoNzi2rNCCebj0fdymHK7cbHNBMECU7DSWlvhtvqTNBSoeZG6QKuyaKd4_9SY4mpWiiNWRlrQ4IffmuDsVe8g%22%5D%7D&state=req_a9f66c0f-70a5-42f0-b0d7-c3ede61f46b2",
+    "status": 200,
+    "ms": 108,
+    "resHeaders": {
+      "cache-control": "no-store",
+      "connection": "keep-alive",
+      "content-encoding": "gzip",
+      "content-type": "application/json",
+      "date": "Mon, 28 Sep 2026 04:13:22 GMT",
+      "pragma": "no-cache",
+      "server": "nginx",
+      "strict-transport-security": "max-age=31536000; includeSubDomains",
+      "transfer-encoding": "chunked",
+      "x-content-type-options": "nosniff",
+      "x-envoy-upstream-service-time": "37",
+      "x-frame-options": "SAMEORIGIN"
+    },
+    "resBody": {}
+  },
+  {
+    "method": "POST",
+    "url": "https://injiverify.collab.mosip.net/v1/verify/v2/vp-results/txn_fc38ff2f-2998-4331-be94-683179f3a0ef",
+    "reqHeaders": {
+      "Content-Type": "application/json"
+    },
+    "reqBody": "{}",
+    "status": 200,
+    "ms": 62,
+    "resHeaders": {
+      "cache-control": "no-store",
+      "connection": "keep-alive",
+      "content-encoding": "gzip",
+      "content-type": "application/json",
+      "date": "Mon, 28 Sep 2026 04:13:22 GMT",
+      "pragma": "no-cache",
+      "server": "nginx",
+      "strict-transport-security": "max-age=31536000; includeSubDomains",
+      "transfer-encoding": "chunked",
+      "x-content-type-options": "nosniff",
+      "x-envoy-upstream-service-time": "28",
+      "x-frame-options": "SAMEORIGIN"
+    },
+    "resBody": {
+      "transactionId": "txn_fc38ff2f-2998-4331-be94-683179f3a0ef",
+      "allChecksSuccessful": false,
+      "credentialResults": [
+        {
+          "allChecksSuccessful": false,
+          "schemaAndSignatureCheck": {
+            "valid": false,
+            "error": {
+              "errorCode": "ERR_SIGNATURE_VERIFICATION_FAILED",
+              "errorMessage": "Exception during Verification: getX509CertChain(...) must not be null"
+            }
+          },
+          "expiryCheck": null,
+          "statusCheck": [],
+          "claims": {},
+          "verifiableCredential": "eyJhbGciOiJFUzI1NiIsImtpZCI6ImRpZDpqd2s6ZXlKcmRIa2lPaUpGUXlJc0ltTnlkaUk2SWxBdE1qVTJJaXdpZUNJNklrY3dVa2xPUW1sR0xXOVJWVVF6WkRWRVIyNWxaMUYxV0dWdVNUSTVTa1JoVFVkdlRYWnBiMHRTUWswaUxDSjVJam9pWldRelpVWkhjekp3UlhSeWNEZDJRVm8zUWt4alluSlZkSEJMYTFsWFFWUXlTbEJWVVVzMGJFNDBSU0o5IzAiLCJ0eXAiOiJkYytzZC1qd3QifQ.eyJhZGRyZXNzIjp7InJlZ2lvbiI6IkFueXN0YXRlIiwic3RyZWV0X2FkZHJlc3MiOiIxMjMgTWFpbiBTdCIsImNvdW50cnkiOiJVUyIsImxvY2FsaXR5IjoiQW55dG93biJ9LCJpc19vdmVyXzE4Ijp0cnVlLCJwaG9uZV9udW1iZXIiOiIrMS0yMDItNTU1LTAxMDEiLCJnaXZlbl9uYW1lIjoiSm9obiIsImZhbWlseV9uYW1lIjoiRG9lIiwiaXNfb3Zlcl8yMSI6dHJ1ZSwiaXNfb3Zlcl82NSI6dHJ1ZSwiZW1haWwiOiJqb2huZG9lQGV4YW1wbGUuY29tIiwiZXhwIjoxODIyMTA0Nzc3LCJuYmYiOjE3OTA1Njg3NzcsImlkIjoidXJuOnV1aWQ6MDI0MDRlMDctNjY2NS00ZDk3LTg5MTYtZjZmOGY5NTE0YmQ5IiwiaWF0IjoxNzkwNTY4Nzc3LCJfc2RfYWxnIjoic2hhLTI1NiIsImlzcyI6ImRpZDpqd2s6ZXlKcmRIa2lPaUpGUXlJc0ltTnlkaUk2SWxBdE1qVTJJaXdpZUNJNklrY3dVa2xPUW1sR0xXOVJWVVF6WkRWRVIyNWxaMUYxV0dWdVNUSTVTa1JoVFVkdlRYWnBiMHRTUWswaUxDSjVJam9pWldRelpVWkhjekp3UlhSeWNEZDJRVm8zUWt4alluSlZkSEJMYTFsWFFWUXlTbEJWVVVzMGJFNDBSU0o5IiwiY25mIjp7Imp3ayI6eyJrdHkiOiJFQyIsImNydiI6IlAtMjU2IiwieCI6IjNGM0VudXZSYW5DX0QxcFhUWi1YWVVVYkpyWjVaX01KdDZsSlNhV3dONWciLCJ5IjoibHYxMWpmTzhNQ2JOY1NHVVVoXzNKX1ZqZ2Y5VlVtNGZpSVFFSWo5V3hWcyIsImtpZCI6ImRpZDpqd2s6ZXlKcmRIa2lPaUpGUXlJc0luZ2lPaUl6UmpORmJuVjJVbUZ1UTE5RU1YQllWRm90V0ZsVlZXSktjbG8xV2w5TlNuUTJiRXBUWVZkM1RqVm5JaXdpZVNJNklteDJNVEZxWms4NFRVTmlUbU5UUjFWVmFGOHpTbDlXYW1kbU9WWlZiVFJtYVVsUlJVbHFPVmQ0Vm5NaUxDSmpjbllpT2lKUUxUSTFOaUo5IzAifX0sInZjdCI6Imh0dHA6Ly9sb2NhbGhvc3Q6MTgxMDMvb3BlbmlkNHZjaS9pZGVudGl0eV9jcmVkZW50aWFsIiwiX3NkIjpbImpneWJYMUV4U0psX0lXLW9EcDVIa1lBbUVQLVlHblRmakhwVGNiSDU2QkEiXX0.W3wooGtYj-pP5zjEyJd40uWJm2w1otnQjYmEa8CuhiDmJ6WEBnb50QLO5CwhWHYJ2EbabFB3O4h42FVCGTHnZQ~WyItbDRzeS1wRzZXZXZHRC1iUEQ0dWRBIiwiYmlydGhkYXRlIiwiMTk0MC0wMS0wMSJd~eyJhbGciOiJFUzI1NiIsInR5cCI6ImtiK2p3dCJ9.eyJpYXQiOjE3OTA1Njg4MDIsImF1ZCI6InBsYXlncm91bmQtd2FsdGlkLXNwaWtlIiwibm9uY2UiOiIwckFGR1BUWlpOR1M1YnlxRTA2dHpIVXhJdTR4bGh0byIsInNkX2hhc2giOiJhLUVQRjA2cUZGMHJycEx2eFFUQmZRQmtIQUlpZ0NfczliNkVfTHJxNUlBIn0.lCoNzi2rNCCebj0fdymHK7cbHNBMECU7DSWlvhtvqTNBSoeZG6QKuyaKd4_9SY4mpWiiNWRlrQ4IffmuDsVe8g",
+          "holderProofCheck": null
+        }
+      ]
+    }
+  }
+]

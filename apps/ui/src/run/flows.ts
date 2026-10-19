@@ -22,6 +22,8 @@ export interface RunFlows {
   issuance: FlowDefinition | null;
   presentation: FlowDefinition | null;
   steps: RailStep[];
+  /** base files of format-delta flows (`extends`), for the diagram's merged steps */
+  bases?: Record<string, FlowDefinition>;
 }
 
 export function mergeSteps(def: FlowDefinition, base: FlowDefinition | null): FlowStep[] {
@@ -105,7 +107,12 @@ export function useRunFlows(
         if (live)
           setLoad({
             status: 'ready',
-            flows: { issuance: i, presentation: p, steps: railSteps(i, p, bases, spec) },
+            flows: {
+              issuance: i,
+              presentation: p,
+              steps: railSteps(i, p, bases, spec),
+              bases,
+            },
           });
       } catch (error) {
         if (live) setLoad({ status: 'error', error });

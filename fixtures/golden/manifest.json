@@ -121,6 +121,20 @@
       "sha256": "d43c3aa83c5d35914b78be2264b151b032e0958dff87122c2adb314b9ea3a19e"
     },
     {
+      "file": "diagnosis/S-077-trace-waltid-to-collab.json",
+      "sids": [
+        "S-077"
+      ],
+      "sha256": "3e84ea011046cea026a5b5a8b9b0e3eff1ecbad72c82394410308d1759d21145"
+    },
+    {
+      "file": "diagnosis/S-120-trace-x5chain-to-collab.json",
+      "sids": [
+        "S-120"
+      ],
+      "sha256": "5dcfdb3d310ce9bc984e5855b7714fd61955b09c032994591601226a2e930f39"
+    },
+    {
       "file": "peers/S-195-eudi-jar-by_reference.txt",
       "sids": [
         "S-195"

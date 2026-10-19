@@ -11,19 +11,28 @@
  * and passed to `startServer`; the keys they create go into the gateway's correlation index (one
  * index, created before both and handed to `startGateway`), so inbound wallet hops on the
  * gateway listeners are attributed to the run and its step (02 §3.3).
+ *
+ * T-24/T-26: `wallet.playground-ts` is part of `bundleAdapters()`; its holder keys come from the
+ * orchestrator's key service (`HolderKeyService` over the store's `holder_keys` / `run_keys`
+ * tables, 05 §4.1, §6: the private JWK is read back only by `sign`).
  */
 import { existsSync, readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import type { FastifyInstance } from 'fastify';
-import { bundleAdapters } from '@interop-playground/adapters';
-import type { GatewayCorrelation, WalletAdapter } from '@interop-playground/adapters';
+import { HolderKeyService, bundleAdapters } from '@interop-playground/adapters';
+import type {
+  GatewayCorrelation,
+  HolderKeyRef,
+  HolderKeyStore,
+  WalletAdapter,
+} from '@interop-playground/adapters';
 import { generateSelfToken } from './capture/self-token.js';
 import { LOOPBACK_HOST, loadConfig } from './config/index.js';
 import { CorrelationIndex, LISTENERS, startGateway } from './gateway/index.js';
 import type { Gateway, RouteEntry, UnattributedItem } from './gateway/index.js';
 import type { AdapterSet } from './orchestrator/index.js';
 import { startServer } from './server.js';
-import type { Store } from './store/index.js';
+import type { SqlDriver, Store } from './store/index.js';
 
 export interface Main {
   app: FastifyInstance;
@@ -76,6 +85,59 @@ export function gatewayCorrelation(index: CorrelationIndex): GatewayCorrelation 
   };
 }
 
+/** the `holder_keys` / `run_keys` repository (05 §4.1; the only reader of `private_jwk_json`) */
+export function sqlHolderKeyStore(
+  db: SqlDriver,
+  now: () => Date = () => new Date(),
+): HolderKeyStore {
+  return {
+    keyOfRun(runId) {
+      const r = db.get<{ key_id: string; alg: string; public_jwk_json: string; did_jwk: string }>(
+        'SELECT h.key_id, h.alg, h.public_jwk_json, h.did_jwk FROM run_keys r JOIN holder_keys h ON h.key_id = r.key_id WHERE r.run_id = ? ORDER BY h.created_at LIMIT 1',
+        runId,
+      );
+      if (!r) return null;
+      const ref: HolderKeyRef = {
+        keyId: r.key_id,
+        alg: r.alg as HolderKeyRef['alg'],
+        publicJwk: JSON.parse(r.public_jwk_json) as HolderKeyRef['publicJwk'],
+        didJwk: r.did_jwk,
+      };
+      return ref;
+    },
+    insert(key, rootRunId) {
+      db.run(
+        "INSERT INTO holder_keys (key_id, kind, alg, public_jwk_json, did_jwk, private_jwk_json, root_run_id, created_at) VALUES (?, 'holder', ?, ?, ?, ?, ?, ?)",
+        key.ref.keyId,
+        key.ref.alg,
+        JSON.stringify(key.ref.publicJwk),
+        key.ref.didJwk,
+        JSON.stringify(key.privateJwk),
+        rootRunId,
+        now().toISOString(),
+      );
+    },
+    link(runId, keyId) {
+      db.run('INSERT OR IGNORE INTO run_keys (run_id, key_id) VALUES (?, ?)', runId, keyId);
+    },
+    privateJwk(keyId) {
+      const r = db.get<{ private_jwk_json: string }>(
+        'SELECT private_jwk_json FROM holder_keys WHERE key_id = ?',
+        keyId,
+      );
+      return r
+        ? (JSON.parse(r.private_jwk_json) as ReturnType<HolderKeyStore['privateJwk']>)
+        : null;
+    },
+  };
+}
+
+/** the orchestrator's key service over a store */
+export function holderKeysFor(store: Pick<Store, 'driver'>): HolderKeyService {
+  const repo = sqlHolderKeyStore(store.driver);
+  return new HolderKeyService(() => repo);
+}
+
 export interface MainOptions {
   /** wallets of later tasks (T-24) or tests */
   wallets?: Readonly<Record<string, WalletAdapter>>;
@@ -114,13 +176,17 @@ export async function main(
   // T-12: the env manager refreshes the gateway allowlists after env.ready (late-bound: the
   // gateway starts after the server)
   let refreshGateway: (() => Promise<void>) | null = null;
+  // holder keys (T-24): late-bound to the store startServer opens (no run starts before it)
+  let keyRepo: HolderKeyStore | null = null;
   const app = await startServer(env, {
     selfToken,
     gatewayOrigins,
     adapters,
+    keys: new HolderKeyService(() => keyRepo),
     onEnvReady: () => refreshGateway?.(),
   });
   const store = (app as unknown as { playgroundStore?: Store | null }).playgroundStore ?? null;
+  if (store) keyRepo = sqlHolderKeyStore(store.driver);
   if (!store || env.GATEWAY_DISABLED === '1') {
     app.log.warn('gateway not started (no store, or GATEWAY_DISABLED=1)');
     return {
