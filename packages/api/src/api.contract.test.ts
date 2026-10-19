@@ -203,6 +203,32 @@ describe('contracts.errors', () => {
 });
 
 describe('contracts.generated', () => {
+  it('free-form records are not collapsed into KnobValues (G-139)', () => {
+    const ajv = draft07();
+    const validate = ajv.getSchema('api#/definitions/ErrorEnvelope');
+    const envelope = {
+      error: {
+        code: 'engine_exception',
+        message: 'The engine threw.',
+        status: 500,
+        requestId: '01JA0000000000000000000000',
+        retryable: false,
+        details: { exceptionClass: 'VCIClientException', message: 'proof rejected', n: 1 },
+      },
+    };
+    expect(validate?.(envelope), JSON.stringify(validate?.errors)).toBe(true);
+    const degraded = ajv.getSchema('api#/definitions/Event.env.degraded');
+    const event = {
+      v: 1,
+      runId: 'env',
+      seq: 3,
+      ts: '2026-10-06T09:30:12.345Z',
+      type: 'env.degraded',
+      payload: { upstreams: ['verify-service'], reasons: { 'verify-service': 'HTTP 503' } },
+    };
+    expect(degraded?.(event), JSON.stringify(degraded?.errors)).toBe(true);
+  });
+
   it('every 04 §3 type (and EventEnvelope) has a schema', () => {
     for (const name of [...SCHEMA_TYPE_NAMES, 'EventEnvelope']) {
       expect(jsonSchema.definitions[name], name).toBeDefined();

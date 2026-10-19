@@ -2796,7 +2796,9 @@ components:
               $ref: "#/components/schemas/ErrorCode"
               description: stable snake_case, 04 §6.2
             details:
-              $ref: "#/components/schemas/KnobValues"
+              additionalProperties: {}
+              description: free-form, per error code (04 §6.2); its own shape, not KnobValues (G-139)
+              type: object
             message:
               description: English, one sentence, safe to show; never secrets, never stack traces
               type: string
@@ -2934,7 +2936,9 @@ components:
           additionalProperties: false
           properties:
             reasons:
-              $ref: "#/components/schemas/KnobValues"
+              additionalProperties:
+                type: string
+              type: object
             upstreams:
               items:
                 type: string
@@ -4445,8 +4449,14 @@ components:
             type: string
           type: array
         status:
-          $ref: "#/components/schemas/KnobValues"
+          additionalProperties:
+            enum:
+              - no-value-passes
+              - proven
+              - unproven
+            type: string
           description: key = CredentialFormat | `${CredentialFormat}@${AdapterId}`
+          type: object
         targets:
           items:
             $ref: "#/components/schemas/FingerprintId"
@@ -4944,7 +4954,9 @@ components:
           additionalProperties: false
           properties:
             reasons:
-              $ref: "#/components/schemas/KnobValues"
+              additionalProperties:
+                type: string
+              type: object
             upstreams:
               items:
                 type: string
@@ -7070,7 +7082,8 @@ components:
       description: offerUri = 'openid-credential-offer://…'
       properties:
         clientMetadata:
-          $ref: "#/components/schemas/KnobValues"
+          additionalProperties: {}
+          type: object
         offerUri:
           type: string
       required:
@@ -7152,7 +7165,8 @@ components:
         urlEncodedRequest:
           type: string
         walletMetadata:
-          $ref: "#/components/schemas/KnobValues"
+          additionalProperties: {}
+          type: object
       required:
         - trustedVerifiers
         - urlEncodedRequest

@@ -1277,7 +1277,10 @@ export interface components {
             error: {
                 /** @description stable snake_case, 04 §6.2 */
                 code: components["schemas"]["ErrorCode"];
-                details?: components["schemas"]["KnobValues"];
+                /** @description free-form, per error code (04 §6.2); its own shape, not KnobValues (G-139) */
+                details?: {
+                    [key: string]: unknown;
+                };
                 /** @description English, one sentence, safe to show; never secrets, never stack traces */
                 message: string;
                 requestId: components["schemas"]["Ulid"];
@@ -1333,7 +1336,9 @@ export interface components {
         };
         "Event.env.degraded": {
             payload: {
-                reasons: components["schemas"]["KnobValues"];
+                reasons: {
+                    [key: string]: string;
+                };
                 upstreams: string[];
             };
             runId: components["schemas"]["StreamId"];
@@ -1869,7 +1874,9 @@ export interface components {
             label: string;
             provenBy: string[];
             /** @description key = CredentialFormat | `${CredentialFormat}@${AdapterId}` */
-            status: components["schemas"]["KnobValues"];
+            status: {
+                [key: string]: "no-value-passes" | "proven" | "unproven";
+            };
             targets: components["schemas"]["FingerprintId"][];
         };
         /** @description Catalogue: plan/09 §Spec. */
@@ -2040,7 +2047,9 @@ export interface components {
                 message: string;
             };
             "env.degraded": {
-                reasons: components["schemas"]["KnobValues"];
+                reasons: {
+                    [key: string]: string;
+                };
                 upstreams: string[];
             };
             "env.fingerprint": {
@@ -2712,7 +2721,9 @@ export interface components {
         };
         /** @description offerUri = 'openid-credential-offer://…' */
         VciSessionCreate: {
-            clientMetadata?: components["schemas"]["KnobValues"];
+            clientMetadata?: {
+                [key: string]: unknown;
+            };
             offerUri: string;
         };
         VciSessionCreated: {
@@ -2752,7 +2763,9 @@ export interface components {
                 responseUris: string[];
             }[];
             urlEncodedRequest: string;
-            walletMetadata?: components["schemas"]["KnobValues"];
+            walletMetadata?: {
+                [key: string]: unknown;
+            };
         };
         VpAuthenticateResponse: {
             authorizationRequest: {

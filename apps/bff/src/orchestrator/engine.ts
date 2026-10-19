@@ -27,6 +27,7 @@ import type { Coverage, EngineOp, Outcome, RunSpec, RunVerdict } from '@interop-
 import type { EventSink, SinkEvent } from '../store/index.js';
 import type { FlowTable, PlannedStep } from './flows.js';
 import { planRun, targetOf } from './flows.js';
+import { issuerVariantKnobsChanged } from '../catalog/knobs.js';
 
 export interface AdapterSet {
   issuer(id: string): IssuerAdapter | undefined;
@@ -289,7 +290,7 @@ export class RunExecution {
     const wallet = this.adapter((id) => this.deps.adapters.wallet(id), this.spec.wallet);
     let configurationId = this.spec.configurationId;
     // vci.setup.variant: only when an issuer-side knob differs from its default (02 §1.3 item 5)
-    const issuerKnobs = Object.keys(this.spec.knobs).length > 0;
+    const issuerKnobs = issuerVariantKnobsChanged(this.spec);
     if (issuerKnobs && this.applies('vci.setup.variant')) {
       configurationId = await issuer.resolveVariant(ctx, configurationId);
       if (!(await this.afterPhase())) return null;

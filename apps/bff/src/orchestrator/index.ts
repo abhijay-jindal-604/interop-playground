@@ -13,7 +13,13 @@ import { RunExecution, evidenceTierOf } from './engine.js';
 import type { AdapterSet, CaptureHooks, KeyService } from './engine.js';
 import type { FlowTable } from './flows.js';
 import { targetOf } from './flows.js';
-import { DEFAULT_RESOLVE_ENV, resolveRunSpec, validateCreateRunRequest } from './resolve.js';
+import { knobsAllDefault } from '../catalog/knobs.js';
+import {
+  DEFAULT_RESOLVE_ENV,
+  resolveRunSpec,
+  tamperApplicableFor,
+  validateCreateRunRequest,
+} from './resolve.js';
 import type { ResolveEnv } from './resolve.js';
 
 export { RunExecution, RunFault, evidenceTierOf } from './engine.js';
@@ -92,14 +98,15 @@ export class Orchestrator {
     const r = resolveRunSpec(req, this.opts.flows, this.env, {
       stateful: true,
       checkAvailability: false,
+      allowTamper: true,
     });
     if (!r.ok) return { ok: false, hit: r.hit };
     return {
       ok: true,
       spec: r.spec,
       warnings: r.warnings,
-      tamperApplicable: [],
-      controlRequired: false,
+      tamperApplicable: tamperApplicableFor(r.spec),
+      controlRequired: r.spec.tamperCase !== null,
     };
   }
 
@@ -169,7 +176,7 @@ export class Orchestrator {
       spec,
       label: r.label,
       queuePosition: this.queue.length,
-      knobsAllDefault: true,
+      knobsAllDefault: knobsAllDefault(spec),
       targetStepKey: target.stepKey,
       evidenceTier: evidenceTierOf(spec),
       appVersion: this.opts.appVersion ?? '0.0.0',

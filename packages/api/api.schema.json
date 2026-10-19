@@ -1601,7 +1601,9 @@
               "description": "stable snake_case, 04 §6.2"
             },
             "details": {
-              "$ref": "#/definitions/KnobValues"
+              "additionalProperties": {},
+              "description": "free-form, per error code (04 §6.2); its own shape, not KnobValues (G-139)",
+              "type": "object"
             },
             "message": {
               "description": "English, one sentence, safe to show; never secrets, never stack traces",
@@ -1791,7 +1793,10 @@
           "additionalProperties": false,
           "properties": {
             "reasons": {
-              "$ref": "#/definitions/KnobValues"
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
             },
             "upstreams": {
               "items": {
@@ -3929,8 +3934,16 @@
           "type": "array"
         },
         "status": {
-          "$ref": "#/definitions/KnobValues",
-          "description": "key = CredentialFormat | `${CredentialFormat}@${AdapterId}`"
+          "additionalProperties": {
+            "enum": [
+              "no-value-passes",
+              "proven",
+              "unproven"
+            ],
+            "type": "string"
+          },
+          "description": "key = CredentialFormat | `${CredentialFormat}@${AdapterId}`",
+          "type": "object"
         },
         "targets": {
           "items": {
@@ -4650,7 +4663,10 @@
           "additionalProperties": false,
           "properties": {
             "reasons": {
-              "$ref": "#/definitions/KnobValues"
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
             },
             "upstreams": {
               "items": {
@@ -7726,7 +7742,8 @@
       "description": "offerUri = 'openid-credential-offer://…'",
       "properties": {
         "clientMetadata": {
-          "$ref": "#/definitions/KnobValues"
+          "additionalProperties": {},
+          "type": "object"
         },
         "offerUri": {
           "type": "string"
@@ -7843,7 +7860,8 @@
           "type": "string"
         },
         "walletMetadata": {
-          "$ref": "#/definitions/KnobValues"
+          "additionalProperties": {},
+          "type": "object"
         }
       },
       "required": [

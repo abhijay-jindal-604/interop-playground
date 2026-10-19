@@ -135,6 +135,7 @@ export function RunPage() {
     >
       <RunScreen
         view={view}
+        events={slice?.events}
         flows={flows}
         run={run}
         stream={slice?.stream ?? null}

@@ -2,7 +2,7 @@ import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
-import { ROUTES, RUN_ID, serveApi, setTheme } from './support.ts';
+import { noBackend, ROUTES, RUN_ID, serveApi, settleAnimations, setTheme } from './support.ts';
 
 const TAGS = ['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'];
 
@@ -25,6 +25,7 @@ for (const theme of ['light', 'dark'] as const) {
         await expect(page.getByRole('region', { name: 'Result' })).toBeVisible();
         await expect(page.getByRole('navigation', { name: 'Steps' })).toBeVisible();
       }
+      await settleAnimations(page);
       const result = await new AxeBuilder({ page }).withTags(TAGS).analyze();
       const blocking = result.violations.filter(
         (v) => v.impact === 'serious' || v.impact === 'critical',
@@ -37,6 +38,7 @@ for (const theme of ['light', 'dark'] as const) {
 }
 
 test('axe on the unreachable page', async ({ page }) => {
+  await noBackend(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('The playground backend is not reachable.');
   const result = await new AxeBuilder({ page }).withTags(TAGS).analyze();
@@ -55,6 +57,7 @@ for (const theme of ['light', 'dark'] as const) {
     await page.goto('/environment');
     await expect(page.locator('h1')).toHaveText('Environment');
     const check = async (label: string) => {
+      await settleAnimations(page);
       const result = await new AxeBuilder({ page }).withTags(TAGS).analyze();
       const blocking = result.violations.filter(
         (v) => v.impact === 'serious' || v.impact === 'critical',

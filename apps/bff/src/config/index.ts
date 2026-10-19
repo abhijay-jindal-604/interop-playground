@@ -14,6 +14,10 @@ export const LOOPBACK_HOST = '127.0.0.1';
 export const ALLOWED_HOSTS: readonly string[] = [`127.0.0.1:${BFF_PORT}`, `localhost:${BFF_PORT}`];
 /** The UI origin(s) a non-GET `Origin` must equal (the UI is served from the same listener). */
 export const UI_ORIGINS: readonly string[] = ALLOWED_HOSTS.map((h) => `http://${h}`);
+/** API-12 (02 §2.6): the peer addresses `scripts/tunnel.sh` may register from. */
+export const LOOPBACK_PEERS: readonly string[] = ['127.0.0.1', '::1', '::ffff:127.0.0.1'];
+/** Admin token inside the bff container (compose mount, 02 §6.2). */
+export const CONTAINER_ADMIN_TOKEN = '/certs/bff-admin.token';
 /** Internal sidecar base URL on playground_net (04 §2.7). */
 export const DEFAULT_SIDECAR_URL = 'http://sidecar:7070';
 
@@ -33,6 +37,12 @@ export interface BffConfig {
   logLevel: string;
   mode: 'local' | 'collab';
   publicHost: string | null;
+  /** `certs/bff-admin.token` (API-12 `X-Admin-Token`) */
+  adminTokenFile: string;
+  /** `versions.lock` (image digests = local version fingerprints, T-12) */
+  versionsLockFile: string;
+  /** env probe loop period, ms (ENV_PROBE_INTERVAL_MS, default 30 s) */
+  envProbeIntervalMs: number;
 }
 
 function pick(env: NodeJS.ProcessEnv, key: string, fallback: string): string {
@@ -55,6 +65,15 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): BffConfig {
     logLevel: pick(env, 'BFF_LOG_LEVEL', 'info'),
     mode: mode === 'collab' ? 'collab' : 'local',
     publicHost: env.PUBLIC_HOST !== undefined && env.PUBLIC_HOST !== '' ? env.PUBLIC_HOST : null,
+    adminTokenFile: pick(
+      env,
+      'ADMIN_TOKEN_FILE',
+      existsSync(CONTAINER_ADMIN_TOKEN)
+        ? CONTAINER_ADMIN_TOKEN
+        : path.join(REPO_ROOT, 'certs', 'bff-admin.token'),
+    ),
+    versionsLockFile: pick(env, 'VERSIONS_LOCK_FILE', path.join(REPO_ROOT, 'versions.lock')),
+    envProbeIntervalMs: Number(pick(env, 'ENV_PROBE_INTERVAL_MS', '30000')),
   };
 }
 

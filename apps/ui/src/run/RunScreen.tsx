@@ -4,13 +4,16 @@
  * (T-31) sits in the banners region. Pure over the reduced view; data wiring is in RunPage.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { Run } from '@interop-playground/api';
+import type { EventEnvelope, Run } from '@interop-playground/api';
 import { ConnectionBanner } from '../components/ConnectionBanner.js';
 import { InlineError } from '../components/InlineError.js';
 import { Skeleton } from '../components/Skeleton.js';
 import { runCopy } from '../copy.js';
 import type { StreamStatus } from '../state/stream.js';
-import { defaultStep, labelOf, stepFromHash, targetStepKey } from './derive.js';
+import { AwaitingPanel } from '../delivery/AwaitingPanel.js';
+import { Inspector } from '../inspector/Inspector.js';
+import { latestDelivery } from '../inspector/model.js';
+import { defaultStep, stepFromHash, targetStepKey } from './derive.js';
 import type { FlowLoad } from './flows.js';
 import { CoverageBanner, ResultCard, StatusBanner } from './parts.js';
 import { isTerminal, viewStateOf, type RunView } from './reduce.js';
@@ -36,8 +39,11 @@ export function useStepHash(): [string | null, (key: string) => void] {
   return [step, select];
 }
 
+const NO_EVENTS: readonly EventEnvelope[] = [];
+
 export function RunScreen({
   view,
+  events = NO_EVENTS,
   flows,
   run,
   stream,
@@ -45,6 +51,8 @@ export function RunScreen({
   onCancel,
 }: {
   view: RunView;
+  /** the ordered log the view was reduced from (inspector, delivery) */
+  events?: readonly EventEnvelope[];
   flows: FlowLoad;
   run: Run | null;
   stream: StreamStatus | null;
@@ -67,14 +75,18 @@ export function RunScreen({
   useStepAnnouncements(view, steps, liveRef.current && ready);
 
   const target = flows.status === 'ready' ? targetStepKey(flows.flows) : null;
-  const selStep = selected ? view.steps[selected] : undefined;
+  const delivery = useMemo(() => latestDelivery(events), [events]);
 
   return (
     <>
       <div className="run-region" data-region="banners">
         <ConnectionBanner status={stream} onRetry={onRetryLive} />
         <StatusBanner vs={vs} view={view} steps={steps} onCancel={onCancel} />
-        <div data-slot="awaiting" />
+        <div data-slot="awaiting">
+          {view.awaiting && !terminal ? (
+            <AwaitingPanel awaiting={view.awaiting} delivery={delivery} />
+          ) : null}
+        </div>
         {ready ? <CoverageBanner view={view} steps={steps} onSelect={select} /> : null}
       </div>
       <div className="run-region" data-region="diagnosis" data-slot="diagnosis" />
@@ -122,20 +134,16 @@ export function RunScreen({
         >
           {!ready ? (
             <p className="muted">{runCopy.loading}</p>
-          ) : selected ? (
-            <>
-              <h2 className="inspector-title">{labelOf(selected, steps)}</h2>
-              <p className="mono muted small">{selected}</p>
-              {(selStep?.exchangeIds.length ?? 0) === 0 && !terminal ? (
-                <p className="muted">{runCopy.inspector.noMessages}</p>
-              ) : (
-                <p className="muted">{runCopy.rail.messages(selStep?.exchangeIds.length ?? 0)}</p>
-              )}
-            </>
           ) : (
-            <p className="muted">
-              {terminal ? runCopy.inspector.selectStep : runCopy.inspector.noMessages}
-            </p>
+            <Inspector
+              events={events}
+              view={view}
+              steps={steps}
+              selected={selected}
+              following={!terminal && !hashStep && selected !== null}
+              terminal={terminal}
+              onSelect={select}
+            />
           )}
         </section>
       </div>

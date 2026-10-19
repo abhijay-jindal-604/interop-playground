@@ -7,6 +7,8 @@
  *
  * With a store (T-08/T-20): the sink is attached to the event bus, API-15 streams, the
  * orchestrator (runs left open by an earlier process are failed `bff_restarted`) and the run routes.
+ * Always: the catalog routes (T-21: API-02/04/07/08/09) and the environment manager (T-12:
+ * API-10..12), which is the orchestrator's `ResolveEnv`; `startServer` starts its probe loop.
  */
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
@@ -18,6 +20,10 @@ import { loadConfig } from './config/index.js';
 import type { BffConfig } from './config/index.js';
 import { registerErrorHandling } from './errors/index.js';
 import { registerGuard } from './guard/index.js';
+import type { CaptureContext, CapturingHttp } from '@interop-playground/adapters';
+import { EnvManager } from './env/index.js';
+import { registerCatalog } from './routes/catalog.js';
+import { fileToken, registerEnv } from './routes/env.js';
 import { registerFlows } from './routes/flows.js';
 import { registerHealth } from './routes/health.js';
 import type { SidecarProbe } from './routes/health.js';
@@ -51,8 +57,18 @@ export interface CreateServerOptions {
   selfToken?: string;
   /** `host:port` of the gateway listeners; the default CaptureHttp sends the token to them */
   gatewayOrigins?: Iterable<string>;
-  /** environment view for resolution (T-12); default: never probed, tunnel down */
+  /** environment view for resolution; default: the environment manager below (T-12) */
   resolveEnv?: ResolveEnv;
+  /** a ready environment manager (tests); default: built from `config` (probe loop not started) */
+  env?: EnvManager;
+  /** the client the env probes go through (default: an uncaptured probe client, ADR-73) */
+  envProbeHttp?: CapturingHttp;
+  /** start the env probe loop (default false; `startServer` passes true) */
+  startEnvProbes?: boolean;
+  /** called after each transition to env ready (main.ts: the gateway's `refresh()`) */
+  onEnvReady?: () => void | Promise<void>;
+  /** API-12 admin token source (default: `config.adminTokenFile`) */
+  adminToken?: () => string | null;
   keys?: KeyService;
   /** a ready orchestrator (tests); default: built from the options above */
   orchestrator?: Orchestrator;
@@ -91,6 +107,28 @@ export function captureHooks(c: CaptureHttp): CaptureHooks {
   return { http: c, flushStep: (r, k) => c.flushStep(r, k), endRun: (r) => c.endRun(r) };
 }
 
+/**
+ * The env probe client (ADR-73): the `CapturingHttp` contract without a run log. Probe results are
+ * recorded as `env.probe` events on the `env` stream; CaptureHttp's exchanges need a run.
+ */
+export function envProbeHttp(
+  fetchImpl: typeof fetch = globalThis.fetch.bind(globalThis),
+): CapturingHttp {
+  return {
+    fetch: (_ctx: CaptureContext, url: string | URL, init?: RequestInit) => fetchImpl(url, init),
+    closePoll: () => Promise.resolve(),
+  };
+}
+
+function imageDigests(file: string): Record<string, string> {
+  try {
+    const lock = JSON.parse(readFileSync(file, 'utf8')) as { images?: Record<string, string> };
+    return lock.images ?? {};
+  } catch {
+    return {};
+  }
+}
+
 const NO_ADAPTERS: AdapterSet = {
   issuer: () => undefined,
   wallet: () => undefined,
@@ -119,6 +157,25 @@ export async function createServer(opts: CreateServerOptions = {}): Promise<Fast
   });
   registerFlows(app, content.flows);
   const store = opts.store ?? null;
+  const env =
+    opts.env ??
+    new EnvManager({
+      http: opts.envProbeHttp ?? envProbeHttp(),
+      sink: store?.sink ?? null,
+      mode: config.mode,
+      publicHost: config.publicHost ?? '',
+      bffVersion: bffVersion(),
+      imageDigests: imageDigests(config.versionsLockFile),
+      intervalMs: config.envProbeIntervalMs,
+      ...(opts.onEnvReady ? { onReady: opts.onEnvReady } : {}),
+    });
+  app.decorate('playgroundEnv', env);
+  app.addHook('onClose', () => {
+    env.stop();
+    return Promise.resolve();
+  });
+  registerCatalog(app, { availability: (id) => env.entry(id) });
+  registerEnv(app, { env, adminToken: opts.adminToken ?? fileToken(config.adminTokenFile) });
   if (store !== null) {
     const bus = opts.bus ?? defaultBus;
     attachBus(store, bus);
@@ -142,7 +199,7 @@ export async function createServer(opts: CreateServerOptions = {}): Promise<Fast
               ...(opts.gatewayOrigins ? { gatewayOrigins: opts.gatewayOrigins } : {}),
             }),
           ),
-        ...(opts.resolveEnv ? { env: opts.resolveEnv } : {}),
+        env: opts.resolveEnv ?? env,
         keys: opts.keys ?? null,
         appVersion: bffVersion(),
       });
@@ -152,6 +209,7 @@ export async function createServer(opts: CreateServerOptions = {}): Promise<Fast
     registerRuns(app, { store, orchestrator });
   }
   await registerStatic(app, config.uiDistDir);
+  if (opts.startEnvProbes === true) env.start();
   return app;
 }
 
@@ -165,7 +223,13 @@ export async function startServer(
 ): Promise<FastifyInstance> {
   const config = loadConfig(env);
   const store = openStore(path.join(config.dataDir, 'playground.db'));
-  const app = await createServer({ logger: { level: config.logLevel }, ...extra, config, store });
+  const app = await createServer({
+    logger: { level: config.logLevel },
+    startEnvProbes: true,
+    ...extra,
+    config,
+    store,
+  });
   app.addHook('onClose', () => {
     store.close();
     return Promise.resolve();

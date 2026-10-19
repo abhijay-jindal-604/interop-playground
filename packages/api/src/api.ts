@@ -281,7 +281,7 @@ export interface KnobEntry {
   adapters: AdapterId[];
   targets: FingerprintId[];
   /** key = CredentialFormat | `${CredentialFormat}@${AdapterId}` */
-  status: Record<string, 'proven' | 'unproven' | 'no-value-passes'>;
+  status: { [key: string]: 'proven' | 'unproven' | 'no-value-passes' };
   provenBy: string[];
   /** A4 report label */
   label: string;
@@ -772,7 +772,7 @@ export interface SidecarHealth {
 /** offerUri = 'openid-credential-offer://…' */
 export interface VciSessionCreate {
   offerUri: string;
-  clientMetadata?: Record<string, unknown>;
+  clientMetadata?: { [key: string]: unknown };
 }
 export interface VciSessionCreated {
   sessionId: Ulid;
@@ -810,7 +810,7 @@ export type VciResult =
 export interface VpAuthenticateRequest {
   urlEncodedRequest: string;
   trustedVerifiers: { clientId: string; responseUris: string[] }[];
-  walletMetadata?: Record<string, unknown>;
+  walletMetadata?: { [key: string]: unknown };
 }
 export interface VpAuthenticateResponse {
   authorizationRequest: {
@@ -965,7 +965,8 @@ export interface ErrorEnvelope {
     requestId: Ulid;
     /** true for 429 and 503 only */
     retryable: boolean;
-    details?: Record<string, unknown>;
+    /** free-form, per error code (04 §6.2); its own shape, not KnobValues (G-139) */
+    details?: { [key: string]: unknown };
   };
 }
 
@@ -1070,7 +1071,7 @@ export interface PayloadMap {
     versionFingerprint: string | null;
   };
   'env.ready': { upstreams: string[] };
-  'env.degraded': { upstreams: string[]; reasons: Record<string, string> };
+  'env.degraded': { upstreams: string[]; reasons: { [upstream: string]: string } };
   'env.fingerprint': {
     upstream: string;
     fingerprint: string;

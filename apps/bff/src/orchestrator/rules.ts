@@ -1,6 +1,7 @@
 /**
  * Static compatibility rules of 04 §4.3 (API-03, API-09, API-20 step 3): the first matching rule
- * wins. `stateful` rules depend on the tunnel (409 `tunnel_required`); all others are 422
+ * wins. A more specific rule precedes the general one it overlaps (ADR-72 (2)), so every rule of
+ * the table can be a first hit. `stateful` rules depend on the tunnel (409 `tunnel_required`); all others are 422
  * `incompatible_selection`. Verifier rules are skipped for `scope = "issuance"`.
  */
 import { catalogEntry } from '@interop-playground/adapters';
@@ -29,6 +30,8 @@ export interface RuleInput {
 export interface CompatRule {
   ruleId: string;
   reason: (r: RuleInput) => string;
+  /** the reason as API-09 shows it (placeholders in angle brackets, 04 §4.3 "Reason shown") */
+  reasonTemplate: string;
   gapId: string | null;
   evidence: string;
   /** predicate in words (API-09) */
@@ -50,7 +53,7 @@ const reasonOf = (s: string) => (): string => s;
 function rule(
   ruleId: string,
   when: string,
-  reason: string | ((r: RuleInput) => string),
+  reason: string | readonly [(r: RuleInput) => string, string],
   gapId: string | null,
   evidence: string,
   applies: (r: RuleInput) => boolean,
@@ -59,7 +62,8 @@ function rule(
   return {
     ruleId,
     when,
-    reason: typeof reason === 'string' ? reasonOf(reason) : reason,
+    reason: typeof reason === 'string' ? reasonOf(reason) : reason[0],
+    reasonTemplate: typeof reason === 'string' ? reason : reason[1],
     gapId,
     evidence,
     applies,
@@ -72,10 +76,21 @@ const formatsOf = (id: AdapterId): readonly CredentialFormat[] => catalogEntry(i
 
 export const COMPAT_RULES: readonly CompatRule[] = [
   rule(
+    'collab-issuer-no-preauth',
+    'issuer.certify-collab × pre-auth',
+    'Collab Certify does not offer pre-authorized issuance.',
+    'G-06',
+    '02 §5.3',
+    (r) => r.issuer === 'issuer.certify-collab' && r.grant === 'pre-authorized_code',
+  ),
+  rule(
     'issuer-grant-mismatch',
     'grant not supported by the issuer',
-    (r) =>
-      `This issuer only supports ${PREAUTH_ONLY.includes(r.issuer) ? 'pre-authorized_code' : 'authorization_code'}.`,
+    [
+      (r) =>
+        `This issuer only supports ${PREAUTH_ONLY.includes(r.issuer) ? 'pre-authorized_code' : 'authorization_code'}.`,
+      'This issuer only supports <grant>.',
+    ],
     null,
     '02 §5.3',
     (r) =>
@@ -83,9 +98,17 @@ export const COMPAT_RULES: readonly CompatRule[] = [
       (AUTHCODE_ONLY.includes(r.issuer) && r.grant !== 'authorization_code'),
   ),
   rule(
+    'fixture-formats',
+    'issuer.fixture × ldp_vc',
+    'Fixtures exist for dc+sd-jwt and mso_mdoc.',
+    null,
+    'FLOW-14',
+    (r) => r.issuer === 'issuer.fixture' && r.format === 'ldp_vc',
+  ),
+  rule(
     'issuer-format-unsupported',
     'format not in the issuer descriptor formats',
-    (r) => `Issuer does not issue ${r.format}.`,
+    [(r) => `Issuer does not issue ${r.format}.`, 'Issuer does not issue <format>.'],
     null,
     '02 §5.3',
     // Collab Certify advertises its formats at probe time (empty static list)
@@ -101,9 +124,18 @@ export const COMPAT_RULES: readonly CompatRule[] = [
     { verifierRule: true },
   ),
   rule(
+    'ldp-at-eudi',
+    'ldp_vc × verifier.eudi',
+    'EUDI verifier has no ldp_vc.',
+    null,
+    'S-085',
+    (r) => r.format === 'ldp_vc' && r.verifier === 'verifier.eudi',
+    { verifierRule: true },
+  ),
+  rule(
     'verifier-format-unsupported',
     'format not in the verifier descriptor formats',
-    (r) => `Verifier does not verify ${r.format}.`,
+    [(r) => `Verifier does not verify ${r.format}.`, 'Verifier does not verify <format>.'],
     null,
     '02 §5.3',
     (r) => !formatsOf(r.verifier).includes(r.format),
@@ -122,29 +154,12 @@ export const COMPAT_RULES: readonly CompatRule[] = [
     { verifierRule: true },
   ),
   rule(
-    'ldp-at-eudi',
-    'ldp_vc × verifier.eudi',
-    'EUDI verifier has no ldp_vc.',
-    null,
-    'S-085',
-    (r) => r.format === 'ldp_vc' && r.verifier === 'verifier.eudi',
-    { verifierRule: true },
-  ),
-  rule(
     'webwallet-no-preauth',
     'wallet.inji-web × pre-auth',
     'Inji Web has no offer entry.',
     'G-08',
     '02 §5.3',
     (r) => r.wallet === 'wallet.inji-web' && r.grant === 'pre-authorized_code',
-  ),
-  rule(
-    'collab-issuer-no-preauth',
-    'issuer.certify-collab × pre-auth',
-    'Collab Certify does not offer pre-authorized issuance.',
-    'G-06',
-    '02 §5.3',
-    (r) => r.issuer === 'issuer.certify-collab' && r.grant === 'pre-authorized_code',
   ),
   rule(
     'collab-issuer-wallet',
@@ -155,14 +170,12 @@ export const COMPAT_RULES: readonly CompatRule[] = [
     (r) => r.issuer === 'issuer.certify-collab' && r.wallet !== 'wallet.inji-web',
   ),
   rule(
-    'jvm-http-issuer',
-    'wallet.inji-jvm × certify-authcode / certify-mdoc / waltid',
-    'VCIClient refuses http issuers.',
-    'G-103',
-    '02 §5.3',
-    (r) =>
-      r.wallet === 'wallet.inji-jvm' &&
-      ['issuer.certify-authcode', 'issuer.certify-mdoc', 'issuer.waltid'].includes(r.issuer),
+    'jvm-mdoc-unoffered',
+    'wallet.inji-jvm × mso_mdoc',
+    'mso_mdoc through VCIClient is not offered (needs a did:jwk proof, FP-07).',
+    'G-23',
+    '03 FLOW-06',
+    (r) => r.wallet === 'wallet.inji-jvm' && r.format === 'mso_mdoc',
   ),
   rule(
     'jvm-preauth-only',
@@ -173,12 +186,14 @@ export const COMPAT_RULES: readonly CompatRule[] = [
     (r) => r.wallet === 'wallet.inji-jvm' && r.grant === 'authorization_code',
   ),
   rule(
-    'jvm-mdoc-unoffered',
-    'wallet.inji-jvm × mso_mdoc',
-    'mso_mdoc through VCIClient is not offered (needs a did:jwk proof, FP-07).',
-    'G-23',
-    '03 FLOW-06',
-    (r) => r.wallet === 'wallet.inji-jvm' && r.format === 'mso_mdoc',
+    'jvm-http-issuer',
+    'wallet.inji-jvm × certify-authcode / certify-mdoc / waltid',
+    'VCIClient refuses http issuers.',
+    'G-103',
+    '02 §5.3',
+    (r) =>
+      r.wallet === 'wallet.inji-jvm' &&
+      ['issuer.certify-authcode', 'issuer.certify-mdoc', 'issuer.waltid'].includes(r.issuer),
   ),
   rule(
     'jvm-eudi-verifier',
@@ -242,14 +257,6 @@ export const COMPAT_RULES: readonly CompatRule[] = [
     null,
     '02 §5.3',
     (r) => r.wallet === 'wallet.credo' && r.issuer !== 'issuer.fixture',
-  ),
-  rule(
-    'fixture-formats',
-    'issuer.fixture × ldp_vc',
-    'Fixtures exist for dc+sd-jwt and mso_mdoc.',
-    null,
-    'FLOW-14',
-    (r) => r.issuer === 'issuer.fixture' && r.format === 'ldp_vc',
   ),
   rule(
     'txcode-scope',

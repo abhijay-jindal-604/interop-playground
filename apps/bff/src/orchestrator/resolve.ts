@@ -1,9 +1,9 @@
 /**
  * `CreateRunRequest` → `RunSpec` (04 §4.1 steps 1–7, §4.2), shared by API-03 (preview) and API-20.
- * First failure wins. Knob, preset, tamper and configuration catalogues arrive with T-21 / T-76;
- * until then the defaults of ADR-65 apply (no knob is accepted, no tamper case applies).
+ * First failure wins. T-21 (ADR-72) replaced the ADR-65 (1) stubs: KNOB-02 normalisation, knob and
+ * preset validation (09 A4, 04 §4.4), API-08 configuration defaults, tamper applicability (§4.5).
  */
-import { ADAPTER_IDS, catalogEntry } from '@interop-playground/adapters';
+import { ADAPTER_IDS, catalogEntry, configurationsOf } from '@interop-playground/adapters';
 import type {
   AdapterId,
   Availability,
@@ -15,8 +15,11 @@ import type {
   IncompatibilityHit,
   Role,
   RunSpec,
+  TmpId,
 } from '@interop-playground/api';
 import { ApiError, issueDetails } from '../errors/index.js';
+import { requestedKnob, resolveKnobs } from '../catalog/knobs.js';
+import { applicableTamperCases, tamperInapplicability } from '../catalog/tamper.js';
 import type { FlowTable } from './flows.js';
 import { firstHit, type CompatRule, type RuleInput } from './rules.js';
 
@@ -60,18 +63,13 @@ const FORMATS = ['ldp_vc', 'dc+sd-jwt', 'mso_mdoc', 'jwt_vc_json'];
 const DELIVERIES = ['qr', 'deep-link', 'web-wallet-redirect', 'adb-intent', 'in-process'];
 const ULID_RE = /^[0-9A-HJKMNP-TV-Z]{26}$/;
 
-/** API-08 defaults known today (03 FLOW-01/03/04/05 traces); other pairs use 'default' (ADR-65) */
-const DEFAULT_CONFIG: Partial<Record<AdapterId, Partial<Record<CredentialFormat, string>>>> = {
-  'issuer.certify-preauth': {
-    ldp_vc: 'FarmerCredential',
-    'dc+sd-jwt': 'PlaygroundSdJwt',
-    mso_mdoc: 'DrivingLicenseCredential',
-  },
-};
-
+/**
+ * 03 §2.0 DCQL claims: `ldp_vc` paths are relative to `credentialSubject` (S-199 point 5; a
+ * `["credentialSubject","fullName"]` path is rejected by Verify with 400), ADR-72 (4).
+ */
 const DEFAULT_DISCLOSURE: Record<CredentialFormat, DisclosureSelection> = {
   'dc+sd-jwt': { claimPaths: [['fullName']] },
-  ldp_vc: { claimPaths: [['credentialSubject', 'fullName']] },
+  ldp_vc: { claimPaths: [['fullName']] },
   mso_mdoc: { claimPaths: [] },
   jwt_vc_json: { claimPaths: [] },
 };
@@ -240,7 +238,7 @@ export function resolveRunSpec(
   req: CreateRunRequest,
   flows: FlowTable,
   env: ResolveEnv,
-  opts: { stateful: boolean; checkAvailability: boolean },
+  opts: { stateful: boolean; checkAvailability: boolean; allowTamper?: boolean },
 ): Resolution {
   const warnings: string[] = [];
   // 2. normalise
@@ -249,6 +247,35 @@ export function resolveRunSpec(
     grant = 'pre-authorized_code';
     warnings.push('grant ignored for fixture');
   }
+  // KNOB-02 (issuer-target-switch, 02 §5.7, FLOW-05): the effective mso_mdoc issuer
+  let issuer = req.issuer;
+  if (
+    req.format === 'mso_mdoc' &&
+    (issuer === 'issuer.certify-preauth' || issuer === 'issuer.certify-mdoc')
+  ) {
+    const profile = requestedKnob('KNOB-02', req.knobs, req.preset);
+    const target = profile === 'alpha1-template' ? 'issuer.certify-preauth' : 'issuer.certify-mdoc';
+    if (target !== issuer) warnings.push(`KNOB-02 selects ${target} for mso_mdoc`);
+    issuer = target;
+  }
+  const configs = configurationsOf(issuer, req.format);
+  if (
+    req.configurationId !== undefined &&
+    configs.length > 0 &&
+    !configs.some((c) => c.configurationId === req.configurationId)
+  ) {
+    throw validationError([
+      {
+        path: '$.configurationId',
+        message: `${issuer} × ${req.format} offers ${configs.map((c) => c.configurationId).join(', ')}`,
+      },
+    ]);
+  }
+  const configurationId =
+    req.configurationId ??
+    configs.find((c) => c.default)?.configurationId ??
+    configs[0]?.configurationId ??
+    'default';
   const delivery = req.delivery ?? defaultDelivery(req.wallet, req.verifier, req.presentationMode);
   const scope = req.scope ?? 'full';
   const withTxCode = req.withTxCode ?? false;
@@ -256,7 +283,7 @@ export function resolveRunSpec(
   const tunnel = env.tunnel();
   // 3. static compatibility (before the delivery set check: a rule names the reason better)
   const input: RuleInput = {
-    issuer: req.issuer,
+    issuer,
     wallet: req.wallet,
     verifier: req.verifier,
     grant,
@@ -281,23 +308,23 @@ export function resolveRunSpec(
       },
     ]);
   }
-  // 4. knobs: no catalogue is loaded yet (T-21), so every given knob is unknown
-  const knobIds = Object.keys(req.knobs ?? {});
-  if (knobIds.length > 0) {
-    throw new ApiError('knob_invalid', 'Unknown knob.', {
-      knobId: knobIds[0],
-      reason: 'unknown-knob',
-    });
-  }
-  if (req.preset !== undefined) {
-    throw validationError([{ path: '$.preset', message: `unknown preset ${req.preset}` }]);
-  }
-  // 5. tamper: no catalogue is loaded yet (T-76)
-  if (req.tamperCase) {
-    throw new ApiError('tamper_not_applicable', 'This tamper case does not apply.', {
-      tmpId: req.tamperCase,
-      reason: 'tamper catalogue not loaded',
-    });
+  // 4. knobs (04 §4.4): defaults written out for every applicable knob
+  const target = { issuer, wallet: req.wallet, verifier: req.verifier, format: req.format };
+  const knobs = resolveKnobs(target, req.knobs, req.preset, warnings);
+  // 5. tamper (04 §4.5)
+  const tamperCase = req.tamperCase ?? null;
+  if (tamperCase !== null) {
+    const reason = tamperInapplicability(tamperCase, { ...target, scope });
+    if (reason !== null)
+      throw new ApiError('tamper_not_applicable', 'This tamper case does not apply.', {
+        tmpId: tamperCase,
+        reason,
+      });
+    if (!opts.allowTamper)
+      throw new ApiError('tamper_not_applicable', 'Tamper runs are not available yet.', {
+        tmpId: tamperCase,
+        reason: 'tamper runtime not built (T-76)',
+      });
   }
   // 6. stateful checks
   if (opts.stateful) {
@@ -307,8 +334,9 @@ export function resolveRunSpec(
   const roles: Role[] = ['issuer', 'wallet', 'verifier'];
   const versions = {} as Record<Role, string>;
   const envs = {} as RunSpec['env'];
+  const chosen: Record<Role, AdapterId> = { issuer, wallet: req.wallet, verifier: req.verifier };
   for (const role of roles) {
-    const id = req[role];
+    const id = chosen[role];
     const a = env.availability(id);
     if (opts.checkAvailability && a && !a.available) {
       throw new ApiError('adapter_unavailable', `${id} is not available.`, {
@@ -320,11 +348,17 @@ export function resolveRunSpec(
     envs[role] = catalogEntry(id).envClass;
   }
   // flow selection (04 §4.2) and its shipped file
+  // 04 §4.2: redirect_uri for the phone, the KNOB-07 value at Inji Verify, else plain
+  const knob07 = knobs['KNOB-07'];
   const clientIdScheme: RunSpec['clientIdScheme'] =
-    req.wallet === 'wallet.inji-mobile' ? 'redirect_uri' : 'plain';
-  const wantedIssuance = issuanceFlowOf({ ...req, grant });
+    req.wallet === 'wallet.inji-mobile'
+      ? 'redirect_uri'
+      : req.verifier.startsWith('verifier.inji-verify-') && knob07 !== undefined
+        ? (knob07 as RunSpec['clientIdScheme'])
+        : 'plain';
+  const wantedIssuance = issuanceFlowOf({ ...req, issuer, grant });
   const wantedPresentation =
-    scope === 'issuance' ? null : presentationFlowOf(req, delivery, clientIdScheme);
+    scope === 'issuance' ? null : presentationFlowOf({ ...req, issuer }, delivery, clientIdScheme);
   const issuanceFlowId = shippedFlow(flows, wantedIssuance);
   const presentationFlowId =
     wantedPresentation === null ? null : shippedFlow(flows, wantedPresentation);
@@ -341,17 +375,17 @@ export function resolveRunSpec(
     req.wallet === 'wallet.inji-mobile' ||
     (req.format === 'ldp_vc' && req.verifier === 'verifier.inji-verify-collab');
   const spec: RunSpec = {
-    issuer: req.issuer,
+    issuer,
     wallet: req.wallet,
     verifier: req.verifier,
     grant,
     presentationMode: scope === 'issuance' ? null : req.presentationMode,
     format: req.format,
-    configurationId: req.configurationId ?? DEFAULT_CONFIG[req.issuer]?.[req.format] ?? 'default',
+    configurationId,
     env: envs,
     versions,
-    tamperCase: null,
-    knobs: {},
+    tamperCase,
+    knobs,
     parentRunId: null,
     knobDelta: null,
     tunnelHost: tunnelDependent ? tunnel.host : null,
@@ -372,4 +406,15 @@ export function resolveRunSpec(
   if (wantedPresentation !== null && wantedPresentation !== presentationFlowId)
     warnings.push(`${wantedPresentation} runs as its base ${String(presentationFlowId)}`);
   return { ok: true, spec, warnings, label: req.label ?? null };
+}
+
+/** API-03 `tamperApplicable`: the TMP cases that apply to a resolved spec (04 §4.5) */
+export function tamperApplicableFor(spec: RunSpec): TmpId[] {
+  return applicableTamperCases({
+    issuer: spec.issuer,
+    wallet: spec.wallet,
+    verifier: spec.verifier,
+    format: spec.format,
+    scope: spec.scope,
+  });
 }

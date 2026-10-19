@@ -155,9 +155,7 @@ describe('sidecar.contract', () => {
     });
     const r = await call('POST', '/vc/verify', { format: 'ldp_vc', raw: '{}' });
     expect(r.status).toBe(422);
-    // G-139: the generated ErrorEnvelope.details points at KnobValues, so validate without details
-    const { details: _details, ...envelope } = (r.json as { error: Record<string, unknown> }).error;
-    expectShape('ErrorEnvelope', { error: envelope });
+    expectShape('ErrorEnvelope', r.json);
     expect(r.json).toMatchObject({
       error: {
         code: 'engine_exception',

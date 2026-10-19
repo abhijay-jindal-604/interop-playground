@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { ROUTES, RUN_ID, hasHorizontalScroll, serveApi } from './support.ts';
+import { ROUTES, RUN_ID, hasHorizontalScroll, noBackend, serveApi } from './support.ts';
 
 test.describe('shell', () => {
   test.beforeEach(async ({ page }) => {
@@ -101,6 +101,7 @@ test.describe('shell', () => {
 
 test('backend unreachable shows the full-page copy (UI-02)', async ({ page }) => {
   // no API route: vite preview answers index.html, which is not the BFF
+  await noBackend(page);
   await page.goto('/');
   await expect(page.locator('h1')).toHaveText('The playground backend is not reachable.');
   await expect(page.getByRole('button', { name: 'Reload' })).toBeVisible();

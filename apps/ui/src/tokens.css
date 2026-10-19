@@ -68,6 +68,11 @@
   --rail-width: 220px;
   --content-max: 1280px;
   --topbar-height: 56px;
+
+  /* QR code (UI-16): dark modules on a white square in both themes */
+  --qr-size: 280px;
+  --qr-light: #fff;
+  --qr-dark: #000;
 }
 
 :root[data-theme='dark'] {

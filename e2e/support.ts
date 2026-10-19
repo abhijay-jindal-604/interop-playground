@@ -121,3 +121,28 @@ export function hasHorizontalScroll(page: Page): Promise<boolean> {
     () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
   );
 }
+
+/**
+ * Waits until every finite CSS animation and transition has finished (the drawer's 200 ms
+ * slide-in fades from opacity 0, and axe measuring mid-fade reports a false color-contrast hit;
+ * that was the wave-2 360 px flake). Infinite ones (skeleton shimmer) are ignored.
+ */
+export async function settleAnimations(page: Page): Promise<void> {
+  await page.evaluate(async () => {
+    const finite = document
+      .getAnimations()
+      .filter((a) => a.effect?.getComputedTiming().iterations !== Infinity);
+    await Promise.all(finite.map((a) => a.finished.catch(() => undefined)));
+  });
+}
+
+/**
+ * No BFF behind the preview: answer every API path with the SPA's HTML, as `vite preview` does
+ * when nothing listens on 127.0.0.1:3100 (a host BFF, e.g. the Docker stack, would otherwise
+ * answer through the preview proxy and the "unreachable" page would never show).
+ */
+export async function noBackend(page: Page): Promise<void> {
+  await page.route(/\/api\//, (route) =>
+    route.fulfill({ status: 200, contentType: 'text/html', body: '<!doctype html><html></html>' }),
+  );
+}
