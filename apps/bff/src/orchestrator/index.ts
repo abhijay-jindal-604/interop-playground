@@ -6,7 +6,13 @@
  */
 import { ulid } from 'ulid';
 import type { CorrelationKey } from '@interop-playground/adapters';
-import type { CreateRunRequest, PreviewResponse, RunSpec } from '@interop-playground/api';
+import type {
+  CreateRunRequest,
+  PreviewResponse,
+  Run,
+  RunSpec,
+  RunVerdict,
+} from '@interop-playground/api';
 import { ApiError, issueDetails } from '../errors/index.js';
 import type { Store } from '../store/index.js';
 import { RunExecution, evidenceTierOf } from './engine.js';
@@ -21,6 +27,7 @@ import {
   validateCreateRunRequest,
 } from './resolve.js';
 import type { ResolveEnv } from './resolve.js';
+import { planDerive } from './derive.js';
 
 export { RunExecution, RunFault, evidenceTierOf } from './engine.js';
 export type { AdapterSet, CaptureHooks, KeyService } from './engine.js';
@@ -29,6 +36,7 @@ export type { FlowTable, PlannedStep } from './flows.js';
 export { COMPAT_RULES } from './rules.js';
 export { resolveRunSpec, validateCreateRunRequest, DEFAULT_RESOLVE_ENV } from './resolve.js';
 export type { ResolveEnv } from './resolve.js';
+export { applyKnob, driftOf, knobDiff, planDerive, validateDeriveRequest } from './derive.js';
 
 export const LIMITS = { maxRunning: 4, maxCollab: 1, queueCap: 50, retryAfterS: 30 } as const;
 
@@ -45,6 +53,8 @@ export interface OrchestratorOptions {
   resultTimeoutMs?: number;
   /** T-41 hook: the diagnosis engine, called before each run's terminal event (ADR-80) */
   diagnose?: (runId: string, terminal: 'completed' | 'failed') => void;
+  /** T-42 hook: the `counterfactualResult` of a derived run, called after `diagnose` (09 A5.3) */
+  classify?: (runId: string, verdict: RunVerdict) => Run['counterfactualResult'];
 }
 
 interface Active {
@@ -127,7 +137,20 @@ export class Orchestrator {
         });
       throw new ApiError('incompatible_selection', r.hit.reason, { ...r.hit });
     }
-    const spec = r.spec;
+    return this.enqueue(r.spec, r.label);
+  }
+
+  /**
+   * API-24 (04 §5.4): checks the request against the parent, then queues the child spec (one knob
+   * changed, `parentRunId`/`knobDelta`/`causeFingerprintId` set) like an interactive run.
+   */
+  derive(parentRunId: string, body: unknown): string {
+    const plan = planDerive(this.opts.store, this.opts.flows, this.env, parentRunId, body);
+    return this.enqueue(plan.spec, null);
+  }
+
+  /** API-20 steps 6–8 shared with API-24: adapters built, queue cap, suite, `run.created` */
+  private enqueue(spec: RunSpec, label: string | null): string {
     for (const [role, get] of [
       ['issuer', (id: string) => this.opts.adapters.issuer(id)],
       ['wallet', (id: string) => this.opts.adapters.wallet(id)],
@@ -162,7 +185,7 @@ export class Orchestrator {
       const envs = new Set(Object.values(spec.env));
       store.sink.createSuite({
         suiteId,
-        name: r.label ?? 'interactive run',
+        name: label ?? (spec.parentRunId !== null ? 'derived run' : 'interactive run'),
         triggerKind: 'interactive',
         envClass: envs.size > 1 ? 'mixed' : envs.has('collab') ? 'collab' : 'local',
         appVersion: this.opts.appVersion ?? '0.0.0',
@@ -176,7 +199,7 @@ export class Orchestrator {
       triggerKind: 'interactive',
       flowId: target.flowId,
       spec,
-      label: r.label,
+      label,
       queuePosition: this.queue.length,
       knobsAllDefault: knobsAllDefault(spec),
       targetStepKey: target.stepKey,
@@ -269,6 +292,7 @@ export class Orchestrator {
         now: this.now,
         resultTimeoutMs: this.opts.resultTimeoutMs ?? 300_000,
         ...(this.opts.diagnose ? { beforeTerminal: this.opts.diagnose } : {}),
+        ...(this.opts.classify ? { classify: this.opts.classify } : {}),
       },
       runId,
       spec,

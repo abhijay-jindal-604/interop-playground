@@ -2,7 +2,16 @@ import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
-import { noBackend, ROUTES, RUN_ID, serveApi, settleAnimations, setTheme } from './support.ts';
+import {
+  CHILD_ID,
+  noBackend,
+  PARENT_ID,
+  ROUTES,
+  RUN_ID,
+  serveApi,
+  settleAnimations,
+  setTheme,
+} from './support.ts';
 
 const TAGS = ['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'];
 
@@ -24,6 +33,15 @@ for (const theme of ['light', 'dark'] as const) {
         // the run screen is fully rendered from the recorded log before axe runs
         await expect(page.getByRole('region', { name: 'Result' })).toBeVisible();
         await expect(page.getByRole('navigation', { name: 'Steps' })).toBeVisible();
+      }
+      if (route === `/runs/${PARENT_ID}`) {
+        // T-45: the diagnosis card with its open fix-it panel is part of the scan
+        await expect(page.getByRole('region', { name: 'Fix it and re-run' })).toBeVisible();
+      }
+      if (route === `/runs/${CHILD_ID}`) {
+        await expect(page.getByTestId('claim')).toBeVisible();
+        await page.getByRole('button', { name: /^Compare with run/ }).click();
+        await expect(page.locator('.compare-strip')).toBeVisible();
       }
       await settleAnimations(page);
       const result = await new AxeBuilder({ page }).withTags(TAGS).analyze();

@@ -25,7 +25,8 @@ export default defineConfig({
     ...devices['Desktop Chrome'],
   },
   projects: [
-    { name: 'chromium-functional', testIgnore: /a11y\.spec\.ts/ },
+    // e2e/live/** is session A's real-stack suite (e2e/playwright.live.config.ts)
+    { name: 'chromium-functional', testIgnore: [/a11y\.spec\.ts/, /[\\/]live[\\/]/] },
     { name: 'chromium-a11y', testMatch: /a11y\.spec\.ts/ },
   ],
   webServer: {

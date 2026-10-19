@@ -7,6 +7,7 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import type {
+  CreateRunRequest,
   AdapterEntry,
   AdapterId,
   IncompatibilityHit,
@@ -15,6 +16,8 @@ import type {
   Run,
 } from '@interop-playground/api';
 import { apiSend } from '../api/client.js';
+import { applicableKnobs, changedKnobs, KnobsPanel, type KnobChoice } from '../angle/KnobsPanel.js';
+import { knobList } from '../angle/model.js';
 import { EmptyState } from '../components/EmptyState.js';
 import { InlineError } from '../components/InlineError.js';
 import { Skeleton } from '../components/Skeleton.js';
@@ -379,6 +382,9 @@ export function SelectorPage() {
   }, []);
 
   // ----- StartBar (UI-08)
+  const [knobChoice, setKnobChoice] = useState<KnobChoice>({});
+  const [runLabel, setRunLabel] = useState('');
+  const knobLoad = useStore((st) => st.catalog.knobs);
   const [starting, setStarting] = useState(false);
   const [startError, setStartError] = useState<unknown>(null);
   const idem = useRef<{ key: string; body: string } | null>(null);
@@ -406,7 +412,14 @@ export function SelectorPage() {
   const canRun = entries !== null && !starting && blockReason === null;
   const start = useCallback(async () => {
     if (!canRun) return;
-    const req = toRequest(sel);
+    const chosen = [sel.issuer, sel.wallet, ...(sel.scope === 'full' ? [sel.verifier] : [])];
+    const all = knobLoad.status === 'ready' ? knobList(knobLoad.data) : [];
+    const knobs = changedKnobs(knobChoice, applicableKnobs(all, chosen, sel.format));
+    const req: CreateRunRequest = {
+      ...toRequest(sel),
+      ...(Object.keys(knobs).length > 0 ? { knobs } : {}),
+      ...(runLabel.trim() ? { label: runLabel.trim() } : {}),
+    };
     const body = JSON.stringify(req);
     if (!idem.current || idem.current.body !== body)
       idem.current = { key: crypto.randomUUID(), body };
@@ -420,7 +433,7 @@ export function SelectorPage() {
       setStartError(err);
       setStarting(false);
     }
-  }, [canRun, sel, navigate]);
+  }, [canRun, sel, navigate, knobChoice, knobLoad, runLabel]);
   useEffect(() => {
     const on = (e: KeyboardEvent) => {
       if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
@@ -517,6 +530,14 @@ export function SelectorPage() {
             ))}
           </div>
           {allFailed ? <p className="tone-warn small selector-warn">{c.checkFailed}</p> : null}
+          <KnobsPanel
+            adapters={[sel.issuer, sel.wallet, ...(sel.scope === 'full' ? [sel.verifier] : [])]}
+            format={sel.format}
+            choice={knobChoice}
+            label={runLabel}
+            onChoice={setKnobChoice}
+            onLabel={setRunLabel}
+          />
           <div className="start-bar" role="region" aria-label={c.startBar}>
             <div className="start-summary">
               <p className="start-text">{summary}</p>

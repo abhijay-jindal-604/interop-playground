@@ -9,6 +9,17 @@ import path from 'node:path';
 import type { Page } from '@playwright/test';
 import { BOOT_FIXTURES } from '../apps/ui/src/test/fixtures.ts';
 import { FAIL_REPORT } from '../apps/ui/src/test/report-fixtures.ts';
+import {
+  CHILD_ID,
+  CHILD_LINEAGE,
+  EXACT_DIAGNOSIS,
+  KNOB01,
+  PARENT_ID,
+  PARENT_LINEAGE,
+  POSSIBLE_DIAGNOSIS,
+  POSSIBLE_ID,
+  childCompare,
+} from '../apps/ui/src/test/angle-fixtures.ts';
 
 export const RUN_ID = '01J8ZZZZZZZZZZZZZZZZZZZZZZ';
 const repo = path.resolve(import.meta.dirname, '..');
@@ -47,10 +58,78 @@ const RUN_FIXTURES: Record<string, unknown> = {
   [`/api/v1/reports/runs/${RUN_ID}`]: { ...FAIL_REPORT, runId: RUN_ID },
 };
 
+// ---- angle A (T-45) on the T-44 flow: parent fails with FP-01 exact + KNOB-01 offered; the derive
+// call creates the child, which passes with `counterfactualResult: fixed` (fixture routes only)
+const passLog = JSON.parse(read('fixtures/events/FLOW-30-pass.json')) as Fixture;
+const delta = { knobId: 'KNOB-01', from: 'absent', to: 'present' };
+function relabel(log: Fixture, runId: string, child: boolean): Fixture {
+  const text = JSON.stringify(log).replaceAll(log.runId, runId);
+  const out = JSON.parse(text) as Fixture;
+  if (child) {
+    const created = out.events[0]!.payload as { spec: Record<string, unknown> };
+    created.spec = {
+      ...created.spec,
+      parentRunId: PARENT_ID,
+      knobDelta: delta,
+      causeFingerprintId: 'FP-01',
+      knobs: { 'KNOB-01': 'present' },
+    };
+    for (const e of out.events)
+      if (e.type === 'run.completed') Object.assign(e.payload, { counterfactualResult: 'fixed' });
+  }
+  return out;
+}
+const sse = (log: Fixture) =>
+  [
+    'retry: 3000\n\n',
+    ...log.events.map((e) => `id: ${e.seq}\nevent: ${e.type}\ndata: ${JSON.stringify(e)}\n\n`),
+    `event: stream.end\ndata: ${JSON.stringify(log.end)}\n\n`,
+  ].join('');
+const runOf = (log: Fixture, runId: string, extra: Record<string, unknown> = {}) => ({
+  runId,
+  spec: log.events[0]?.payload.spec,
+  label: null,
+  state: 'completed',
+  pinned: false,
+  note: null,
+  origin: 'local',
+  counterfactualResult: null,
+  links: { parentRunId: null, controlRunId: null, childRunIds: [] },
+  ...extra,
+});
+const parentLog = relabel(fixture, PARENT_ID, false);
+const possibleLog = relabel(fixture, POSSIBLE_ID, false);
+const childLog = relabel(passLog, CHILD_ID, true);
+const parentRun = runOf(parentLog, PARENT_ID);
+const childRun = runOf(childLog, CHILD_ID, {
+  counterfactualResult: 'fixed',
+  links: { parentRunId: PARENT_ID, controlRunId: null, childRunIds: [] },
+});
+const ANGLE_STREAMS: Record<string, string> = {
+  [PARENT_ID]: sse(parentLog),
+  [POSSIBLE_ID]: sse(possibleLog),
+  [CHILD_ID]: sse(childLog),
+};
+const ANGLE_FIXTURES: Record<string, unknown> = {
+  '/api/v1/knobs': { knobs: [KNOB01] },
+  [`/api/v1/runs/${PARENT_ID}`]: parentRun,
+  [`/api/v1/runs/${PARENT_ID}/diagnosis`]: EXACT_DIAGNOSIS,
+  [`/api/v1/runs/${PARENT_ID}/lineage`]: PARENT_LINEAGE,
+  [`POST /api/v1/runs/${PARENT_ID}/derive`]: { ...childRun, state: 'queued' },
+  [`/api/v1/runs/${POSSIBLE_ID}`]: runOf(possibleLog, POSSIBLE_ID),
+  [`/api/v1/runs/${POSSIBLE_ID}/diagnosis`]: POSSIBLE_DIAGNOSIS,
+  [`/api/v1/runs/${CHILD_ID}`]: childRun,
+  [`/api/v1/runs/${CHILD_ID}/lineage`]: CHILD_LINEAGE,
+  [`/api/v1/runs/${PARENT_ID}/compare/${CHILD_ID}`]: childCompare(parentRun, childRun),
+};
+export { CHILD_ID, PARENT_ID, POSSIBLE_ID };
+
 export const ROUTES = [
   '/',
   '/runs/01J8ZZZZZZZZZZZZZZZZZZZZZZ',
   '/runs/01J8ZZZZZZZZZZZZZZZZZZZZZZ/report',
+  `/runs/${PARENT_ID}`,
+  `/runs/${CHILD_ID}`,
   '/runs/01J8ZZZZZZZZZZZZZZZZZZZZZZ/compare/01J8YYYYYYYYYYYYYYYYYYYYYY',
   '/environment',
   '/history',
@@ -67,6 +146,22 @@ export const ROUTES = [
 export async function serveApi(page: Page): Promise<void> {
   await page.route('**/api/v1/**', async (route) => {
     const url = new URL(route.request().url());
+    const angleStream = /^\/api\/v1\/streams\/([^/]+)\/events$/.exec(url.pathname)?.[1];
+    if (angleStream && ANGLE_STREAMS[angleStream] && url.searchParams.get('format') !== 'json') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'text/event-stream',
+        body: ANGLE_STREAMS[angleStream],
+      });
+      return;
+    }
+    if (route.request().method() === 'POST') {
+      const posted = ANGLE_FIXTURES[`POST ${url.pathname}`];
+      if (posted !== undefined) {
+        await route.fulfill({ status: 201, json: posted });
+        return;
+      }
+    }
     if (
       url.pathname === `/api/v1/streams/${RUN_ID}/events` &&
       url.searchParams.get('format') !== 'json'
@@ -88,7 +183,8 @@ export async function serveApi(page: Page): Promise<void> {
       });
       return;
     }
-    const body = BOOT_FIXTURES[url.pathname] ?? RUN_FIXTURES[url.pathname];
+    const body =
+      ANGLE_FIXTURES[url.pathname] ?? BOOT_FIXTURES[url.pathname] ?? RUN_FIXTURES[url.pathname];
     if (body === undefined) {
       await route.fulfill({
         status: 404,

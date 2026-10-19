@@ -159,6 +159,61 @@ describe('ui.inspector pane on FLOW-30', () => {
     expect(panel.textContent).toContain('Key-binding JWT');
   });
 
+  it('shows the wallet engine ops decoded (ADR-77): inspect-credential and build-kb-jwt', () => {
+    let ev = append(
+      withoutTerminal(f.events),
+      'engine.call',
+      {
+        engine: 'playground-ts',
+        op: 'inspect-credential',
+        inputSummary: { format: 'dc+sd-jwt', bytes: 900 },
+        outputSummary: {
+          format: 'dc+sd-jwt',
+          header: { alg: 'ES256', typ: 'dc+sd-jwt', kid: 'did:web:issuer#k1' },
+          payload: { iss: 'https://issuer.example', vct: 'urn:eu.europa.ec.eudi:pid:1' },
+          disclosures: [{ name: 'given_name', value: 'Asha', digest: 'd1' }],
+          artifacts: { 'credential-header': { x5cPresent: false, x5cLength: 0 } },
+        },
+        durationMs: 3,
+      },
+      'vci.credential.inspect',
+    );
+    ev = append(
+      ev,
+      'engine.call',
+      {
+        engine: 'playground-ts',
+        op: 'build-kb-jwt',
+        inputSummary: { alg: 'ES256', kid: 'did:jwk:x', disclosures: 1 },
+        outputSummary: {
+          header: { alg: 'ES256', typ: 'kb+jwt' },
+          payload: { iat: 1, aud: 'verifier.example', nonce: 'n-1', sd_hash: 'h' },
+          jwsSha256: 'cd'.repeat(32),
+        },
+        durationMs: 2,
+      },
+      'vp.token.build',
+    );
+    window.history.replaceState(null, '', '/runs/x#step=vci.credential.inspect');
+    let pane = show(ev);
+    fireEvent.click(tab(pane, 'Decoded'));
+    let panel = ipanel(pane);
+    expect(panel.textContent).toContain('Credential as the wallet decoded it (SD-JWT VC)');
+    expect(panel.textContent).toContain('From the engine call inspect-credential (playground-ts)');
+    expect(panel.textContent).toContain('Disclosed claim: given_name = Asha');
+    expect(panel.textContent).toContain('x5c no');
+    expect(panel.textContent).toContain('urn:eu.europa.ec.eudi:pid:1');
+    cleanup();
+    window.history.replaceState(null, '', '/runs/x#step=vp.token.build');
+    pane = show(ev);
+    fireEvent.click(tab(pane, 'Decoded'));
+    panel = ipanel(pane);
+    expect(panel.textContent).toContain('Key-binding JWT (ES256)');
+    expect(panel.textContent).toContain('typ: kb+jwt');
+    expect(panel.textContent).toContain('"aud": "verifier.example"');
+    expect(panel.textContent).toContain(`SHA-256 of the signed JWT: ${'cd'.repeat(32)}`);
+  });
+
   it('renders bodyState chips and copy, and redaction chips', () => {
     const base = withoutTerminal(f.events);
     const sha = 'ab'.repeat(32);

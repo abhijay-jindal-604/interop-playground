@@ -1,9 +1,10 @@
 /**
  * The pinned-Mermaid path of the sequence diagram (06 UI-12 rendering steps 2-3, ADR-40, RISK-32).
- * This is the only module that may reach Mermaid (plan/10 §2: pinned 11.17.2). The loader is a
- * seam: until the `mermaid` dependency is installed in the workspace it answers `null` and the
- * built-in SVG renderer draws every flow, with the toolbar line "Using the built-in diagram renderer."
- * (ADR-78). Tests swap the loader to exercise the integrity check.
+ * This is the only module that may reach Mermaid (plan/10 §2: pinned 11.17.2). The production loader
+ * imports the pinned `mermaid` lazily (its own chunk, ADR-78); a loader that answers `null` or a
+ * render that throws hands the flow to the built-in SVG renderer, with the toolbar line "Using the
+ * built-in diagram renderer.". Tests swap the loader to exercise the integrity check (jsdom has no
+ * layout, so the ui test setup installs the `null` loader).
  */
 import { expectedMessageCount, mermaidText, type DiagramFlow } from './model.js';
 
@@ -17,10 +18,13 @@ export interface MermaidApi {
 
 type Loader = () => Promise<MermaidApi | null>;
 const NOT_INSTALLED: Loader = () => Promise.resolve(null);
-let loader: Loader = NOT_INSTALLED;
+/** ADR-78: the pinned dependency, loaded on first use */
+export const MERMAID_IMPORT: Loader = () =>
+  import('mermaid').then((m) => m.default as unknown as MermaidApi);
+let loader: Loader = MERMAID_IMPORT;
 let loaded: Promise<MermaidApi | null> | null = null;
 
-/** replace the Mermaid loader (tests; the production loader once the pinned dependency lands) */
+/** replace the Mermaid loader (tests); `null` = Mermaid unavailable */
 export function setMermaidLoader(next: Loader | null): void {
   loader = next ?? NOT_INSTALLED;
   loaded = null;

@@ -7,7 +7,8 @@
  *
  * With a store (T-08/T-20): the sink is attached to the event bus, API-15 streams, the
  * orchestrator (runs left open by an earlier process are failed `bff_restarted`) and the run routes.
- * With a store also the C12 diagnosis hook (T-41) and API-45 run reports (T-32).
+ * With a store also the C12 diagnosis hook (T-41) and API-45 run reports (T-32), API-24 derive
+ * with child classification (T-42), API-30 diagnosis and API-31 compare.
  * Always: the catalog routes (T-21: API-02/04/07/08/09) and the environment manager (T-12:
  * API-10..12), which is the orchestrator's `ResolveEnv`; `startServer` starts its probe loop.
  */
@@ -31,9 +32,12 @@ import type { SidecarProbe } from './routes/health.js';
 import { registerStatic } from './routes/static.js';
 import { validateContent } from './validate/index.js';
 import { CaptureHttp, generateSelfToken } from './capture/index.js';
-import { DiagnosisEngine, loadLibrary } from './diagnosis/index.js';
+import { DiagnosisEngine, classifyStoredChild, loadLibrary } from './diagnosis/index.js';
 import { Orchestrator } from './orchestrator/index.js';
 import type { AdapterSet, CaptureHooks, KeyService, ResolveEnv } from './orchestrator/index.js';
+import { registerCompare } from './routes/compare.js';
+import { registerDerive } from './routes/derive.js';
+import { registerDiagnosis } from './routes/diagnosis.js';
 import { registerReports } from './routes/reports.js';
 import { registerRuns } from './routes/runs.js';
 import { registerStream } from './routes/stream.js';
@@ -210,12 +214,16 @@ export async function createServer(opts: CreateServerOptions = {}): Promise<Fast
         diagnose: (runId, terminal) => {
           diagnosis.diagnoseRun(runId, terminal);
         },
+        classify: (runId, verdict) => classifyStoredChild(store, runId, verdict),
       });
     if (opts.orchestrator === undefined) orchestrator.recover();
     app.decorate('playgroundOrchestrator', orchestrator);
     app.addHook('onClose', async () => orchestrator.stop());
     registerRuns(app, { store, orchestrator });
     registerReports(app, { store, flows: orchestrator.flows });
+    registerDerive(app, { store, orchestrator });
+    registerDiagnosis(app, { store, env: opts.resolveEnv ?? env });
+    registerCompare(app, { store, flows: orchestrator.flows });
   }
   await registerStatic(app, config.uiDistDir);
   if (opts.startEnvProbes === true) env.start();

@@ -442,6 +442,13 @@ export const runDialogCopy = {
 } as const;
 
 /** UI-18..UI-23 inspector copy, verbatim. */
+const INSPECT_FORMAT: Record<string, string> = {
+  'dc+sd-jwt': 'SD-JWT VC',
+  ldp_vc: 'JSON-LD',
+  mso_mdoc: 'mDoc',
+  jwt_vc_json: 'JWT VC',
+};
+
 export const inspectorCopy = {
   tabsLabel: 'Inspector views',
   tabs: {
@@ -534,6 +541,16 @@ export const inspectorCopy = {
     from: (where: string) => `From ${where}`,
     disclosed: (name: string, value: string) => `Disclosed claim: ${name} = ${value}`,
     x5c: (present: boolean) => `x5c ${present ? 'yes' : 'no'}`,
+    fromEngine: (op: string, engine: string) => `From the engine call ${op} (${engine})`,
+    inspected: (format: string) =>
+      `Credential as the wallet decoded it${format ? ` (${INSPECT_FORMAT[format] ?? format})` : ''}`,
+    inspectError: (message: string) => `The wallet could not decode the credential: ${message}`,
+    bytesOnly: (n: number) => `${n} bytes. This format is decoded by the verifier side, not here.`,
+    artifacts: 'Fields the diagnosis reads',
+    kbJwt: (alg: string | null) => `Key-binding JWT${alg ? ` (${alg})` : ''}`,
+    jwsSha256: (hash: string) => `SHA-256 of the signed JWT: ${hash}`,
+    engineNote:
+      'Built and signed inside the playground wallet. The holder key itself never leaves the server.',
   },
   checks: {
     empty: 'No checks were recorded for this step.',
@@ -849,4 +866,174 @@ export const reportCopy = {
     action: 'Go to History',
   },
   claim: 'Result of the change',
+} as const;
+
+/** Angle A on the run screen and the report (06 UI-24..UI-28, UI-07 KnobList), verbatim. */
+export const angleCopy = {
+  card: {
+    region: 'Diagnosis',
+    loading: 'Looking for a known cause…',
+    loadError: 'The diagnosis could not be loaded. The run itself is unaffected. Try again.',
+    heading: {
+      exact: (title: string) => `Diagnosis: ${title}`,
+      possible: 'Possible causes',
+      observed: 'Observed, not diagnosed',
+      unclassified: 'No known cause matched',
+    },
+    sub: {
+      exact: 'The playground recognised this failure from captured traffic.',
+      possible:
+        'More than one known cause fits this failure, so the playground does not offer a re-run.',
+      observed:
+        "This was seen but part of the evidence is outside the playground's capture, so no cause is claimed.",
+      unclassified: 'The failing check is shown as the upstream reported it.',
+    },
+    chip: {
+      exact: 'Exact match',
+      possible: 'Possible cause',
+      observed: 'Observed only',
+      unclassified: 'Unclassified',
+    },
+    chipTip: {
+      exact: 'One known cause matched using fully captured traffic.',
+      possible: 'Several known causes match; none is proven for this run.',
+      observed: 'Seen, but not diagnosed: part of the evidence is not captured.',
+      unclassified: 'No known cause matched this failure.',
+    },
+    partial: (capture: string, reason: string | null) =>
+      `The failing step has ${capture}${reason ? ` (${reason})` : ''}. The playground does not diagnose from partial captures.`,
+    side: (side: string, component: string, versions: string) =>
+      `Deviating side: ${side}: ${component} ${versions}`,
+    spec: (clause: string) => `Spec: ${clause}`,
+    gaps: (ids: string) => `Known gaps: ${ids}`,
+    evidence: 'Evidence: ',
+    evidenceTip: 'Evidence identifier in the research log',
+    showMessages: 'Show matched messages',
+    showCheck: 'Show the failing check',
+    findings: 'Conformance findings',
+    findingsSub: 'These are lint results on steps that passed. They never change the verdict.',
+    none: 'none',
+    check: (checkId: string, code: string | null, message: string) =>
+      `${checkId}${code ? ` ${code}` : ''}: ${message}`,
+  },
+  fix: {
+    region: 'Fix it and re-run',
+    title: 'Try the fix',
+    arrowTip: 'The only value that changes.',
+    explainer:
+      'Everything else stays the same: same issuer, wallet, verifier, format and holder key.',
+    walletRuntime:
+      "This is a simulated fix: the playground's own wallet is changed, so it shows where the defect is, not a change you can make to Inji.",
+    peerRuntime: (name: string) => `This changes an option of the ${name} component, not of Inji.`,
+    provenBy: (ids: string) => `Proven by earlier runs: ${ids}`,
+    button: 'Fix it and re-run',
+    sending: 'Starting…',
+  },
+  noFix: {
+    'no-proven-knob':
+      'Diagnosis only. No change has been proven to fix this for this wallet, verifier and format.',
+    'several-causes':
+      'Diagnosis only. More than one known cause fits, so no single change can be proven.',
+    unclassified: 'Diagnosis only. No known cause matched, so there is nothing to re-run.',
+    'tamper-run': 'Tamper runs are not re-run with a fix. See the tamper result.',
+    'observed-only':
+      'Diagnosis only. This was observed but not diagnosed, so no re-run is offered.',
+    'version-drift':
+      "A fix was found but a component's version changed since this run. Run the original combination again first.",
+    'environment-changed':
+      'A fix was found but the tunnel changed since this run. Restore the tunnel (scripts/tunnel.sh) or run the original combination again.',
+    imported: 'Imported runs cannot be re-run with a fix: their holder key is not included.',
+    'not-fixed-before':
+      'The fix for this combination is switched off until it is re-verified (it did not hold last time).',
+  } as Record<string, string>,
+  versionDrift: (column: string, was: string, now: string) =>
+    `A fix was found but the ${column} version changed since this run (${was} to ${now}). Run the original combination again first.`,
+  child: {
+    banner: (parent: string, knob: string, from: string, to: string, fp: string | null) =>
+      `This run is a re-run of ${parent} with one change: ${knob} ${from} → ${to}.${fp ? ` It tests whether that change fixes ${fp}.` : ''}`,
+    bannerShort: (parent: string, knob: string, from: string, to: string) =>
+      `Re-run of ${parent}: ${knob} ${from} → ${to}`,
+    region: 'Re-run result',
+    chip: {
+      fixed: 'Fixed',
+      moved: 'Moved',
+      'not-fixed': 'Not fixed',
+      inconclusive: 'Inconclusive',
+    },
+    heading: {
+      fixed: 'The change fixed it.',
+      moved: 'The run now fails somewhere else.',
+      'not-fixed': 'The change did not fix it.',
+      inconclusive: 'The re-run did not settle it.',
+    },
+    moved: (checkId: string) =>
+      `The run fails at a different check (${checkId}) or a different cause matches. Its own diagnosis is above. You can try one more change.`,
+    notFixed: (fp: string) =>
+      `The same cause (${fp}) still matches. This change is flagged for review for this combination, and its fix button is off until it is re-verified.`,
+    inconclusive:
+      "The re-run ended with an error or was cancelled, or a step the diagnosis relied on lost capture. Nothing is concluded; the original run's diagnosis still stands. Run the fix again.",
+    runAgain: 'Run the fix again',
+    compare: (parent: string) => `Compare with run ${parent}`,
+    open: (parent: string) => `Open run ${parent}`,
+    copyClaim: 'Copy claim sentence',
+    copied: 'Copied the claim sentence.',
+    parentDeleted: 'The parent run was deleted, so the comparison is no longer available.',
+    notComparable: 'The runs cannot be compared.',
+    announce: (word: string) => `Finished. Re-run result: ${word}.`,
+  },
+  strip: {
+    disclosure: (parent: string) => `Compare with run ${parent}`,
+    original: (parent: string) => `Run ${parent} (original)`,
+    rerun: (child: string, knob: string, to: string) => `Run ${child} (with ${knob} = ${to})`,
+    step: 'Step',
+    change: 'Change',
+    direct: (knobId: string) => `Changed by ${knobId}`,
+    showUnchanged: (n: number) => `Show ${n} unchanged steps`,
+    full: 'Open full comparison',
+    volatile:
+      'Volatile fields such as nonces and timestamps are hidden. Show them in the full comparison.',
+    same: 'Same',
+    differs: (n: number) => `Differs (${n} field${n === 1 ? '' : 's'})`,
+    onlyParent: 'Only in original',
+    onlyChild: 'Only in re-run',
+    skipped: (side: 'parent' | 'child') =>
+      `Skipped in ${side === 'parent' ? 'original' : 're-run'}`,
+    empty: 'No step differs between the two runs.',
+    parentDeleted: 'The original run was deleted.',
+    notComparable: 'These runs cannot be compared.',
+  },
+  lineage: {
+    heading: 'Re-run chain',
+    current: 'current',
+    deleted: 'run deleted',
+    result: {
+      fixed: 'Fixed',
+      moved: 'Moved',
+      'not-fixed': 'Not fixed',
+      inconclusive: 'Inconclusive',
+      running: 'Running',
+    },
+    run: (id: string) => `Run ${id}`,
+  },
+  knobs: {
+    disclosure: 'Advanced options',
+    label: 'Run label',
+    heading: 'Settings for this combination',
+    none: 'No settings apply to this combination.',
+    loading: 'Loading the settings…',
+    error: 'Could not load the settings list. You can still run with the defaults.',
+    defaultMark: '(default)',
+    status: { proven: 'Proven', unproven: 'Unproven', 'no-value-passes': 'No value passes' },
+    statusTip: {
+      proven: (by: string) =>
+        `A re-run with this change was seen to fix the failure it targets (${by}).`,
+      unproven:
+        'No re-run has proven this change yet. It can be set, but the playground will not offer it as a fix.',
+      'no-value-passes': 'No value of this setting makes the combination pass.',
+    },
+    lockedCollab: 'Locked: the Collab sandbox is read-only, so issuer settings cannot change.',
+    lockedMobile: 'Locked: the phone leg uses a fixed request profile.',
+    summary: (n: number) =>
+      `${n} setting(s) differ from the defaults. Runs with changed settings are kept in history but do not count in the matrix.`,
+  },
 } as const;

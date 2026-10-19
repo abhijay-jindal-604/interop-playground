@@ -140,7 +140,9 @@ const FLOW30 = [
   ['vp.dcapi.response.post', 2],
   ['vp.dcapi.holder', 1],
 ];
-const EXPECTED = { 'FLOW-01': FLOW01, 'FLOW-04': FLOW01, 'FLOW-30': FLOW30 };
+// FLOW-08: 03 FLOW-08 step table (9 keys; no variant/config-read, offer fetch skipped by value).
+const FLOW08 = FLOW01.filter(([k]) => k !== 'vci.setup.variant' && k !== 'vci.setup.config-read');
+const EXPECTED = { 'FLOW-01': FLOW01, 'FLOW-04': FLOW01, 'FLOW-08': FLOW08, 'FLOW-30': FLOW30 };
 
 const messageIndex = (steps) => steps.flatMap((s) => Array(s.messages).fill(s.stepKey));
 

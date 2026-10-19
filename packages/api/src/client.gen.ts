@@ -1672,8 +1672,11 @@ export interface components {
             };
             /** @enum {string} */
             confidence: "exact" | "observed" | "possible";
-            /** @enum {string} */
-            deviatingSide: "issuer" | "playground" | "verifier" | "wallet";
+            /**
+             * @description 09 A2's six sides (G-151): a two-sided defect is 'issuer+verifier', an environment fault 'environment'
+             * @enum {string}
+             */
+            deviatingSide: "environment" | "issuer" | "issuer+verifier" | "playground" | "verifier" | "wallet";
             evidenceSIds: string[];
             fingerprintId: components["schemas"]["FingerprintId"];
             fingerprintVersion: number;

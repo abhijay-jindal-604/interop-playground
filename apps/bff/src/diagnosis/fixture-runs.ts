@@ -6,7 +6,7 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { mapVerifyResult } from '@interop-playground/adapters';
-import type { CheckResult, Coverage, RunSpec, RunVerdict } from '@interop-playground/api';
+import type { CheckResult, Coverage, Run, RunSpec, RunVerdict } from '@interop-playground/api';
 import { REPO_ROOT } from '../config/index.js';
 import { sampleSpec } from '../store/fixture-log.js';
 import type { Store } from '../store/index.js';
@@ -150,11 +150,12 @@ export function closeRun(
   store: Store,
   runId: string,
   terminal: { verdict: RunVerdict } | { failed: string },
+  counterfactualResult: Run['counterfactualResult'] = null,
 ): void {
   if ('verdict' in terminal)
     store.sink.append(runId, {
       type: 'run.completed',
-      payload: { verdict: terminal.verdict, counterfactualResult: null },
+      payload: { verdict: terminal.verdict, counterfactualResult },
     });
   else
     store.sink.append(runId, {

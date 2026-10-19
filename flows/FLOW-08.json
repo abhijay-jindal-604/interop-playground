@@ -1,0 +1,96 @@
+{
+  "flowId": "FLOW-08",
+  "kind": "issuance",
+  "title": "Pre-auth against walt.id issuer-api2 (issuer.waltid, wallet.playground-ts)",
+  "targetStepKey": "vci.credential",
+  "lifelines": [
+    "IUI",
+    "I",
+    "W",
+    "L"
+  ],
+  "steps": [
+    {
+      "stepKey": "vci.offer.mint",
+      "order": 1,
+      "from": "IUI",
+      "to": "I",
+      "label": "POST /issuer2/credential-offers (by value; KNOB-01 runtimeOverrides)",
+      "kind": "http",
+      "messages": 2
+    },
+    {
+      "stepKey": "vci.offer.fetch",
+      "order": 2,
+      "from": "W",
+      "to": "I",
+      "label": "offer carried by value (no fetch)",
+      "kind": "http",
+      "messages": 2,
+      "skipReason": "offer by value"
+    },
+    {
+      "stepKey": "vci.metadata.issuer",
+      "order": 3,
+      "from": "W",
+      "to": "I",
+      "label": "GET /.well-known/openid-credential-issuer/openid4vci",
+      "kind": "http",
+      "messages": 2
+    },
+    {
+      "stepKey": "vci.metadata.as",
+      "order": 4,
+      "from": "W",
+      "to": "I",
+      "label": "GET /.well-known/oauth-authorization-server/openid4vci",
+      "kind": "http",
+      "messages": 2
+    },
+    {
+      "stepKey": "vci.token",
+      "order": 5,
+      "from": "W",
+      "to": "I",
+      "label": "POST /openid4vci/token",
+      "kind": "http",
+      "messages": 2
+    },
+    {
+      "stepKey": "vci.nonce",
+      "order": 6,
+      "from": "W",
+      "to": "I",
+      "label": "POST /openid4vci/nonce",
+      "kind": "http",
+      "messages": 2
+    },
+    {
+      "stepKey": "vci.proof.sign",
+      "order": 7,
+      "from": "W",
+      "to": "L",
+      "label": "sign proof JWT (ES256, P1363)",
+      "kind": "engine",
+      "messages": 1
+    },
+    {
+      "stepKey": "vci.credential",
+      "order": 8,
+      "from": "W",
+      "to": "I",
+      "label": "POST /openid4vci/credential",
+      "kind": "http",
+      "messages": 2
+    },
+    {
+      "stepKey": "vci.credential.inspect",
+      "order": 9,
+      "from": "W",
+      "to": "L",
+      "label": "decode SD-JWT: x5c present/absent, cnf.jwk",
+      "kind": "engine",
+      "messages": 1
+    }
+  ]
+}

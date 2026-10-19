@@ -30,6 +30,7 @@
     "test:repo": "vitest run --project repo",
     "test:ui": "vitest run --project ui",
     "e2e": "playwright test",
+    "e2e:live": "playwright test -c e2e/playwright.live.config.ts",
     "contrast": "node scripts/contrast.mjs",
     "contracts:generate": "node scripts/contracts-generate.mjs",
     "contracts:check": "npm run contracts:generate && git diff --exit-code -- packages/api/openapi.yaml packages/api/api.schema.json packages/api/src/client.gen.ts",

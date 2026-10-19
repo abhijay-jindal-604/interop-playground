@@ -12,7 +12,10 @@ import { InlineError } from '../components/InlineError.js';
 import { shortId } from '../components/RunLink.js';
 import { Skeleton } from '../components/Skeleton.js';
 import { StatusBadge } from '../components/StatusBadge.js';
-import { reportCopy as c, selectorCopy } from '../copy.js';
+import { FixItPanel } from '../angle/DiagnosisCard.js';
+import { CLASS_TONE, diagnosisCase, fixItDecision, knobEntry, sideWord } from '../angle/model.js';
+import { useKnobs } from '../angle/RunAngle.js';
+import { angleCopy, reportCopy as c, selectorCopy } from '../copy.js';
 import { announce } from '../lib/announce.js';
 import { FORMAT_LABEL } from '../lib/labels.js';
 import { PageFrame } from '../routes/PageFrame.js';
@@ -195,7 +198,7 @@ function Diagnosis({ r }: { r: RunReport }) {
               <div>
                 <dt>{c.match.side}</dt>
                 <dd>
-                  {m.deviatingSide}: {m.component.name} {m.component.versions}
+                  {sideWord(m.deviatingSide)}: {m.component.name} {m.component.versions}
                 </dd>
               </div>
               <div>
@@ -228,26 +231,55 @@ function Diagnosis({ r }: { r: RunReport }) {
   );
 }
 
-function FixIt({ r }: { r: RunReport }) {
-  const { offers, noFixReason } = r.diagnosis;
-  if (r.claimSentence)
+/** the Fix-it section: the UI-25 panel (exact cause, one offer, local failed run), the child's
+ * counterfactual block (classification chip + claim sentence + compare link), or the NoFixLine */
+function FixIt({ r, run }: { r: RunReport; run: Run | null }) {
+  const knobs = useKnobs();
+  const d = r.diagnosis;
+  const parent = run?.links?.parentRunId ?? run?.spec?.parentRunId ?? null;
+  const result = run?.counterfactualResult ?? null;
+  if (parent && result)
     return (
-      <p>
-        <strong>{c.claim}:</strong> {r.claimSentence}
-      </p>
+      <div className="child-result" data-classification={result} data-testid="report-child-result">
+        <p className="diagnosis-head">
+          <span className={`badge tone-${CLASS_TONE[result]}`}>{angleCopy.child.chip[result]}</span>
+          <strong>{angleCopy.child.heading[result]}</strong>
+        </p>
+        {result === 'fixed' && r.claimSentence ? (
+          <blockquote className="claim-block" data-testid="claim">
+            {r.claimSentence}
+          </blockquote>
+        ) : null}
+        <p>
+          <Link to={`/runs/${parent}/compare/${r.runId}`}>
+            {angleCopy.child.compare(shortId(parent))}
+          </Link>
+        </p>
+      </div>
     );
-  if (offers.length > 0)
+  const view = diagnosisCase(d);
+  const decision = fixItDecision(d, view, {
+    origin: run?.origin ?? null,
+    outcome: r.fields.verdict.outcome,
+  });
+  if (decision.offer)
     return (
-      <ul className="report-list">
-        {offers.map((o) => (
-          <li key={`${o.fingerprintId}-${o.knobId}`}>
-            <code>{c.offer(o.knobId, o.from, o.to)}</code>{' '}
-            <span className="muted small">{c.offerProven(o.provenBy.join(', '))}</span>
-          </li>
-        ))}
-      </ul>
+      <FixItPanel
+        runId={r.runId}
+        offer={decision.offer}
+        knob={knobEntry(knobs, decision.offer.knobId)}
+        peerName={null}
+        onGone={() => undefined}
+      />
     );
-  return <p className="muted">{noFixReason ? (c.noFix[noFixReason] ?? noFixReason) : c.noOffer}</p>;
+  // the report keeps its own A9.3 wording (reportCopy.noFix), the card's line otherwise
+  const key = d.noFixReason ?? decision.noFix;
+  const line = key ? (c.noFix[key] ?? angleCopy.noFix[key] ?? key) : c.noOffer;
+  return (
+    <p className="muted" data-nofix={key ?? 'none'}>
+      {line}
+    </p>
+  );
 }
 
 function ReportBody({ r, run }: { r: RunReport; run: Run | null }) {
@@ -264,7 +296,7 @@ function ReportBody({ r, run }: { r: RunReport; run: Run | null }) {
         <Diagnosis r={r} />
       </Section>
       <Section id="fix-it" title={c.sections.fixit}>
-        <FixIt r={r} />
+        <FixIt r={r} run={run} />
       </Section>
       {r.tamper ? (
         <Section id="tamper" title={c.sections.tamper}>

@@ -15,11 +15,19 @@
  * T-24/T-26: `wallet.playground-ts` is part of `bundleAdapters()`; its holder keys come from the
  * orchestrator's key service (`HolderKeyService` over the store's `holder_keys` / `run_keys`
  * tables, 05 §4.1, §6: the private JWK is read back only by `sign`).
+ *
+ * T-43: `issuer.waltid` (peers profile) is part of `bundleAdapters()` too; its KNOB-01 `present`
+ * material is read from `/certs/peers` (`PEERS_CERT_DIR` overrides, `WALTID_ISSUER_URL` the base).
  */
 import { existsSync, readFileSync } from 'node:fs';
+import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import type { FastifyInstance } from 'fastify';
-import { HolderKeyService, bundleAdapters } from '@interop-playground/adapters';
+import {
+  HolderKeyService,
+  bundleAdapters,
+  x5cMaterialFromFiles,
+} from '@interop-playground/adapters';
 import type {
   GatewayCorrelation,
   HolderKeyRef,
@@ -138,6 +146,22 @@ export function holderKeysFor(store: Pick<Store, 'driver'>): HolderKeyService {
   return new HolderKeyService(() => repo);
 }
 
+/**
+ * 03 FLOW-08 "key redacted": the walt.id issuer key's private `d` that KNOB-01 `present` sends in
+ * the mint body goes into the store's secret registry, so the sink redacts it before anything
+ * is stored (02 §6.2). No key file (no peers profile material): nothing to register.
+ */
+export function registerPeerSecrets(store: Pick<Store, 'sink'>, env: NodeJS.ProcessEnv): string[] {
+  const dir = env.PEERS_CERT_DIR ?? '/certs/peers';
+  const key = path.join(dir, 'waltid-issuer.key');
+  const cert = path.join(dir, 'waltid-issuer.pem');
+  if (!existsSync(key) || !existsSync(cert)) return [];
+  const d = x5cMaterialFromFiles(key, cert)().issuerJwk.d;
+  if (!d) return [];
+  store.sink.registry.add('WALTID_ISSUER_KEY_D', d);
+  return ['WALTID_ISSUER_KEY_D'];
+}
+
 export interface MainOptions {
   /** wallets of later tasks (T-24) or tests */
   wallets?: Readonly<Record<string, WalletAdapter>>;
@@ -154,6 +178,8 @@ export function adaptersFor(
     publicHost: config.publicHost ?? LOOPBACK_HOST,
     ...(env.CERTIFY_PREAUTH_URL ? { certifyPreauthBase: env.CERTIFY_PREAUTH_URL } : {}),
     ...(env.VERIFY_SERVICE_URL ? { verifyServiceBase: env.VERIFY_SERVICE_URL } : {}),
+    ...(env.WALTID_ISSUER_URL ? { waltidIssuerBase: env.WALTID_ISSUER_URL } : {}),
+    ...(env.PEERS_CERT_DIR ? { peersCertDir: env.PEERS_CERT_DIR } : {}),
     configDir: config.configDir,
     gateway: gatewayCorrelation(correlation),
     ...(opts.wallets ? { wallets: opts.wallets } : {}),
@@ -186,7 +212,10 @@ export async function main(
     onEnvReady: () => refreshGateway?.(),
   });
   const store = (app as unknown as { playgroundStore?: Store | null }).playgroundStore ?? null;
-  if (store) keyRepo = sqlHolderKeyStore(store.driver);
+  if (store) {
+    keyRepo = sqlHolderKeyStore(store.driver);
+    registerPeerSecrets(store, env);
+  }
   if (!store || env.GATEWAY_DISABLED === '1') {
     app.log.warn('gateway not started (no store, or GATEWAY_DISABLED=1)');
     return {

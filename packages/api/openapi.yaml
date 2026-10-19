@@ -3882,8 +3882,11 @@ components:
             - possible
           type: string
         deviatingSide:
+          description: "09 A2's six sides (G-151): a two-sided defect is 'issuer+verifier', an environment fault 'environment'"
           enum:
+            - environment
             - issuer
+            - issuer+verifier
             - playground
             - verifier
             - wallet

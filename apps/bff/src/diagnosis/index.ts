@@ -20,3 +20,5 @@ export {
   validatePredicate,
 } from './library.js';
 export type { Fingerprint, NoFixReason, Predicate } from './types.js';
+export { classifyChild, classifyStoredChild, diagnosisSteps, storedMatches } from './classify.js';
+export type { ChildResult, StoredMatch } from './classify.js';

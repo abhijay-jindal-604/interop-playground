@@ -52,6 +52,18 @@ const b64u = (b: Uint8Array | string): string =>
   (typeof b === 'string' ? Buffer.from(b, 'utf8') : Buffer.from(b)).toString('base64url');
 const sha256Hex = (s: string): string => createHash('sha256').update(s).digest('hex');
 
+/**
+ * The well-known URL of an issuer or AS identifier (OID4VCI 1.0 §12.2.2, RFC 8414 §3): the
+ * well-known segment goes between the host and the identifier's path (walt.id
+ * `…:18103/.well-known/openid-credential-issuer/openid4vci`); an identifier without a path
+ * (Certify `https://<PUBLIC_HOST>`) gives the plain `<origin>/.well-known/<name>`.
+ */
+export function wellKnownUrl(identifier: string, name: string): string {
+  const u = new URL(identifier);
+  const p = u.pathname.replace(/\/+$/, '');
+  return `${u.origin}/.well-known/${name}${p}`;
+}
+
 export interface PlaygroundTsOptions {
   gateway?: GatewayCorrelation;
   /** clock in ms (KB-JWT / proof `iat`) */
@@ -210,6 +222,10 @@ export class PlaygroundTsWallet implements WalletAdapter {
       } catch {
         offerJson = null;
       }
+      // FLOW-08: an offer by value has no fetch hop; the step is recorded as skipped
+      await inStep(ctx, 'vci.offer.fetch', () =>
+        Promise.resolve({ outcome: 'skipped' as const, value: null }),
+      );
     }
     const code = preAuthorizedCodeOf(offerJson);
     const iss = isRecord(offerJson) ? str(offerJson.credential_issuer) : null;
@@ -229,7 +245,7 @@ export class PlaygroundTsWallet implements WalletAdapter {
     // vci.metadata.issuer / vci.metadata.as
     const issBase = trimSlash(iss);
     const md = await inStep(ctx, 'vci.metadata.issuer', async () => {
-      const r = await get('vci.metadata.issuer', `${issBase}/.well-known/openid-credential-issuer`);
+      const r = await get('vci.metadata.issuer', wellKnownUrl(issBase, 'openid-credential-issuer'));
       return { outcome: r.status === 200 && isRecord(r.body) ? 'pass' : 'fail', value: r.body };
     });
     if (!isRecord(md)) return fail;
@@ -239,7 +255,7 @@ export class PlaygroundTsWallet implements WalletAdapter {
         : issBase,
     );
     const as = await inStep(ctx, 'vci.metadata.as', async () => {
-      const r = await get('vci.metadata.as', `${asBase}/.well-known/oauth-authorization-server`);
+      const r = await get('vci.metadata.as', wellKnownUrl(asBase, 'oauth-authorization-server'));
       return { outcome: r.status === 200 && isRecord(r.body) ? 'pass' : 'fail', value: r.body };
     });
     if (!isRecord(as)) return fail;

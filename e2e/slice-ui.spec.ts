@@ -12,7 +12,9 @@ test.describe('slice UI (T-29 diagram, T-30 selector, UI-51 report)', () => {
     await page.goto(`/runs/${RUN_ID}`);
     const figure = page.getByRole('figure', { name: 'Sequence diagram' });
     await expect(figure.locator('.dg-block')).toHaveCount(2);
-    await expect(figure.getByText('Using the built-in diagram renderer.')).toBeVisible();
+    // ADR-78: the pinned Mermaid draws both blocks and passes the index check (RISK-32)
+    await expect(figure.locator('[data-renderer="mermaid"]')).toHaveCount(2);
+    await expect(figure.getByText('Using the built-in diagram renderer.')).toHaveCount(0);
     await expect(figure.locator('[data-step="vp.response.post"]').first()).toHaveAttribute(
       'data-state',
       'fail',

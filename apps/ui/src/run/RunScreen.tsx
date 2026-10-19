@@ -14,7 +14,8 @@ import { AwaitingPanel } from '../delivery/AwaitingPanel.js';
 import { DeliveryDialog } from '../delivery/Delivery.js';
 import { DiagramPane } from '../diagram/Diagram.js';
 import { lifelineNames } from '../diagram/model.js';
-import { Inspector } from '../inspector/Inspector.js';
+import { Inspector, type InspectorFocus } from '../inspector/Inspector.js';
+import { ChildBannerSlot, RunAngle } from '../angle/RunAngle.js';
 import { latestDelivery, type DeliveryOutput } from '../inspector/model.js';
 import { defaultStep, stepFromHash, targetStepKey } from './derive.js';
 import type { FlowLoad } from './flows.js';
@@ -82,6 +83,16 @@ export function RunScreen({
   const adapterName = useAdapterName();
   const names = lifelineNames(view.spec, (id) => adapterName(id as AdapterId));
   const [dialog, setDialog] = useState<DeliveryOutput | null>(null);
+  const [focus, setFocus] = useState<InspectorFocus | null>(null);
+  const showTab = useCallback(
+    (stepKey: string, tab: InspectorFocus['tab'], exchangeIds: string[]) => {
+      select(stepKey);
+      setFocus({ stepKey, tab, exchangeIds });
+      inspector.current?.focus();
+    },
+    [select],
+  );
+  const runId = view.runId ?? run?.runId ?? null;
   const opener = useRef<HTMLElement | null>(null);
   const openDelivery = useCallback(() => {
     opener.current = document.activeElement as HTMLElement | null;
@@ -92,6 +103,7 @@ export function RunScreen({
     <>
       <div className="run-region" data-region="banners">
         <ConnectionBanner status={stream} onRetry={onRetryLive} />
+        <ChildBannerSlot view={view} run={run} />
         <StatusBanner vs={vs} view={view} steps={steps} onCancel={onCancel} />
         <div data-slot="awaiting">
           {view.awaiting && !terminal ? (
@@ -100,7 +112,19 @@ export function RunScreen({
         </div>
         {ready ? <CoverageBanner view={view} steps={steps} onSelect={select} /> : null}
       </div>
-      <div className="run-region" data-region="diagnosis" data-slot="diagnosis" />
+      <div className="run-region" data-region="diagnosis" data-slot="diagnosis">
+        {runId && ready ? (
+          <RunAngle
+            runId={runId}
+            view={view}
+            run={run}
+            events={events}
+            steps={steps}
+            onShowMessages={(k, ids) => showTab(k, 'messages', ids)}
+            onShowCheck={(k) => showTab(k, 'checks', [])}
+          />
+        ) : null}
+      </div>
       {vs.startsWith('done-') ? (
         <div className="run-region" data-region="result">
           <ResultCard view={view} steps={steps} target={target} note={run?.note ?? null} />
@@ -174,6 +198,7 @@ export function RunScreen({
               following={!terminal && !hashStep && selected !== null}
               terminal={terminal}
               onSelect={select}
+              focus={focus}
             />
           )}
         </section>

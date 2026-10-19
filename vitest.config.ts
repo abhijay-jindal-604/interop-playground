@@ -22,7 +22,7 @@ export default defineConfig({
           environment: 'jsdom',
           include: ['apps/ui/src/**/*.test.ts', 'apps/ui/src/**/*.test.tsx'],
           exclude: common,
-          setupFiles: [networkGuard],
+          setupFiles: [networkGuard, './apps/ui/src/test/setup.ts'],
         },
       },
       {

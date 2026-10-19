@@ -23,7 +23,14 @@ import type {
   VerifierAdapter,
   WalletAdapter,
 } from '@interop-playground/adapters';
-import type { Coverage, EngineOp, Outcome, RunSpec, RunVerdict } from '@interop-playground/api';
+import type {
+  Coverage,
+  EngineOp,
+  Outcome,
+  Run,
+  RunSpec,
+  RunVerdict,
+} from '@interop-playground/api';
 import type { EventSink, SinkEvent } from '../store/index.js';
 import type { FlowTable, PlannedStep } from './flows.js';
 import { planRun, targetOf } from './flows.js';
@@ -62,6 +69,12 @@ export interface EngineDeps {
    * when it sets `cause_fingerprint_id`. A throw is ignored (diagnosis never fails a run).
    */
   beforeTerminal?: (runId: string, terminal: 'completed' | 'failed') => void;
+  /**
+   * Child classification (T-42, 09 A5.3): called after `beforeTerminal` for `run.completed`; its
+   * value is the event's `counterfactualResult` (null for runs that are not derived). A throw
+   * gives null. `run.failed` / `run.cancelled` children are `inconclusive` in the sink.
+   */
+  classify?: (runId: string, verdict: RunVerdict) => Run['counterfactualResult'];
 }
 
 /** an error that carries a `Run.errorCode` (04 §6.2 closing paragraph) */
@@ -442,6 +455,15 @@ export class RunExecution {
     }
   }
 
+  private classify(verdict: RunVerdict): Run['counterfactualResult'] {
+    if (this.spec.parentRunId === null) return null;
+    try {
+      return this.deps.classify?.(this.runId, verdict) ?? null;
+    } catch {
+      return 'inconclusive';
+    }
+  }
+
   /** runs to exactly one terminal event; never throws */
   async run(): Promise<void> {
     const ctx = this.context();
@@ -458,9 +480,10 @@ export class RunExecution {
       this.skipBefore(this.plan.length, reason);
       await this.deps.capture.endRun(this.runId);
       this.diagnose('completed');
+      const verdict = this.verdict();
       this.append({
         type: 'run.completed',
-        payload: { verdict: this.verdict(), counterfactualResult: null },
+        payload: { verdict, counterfactualResult: this.classify(verdict) },
       });
     } catch (e) {
       await this.terminate(e);

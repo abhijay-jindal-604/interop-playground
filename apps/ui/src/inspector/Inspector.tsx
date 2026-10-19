@@ -30,6 +30,12 @@ import {
 
 export const TABS = ['messages', 'decoded', 'checks', 'engine', 'events'] as const;
 export type TabId = (typeof TABS)[number];
+/** an outside request to show a tab of the selected step (UI-24 "Show matched messages") */
+export interface InspectorFocus {
+  stepKey: string;
+  tab: TabId;
+  exchangeIds: string[];
+}
 const TAB_KEY = 'pg.inspector.tab';
 
 function readTab(): TabId {
@@ -375,7 +381,82 @@ function ArtifactCard({ item, from }: { item: DecodedItem; from: string }) {
   );
 }
 
-function DecodedTab({ list }: { list: ExchangeView[] }) {
+const isRec = (v: unknown): v is Record<string, unknown> =>
+  typeof v === 'object' && v !== null && !Array.isArray(v);
+
+/**
+ * The wallet's engine ops (ADR-77): `inspect-credential` carries the decoded credential the
+ * wallet received (`vci.credential.inspect`), `build-kb-jwt` the KB-JWT header and payload it
+ * signed (`vp.token.build`). Both steps have no HTTP, so this is the only decoded view of them.
+ */
+function EngineArtifactCard({ row }: { row: EngineRowView }) {
+  const call = row.call;
+  if (!call) return null;
+  const out = call.outputSummary;
+  const from = c.decoded.fromEngine(call.op, call.engine);
+  if (call.op === 'build-kb-jwt' && isRec(out)) {
+    const header = isRec(out.header) ? out.header : {};
+    return (
+      <article className="artifact-card" data-artifact="kb-jwt" data-engine-op={call.op}>
+        <h3 className="artifact-title">
+          {c.decoded.kbJwt(typeof header.alg === 'string' ? header.alg : null)}
+        </h3>
+        <p className="muted small">{from}</p>
+        <JoseChips h={header} />
+        <pre className="body-code">{pretty(out.payload ?? null)}</pre>
+        {typeof out.jwsSha256 === 'string' ? (
+          <p className="muted small mono">{c.decoded.jwsSha256(out.jwsSha256)}</p>
+        ) : null}
+        <p className="muted small">{c.decoded.engineNote}</p>
+      </article>
+    );
+  }
+  if (call.op !== 'inspect-credential' || !isRec(out)) return null;
+  const format = typeof out.format === 'string' ? out.format : '';
+  const header = isRec(out.header) ? out.header : null;
+  const disclosures = Array.isArray(out.disclosures) ? out.disclosures.filter(isRec) : [];
+  return (
+    <article className="artifact-card" data-artifact="credential" data-engine-op={call.op}>
+      <h3 className="artifact-title">{c.decoded.inspected(format)}</h3>
+      <p className="muted small">{from}</p>
+      {typeof out.error === 'string' ? (
+        <p className="tone-fail small">{c.decoded.inspectError(out.error)}</p>
+      ) : null}
+      {header ? <JoseChips h={header} /> : null}
+      {disclosures.length > 0 ? (
+        <ul className="disclosure-list">
+          {disclosures.map((d, i) => (
+            <li key={typeof d.digest === 'string' ? d.digest : i} className="mono small">
+              {c.decoded.disclosed(
+                typeof d.name === 'string' ? d.name : '[array element]',
+                show(d.value),
+              )}
+            </li>
+          ))}
+        </ul>
+      ) : null}
+      {'payload' in out ? (
+        <pre className="body-code">{pretty(out.payload)}</pre>
+      ) : 'credential' in out ? (
+        <pre className="body-code">{pretty(out.credential)}</pre>
+      ) : typeof out.bytes === 'number' ? (
+        <p className="small">{c.decoded.bytesOnly(out.bytes)}</p>
+      ) : null}
+      {isRec(out.artifacts) ? (
+        <details className="disclosure">
+          <summary>{c.decoded.artifacts}</summary>
+          <pre className="body-code">{pretty(out.artifacts)}</pre>
+        </details>
+      ) : null}
+      {header ? <p className="muted small">{c.decoded.disclaimer}</p> : null}
+    </article>
+  );
+}
+
+const ENGINE_ARTIFACT_OPS = new Set(['inspect-credential', 'build-kb-jwt']);
+
+function DecodedTab({ list, engines }: { list: ExchangeView[]; engines: EngineRowView[] }) {
+  const fromEngines = engines.filter((r) => r.call && ENGINE_ARTIFACT_OPS.has(r.call.op));
   const items = useMemo(() => {
     const out: { item: DecodedItem; from: string; key: string }[] = [];
     for (const x of list) {
@@ -395,9 +476,13 @@ function DecodedTab({ list }: { list: ExchangeView[] }) {
     }
     return out;
   }, [list]);
-  if (items.length === 0) return <p className="tab-empty">{c.decoded.empty}</p>;
+  if (items.length === 0 && fromEngines.length === 0)
+    return <p className="tab-empty">{c.decoded.empty}</p>;
   return (
     <div className="artifact-list">
+      {fromEngines.map((r) => (
+        <EngineArtifactCard key={`engine-${r.seq}`} row={r} />
+      ))}
       {items.map(({ item, from, key }) => (
         <ArtifactCard key={key} item={item} from={from} />
       ))}
@@ -728,6 +813,7 @@ export function Inspector({
   following,
   terminal,
   onSelect,
+  focus = null,
 }: {
   events: readonly EventEnvelope[];
   view: RunView;
@@ -736,6 +822,8 @@ export function Inspector({
   following: boolean;
   terminal: boolean;
   onSelect: (stepKey: string) => void;
+  /** UI-24 evidence links: open a tab with these exchanges expanded (a new object each request) */
+  focus?: InspectorFocus | null;
 }) {
   const model = useMemo(() => buildModel(events), [events]);
   const [tab, setTabState] = useState<TabId>(readTab);
@@ -780,6 +868,20 @@ export function Inspector({
     }
     setJump(t);
   };
+
+  useEffect(() => {
+    if (!focus) return;
+    setTab(focus.tab);
+    if (focus.exchangeIds.length > 0) {
+      setOpen((s) => {
+        const next = new Set(s);
+        for (const id of focus.exchangeIds) next.add(id);
+        return next;
+      });
+      setJump({ stepKey: focus.stepKey, exchangeId: focus.exchangeIds[0]!, part: 'response' });
+    }
+    // a new focus object is a new request
+  }, [focus]);
 
   const step = selected ? view.steps[selected] : undefined;
   const label = selected ? (steps.find((s) => s.stepKey === selected)?.label ?? selected) : null;
@@ -925,7 +1027,7 @@ export function Inspector({
             labels={model.labels}
           />
         ) : tab === 'decoded' ? (
-          <DecodedTab list={exchanges} />
+          <DecodedTab list={exchanges} engines={engines} />
         ) : tab === 'checks' ? (
           <ChecksTab
             model={model}

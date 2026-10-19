@@ -1138,7 +1138,9 @@ export interface FingerprintMatchedPayload {
   gapIds: string[];
   confidence: 'exact' | 'possible' | 'observed';
   role: 'cause' | 'finding';
-  deviatingSide: 'issuer' | 'wallet' | 'verifier' | 'playground';
+  /** 09 A2's six sides (G-151): a two-sided defect is 'issuer+verifier', an environment fault 'environment' */
+  deviatingSide:
+    'issuer' | 'wallet' | 'verifier' | 'issuer+verifier' | 'environment' | 'playground';
   specClause: string;
   evidenceSIds: string[];
   matchedExchangeIds: string[];

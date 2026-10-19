@@ -1,0 +1,503 @@
+{
+  "recorded": "2026-10-20 walt.id issuer-api2:1.1.0 via the bundle (T-43); first run KNOB-01 absent, second present; PUBLIC_HOST rewritten to 192.0.2.10, issuer key d redacted; issuer metadata trimmed to identity_credential",
+  "exchanges": [
+    {
+      "method": "POST",
+      "url": "http://waltid-issuer-api2:8080/issuer2/credential-offers",
+      "reqBody": "{\"profileId\":\"identityCredentialSdJwt\",\"authMethod\":\"PRE_AUTHORIZED\",\"valueMode\":\"BY_VALUE\"}",
+      "status": 201,
+      "resBody": {
+        "offerId": "e9becf1f-f13f-4f78-a3a7-15eec6ca3c4f",
+        "profileId": "identityCredentialSdJwt",
+        "authMethod": "PRE_AUTHORIZED",
+        "expiresAt": 1792450038649,
+        "credentialOffer": "openid-credential-offer://?credential_offer=%7B%22credential_issuer%22%3A%22http%3A%2F%2F192.0.2.10%3A18103%2Fopenid4vci%22%2C%22credential_configuration_ids%22%3A%5B%22identity_credential%22%5D%2C%22grants%22%3A%7B%22urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Apre-authorized_code%22%3A%7B%22pre-authorized_code%22%3A%224ILipwyFGj8kdHxDzsj1wS0Xt7WF_TX_Uoqfwt3B68jC%22%7D%7D%7D"
+      }
+    },
+    {
+      "method": "GET",
+      "url": "http://192.0.2.10:18103/.well-known/openid-credential-issuer/openid4vci",
+      "reqBody": null,
+      "status": 200,
+      "resBody": {
+        "credential_issuer": "http://192.0.2.10:18103/openid4vci",
+        "credential_endpoint": "http://192.0.2.10:18103/openid4vci/credential",
+        "nonce_endpoint": "http://192.0.2.10:18103/openid4vci/nonce",
+        "display": [
+          {
+            "name": "walt.id Issuer",
+            "locale": "en-US",
+            "logo": {
+              "uri": "http://192.0.2.10:18103/static/credential-cards/waltid-mark.png",
+              "alt_text": "walt.id Issuer logo"
+            }
+          },
+          {
+            "name": "walt.id Issuer",
+            "locale": "de-DE",
+            "logo": {
+              "uri": "http://192.0.2.10:18103/static/credential-cards/waltid-mark.png",
+              "alt_text": "walt.id Issuer DE Logo"
+            }
+          }
+        ],
+        "credential_configurations_supported": {
+          "identity_credential": {
+            "format": "dc+sd-jwt",
+            "scope": "identity_credential",
+            "vct": "http://192.0.2.10:18103/openid4vci/identity_credential",
+            "credential_signing_alg_values_supported": ["ES256"],
+            "cryptographic_binding_methods_supported": [
+              "jwk",
+              "did:key",
+              "did:web",
+              "did:jwk",
+              "did:ebsi"
+            ],
+            "proof_types_supported": {
+              "jwt": {
+                "proof_signing_alg_values_supported": ["ES256", "EdDSA"]
+              }
+            },
+            "credential_metadata": {
+              "display": [
+                {
+                  "name": "Identity Credential",
+                  "locale": "en",
+                  "logo": {
+                    "uri": "http://192.0.2.10:18103/static/credential-cards/waltid-mark.png",
+                    "alt_text": "walt.id"
+                  },
+                  "description": "Selective disclosure identity credential",
+                  "background_color": "#0573F0",
+                  "background_image": {
+                    "uri": "http://192.0.2.10:18103/static/credential-cards/identity.png"
+                  },
+                  "text_color": "#FFFFFF"
+                }
+              ],
+              "claims": [
+                {
+                  "path": ["given_name"],
+                  "display": [
+                    {
+                      "name": "Given name",
+                      "locale": "en"
+                    }
+                  ]
+                },
+                {
+                  "path": ["family_name"],
+                  "display": [
+                    {
+                      "name": "Family name",
+                      "locale": "en"
+                    }
+                  ]
+                },
+                {
+                  "path": ["email"],
+                  "display": [
+                    {
+                      "name": "Email",
+                      "locale": "en"
+                    }
+                  ]
+                },
+                {
+                  "path": ["phone_number"],
+                  "display": [
+                    {
+                      "name": "Phone number",
+                      "locale": "en"
+                    }
+                  ]
+                },
+                {
+                  "path": ["address", "street_address"],
+                  "display": [
+                    {
+                      "name": "Street address",
+                      "locale": "en"
+                    }
+                  ]
+                },
+                {
+                  "path": ["address", "locality"],
+                  "display": [
+                    {
+                      "name": "Locality",
+                      "locale": "en"
+                    }
+                  ]
+                },
+                {
+                  "path": ["address", "region"],
+                  "display": [
+                    {
+                      "name": "Region",
+                      "locale": "en"
+                    }
+                  ]
+                },
+                {
+                  "path": ["address", "country"],
+                  "display": [
+                    {
+                      "name": "Country",
+                      "locale": "en"
+                    }
+                  ]
+                },
+                {
+                  "path": ["birthdate"],
+                  "display": [
+                    {
+                      "name": "Birthdate",
+                      "locale": "en"
+                    }
+                  ]
+                },
+                {
+                  "path": ["is_over_18"],
+                  "display": [
+                    {
+                      "name": "Over 18",
+                      "locale": "en"
+                    }
+                  ]
+                },
+                {
+                  "path": ["is_over_21"],
+                  "display": [
+                    {
+                      "name": "Over 21",
+                      "locale": "en"
+                    }
+                  ]
+                },
+                {
+                  "path": ["is_over_65"],
+                  "display": [
+                    {
+                      "name": "Over 65",
+                      "locale": "en"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "url": "http://192.0.2.10:18103/.well-known/oauth-authorization-server/openid4vci",
+      "reqBody": null,
+      "status": 200,
+      "resBody": {
+        "issuer": "http://192.0.2.10:18103/openid4vci",
+        "authorization_endpoint": "http://192.0.2.10:18103/openid4vci/authorize",
+        "token_endpoint": "http://192.0.2.10:18103/openid4vci/token",
+        "jwks_uri": "http://192.0.2.10:18103/openid4vci/jwks",
+        "response_types_supported": ["code"],
+        "response_modes_supported": ["query", "fragment"],
+        "grant_types_supported": [
+          "authorization_code",
+          "urn:ietf:params:oauth:grant-type:pre-authorized_code",
+          "refresh_token"
+        ],
+        "dpop_signing_alg_values_supported": ["ES256"],
+        "pushed_authorization_request_endpoint": "http://192.0.2.10:18103/openid4vci/par",
+        "require_pushed_authorization_requests": false,
+        "authorization_response_iss_parameter_supported": true,
+        "code_challenge_methods_supported": ["S256"],
+        "pre-authorized_grant_anonymous_access_supported": true
+      }
+    },
+    {
+      "method": "POST",
+      "url": "http://192.0.2.10:18103/openid4vci/token",
+      "reqBody": "grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Apre-authorized_code&pre-authorized_code=4ILipwyFGj8kdHxDzsj1wS0Xt7WF_TX_Uoqfwt3B68jC",
+      "status": 200,
+      "resBody": {
+        "token_type": "bearer",
+        "access_token": "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ijl2dWFKeVV4Ung0S21IeW9aOWtqSnhNc19tanBubmYtbVBNOW5QTUc1MUEifQ.eyJzdWIiOiJlOWJlY2YxZi1mMTNmLTRmNzgtYTNhNy0xNWVlYzZjYTNjNGYiLCJpc3MiOiJodHRwOi8vMTkyLjE2OC4xLjg0OjE4MTAzL29wZW5pZDR2Y2kiLCJpYXQiOjE3OTI0NDk3MzgsImV4cCI6MTc5MjQ1MDAzOCwiYXV0aG9yaXphdGlvbl9kZXRhaWxzIjpbeyJ0eXBlIjoib3BlbmlkX2NyZWRlbnRpYWwiLCJjcmVkZW50aWFsX2NvbmZpZ3VyYXRpb25faWQiOiJpZGVudGl0eV9jcmVkZW50aWFsIiwiY3JlZGVudGlhbF9pZGVudGlmaWVycyI6WyI5YjY5OWRlOS1hZDUyLTQ5YTQtOTlhZi0zNDliYjZlYTg0OTgiXX1dLCJwcmVfYXV0aG9yaXplZF9jb2RlIjoiNElMaXB3eUZHajhrZEh4RHpzajF3UzBYdDdXRl9UWF9Vb3Fmd3QzQjY4akMiLCJpc3N1YW5jZV9zZXNzaW9uX2lkIjoiZTliZWNmMWYtZjEzZi00Zjc4LWEzYTctMTVlZWM2Y2EzYzRmIn0.xFacGMuBCAg1OqUbP2_53u2R--lL5yyoCRHZadJFCjy9NjD868YT1nJdoWAtDM82WOh4yPRr2AI3Ayc7So1pJw",
+        "expires_in": 299,
+        "refresh_token": "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ijl2dWFKeVV4Ung0S21IeW9aOWtqSnhNc19tanBubmYtbVBNOW5QTUc1MUEifQ.eyJqdGkiOiJiZVdrNEp2WmNrYXVaVnZHN3M5dUZ0TUJ1cWtwQ1FLcDFoQWlqNUZLVGtVIiwiaXNzIjoiaHR0cDovLzE5Mi4xNjguMS44NDoxODEwMy9vcGVuaWQ0dmNpIiwic3ViIjoiZTliZWNmMWYtZjEzZi00Zjc4LWEzYTctMTVlZWM2Y2EzYzRmIiwiYXVkIjoiaHR0cDovLzE5Mi4xNjguMS44NDoxODEwMy9vcGVuaWQ0dmNpIiwiaWF0IjoxNzkyNDQ5NzM4LCJleHAiOjE3OTI1MzYxMzgsInR5cCI6IlJlZnJlc2giLCJzaWQiOiJlOWJlY2YxZi1mMTNmLTRmNzgtYTNhNy0xNWVlYzZjYTNjNGYifQ.iXr_PqrDdqJrAlQidZer2JcH3ugo-sumgdJenFv-gE19h-lvA1QWjBRP0abYUdhIX8tMzbQ9v5qSEdcd8CwJQw"
+      }
+    },
+    {
+      "method": "POST",
+      "url": "http://192.0.2.10:18103/openid4vci/nonce",
+      "reqBody": null,
+      "status": 200,
+      "resBody": {
+        "c_nonce": "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ijl2dWFKeVV4Ung0S21IeW9aOWtqSnhNc19tanBubmYtbVBNOW5QTUc1MUEifQ.eyJpc3MiOiJodHRwOi8vMTkyLjE2OC4xLjg0OjE4MTAzL29wZW5pZDR2Y2kiLCJhdWQiOlsiaHR0cDovLzE5Mi4xNjguMS44NDoxODEwMy9vcGVuaWQ0dmNpL2NyZWRlbnRpYWwiXSwiaWF0IjoxNzkyNDQ5NzM4LCJleHAiOjE3OTI0NTAwMzgsImp0aSI6IkNSMmRuNzhfYnhwWWdURE12QlMyanc2VDM1b05jbWNLcUZfVTg5NVB3TXMiLCJzb3VyY2VfZW5kcG9pbnQiOiJodHRwOi8vMTkyLjE2OC4xLjg0OjE4MTAzL29wZW5pZDR2Y2kvbm9uY2UifQ.bfBU3EjazgBOCQqSlbFzXJ0yIMm3UI6wA_Z-3TljFYbKqYlFQ8j5M8sgC-FUEbYsCUc9xnhHvBlPuqk2TreuYw"
+      }
+    },
+    {
+      "method": "POST",
+      "url": "http://192.0.2.10:18103/openid4vci/credential",
+      "reqBody": "{\"credential_configuration_id\":\"identity_credential\",\"proofs\":{\"jwt\":[\"eyJhbGciOiJFUzI1NiIsInR5cCI6Im9wZW5pZDR2Y2ktcHJvb2Yrand0Iiwia2lkIjoiZGlkOmp3azpleUpyZEhraU9pSkZReUlzSW1OeWRpSTZJbEF0TWpVMklpd2llQ0k2SWxKZlR6UmtRemN6WkRocU1HMTZWRzUzY25RMFZGQnRObWR3ZUZoc2JtTlNZa0pOVFVoSVJ6UjFkMFVpTENKNUlqb2lkSEZPWVhwSVpUQllkVXBRUVROelJ6UTJNbXBwVDFwc1FVcFpaMFkyY25KbmJWcHdPREV0Ym5WcmR5SjkjMCJ9.eyJhdWQiOiJodHRwOi8vMTkyLjE2OC4xLjg0OjE4MTAzL29wZW5pZDR2Y2kiLCJpYXQiOjE3OTI0NDk3MzgsIm5vbmNlIjoiZXlKaGJHY2lPaUpGVXpJMU5pSXNJblI1Y0NJNklrcFhWQ0lzSW10cFpDSTZJamwyZFdGS2VWVjRVbmcwUzIxSWVXOWFPV3RxU25oTmMxOXRhbkJ1Ym1ZdGJWQk5PVzVRVFVjMU1VRWlmUS5leUpwYzNNaU9pSm9kSFJ3T2k4dk1Ua3lMakUyT0M0eExqZzBPakU0TVRBekwyOXdaVzVwWkRSMlkya2lMQ0poZFdRaU9sc2lhSFIwY0Rvdkx6RTVNaTR4TmpndU1TNDRORG94T0RFd015OXZjR1Z1YVdRMGRtTnBMMk55WldSbGJuUnBZV3dpWFN3aWFXRjBJam94TnpreU5EUTVOek00TENKbGVIQWlPakUzT1RJME5UQXdNemdzSW1wMGFTSTZJa05TTW1SdU56aGZZbmh3V1dkVVJFMTJRbE15YW5jMlZETTFiMDVqYldOTGNVWmZWVGc1TlZCM1RYTWlMQ0p6YjNWeVkyVmZaVzVrY0c5cGJuUWlPaUpvZEhSd09pOHZNVGt5TGpFMk9DNHhMamcwT2pFNE1UQXpMMjl3Wlc1cFpEUjJZMmt2Ym05dVkyVWlmUS5iZkJVM0VqYXpnQk9DUXFTbGJGelhKMHlJTW0zVUk2d0FfWi0zVGxqRlliS3FZbEZROGo1TThzZ0MtRlVFYllzQ1VjOXhuaEh2QmxQdXFrMlRyZXVZdyJ9.yQ6AbMAKeMdi8W6EgA-XDtaLQoc7tVLZsY1ChDbqk4eM_4v7_V2_Ym3opLDyMDFHlF0hBRN5M9CTBW0Z9w5Maw\"]}}",
+      "status": 200,
+      "resBody": {
+        "credentials": [
+          {
+            "credential": "eyJhbGciOiJFUzI1NiIsImtpZCI6ImRpZDpqd2s6ZXlKcmRIa2lPaUpGUXlJc0ltTnlkaUk2SWxBdE1qVTJJaXdpZUNJNklrY3dVa2xPUW1sR0xXOVJWVVF6WkRWRVIyNWxaMUYxV0dWdVNUSTVTa1JoVFVkdlRYWnBiMHRTUWswaUxDSjVJam9pWldRelpVWkhjekp3UlhSeWNEZDJRVm8zUWt4alluSlZkSEJMYTFsWFFWUXlTbEJWVVVzMGJFNDBSU0o5IzAiLCJ0eXAiOiJkYytzZC1qd3QifQ.eyJhZGRyZXNzIjp7InJlZ2lvbiI6IkFueXN0YXRlIiwic3RyZWV0X2FkZHJlc3MiOiIxMjMgTWFpbiBTdCIsImNvdW50cnkiOiJVUyIsImxvY2FsaXR5IjoiQW55dG93biJ9LCJpc19vdmVyXzE4Ijp0cnVlLCJwaG9uZV9udW1iZXIiOiIrMS0yMDItNTU1LTAxMDEiLCJnaXZlbl9uYW1lIjoiSm9obiIsImZhbWlseV9uYW1lIjoiRG9lIiwiaXNfb3Zlcl8yMSI6dHJ1ZSwiaXNfb3Zlcl82NSI6dHJ1ZSwiZW1haWwiOiJqb2huZG9lQGV4YW1wbGUuY29tIiwiZXhwIjoxODIzOTgzMjAwLCJuYmYiOjE3OTIzNjgwMDAsImlkIjoidXJuOnV1aWQ6OGMzNDhjZDItMjEwZS00MzM3LWIyMWMtN2VkZGFhOTM3MzAxIiwiaWF0IjoxNzkyMzY4MDAwLCJfc2RfYWxnIjoic2hhLTI1NiIsImlzcyI6ImRpZDpqd2s6ZXlKcmRIa2lPaUpGUXlJc0ltTnlkaUk2SWxBdE1qVTJJaXdpZUNJNklrY3dVa2xPUW1sR0xXOVJWVVF6WkRWRVIyNWxaMUYxV0dWdVNUSTVTa1JoVFVkdlRYWnBiMHRTUWswaUxDSjVJam9pWldRelpVWkhjekp3UlhSeWNEZDJRVm8zUWt4alluSlZkSEJMYTFsWFFWUXlTbEJWVVVzMGJFNDBSU0o5IiwiY25mIjp7Imp3ayI6eyJrdHkiOiJFQyIsImNydiI6IlAtMjU2IiwieCI6IlJfTzRkQzczZDhqMG16VG53cnQ0VFBtNmdweFhsbmNSYkJNTUhIRzR1d0UiLCJ5IjoidHFOYXpIZTBYdUpQQTNzRzQ2MmppT1psQUpZZ0Y2cnJnbVpwODEtbnVrdyIsImtpZCI6ImRpZDpqd2s6ZXlKcmRIa2lPaUpGUXlJc0ltTnlkaUk2SWxBdE1qVTJJaXdpZUNJNklsSmZUelJrUXpjelpEaHFNRzE2Vkc1M2NuUTBWRkJ0Tm1kd2VGaHNibU5TWWtKTlRVaElSelIxZDBVaUxDSjVJam9pZEhGT1lYcElaVEJZZFVwUVFUTnpSelEyTW1wcFQxcHNRVXBaWjBZMmNuSm5iVnB3T0RFdGJuVnJkeUo5IzAifX0sInZjdCI6Imh0dHA6Ly8xOTIuMTY4LjEuODQ6MTgxMDMvb3BlbmlkNHZjaS9pZGVudGl0eV9jcmVkZW50aWFsIiwiX3NkIjpbIkN4eC1oZ2EteTAwS1piZTg0QldueFFndGU0aS1UT05SVDZpVmNuX1R3V0EiXX0.Y5Sw_HE1d9xp7XZVXVIp79GSuvm_X629C64rJoeWRrgHuMthkV6f5H7u0N_DpPe6i6NZvn7LTFheMvTjrrXU0w~WyJROEQ1Z3FIWVhYV0Z6eG42VmJ2Tnh3IiwiYmlydGhkYXRlIiwiMTk0MC0wMS0wMSJd~"
+          }
+        ]
+      }
+    },
+    {
+      "method": "POST",
+      "url": "http://waltid-issuer-api2:8080/issuer2/credential-offers",
+      "reqBody": "{\"profileId\": \"identityCredentialSdJwt\", \"authMethod\": \"PRE_AUTHORIZED\", \"valueMode\": \"BY_VALUE\", \"runtimeOverrides\": {\"issuerKey\": {\"type\": \"jwk\", \"jwk\": {\"kty\": \"EC\", \"x\": \"07CQNPRQwlo2JZ7OPacQkEExfWwOnyCo5G3sF0by_g8\", \"y\": \"S9GwIIM3J9xwNIbeg1Uqk6rZMlI6z2wcvBgYFCKTpII\", \"crv\": \"P-256\", \"d\": \"<redacted>\"}}, \"x5Chain\": [\"-----BEGIN CERTIFICATE-----\\nMIIB5jCCAYugAwIBAgIUa0nqdnU5GMRcE6+JNpp88ubuE9IwCgYIKoZIzj0EAwIw\\nSDEpMCcGA1UEAwwgd2FsdGlkLWlzc3Vlci5pbnRlcm9wLXBsYXlncm91bmQxGzAZ\\nBgNVBAoMEmludGVyb3AtcGxheWdyb3VuZDAeFw0yNjEwMTMxMTE1NDRaFw0zNjEw\\nMTAxMTE1NDRaMEgxKTAnBgNVBAMMIHdhbHRpZC1pc3N1ZXIuaW50ZXJvcC1wbGF5\\nZ3JvdW5kMRswGQYDVQQKDBJpbnRlcm9wLXBsYXlncm91bmQwWTATBgcqhkjOPQIB\\nBggqhkjOPQMBBwNCAATTsJA09FDCWjYlns49pxCQQTF9bA6fIKjkbewXRvL+D0vR\\nsCCDNyfccDSG3oNVKpOq2TJSOs9sHLwYGBQik6SCo1MwUTAdBgNVHQ4EFgQUmhXp\\nTr1NwdGs03FNKtBxYES+db4wHwYDVR0jBBgwFoAUmhXpTr1NwdGs03FNKtBxYES+\\ndb4wDwYDVR0TAQH/BAUwAwEB/zAKBggqhkjOPQQDAgNJADBGAiEAw+5Yrpdr9PkY\\n0yHlbBxxNKh5Sg+1z4Adb4+KoiRrKuICIQDeRzgc2JnyQn3TomYzNUupLua3wHWj\\nDppTMNvAoHI6+w==\\n-----END CERTIFICATE-----\"]}}",
+      "status": 201,
+      "resBody": {
+        "offerId": "dc62c040-a9e2-4a26-a3ad-45805b779e17",
+        "profileId": "identityCredentialSdJwt",
+        "authMethod": "PRE_AUTHORIZED",
+        "expiresAt": 1792450038915,
+        "credentialOffer": "openid-credential-offer://?credential_offer=%7B%22credential_issuer%22%3A%22http%3A%2F%2F192.0.2.10%3A18103%2Fopenid4vci%22%2C%22credential_configuration_ids%22%3A%5B%22identity_credential%22%5D%2C%22grants%22%3A%7B%22urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Apre-authorized_code%22%3A%7B%22pre-authorized_code%22%3A%225P3-k0VStPszN3DLJNZ-sxMcgVEsvf-vcAGLuCHzUzyM%22%7D%7D%7D"
+      }
+    },
+    {
+      "method": "GET",
+      "url": "http://192.0.2.10:18103/.well-known/openid-credential-issuer/openid4vci",
+      "reqBody": null,
+      "status": 200,
+      "resBody": {
+        "credential_issuer": "http://192.0.2.10:18103/openid4vci",
+        "credential_endpoint": "http://192.0.2.10:18103/openid4vci/credential",
+        "nonce_endpoint": "http://192.0.2.10:18103/openid4vci/nonce",
+        "display": [
+          {
+            "name": "walt.id Issuer",
+            "locale": "en-US",
+            "logo": {
+              "uri": "http://192.0.2.10:18103/static/credential-cards/waltid-mark.png",
+              "alt_text": "walt.id Issuer logo"
+            }
+          },
+          {
+            "name": "walt.id Issuer",
+            "locale": "de-DE",
+            "logo": {
+              "uri": "http://192.0.2.10:18103/static/credential-cards/waltid-mark.png",
+              "alt_text": "walt.id Issuer DE Logo"
+            }
+          }
+        ],
+        "credential_configurations_supported": {
+          "identity_credential": {
+            "format": "dc+sd-jwt",
+            "scope": "identity_credential",
+            "vct": "http://192.0.2.10:18103/openid4vci/identity_credential",
+            "credential_signing_alg_values_supported": ["ES256"],
+            "cryptographic_binding_methods_supported": [
+              "jwk",
+              "did:key",
+              "did:web",
+              "did:jwk",
+              "did:ebsi"
+            ],
+            "proof_types_supported": {
+              "jwt": {
+                "proof_signing_alg_values_supported": ["ES256", "EdDSA"]
+              }
+            },
+            "credential_metadata": {
+              "display": [
+                {
+                  "name": "Identity Credential",
+                  "locale": "en",
+                  "logo": {
+                    "uri": "http://192.0.2.10:18103/static/credential-cards/waltid-mark.png",
+                    "alt_text": "walt.id"
+                  },
+                  "description": "Selective disclosure identity credential",
+                  "background_color": "#0573F0",
+                  "background_image": {
+                    "uri": "http://192.0.2.10:18103/static/credential-cards/identity.png"
+                  },
+                  "text_color": "#FFFFFF"
+                }
+              ],
+              "claims": [
+                {
+                  "path": ["given_name"],
+                  "display": [
+                    {
+                      "name": "Given name",
+                      "locale": "en"
+                    }
+                  ]
+                },
+                {
+                  "path": ["family_name"],
+                  "display": [
+                    {
+                      "name": "Family name",
+                      "locale": "en"
+                    }
+                  ]
+                },
+                {
+                  "path": ["email"],
+                  "display": [
+                    {
+                      "name": "Email",
+                      "locale": "en"
+                    }
+                  ]
+                },
+                {
+                  "path": ["phone_number"],
+                  "display": [
+                    {
+                      "name": "Phone number",
+                      "locale": "en"
+                    }
+                  ]
+                },
+                {
+                  "path": ["address", "street_address"],
+                  "display": [
+                    {
+                      "name": "Street address",
+                      "locale": "en"
+                    }
+                  ]
+                },
+                {
+                  "path": ["address", "locality"],
+                  "display": [
+                    {
+                      "name": "Locality",
+                      "locale": "en"
+                    }
+                  ]
+                },
+                {
+                  "path": ["address", "region"],
+                  "display": [
+                    {
+                      "name": "Region",
+                      "locale": "en"
+                    }
+                  ]
+                },
+                {
+                  "path": ["address", "country"],
+                  "display": [
+                    {
+                      "name": "Country",
+                      "locale": "en"
+                    }
+                  ]
+                },
+                {
+                  "path": ["birthdate"],
+                  "display": [
+                    {
+                      "name": "Birthdate",
+                      "locale": "en"
+                    }
+                  ]
+                },
+                {
+                  "path": ["is_over_18"],
+                  "display": [
+                    {
+                      "name": "Over 18",
+                      "locale": "en"
+                    }
+                  ]
+                },
+                {
+                  "path": ["is_over_21"],
+                  "display": [
+                    {
+                      "name": "Over 21",
+                      "locale": "en"
+                    }
+                  ]
+                },
+                {
+                  "path": ["is_over_65"],
+                  "display": [
+                    {
+                      "name": "Over 65",
+                      "locale": "en"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "url": "http://192.0.2.10:18103/.well-known/oauth-authorization-server/openid4vci",
+      "reqBody": null,
+      "status": 200,
+      "resBody": {
+        "issuer": "http://192.0.2.10:18103/openid4vci",
+        "authorization_endpoint": "http://192.0.2.10:18103/openid4vci/authorize",
+        "token_endpoint": "http://192.0.2.10:18103/openid4vci/token",
+        "jwks_uri": "http://192.0.2.10:18103/openid4vci/jwks",
+        "response_types_supported": ["code"],
+        "response_modes_supported": ["query", "fragment"],
+        "grant_types_supported": [
+          "authorization_code",
+          "urn:ietf:params:oauth:grant-type:pre-authorized_code",
+          "refresh_token"
+        ],
+        "dpop_signing_alg_values_supported": ["ES256"],
+        "pushed_authorization_request_endpoint": "http://192.0.2.10:18103/openid4vci/par",
+        "require_pushed_authorization_requests": false,
+        "authorization_response_iss_parameter_supported": true,
+        "code_challenge_methods_supported": ["S256"],
+        "pre-authorized_grant_anonymous_access_supported": true
+      }
+    },
+    {
+      "method": "POST",
+      "url": "http://192.0.2.10:18103/openid4vci/token",
+      "reqBody": "grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Apre-authorized_code&pre-authorized_code=5P3-k0VStPszN3DLJNZ-sxMcgVEsvf-vcAGLuCHzUzyM",
+      "status": 200,
+      "resBody": {
+        "token_type": "bearer",
+        "access_token": "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ijl2dWFKeVV4Ung0S21IeW9aOWtqSnhNc19tanBubmYtbVBNOW5QTUc1MUEifQ.eyJzdWIiOiJkYzYyYzA0MC1hOWUyLTRhMjYtYTNhZC00NTgwNWI3NzllMTciLCJpc3MiOiJodHRwOi8vMTkyLjE2OC4xLjg0OjE4MTAzL29wZW5pZDR2Y2kiLCJpYXQiOjE3OTI0NDk3MzgsImV4cCI6MTc5MjQ1MDAzOCwiYXV0aG9yaXphdGlvbl9kZXRhaWxzIjpbeyJ0eXBlIjoib3BlbmlkX2NyZWRlbnRpYWwiLCJjcmVkZW50aWFsX2NvbmZpZ3VyYXRpb25faWQiOiJpZGVudGl0eV9jcmVkZW50aWFsIiwiY3JlZGVudGlhbF9pZGVudGlmaWVycyI6WyJhMDY3NGUyNi05ZjQ0LTRiMWItODA2NS01NDcyMDkwY2FhNDMiXX1dLCJwcmVfYXV0aG9yaXplZF9jb2RlIjoiNVAzLWswVlN0UHN6TjNETEpOWi1zeE1jZ1ZFc3ZmLXZjQUdMdUNIelV6eU0iLCJpc3N1YW5jZV9zZXNzaW9uX2lkIjoiZGM2MmMwNDAtYTllMi00YTI2LWEzYWQtNDU4MDViNzc5ZTE3In0.DW87M3yOWrL_CdDagTKviPoEUoy06v7f59Ca3CZYTs3GDid4fSvVvKvjCaCP4IIDePeQpRTKSqNBvo8z7v5AhA",
+        "expires_in": 299,
+        "refresh_token": "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ijl2dWFKeVV4Ung0S21IeW9aOWtqSnhNc19tanBubmYtbVBNOW5QTUc1MUEifQ.eyJqdGkiOiJiQXBlbFZqLU1UT1c4TnpMa1BGdzZyT1RtN1FZYUtQOC1TeDlMaUFXS2dzIiwiaXNzIjoiaHR0cDovLzE5Mi4xNjguMS44NDoxODEwMy9vcGVuaWQ0dmNpIiwic3ViIjoiZGM2MmMwNDAtYTllMi00YTI2LWEzYWQtNDU4MDViNzc5ZTE3IiwiYXVkIjoiaHR0cDovLzE5Mi4xNjguMS44NDoxODEwMy9vcGVuaWQ0dmNpIiwiaWF0IjoxNzkyNDQ5NzM4LCJleHAiOjE3OTI1MzYxMzgsInR5cCI6IlJlZnJlc2giLCJzaWQiOiJkYzYyYzA0MC1hOWUyLTRhMjYtYTNhZC00NTgwNWI3NzllMTcifQ.IE0A0pw9tN4ezd3o6xWfJzfG_bfIhhlBagLU_gEQgGc7-i0_NeLyNfF7x7iY8kfXIEbPJfWBze5jLTGqrPY_yQ"
+      }
+    },
+    {
+      "method": "POST",
+      "url": "http://192.0.2.10:18103/openid4vci/nonce",
+      "reqBody": null,
+      "status": 200,
+      "resBody": {
+        "c_nonce": "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ijl2dWFKeVV4Ung0S21IeW9aOWtqSnhNc19tanBubmYtbVBNOW5QTUc1MUEifQ.eyJpc3MiOiJodHRwOi8vMTkyLjE2OC4xLjg0OjE4MTAzL29wZW5pZDR2Y2kiLCJhdWQiOlsiaHR0cDovLzE5Mi4xNjguMS44NDoxODEwMy9vcGVuaWQ0dmNpL2NyZWRlbnRpYWwiXSwiaWF0IjoxNzkyNDQ5NzM4LCJleHAiOjE3OTI0NTAwMzgsImp0aSI6InpuUS1JMVhJRmdsQUpvVEtEa3dieGFLMG1zV05UWlB3VzRfWjV2WGZ3Z2MiLCJzb3VyY2VfZW5kcG9pbnQiOiJodHRwOi8vMTkyLjE2OC4xLjg0OjE4MTAzL29wZW5pZDR2Y2kvbm9uY2UifQ.Od433eZZ3xOxjMlO5Goxq-IcuSda-I9VbSkLUiT_GLMYU-N6VO1MxDyI2loKA3an5ncqnx5TqQem9hgaAmKq7g"
+      }
+    },
+    {
+      "method": "POST",
+      "url": "http://192.0.2.10:18103/openid4vci/credential",
+      "reqBody": "{\"credential_configuration_id\":\"identity_credential\",\"proofs\":{\"jwt\":[\"eyJhbGciOiJFUzI1NiIsInR5cCI6Im9wZW5pZDR2Y2ktcHJvb2Yrand0Iiwia2lkIjoiZGlkOmp3azpleUpyZEhraU9pSkZReUlzSW1OeWRpSTZJbEF0TWpVMklpd2llQ0k2SWtzdGVIQmhaR1V0U25aTlRGUXdhSGRXUzBSU1ExOVlaak5EVWxjMVdEbEtkazVQTUhsYWIyVlVVRlVpTENKNUlqb2liMVo0ZDI1cVpsZEljR015UVVoNlNWRkViMDlwY0dGNVYwRnpNV2htZWtaSllUZ3dZWGx0WVRVNE9DSjkjMCJ9.eyJhdWQiOiJodHRwOi8vMTkyLjE2OC4xLjg0OjE4MTAzL29wZW5pZDR2Y2kiLCJpYXQiOjE3OTI0NDk3MzgsIm5vbmNlIjoiZXlKaGJHY2lPaUpGVXpJMU5pSXNJblI1Y0NJNklrcFhWQ0lzSW10cFpDSTZJamwyZFdGS2VWVjRVbmcwUzIxSWVXOWFPV3RxU25oTmMxOXRhbkJ1Ym1ZdGJWQk5PVzVRVFVjMU1VRWlmUS5leUpwYzNNaU9pSm9kSFJ3T2k4dk1Ua3lMakUyT0M0eExqZzBPakU0TVRBekwyOXdaVzVwWkRSMlkya2lMQ0poZFdRaU9sc2lhSFIwY0Rvdkx6RTVNaTR4TmpndU1TNDRORG94T0RFd015OXZjR1Z1YVdRMGRtTnBMMk55WldSbGJuUnBZV3dpWFN3aWFXRjBJam94TnpreU5EUTVOek00TENKbGVIQWlPakUzT1RJME5UQXdNemdzSW1wMGFTSTZJbnB1VVMxSk1WaEpSbWRzUVVwdlZFdEVhM2RpZUdGTE1HMXpWMDVVV2xCM1Z6UmZXalYyV0daM1oyTWlMQ0p6YjNWeVkyVmZaVzVrY0c5cGJuUWlPaUpvZEhSd09pOHZNVGt5TGpFMk9DNHhMamcwT2pFNE1UQXpMMjl3Wlc1cFpEUjJZMmt2Ym05dVkyVWlmUS5PZDQzM2VaWjN4T3hqTWxPNUdveHEtSWN1U2RhLUk5VmJTa0xVaVRfR0xNWVUtTjZWTzFNeER5STJsb0tBM2FuNW5jcW54NVRxUWVtOWhnYUFtS3E3ZyJ9.gj8Xv-Am9dYk9BK6RJWptbZSfB_pH7y_agBnWDPboRhoOzt7qNrZzVqjgBVTGUT8XYANS4EqPCVbVwfVUKYpNw\"]}}",
+      "status": 200,
+      "resBody": {
+        "credentials": [
+          {
+            "credential": "eyJhbGciOiJFUzI1NiIsImtpZCI6ImRpZDpqd2s6ZXlKcmRIa2lPaUpGUXlJc0ltTnlkaUk2SWxBdE1qVTJJaXdpZUNJNklrY3dVa2xPUW1sR0xXOVJWVVF6WkRWRVIyNWxaMUYxV0dWdVNUSTVTa1JoVFVkdlRYWnBiMHRTUWswaUxDSjVJam9pWldRelpVWkhjekp3UlhSeWNEZDJRVm8zUWt4alluSlZkSEJMYTFsWFFWUXlTbEJWVVVzMGJFNDBSU0o5IzAiLCJ0eXAiOiJkYytzZC1qd3QiLCJ4NWMiOlsiTUlJQjVqQ0NBWXVnQXdJQkFnSVVhMG5xZG5VNUdNUmNFNitKTnBwODh1YnVFOUl3Q2dZSUtvWkl6ajBFQXdJd1NERXBNQ2NHQTFVRUF3d2dkMkZzZEdsa0xXbHpjM1ZsY2k1cGJuUmxjbTl3TFhCc1lYbG5jbTkxYm1ReEd6QVpCZ05WQkFvTUVtbHVkR1Z5YjNBdGNHeGhlV2R5YjNWdVpEQWVGdzB5TmpFd01UTXhNVEUxTkRSYUZ3MHpOakV3TVRBeE1URTFORFJhTUVneEtUQW5CZ05WQkFNTUlIZGhiSFJwWkMxcGMzTjFaWEl1YVc1MFpYSnZjQzF3YkdGNVozSnZkVzVrTVJzd0dRWURWUVFLREJKcGJuUmxjbTl3TFhCc1lYbG5jbTkxYm1Rd1dUQVRCZ2NxaGtqT1BRSUJCZ2dxaGtqT1BRTUJCd05DQUFUVHNKQTA5RkRDV2pZbG5zNDlweENRUVRGOWJBNmZJS2prYmV3WFJ2TCtEMHZSc0NDRE55ZmNjRFNHM29OVktwT3EyVEpTT3M5c0hMd1lHQlFpazZTQ28xTXdVVEFkQmdOVkhRNEVGZ1FVbWhYcFRyMU53ZEdzMDNGTkt0QnhZRVMrZGI0d0h3WURWUjBqQkJnd0ZvQVVtaFhwVHIxTndkR3MwM0ZOS3RCeFlFUytkYjR3RHdZRFZSMFRBUUgvQkFVd0F3RUIvekFLQmdncWhrak9QUVFEQWdOSkFEQkdBaUVBdys1WXJwZHI5UGtZMHlIbGJCeHhOS2g1U2crMXo0QWRiNCtLb2lSckt1SUNJUURlUnpnYzJKbnlRbjNUb21Zek5VdXBMdWEzd0hXakRwcFRNTnZBb0hJNit3PT0iXX0.eyJhZGRyZXNzIjp7InJlZ2lvbiI6IkFueXN0YXRlIiwic3RyZWV0X2FkZHJlc3MiOiIxMjMgTWFpbiBTdCIsImNvdW50cnkiOiJVUyIsImxvY2FsaXR5IjoiQW55dG93biJ9LCJpc19vdmVyXzE4Ijp0cnVlLCJwaG9uZV9udW1iZXIiOiIrMS0yMDItNTU1LTAxMDEiLCJnaXZlbl9uYW1lIjoiSm9obiIsImZhbWlseV9uYW1lIjoiRG9lIiwiaXNfb3Zlcl8yMSI6dHJ1ZSwiaXNfb3Zlcl82NSI6dHJ1ZSwiZW1haWwiOiJqb2huZG9lQGV4YW1wbGUuY29tIiwiZXhwIjoxODIzOTgzMjAwLCJuYmYiOjE3OTIzNjgwMDAsImlkIjoidXJuOnV1aWQ6OWM4YjNmODgtODk5Yy00YzgxLWJmNzEtYTk1NzgwNDYxNzFjIiwiaWF0IjoxNzkyMzY4MDAwLCJfc2RfYWxnIjoic2hhLTI1NiIsImlzcyI6ImRpZDpqd2s6ZXlKcmRIa2lPaUpGUXlJc0ltTnlkaUk2SWxBdE1qVTJJaXdpZUNJNklrY3dVa2xPUW1sR0xXOVJWVVF6WkRWRVIyNWxaMUYxV0dWdVNUSTVTa1JoVFVkdlRYWnBiMHRTUWswaUxDSjVJam9pWldRelpVWkhjekp3UlhSeWNEZDJRVm8zUWt4alluSlZkSEJMYTFsWFFWUXlTbEJWVVVzMGJFNDBSU0o5IiwiY25mIjp7Imp3ayI6eyJrdHkiOiJFQyIsImNydiI6IlAtMjU2IiwieCI6IksteHBhZGUtSnZNTFQwaHdWS0RSQ19YZjNDUlc1WDlKdk5PMHlab2VUUFUiLCJ5Ijoib1Z4d25qZldIcGMyQUh6SVFEb09pcGF5V0FzMWhmekZJYTgwYXltYTU4OCIsImtpZCI6ImRpZDpqd2s6ZXlKcmRIa2lPaUpGUXlJc0ltTnlkaUk2SWxBdE1qVTJJaXdpZUNJNklrc3RlSEJoWkdVdFNuWk5URlF3YUhkV1MwUlNRMTlZWmpORFVsYzFXRGxLZGs1UE1IbGFiMlZVVUZVaUxDSjVJam9pYjFaNGQyNXFabGRJY0dNeVFVaDZTVkZFYjA5cGNHRjVWMEZ6TVdobWVrWkpZVGd3WVhsdFlUVTRPQ0o5IzAifX0sInZjdCI6Imh0dHA6Ly8xOTIuMTY4LjEuODQ6MTgxMDMvb3BlbmlkNHZjaS9pZGVudGl0eV9jcmVkZW50aWFsIiwiX3NkIjpbIjB1QXhZUWpPdU9FMmc1THdwRXVEbG41MjYwWVJQeWYzZlRLYU1jMkJsdTAiXX0.6L6Fd-vrGOqbE41Z3TzISfoY08-I1bjIMlueljM8PMrEODj-2SYc2gUWwy9nWcR2HUarzqH_W5CZ2FBFSD7ahw~WyJRV1BKYTNPaWFtV1dya0lCMWRYdE1BIiwiYmlydGhkYXRlIiwiMTk0MC0wMS0wMSJd~"
+          }
+        ]
+      }
+    }
+  ]
+}

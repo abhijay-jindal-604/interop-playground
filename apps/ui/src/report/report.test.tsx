@@ -9,6 +9,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { RunReport } from '@interop-playground/api';
 import { setFetcher } from '../api/client.js';
 import { initialState, store } from '../state/store.js';
+import { EXACT_DIAGNOSIS, FP01 } from '../test/angle-fixtures.js';
 import { FAIL_MARKDOWN, FAIL_REPORT, PASS_REPORT } from '../test/report-fixtures.js';
 import { ReportPage } from './ReportPage.js';
 
@@ -117,6 +118,23 @@ describe('ui.report REQ-26 fields', () => {
     expect(screen.getByRole('region', { name: 'Diagnosis' }).textContent).toContain(
       'Unclassified. No known fingerprint matched; the raw checks above are the evidence.',
     );
+  });
+
+  it('T-45: an exact FP-01 with one offer renders the fix-it panel; the side word is spelled out', async () => {
+    serve({
+      [FAIL_REPORT.runId]: {
+        ...FAIL_REPORT,
+        diagnosis: { ...EXACT_DIAGNOSIS, matches: [{ ...FP01, deviatingSide: 'issuer+verifier' }] },
+      },
+    });
+    renderAt(`/runs/${FAIL_REPORT.runId}/report`);
+    await screen.findByRole('heading', { level: 1, name: /: FAIL/ });
+    expect(screen.getByRole('region', { name: 'Diagnosis' }).textContent).toContain(
+      'Issuer and verifier: inji-verify (vc-verifier) 1.0-alpha.1',
+    );
+    const fix = screen.getByRole('region', { name: 'Fix-it' });
+    expect(within(fix).getByRole('button', { name: 'Fix it and re-run' })).toBeTruthy();
+    expect(fix.textContent).toContain('KNOB-01 · absent → present');
   });
 
   it('the Markdown tab shows API-45 ?format=markdown', async () => {

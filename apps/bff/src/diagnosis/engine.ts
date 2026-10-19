@@ -307,7 +307,11 @@ export function inScope(fp: Fingerprint, spec: RunSpec): boolean {
   if (s.envs) {
     const side =
       fp.deviatingSide in ROLE_OF ? ROLE_OF[fp.deviatingSide as keyof typeof ROLE_OF] : null;
-    const envs = side ? [spec.env[side]] : Object.values(spec.env);
+    const envs = side
+      ? [spec.env[side]]
+      : fp.deviatingSide === 'issuer+verifier'
+        ? [spec.env.issuer, spec.env.verifier]
+        : Object.values(spec.env);
     if (!envs.every((e) => s.envs?.includes(e))) return false;
   }
   return true;
@@ -332,15 +336,12 @@ function payload(
   confidence: FingerprintMatchedPayload['confidence'],
   role: FingerprintMatchedPayload['role'],
 ): FingerprintMatchedPayload {
-  const side = fp.deviatingSide;
   return {
     fingerprintId: fp.id,
     gapIds: [...fp.gapIds],
     confidence,
     role,
-    // 04 §7.2 names four sides; 09 A2 has six (G-151): the issuer side carries 'issuer+verifier'
-    deviatingSide:
-      side === 'issuer+verifier' ? 'issuer' : side === 'environment' ? 'playground' : side,
+    deviatingSide: fp.deviatingSide, // G-151: the six sides of 09 A2, unmapped
     specClause: fp.specClause ? `${fp.specClause.spec} ${fp.specClause.section}` : '',
     evidenceSIds: [...fp.evidence.sIds],
     matchedExchangeIds: [...new Set(hit.exchangeIds)],

@@ -649,6 +649,7 @@ export class EventSink {
           ts,
           runId,
         );
+        this.childInconclusive(runId);
         break;
       case 'run.cancelled':
         db.run(
@@ -659,6 +660,7 @@ export class EventSink {
           ts,
           runId,
         );
+        this.childInconclusive(runId);
         break;
       default:
         break;
@@ -667,6 +669,15 @@ export class EventSink {
     db.run(
       `UPDATE runs SET last_seq = ?${limited ? ', capture_limited = 1' : ''} WHERE run_id = ?`,
       seq,
+      runId,
+    );
+  }
+
+  /** 09 A5.3: a derived run that ended `run.failed` or was cancelled is `inconclusive` */
+  private childInconclusive(runId: string): void {
+    this.db.run(
+      `UPDATE runs SET counterfactual_result = 'inconclusive'
+       WHERE run_id = ? AND parent_run_id IS NOT NULL AND counterfactual_result IS NULL`,
       runId,
     );
   }

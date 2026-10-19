@@ -4,6 +4,10 @@
  * forced fallback shows "Using the built-in diagram renderer."; reduced motion disables animation;
  * `skipped` steps are greyed with their reason. Plus the UI-16 Delivery dialog trigger.
  */
+import { readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -24,7 +28,7 @@ import {
   lifelineNames,
   mermaidText,
 } from './model.js';
-import { MERMAID_VERSION, setMermaidLoader, type MermaidApi } from './render.js';
+import { MERMAID_IMPORT, MERMAID_VERSION, setMermaidLoader, type MermaidApi } from './render.js';
 
 const NOTICE = 'Using the built-in diagram renderer.';
 
@@ -95,7 +99,24 @@ afterEach(() => {
 describe('ui.diagram model', () => {
   it('pins Mermaid 11.17.2 (plan/10 §2, RISK-32)', () => {
     expect(MERMAID_VERSION).toBe('11.17.2');
+    // plan/10 §2: package.json pins it exactly and the installed copy is that version
+    const pkg = JSON.parse(
+      readFileSync(
+        path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..', 'package.json'),
+        'utf8',
+      ),
+    ) as { dependencies: Record<string, string> };
+    expect(pkg.dependencies.mermaid).toBe(MERMAID_VERSION);
+    const require = createRequire(import.meta.url);
+    const installed = require('mermaid/package.json') as { version: string };
+    expect(installed.version).toBe(MERMAID_VERSION);
   });
+
+  it('the production loader imports the pinned Mermaid lazily (ADR-78)', async () => {
+    const m = await MERMAID_IMPORT();
+    expect(typeof m?.initialize).toBe('function');
+    expect(typeof m?.render).toBe('function');
+  }, 30_000);
 
   for (const id of ['FLOW-01', 'FLOW-04', 'FLOW-30'] as const) {
     it(`${id}: messageIndex → stepKey follows the messages counts, Mermaid text has one arrow per message`, () => {

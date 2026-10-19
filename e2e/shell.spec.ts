@@ -1,5 +1,13 @@
 import { expect, test } from '@playwright/test';
-import { ROUTES, RUN_ID, hasHorizontalScroll, noBackend, serveApi } from './support.ts';
+import {
+  CHILD_ID,
+  PARENT_ID,
+  ROUTES,
+  RUN_ID,
+  hasHorizontalScroll,
+  noBackend,
+  serveApi,
+} from './support.ts';
 
 test.describe('shell', () => {
   test.beforeEach(async ({ page }) => {
@@ -21,7 +29,13 @@ test.describe('shell', () => {
 
   test('reflows at 320 px (UI-72 reflow rule)', async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 740 });
-    for (const path of ['/', '/environment', `/runs/${RUN_ID}`]) {
+    for (const path of [
+      '/',
+      '/environment',
+      `/runs/${RUN_ID}`,
+      `/runs/${PARENT_ID}`,
+      `/runs/${CHILD_ID}`,
+    ]) {
       await page.goto(path);
       await expect(page.locator('h1')).toHaveCount(1);
       if (path.startsWith('/runs/'))

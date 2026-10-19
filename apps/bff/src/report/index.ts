@@ -108,7 +108,7 @@ function errorDetailOf(
   return verdict.failedStepKey ? `${verdict.failedStepKey} failed` : null;
 }
 
-function claimSentenceOf(
+export function claimSentenceOf(
   store: Store,
   runId: string,
   spec: RunSpec,

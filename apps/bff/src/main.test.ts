@@ -7,14 +7,16 @@
  * holder private key is only in `holder_keys` (scan-store), and that the keys the adapters create
  * resolve inbound gateway hops (offer fetch, direct_post) to the run's steps.
  */
-import { readFileSync } from 'node:fs';
+import { generateKeyPairSync } from 'node:crypto';
+import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import type { Run } from '@interop-playground/api';
 import { CaptureHttp } from './capture/index.js';
 import { REPO_ROOT } from './config/index.js';
 import { CorrelationIndex } from './gateway/index.js';
-import { adaptersFor, holderKeysFor } from './main.js';
+import { adaptersFor, holderKeysFor, registerPeerSecrets } from './main.js';
 import { Orchestrator, loadFlowTable } from './orchestrator/index.js';
 import { SecretRegistry } from './redact/registry.js';
 import { scanStore } from './redact/scan.js';
@@ -159,14 +161,15 @@ const part = (jws: string, i: number): Record<string, unknown> =>
   >;
 
 describe('main: adapters registered (T-23..T-26)', () => {
-  it('adaptersFor serves certify-preauth, playground-ts and inji-verify-local', () => {
+  it('adaptersFor serves certify-preauth, waltid, playground-ts and inji-verify-local', () => {
     const a = adaptersFor({ PUBLIC_HOST: PUB }, new CorrelationIndex());
     expect(a.issuer('issuer.certify-preauth')?.descriptor.id).toBe('issuer.certify-preauth');
     expect(a.verifier('verifier.inji-verify-local')?.descriptor.id).toBe(
       'verifier.inji-verify-local',
     );
     expect(a.wallet('wallet.playground-ts')?.descriptor.id).toBe('wallet.playground-ts');
-    expect(a.issuer('issuer.waltid')).toBeUndefined();
+    expect(a.issuer('issuer.waltid')?.descriptor.id).toBe('issuer.waltid');
+    expect(a.issuer('issuer.waltid')?.descriptor.knobs.map((k) => k.id)).toEqual(['KNOB-01']);
     expect(a.wallet('wallet.inji-jvm')).toBeUndefined();
   });
 
@@ -324,5 +327,31 @@ describe('main: adapters registered (T-23..T-26)', () => {
         body: Buffer.from(`vp_token=x&state=${state}`),
       }),
     ).toEqual({ runId, stepKey: 'vp.response.post', actor: null });
+  });
+});
+
+describe('main: peer secrets (T-43, 03 FLOW-08 "key redacted")', () => {
+  it('registers the walt.id issuer key d with the sink, so a mint body is stored redacted', () => {
+    const dir = mkdtempSync(path.join(tmpdir(), 'peers-'));
+    const { privateKey } = generateKeyPairSync('ec', { namedCurve: 'P-256' });
+    writeFileSync(
+      path.join(dir, 'waltid-issuer.key'),
+      privateKey.export({ format: 'pem', type: 'pkcs8' }),
+    );
+    writeFileSync(
+      path.join(dir, 'waltid-issuer.pem'),
+      '-----BEGIN CERTIFICATE-----\nMIIB\n-----END CERTIFICATE-----\n',
+    );
+    const store = openStore(':memory:');
+    try {
+      expect(registerPeerSecrets(store, { PEERS_CERT_DIR: dir })).toEqual(['WALTID_ISSUER_KEY_D']);
+      const d = privateKey.export({ format: 'jwk' }).d as string;
+      expect(store.sink.registry.redactString(`{"d":"${d}"}`)).toBe(
+        '{"d":"«redacted:WALTID_ISSUER_KEY_D»"}',
+      );
+      expect(registerPeerSecrets(store, { PEERS_CERT_DIR: path.join(dir, 'none') })).toEqual([]);
+    } finally {
+      store.close();
+    }
   });
 });

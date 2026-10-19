@@ -3,6 +3,7 @@ export * from './catalog.js';
 export * from './support.js';
 export * from './registry.js';
 export * from './issuers/certify-preauth.js';
+export * from './issuers/waltid.js';
 export * from './verifiers/inji-verify-local.js';
 export * from './verifiers/inji-verify-result.js';
 export * from './wallets/keys.js';
