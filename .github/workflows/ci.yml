@@ -124,7 +124,7 @@ jobs:
         if: hashFiles('e2e/**/*.spec.ts') != ''
         run: |
           npx playwright install --with-deps chromium
-          npm run e2e -- --project chromium
+          npm run e2e
 
   ci-fast:
     runs-on: ubuntu-24.04
