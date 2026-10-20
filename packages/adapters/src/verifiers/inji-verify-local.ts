@@ -312,7 +312,17 @@ export class InjiVerifyLocalVerifier implements VerifierAdapter {
    * a string (G-10), then `vp.verdict.evaluate`. Valid / Invalid / Valid-but-Expired comes from
    * `mapVerifyResult` (signature valid ∧ `expiryCheck.valid:false` = Valid-but-Expired, S-014).
    */
-  async verifyCredential(ctx: AdapterContext, held: HeldCredential): Promise<VerificationOutcome> {
+  async verifyCredential(
+    ctx: AdapterContext,
+    held: HeldCredential,
+    opts: { evaluate?: boolean } = {},
+  ): Promise<VerificationOutcome> {
+    // FLOW-31 tier 1 (ADR-30, ADR-97): the checks stay at vp.vc.verify, never the run's verdict
+    const tier1Checks = async (o: VerificationOutcome): Promise<void> => {
+      if (opts.evaluate !== false) return;
+      for (const check of o.checks)
+        await ctx.emit({ type: 'verdict.check', stepKey: 'vp.vc.verify', check });
+    };
     const outcome = await inStep(ctx, 'vp.vc.verify', async () => {
       const res = await ctx.http.fetch(
         this.cap(ctx, 'vp.vc.verify'),
@@ -331,6 +341,7 @@ export class InjiVerifyLocalVerifier implements VerifierAdapter {
       if (res.status === 200 && isRecord(body)) {
         const mapped = mapVerifyResult(body);
         const value: VerificationOutcome = { ...mapped, rawResult: body, exchangeIds: [] };
+        await tier1Checks(value);
         return { outcome: 'pass' as const, value };
       }
       // a non-200 is data: the upstream code and message are copied verbatim (02 §5.1)
@@ -351,8 +362,10 @@ export class InjiVerifyLocalVerifier implements VerifierAdapter {
         rawResult: body,
         exchangeIds: [],
       };
+      await tier1Checks(value);
       return { outcome: 'fail' as const, value };
     });
+    if (opts.evaluate === false) return outcome;
     await inStep(ctx, 'vp.verdict.evaluate', async () => {
       for (const check of outcome.checks)
         await ctx.emit({ type: 'verdict.check', stepKey: 'vp.verdict.evaluate', check });

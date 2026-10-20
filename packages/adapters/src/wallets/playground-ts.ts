@@ -10,6 +10,9 @@
  * Presentation (03 FLOW-30, §2.0): parse + validate the `openid4vp://` request, DCQL match and
  * disclosure selection, KB-JWT `{iat, aud: clientId, nonce, sd_hash}` signed ES256 P1363,
  * `direct_post` of `vp_token={"<id>":["<sd-jwt>~<kb-jwt>"]}&state=<requestId>`.
+ * `ldp_vc` (T-46, 03 FLOW-03 and FLOW-31 tier 2, S-199): the inspect lints of `ldp.ts`, the
+ * `vci.issuer.did` fetch of the issuer's did:web document, and a JsonWebSignature2020 ES256 VP
+ * signed by the credential's own issuance key, posted as `vp_token={"<id>":[<VP JSON>]}`.
  * Every HTTP hop goes through the injected `CapturingHttp` (to the gateway URLs the issuer and
  * the verifier advertise); protocol rejections are failed steps, not exceptions (02 §5.1).
  */
@@ -41,6 +44,17 @@ import {
   str,
   trimSlash,
 } from '../support.js';
+import type { Canonize } from './ldp.js';
+import {
+  didWebUrl,
+  inspectLdpVc,
+  ldpClaimPresent,
+  ldpTypeMatches,
+  loadJsonldCanonize,
+  proofCreated,
+  signLdpVp,
+  unsignedVp,
+} from './ldp.js';
 import type { Disclosure } from './sd-jwt.js';
 import { decodeSdJwt, findClaim, inspectSdJwt, presentationOf, sdHashOf } from './sd-jwt.js';
 
@@ -66,8 +80,10 @@ export function wellKnownUrl(identifier: string, name: string): string {
 
 export interface PlaygroundTsOptions {
   gateway?: GatewayCorrelation;
-  /** clock in ms (KB-JWT / proof `iat`) */
+  /** clock in ms (KB-JWT / proof `iat`, ldp VP `created`) */
   now?: () => number;
+  /** URDNA2015 canonicaliser for `ldp_vc` VPs (default: `jsonld` with the offline contexts) */
+  canonize?: Canonize;
 }
 
 /** the parsed `openid4vp://authorize?…` request (03 FLOW-30 message 2) */
@@ -358,7 +374,7 @@ export class PlaygroundTsWallet implements WalletAdapter {
 
     // vci.credential.inspect (engine): the decoded artifact + structural lints
     const checks = await inStep(ctx, 'vci.credential.inspect', async () => {
-      const r = this.inspect(ctx.spec.format, raw);
+      const r = this.inspect(ctx.spec.format, raw, key.didJwk);
       await ctx.emit({
         type: 'engine.call',
         stepKey: 'vci.credential.inspect',
@@ -371,6 +387,9 @@ export class PlaygroundTsWallet implements WalletAdapter {
         await ctx.emit({ type: 'verdict.check', stepKey: 'vci.credential.inspect', check });
       return { outcome: r.ok ? 'pass' : 'fail', capture: 'none', value: r.checks };
     });
+    // vci.issuer.did (FLOW-03): the issuer's DID document, through the gateway (ADR-24)
+    if (ctx.spec.format === 'ldp_vc' && checks.every((c) => c.outcome !== 'fail'))
+      await this.issuerDid(ctx, raw);
     const credential: HeldCredential = {
       format: ctx.spec.format,
       raw,
@@ -382,9 +401,56 @@ export class PlaygroundTsWallet implements WalletAdapter {
     return ok ? { ok, credential, checks } : { ok, checks };
   }
 
+  /**
+   * `vci.issuer.did`: `GET` of the did:web document named by the credential's `issuer`, with an
+   * `info` check that sets it beside `proof.verificationMethod` (G-20, G-88 evidence). Skipped for
+   * a non-did:web issuer. A failed fetch is a failed step; the credential is still held.
+   */
+  private async issuerDid(ctx: AdapterContext, raw: string): Promise<void> {
+    const vc = JSON.parse(raw) as Record<string, unknown>;
+    const issuer = str(vc.issuer) ?? (isRecord(vc.issuer) ? str(vc.issuer.id) : null);
+    const vm = isRecord(vc.proof) ? str(vc.proof.verificationMethod) : null;
+    const url = issuer ? didWebUrl(issuer) : null;
+    await inStep(ctx, 'vci.issuer.did', async () => {
+      if (!url) return { outcome: 'skipped' as const, value: null };
+      const res = await ctx.http.fetch(this.cap(ctx, 'vci.issuer.did', ctx.spec.issuer), url, {
+        headers: { accept: 'application/did+json, application/json' },
+        signal: callSignal(ctx, UPSTREAM_TIMEOUT_MS),
+      });
+      const doc = await jsonBody(res);
+      const ok = res.status === 200 && isRecord(doc);
+      const methods =
+        ok && Array.isArray(doc.verificationMethod)
+          ? doc.verificationMethod.filter(isRecord).map((m) => str(m.id) ?? '')
+          : [];
+      const assertion = ok && Array.isArray(doc.assertionMethod) ? doc.assertionMethod : [];
+      const check: CheckResult = {
+        checkId: 'vc.ldp.did-document',
+        outcome: 'info',
+        source: 'playground-lint',
+        message: !ok
+          ? `did.json answered HTTP ${res.status}`
+          : [
+              `DID document id ${String(str(doc.id))}`,
+              vm && methods.includes(vm)
+                ? `lists ${vm}`
+                : `does not list proof.verificationMethod ${String(vm)} (G-20, FP-10 evidence)`,
+              assertion.some((a) => typeof a === 'string' && !a.includes('#'))
+                ? 'assertionMethod holds a bare DID (G-88, FP-19 evidence)'
+                : 'assertionMethod holds key ids',
+            ].join('; '),
+        specClause: 'did:web Method Specification §3.2 (Read)',
+        exchangeIds: [],
+      };
+      await ctx.emit({ type: 'verdict.check', stepKey: 'vci.issuer.did', check });
+      return { outcome: ok ? ('pass' as const) : ('fail' as const), value: null };
+    });
+  }
+
   private inspect(
     format: string,
     raw: string,
+    holderDid: string | null = null,
   ): { ok: boolean; decoded: unknown; checks: CheckResult[] } {
     if (format === 'dc+sd-jwt') {
       try {
@@ -403,10 +469,17 @@ export class PlaygroundTsWallet implements WalletAdapter {
     }
     if (format === 'ldp_vc') {
       try {
-        const vc = JSON.parse(raw) as unknown;
-        return { ok: true, decoded: { format, credential: vc }, checks: [] };
-      } catch {
-        return { ok: true, decoded: { format, bytes: raw.length }, checks: [] };
+        const { inspection, checks } = inspectLdpVc(raw, holderDid);
+        return { ok: true, decoded: inspection, checks };
+      } catch (e) {
+        const check: CheckResult = {
+          checkId: 'vc.ldp.decode',
+          outcome: 'fail',
+          source: 'playground-lint',
+          message: (e as Error).message,
+          exchangeIds: [],
+        };
+        return { ok: false, decoded: { format, error: (e as Error).message }, checks: [check] };
       }
     }
     // mso_mdoc: the normaliser (02 §5.5) decodes it; here only the envelope size
@@ -448,6 +521,14 @@ export class PlaygroundTsWallet implements WalletAdapter {
     const nonce = parsed.nonce ?? req.nonce;
     const state = parsed.state ?? req.state;
     const responseUri = parsed.responseUri ?? req.responseUri;
+
+    if (held.format === 'ldp_vc')
+      return this.presentLdp(ctx, req, held, sel, parsed.dcqlQuery, {
+        clientId,
+        nonce,
+        state,
+        responseUri,
+      });
 
     // vp.credential.match: DCQL against the held credential, disclosure selection
     const match = await inStep(ctx, 'vp.credential.match', async () => {
@@ -495,7 +576,17 @@ export class PlaygroundTsWallet implements WalletAdapter {
       };
     });
 
-    // vp.response.post: direct_post to the verifier's (gateway) response_uri
+    return this.post(ctx, req, responseUri, vpToken, state);
+  }
+
+  /** `vp.response.post` (direct_post to the verifier's gateway response_uri), `vp.error.dispatch` */
+  private async post(
+    ctx: AdapterContext,
+    req: PresentationRequestRef,
+    responseUri: string,
+    vpToken: string,
+    state: string,
+  ): Promise<PresentationOutcome> {
     const posted = await inStep(ctx, 'vp.response.post', async () => {
       const res = await ctx.http.fetch(
         this.cap(ctx, 'vp.response.post', req.verifierAdapter),
@@ -536,6 +627,127 @@ export class PlaygroundTsWallet implements WalletAdapter {
     return { submitted: true, checks: [] };
   }
 
+  /**
+   * FLOW-31 tier 2 (S-199): DCQL `ldp_vc` match (type_values; claim paths relative to
+   * `credentialSubject`), then the JsonWebSignature2020 ES256 VP signed by the issuance key with
+   * `domain` = the full clientId and `challenge` = the nonce, posted as `{"<id>":[<VP>]}`.
+   */
+  private async presentLdp(
+    ctx: AdapterContext,
+    req: PresentationRequestRef,
+    held: HeldCredential,
+    sel: DisclosureSelection,
+    dcql: unknown,
+    r: { clientId: string; nonce: string; state: string; responseUri: string },
+  ): Promise<PresentationOutcome> {
+    const none: PresentationOutcome = { submitted: false, checks: [] };
+    const match = await inStep(ctx, 'vp.credential.match', async () => {
+      const m = this.matchLdp(dcql, held, sel);
+      await ctx.emit({
+        type: 'engine.call',
+        stepKey: 'vp.credential.match',
+        engine: ENGINE,
+        op: 'match-credential',
+        inputSummary: { format: held.format, dcqlQuery: dcql },
+        outputSummary: m.ok
+          ? {
+              credentialQueryId: m.queryId,
+              claimPaths: m.paths,
+              note: 'ldp_vc has no selective disclosure: the whole credential is presented',
+            }
+          : { error: m.error },
+      });
+      return { outcome: m.ok ? 'pass' : 'fail', capture: 'none', value: m };
+    });
+    if (!match.ok) return none;
+
+    const vpToken = await inStep(ctx, 'vp.token.build', async () => {
+      const key = held.holderKey;
+      const fail = async (message: string) => {
+        await ctx.emit({
+          type: 'engine.exception',
+          stepKey: 'vp.token.build',
+          engine: ENGINE,
+          exceptionClass: 'LdpVpBuildError',
+          message,
+        });
+        return { outcome: 'fail' as const, capture: 'none' as const, value: null };
+      };
+      // S-199 point 2: the VP is signed by the P-256 issuance key (no Ed25519 holder key exists)
+      if (key.alg !== 'ES256') return fail(`the issuance key is ${key.alg}; S-199 needs ES256`);
+      let canonize: Canonize;
+      try {
+        canonize = this.opts.canonize ?? (await loadJsonldCanonize());
+      } catch (e) {
+        return fail((e as Error).message);
+      }
+      const { vp, proof } = unsignedVp({
+        credential: match.vc,
+        holderDid: key.didJwk,
+        domain: r.clientId,
+        challenge: r.nonce,
+        created: proofCreated((this.opts.now ?? Date.now)()),
+      });
+      let signed;
+      try {
+        signed = await signLdpVp(vp, proof, canonize, (d) => ctx.sign(key, 'ES256', d));
+      } catch (e) {
+        return fail(`canonicalisation or signing failed: ${(e as Error).message}`);
+      }
+      await ctx.emit({
+        type: 'engine.call',
+        stepKey: 'vp.token.build',
+        engine: ENGINE,
+        op: 'build-ldp-vp',
+        inputSummary: {
+          alg: key.alg,
+          kid: `${key.didJwk}#0`,
+          credentialType: match.type,
+        },
+        outputSummary: {
+          holder: signed.holder,
+          proof,
+          jwsSha256: sha256Hex(signed.proof?.jws ?? ''),
+        },
+      });
+      return {
+        outcome: 'pass' as const,
+        capture: 'none' as const,
+        value: JSON.stringify({ [match.queryId]: [signed] }),
+      };
+    });
+    if (vpToken === null) return none;
+    return this.post(ctx, req, r.responseUri, vpToken, r.state);
+  }
+
+  private matchLdp(
+    dcql: unknown,
+    held: HeldCredential,
+    sel: DisclosureSelection,
+  ):
+    | { ok: true; queryId: string; vc: Record<string, unknown>; type: string[]; paths: string[][] }
+    | { ok: false; error: string } {
+    let vc: unknown;
+    try {
+      vc = JSON.parse(held.raw) as unknown;
+    } catch (e) {
+      return { ok: false, error: `held credential is not JSON: ${(e as Error).message}` };
+    }
+    if (!isRecord(vc)) return { ok: false, error: 'held credential is not a JSON object' };
+    const type = Array.isArray(vc.type) ? vc.type.map(String) : [];
+    const q = dcqlCredentials(dcql).find(
+      (c) => c.format === 'ldp_vc' && ldpTypeMatches(type, c.meta.type_values),
+    );
+    if (!q)
+      return { ok: false, error: `no DCQL ldp_vc credential query matches type ${type.join(',')}` };
+    const paths =
+      q.claims.length > 0 ? q.claims.map((c) => c.path) : sel.claimPaths.map((p) => [...p]);
+    for (const p of paths)
+      if (!ldpClaimPresent(vc, p))
+        return { ok: false, error: `claim ${p.join('.')} not in credentialSubject` };
+    return { ok: true, queryId: q.id, vc, type, paths };
+  }
+
   private match(
     dcql: unknown,
     held: HeldCredential,
@@ -550,7 +762,7 @@ export class PlaygroundTsWallet implements WalletAdapter {
       }
     | { ok: false; error: string } {
     if (held.format !== 'dc+sd-jwt')
-      return { ok: false, error: `presentation of ${held.format} is not built yet (T-46)` };
+      return { ok: false, error: `presentation of ${held.format} is not an OID4VP flow (ADR-30)` };
     let decoded: ReturnType<typeof decodeSdJwt>;
     try {
       decoded = decodeSdJwt(held.raw);

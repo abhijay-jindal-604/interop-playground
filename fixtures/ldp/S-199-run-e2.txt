@@ -1,0 +1,6 @@
+VP written ../vp-e2.json holder did:key:z6Mkv1THW75PyYWaZxq8UvhVXVub7uH8iCGYw19ybJ77nZqW proof {"type":"Ed25519Signature
+submit:
+{"errorCode":"invalid_request","errorMessage":"Client id validation failed due to invalid client_id/domain."}
+[status 400]
+{"allChecksSuccessful":null,"credentialResults":[]}
+{"errorCode":"NO_VP_SUBMISSION","errorMessage":"No VP submission found for given transaction ID."}

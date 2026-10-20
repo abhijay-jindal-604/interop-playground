@@ -331,6 +331,9 @@ export const runCopy = {
     passIssued: 'The credential was issued. No verification was run.',
     failInvalid: (step: string, code: string, message: string) =>
       `Invalid. The verifier rejected the credential at ${step}: ${code} ${message}.`,
+    /** every step passed and the verifier answered "invalid" (FLOW-40 credential-level) */
+    failInvalidChecks: (code: string, message: string) =>
+      `Invalid. The verifier rejected the credential: ${code} ${message}.`,
     failAt: (step: string, code: string, message: string) =>
       `Failed at ${step}: ${code} ${message}.`,
     blocked: (target: string, failing: string) =>
@@ -727,9 +730,15 @@ export const selectorCopy = {
   version: (v: string) => `version ${v}`,
   available: 'Running',
   notRunning: (reason: string) => `Not running: ${reason}`,
+  /** API-02 unavailability: the release cut (ADR-95) is not a stopped service */
+  unavailable: (reason: string) =>
+    reason.startsWith('not in this release')
+      ? `Not in this release (${reason.replace(/^not in this release \((.*)\)$/, '$1')})`
+      : `Not running: ${reason}`,
   notAvailable: (reason: string, gap: string | null) =>
     `Not available with this selection: ${reason}${gap ? ` (${gap})` : ''}`,
-  conflicts: (reason: string) => `Conflicts with the selection: ${reason}`,
+  conflicts: (reason: string, gap: string | null) =>
+    `Conflicts with the selection: ${reason}${gap ? ` (${gap})` : ''}`,
   whyNot: 'Why not?',
   gap: (id: string) => `Gap ${id}`,
   evidence: (list: string) => `Evidence: ${list}`,
@@ -754,13 +763,24 @@ export const selectorCopy = {
       'cross-device': 'Cross-device (QR)',
       'same-device': 'Same-device (deep link)',
       'dc-api': 'Digital Credentials API (probe)',
+      'credential-level': 'Credential only (no OID4VP)',
     } as Record<string, string>,
     modeHelp: {
       'cross-device': 'A QR code or link goes to the wallet.',
       'same-device': 'The wallet opens from a link on the same device.',
       'dc-api':
         'Only checks whether the browser and a wallet can answer. It never counts toward pass rates.',
+      'credential-level':
+        'The verifier checks the held credential directly (POST /v2/vc-verification). No wallet presentation.',
     } as Record<string, string>,
+    fixtureCase: 'Fixture case',
+    fixtureCases: {
+      PlaygroundSdJwt: 'Valid',
+      PlaygroundSdJwtExpired: 'Expired',
+      PlaygroundSdJwtInvalid: 'Bad signature',
+    } as Record<string, string>,
+    fixtureCaseHelp:
+      'Test-only credentials signed at run time: valid, expired yesterday, or with a broken signature.',
     scopes: { full: 'Issue, present and verify', issuance: 'Issue only' } as Record<string, string>,
     issueOnlyHelp: 'Stops after the credential is issued. The verifier is not used.',
     grant: (g: string) =>

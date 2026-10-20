@@ -322,6 +322,14 @@ export class RunExecution {
 
   private async issuance(ctx: AdapterContext): Promise<HeldCredential | null> {
     const issuer = this.adapter((id) => this.deps.adapters.issuer(id), this.spec.issuer);
+    // FLOW-14 (ADR-13, ADR-94): the fixture issuer hands the held credential over, no traffic and
+    // no wallet issuance; `issuanceOk` stays null (04 §3 RunVerdict)
+    if (this.spec.issuanceFlowId === 'FLOW-14') {
+      if (!issuer.fixture)
+        throw new RunFault('engine_exception', `${this.spec.issuer} implements no fixture`);
+      const held = await issuer.fixture(ctx, this.spec.format);
+      return (await this.afterPhase()) ? held : null;
+    }
     const wallet = this.adapter((id) => this.deps.adapters.wallet(id), this.spec.wallet);
     let configurationId = this.spec.configurationId;
     // vci.setup.variant: only when an issuer-side knob differs from its default (02 §1.3 item 5)
@@ -372,7 +380,12 @@ export class RunExecution {
     const verifier = this.adapter((id) => this.deps.adapters.verifier(id), this.spec.verifier);
     const wallet = this.adapter((id) => this.deps.adapters.wallet(id), this.spec.wallet);
     let result: VerificationOutcome;
-    if (verifier.createRequest && verifier.awaitResult) {
+    const credentialLevel =
+      this.spec.presentationFlowId === 'FLOW-40' || this.spec.presentationFlowId === 'FLOW-41';
+    if (credentialLevel && verifier.verifyCredential) {
+      // FLOW-40 (ADR-94): the verifier answers for the held credential; no wallet presentation
+      result = await verifier.verifyCredential(ctx, held);
+    } else if (verifier.createRequest && verifier.awaitResult) {
       const ref: PresentationRequestRef = await verifier.createRequest(ctx, {
         format: this.spec.format,
         configurationId: this.spec.configurationId,
@@ -408,6 +421,17 @@ export class RunExecution {
       result = await verifier.awaitResult(ctx, ref, this.deps.resultTimeoutMs);
       if (!presented.submitted && result.verdict !== 'no-submission')
         result = { ...result, verdict: 'no-submission' };
+      // FLOW-31 tier 1 (ADR-97): the credential itself at /v2/vc-verification; its checks stay at
+      // vp.vc.verify and never replace the tier 2 (OID4VP) verdict
+      if (
+        this.spec.presentationFlowId === 'FLOW-31' &&
+        verifier.verifyCredential &&
+        this.applies('vp.vc.verify') &&
+        !this.emitted.has('vp.vc.verify')
+      ) {
+        if (!(await this.afterPhase())) return;
+        await verifier.verifyCredential(ctx, held, { evaluate: false });
+      }
     } else if (verifier.verifyCredential) {
       result = await verifier.verifyCredential(ctx, held);
     } else {
@@ -415,7 +439,8 @@ export class RunExecution {
     }
     if (!(await this.afterPhase())) return;
     this.verification = result.verdict;
-    if (this.applies('vp.verdict.evaluate')) {
+    // a credential-level adapter may evaluate the verdict itself (inji-verify-local FLOW-40)
+    if (this.applies('vp.verdict.evaluate') && !this.emitted.has('vp.verdict.evaluate')) {
       this.startStep('vp.verdict.evaluate');
       const pass = result.verdict === 'valid' || result.verdict === 'valid-but-expired';
       this.append({
@@ -442,7 +467,8 @@ export class RunExecution {
     if (this.firstFail !== null && targetOutcome === 'skipped') outcome = 'blocked';
     else if (this.verification === 'no-submission') outcome = 'no-submission';
     else if (this.firstFail !== null) outcome = 'fail';
-    else if (this.spec.scope === 'issuance') outcome = this.issuanceOk ? 'pass' : 'fail';
+    else if (this.spec.scope === 'issuance')
+      outcome = (this.issuanceOk ?? this.spec.issuanceFlowId === 'FLOW-14') ? 'pass' : 'fail';
     else
       outcome =
         this.issuanceOk !== false &&

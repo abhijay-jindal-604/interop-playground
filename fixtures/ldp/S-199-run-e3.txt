@@ -1,0 +1,6 @@
+VP written ../vp-e3.json holder did:key:z6Mkv1THW75PyYWaZxq8UvhVXVub7uH8iCGYw19ybJ77nZqW proof {"type":"Ed25519Signature
+submit:
+{"errorCode":"invalid_request","errorMessage":"Nonce validation failed due to invalid nonce/challenge."}
+[status 400]
+{"allChecksSuccessful":null,"credentialResults":[]}
+{"errorCode":"NO_VP_SUBMISSION","errorMessage":"No VP submission found for given transaction ID."}

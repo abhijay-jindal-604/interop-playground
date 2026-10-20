@@ -357,8 +357,16 @@ export interface VerifierAdapter extends AdapterBase {
     req: PresentationRequestRef,
     timeoutMs: number,
   ): Promise<VerificationOutcome>;
-  /** Credential-level verification (no OID4VP): offline and library verifiers, Inji Verify /v2/vc-verification. */
-  verifyCredential?(ctx: AdapterContext, held: HeldCredential): Promise<VerificationOutcome>;
+  /**
+   * Credential-level verification (no OID4VP): offline and library verifiers, Inji Verify
+   * /v2/vc-verification. `evaluate:false` (FLOW-31 tier 1, ADR-97): the checks stay at
+   * `vp.vc.verify` and `vp.verdict.evaluate` is left to the OID4VP tier.
+   */
+  verifyCredential?(
+    ctx: AdapterContext,
+    held: HeldCredential,
+    opts?: { evaluate?: boolean },
+  ): Promise<VerificationOutcome>;
 }
 
 // ---------- registry ----------

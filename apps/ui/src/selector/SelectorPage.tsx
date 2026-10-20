@@ -30,6 +30,7 @@ import {
   cardRequest,
   cardTunnel,
   defaultSelection,
+  FIXTURE_CONFIGS,
   FORMATS,
   fromQuery,
   grantOf,
@@ -174,8 +175,8 @@ function AdapterCard({
   const blurb = c.names[d.id]?.[1] ?? null;
   const hops = d.coverage.partialHops;
   let status: { text: string; tone: string } | null = null;
-  if (down) status = { text: c.notRunning(entry.availability.reason ?? ''), tone: 'skipped' };
-  else if (conflict) status = { text: c.conflicts(hit.reason), tone: 'fail' };
+  if (down) status = { text: c.unavailable(entry.availability.reason ?? ''), tone: 'skipped' };
+  else if (conflict) status = { text: c.conflicts(hit.reason, hit.gapId), tone: 'fail' };
   else if (hit) status = { text: c.notAvailable(hit.reason, hit.gapId), tone: 'skipped' };
   else if (tunnel && !tunnelUp) status = { text: c.tunnel[tunnel], tone: 'warn' };
   return (
@@ -379,6 +380,7 @@ export function SelectorPage() {
     setSel((s) => {
       const next = { ...s, ...patch };
       if (patch.issuer) next.grant = null;
+      if (patch.issuer && patch.issuer !== s.issuer) next.configurationId = null;
       store(next);
       return next;
     });
@@ -408,7 +410,7 @@ export function SelectorPage() {
   const blockReason = selfHit
     ? `${selfHit.reason}${selfHit.gapId ? ` (${selfHit.gapId})` : ''}`
     : down
-      ? `${nameOf(down)}: ${c.notRunning(down.availability.reason ?? '')}`
+      ? `${nameOf(down)}: ${c.unavailable(down.availability.reason ?? '')}`
       : tunnelBlock
         ? c.tunnel.start
         : null;
@@ -496,6 +498,19 @@ export function SelectorPage() {
               onChange={(mode) => update({ mode })}
               help={c.recipe.modeHelp[sel.mode]}
             />
+            {sel.issuer === ('issuer.fixture' as AdapterId) ? (
+              <Segmented
+                label={c.recipe.fixtureCase}
+                name="config"
+                options={FIXTURE_CONFIGS}
+                value={
+                  (sel.configurationId ?? 'PlaygroundSdJwt') as (typeof FIXTURE_CONFIGS)[number]
+                }
+                words={c.recipe.fixtureCases}
+                onChange={(configurationId) => update({ configurationId })}
+                help={c.recipe.fixtureCaseHelp}
+              />
+            ) : null}
             <Segmented
               label={c.recipe.scope}
               name="scope"

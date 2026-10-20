@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Interop Playground deck</title>
+    <!--
+      Deck v1 (T-55, 2026-10-20). Six slides, one message each (plan/13 §3).
+      Self-contained: no external fonts, scripts or images.
+      Keys: arrow keys or space to move, "n" toggles the speaker notes. Print gives one slide per page.
+    -->
+    <style>
+      :root {
+        --bg: #f6f5f1;
+        --fg: #1c1d21;
+        --muted: #5b5e66;
+        --slide: #ffffff;
+        --line: #d9d7cf;
+        --accent: #0f6b5c;
+        --fail: #a3341f;
+        --pass: #1d6b2f;
+        --code: #eceae3;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme='light']) {
+          --bg: #141517;
+          --fg: #e9e8e4;
+          --muted: #a4a6ad;
+          --slide: #1d1f22;
+          --line: #34373c;
+          --accent: #5fc4b0;
+          --fail: #f08a72;
+          --pass: #7fd18e;
+          --code: #2a2c30;
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--fg);
+        font:
+          18px/1.45 system-ui,
+          -apple-system,
+          'Segoe UI',
+          sans-serif;
+      }
+      main {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 24px 16px 64px;
+      }
+      section.slide {
+        background: var(--slide);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        aspect-ratio: 16 / 9;
+        padding: 48px 56px;
+        margin: 0 0 24px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .num {
+        color: var(--muted);
+        font-size: 14px;
+        letter-spacing: 0.04em;
+      }
+      h1,
+      h2 {
+        margin: 8px 0 12px;
+        line-height: 1.15;
+      }
+      h1 {
+        font-size: 52px;
+      }
+      h2 {
+        font-size: 36px;
+      }
+      .message {
+        font-size: 24px;
+        color: var(--accent);
+        margin: 0 0 24px;
+      }
+      .visual {
+        flex: 1;
+        display: flex;
+        gap: 16px;
+        align-items: stretch;
+      }
+      .box {
+        flex: 1;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 16px;
+        font-size: 17px;
+      }
+      .box b {
+        display: block;
+        margin-bottom: 6px;
+      }
+      .arrow {
+        align-self: center;
+        color: var(--muted);
+        font-size: 28px;
+      }
+      .fail {
+        color: var(--fail);
+        font-weight: 600;
+      }
+      .pass {
+        color: var(--pass);
+        font-weight: 600;
+      }
+      code {
+        background: var(--code);
+        padding: 1px 5px;
+        border-radius: 4px;
+        font-size: 0.92em;
+      }
+      .big {
+        font-size: 44px;
+        font-weight: 700;
+        line-height: 1;
+      }
+      .todo {
+        border: 1px dashed var(--muted);
+        color: var(--muted);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+      .credits {
+        color: var(--muted);
+        margin-top: auto;
+      }
+      aside.notes {
+        display: none;
+        margin-top: 16px;
+        padding-top: 12px;
+        border-top: 1px solid var(--line);
+        font-size: 14px;
+        color: var(--muted);
+      }
+      body.show-notes aside.notes {
+        display: block;
+      }
+      body.show-notes section.slide {
+        aspect-ratio: auto;
+      }
+      @media (max-width: 760px) {
+        section.slide {
+          aspect-ratio: auto;
+          padding: 24px 20px;
+        }
+        h1 {
+          font-size: 34px;
+        }
+        h2 {
+          font-size: 26px;
+        }
+        .visual {
+          flex-direction: column;
+        }
+        .arrow {
+          transform: rotate(90deg);
+        }
+      }
+      @media print {
+        body {
+          background: #fff;
+        }
+        main {
+          padding: 0;
+          max-width: none;
+        }
+        section.slide {
+          page-break-after: always;
+          border: 0;
+          margin: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="slide" id="s1">
+        <div class="num">1 / 6</div>
+        <h1>Interop Playground</h1>
+        <p class="message">Inji interop becomes something you can run, see and fix.</p>
+        <div class="visual">
+          <div class="box todo">
+            TODO(wave 9): run screen screenshot (diagram + inspector), from the take
+            deliverables/takes/s04-*.webm
+          </div>
+        </div>
+        <p class="credits">Built by TODO(user): names.</p>
+        <aside class="notes">
+          Speaker: "We built a playground that runs Inji issuers, wallets and verifiers against each
+          other and shows every message on the wire." Sources: README "What it does"; the live slice
+          e2e <code>e2e/live/slice.live.spec.ts</code> (T-36, green 2026-10-20).
+        </aside>
+      </section>
+
+      <section class="slide" id="s2">
+        <div class="num">2 / 6</div>
+        <h2>Why interop is hard to see</h2>
+        <p class="message">
+          A failed presentation is one opaque error; the cause sits in a message two hops earlier.
+        </p>
+        <div class="visual">
+          <div class="box">
+            <b>What the verifier says</b>
+            Inji Verify: <span class="fail">invalid</span><br />
+            <code>ERR_SIGNATURE_VERIFICATION_FAILED</code><br />
+            "getX509CertChain(...) must not be null"
+          </div>
+          <div class="arrow">→</div>
+          <div class="box">
+            <b>Where the cause is</b>
+            The walt.id credential, issued two hops earlier, carries no <code>x5c</code> chain in
+            its SD-JWT header. Matched as FP-01 (gap G-55) on the exact exchange.
+          </div>
+        </div>
+        <aside class="notes">
+          Speaker: "When a credential fails at a verifier, you get one code. We show you which
+          exchange caused it and why." Source: run <code>01M5B6KNNY7DC3YK3CR0ETNBN9</code>, report
+          <code>docs/reports/01M5B6KNNY7DC3YK3CR0ETNBN9.md</code> (T-44, live, 2026-10-20).
+        </aside>
+      </section>
+
+      <section class="slide" id="s3">
+        <div class="num">3 / 6</div>
+        <h2>What it does</h2>
+        <p class="message">
+          Pick three roles, run the real protocols, inspect every payload, get a report.
+        </p>
+        <div class="visual">
+          <div class="box">
+            <b>Select</b>Issuer, wallet, verifier, format, mode. Impossible combinations are greyed
+            out with the reason and gap ID.
+          </div>
+          <div class="arrow">→</div>
+          <div class="box">
+            <b>Run</b>OpenID4VCI 1.0 pre-authorized issuance and OpenID4VP 1.0 cross-device
+            presentation, live against Inji in Docker.
+          </div>
+          <div class="arrow">→</div>
+          <div class="box">
+            <b>Inspect</b>Every HTTP exchange, decoded SD-JWT disclosures, JOSE headers, capture
+            labelled full / partial / none.
+          </div>
+          <div class="arrow">→</div>
+          <div class="box"><b>Report</b>Per-run pass/fail report, JSON and Markdown.</div>
+        </div>
+        <aside class="notes">
+          Speaker: "Pick an issuer, a wallet and a verifier; we run OpenID4VCI and OpenID4VP for
+          real and hand you a pass/fail report." Format scope on 2026-10-20: SD-JWT VC live; W3C
+          JSON-LD (ldp_vc) pending T-46; mDoc cut (docs/decisions.md 2026-10-20). Do not say "three
+          formats". Sources: README flows table; docs/interop-report.md.
+        </aside>
+      </section>
+
+      <section class="slide" id="s4">
+        <div class="num">4 / 6</div>
+        <h2>Fix-it re-runs</h2>
+        <p class="message">
+          We do not only diagnose: we prove the fix by re-running with exactly one change.
+        </p>
+        <div class="visual">
+          <div class="box">
+            <b>Parent</b>walt.id → reference wallet → Inji Verify: <span class="fail">FAIL</span>
+          </div>
+          <div class="arrow">→</div>
+          <div class="box">
+            <b>Diagnosis</b>FP-01, exact match, G-55. One offer: KNOB-01 <code>absent</code> →
+            <code>present</code>.
+          </div>
+          <div class="arrow">→</div>
+          <div class="box">
+            <b>Child</b>Same run, one knob changed: <span class="pass">PASS</span>, classified
+            <b>fixed</b>.
+          </div>
+        </div>
+        <p>"Changing only waltid.sdjwt.x5c from absent to present makes it pass."</p>
+        <aside class="notes">
+          Speaker: "Each diagnosis that has a proven fix gets one button. One knob changes, the run
+          repeats, and the result proves the fix." Sources: runs
+          <code>01M5B6KNNY7DC3YK3CR0ETNBN9</code> → <code>01M5B6M723AQ7T818D36816PRV</code>; golden
+          <code>apps/bff/src/diagnosis/fixit.golden.test.ts</code>; live e2e
+          <code>e2e/live/fixit.live.spec.ts</code> green 3× on the full bundle; take
+          <code>deliverables/takes/m2-fixit.webm</code>.
+        </aside>
+      </section>
+
+      <section class="slide" id="s5">
+        <div class="num">5 / 6</div>
+        <h2>What we found in Inji</h2>
+        <p class="message">Real, reproducible defects, written up for the Inji repositories.</p>
+        <div class="visual">
+          <div class="box">
+            <span class="big">16</span><b>issue drafts (18 issues)</b>Group (a) of the gaps
+            write-up.
+          </div>
+          <div class="box">
+            <span class="big">49</span><b>tamper cases observed</b>3 fail, 5 lenient, the rest pass.
+          </div>
+          <div class="box">
+            <b>Three examples</b>
+            D-01: Certify answers 500 where the spec needs 400.<br />
+            D-04: Inji Verify requires <code>x5c</code> on SD-JWTs.<br />
+            D-05: the KB-JWT <code>aud</code> rule rejects client_id prefixes with <code>_</code>.
+          </div>
+        </div>
+        <aside class="notes">
+          Speaker: "Running independent stacks against Inji surfaced defects with exact reproduction
+          steps; each is drafted for us to file by hand." Sources: docs/gaps.md group (a) D-01..D-16
+          (16 drafts, 18 issues; plan/08 Summary); 49 tamper cases in 56 cells, 3 fail, 5 lenient
+          (plan/07 Summary). These are research results; the build re-ran D-04 live (T-44). The
+          tamper engine is not in this release. Nothing is filed by software.
+        </aside>
+      </section>
+
+      <section class="slide" id="s6">
+        <div class="num">6 / 6</div>
+        <h2>Run it yourself</h2>
+        <p class="message">One command, local, digest-pinned.</p>
+        <div class="visual">
+          <div class="box">
+            <b>Start</b>
+            <code>scripts/up.sh</code><br />
+            then open <code>http://127.0.0.1:3100</code>
+          </div>
+          <div class="box">
+            <b>Architecture</b>
+            Browser → BFF (orchestrator, adapters, capture, gateway, store, diagnosis) → Inji
+            Certify, Verify, Mimoto, eSignet and walt.id in Docker.
+          </div>
+          <div class="box"><b>Source</b>TODO(user): repository URL</div>
+        </div>
+        <p class="credits">Built by TODO(user): names.</p>
+        <aside class="notes">
+          Speaker: "Clone, run one script, and run your first combination." Source: clean
+          <code>scripts/up.sh</code> ready in 1 min 22 s on a host with cached images, slice e2e
+          green (2026-10-20). The "fresh clone to a first Pass in under 30 minutes" figure is
+          pending its timing (docs/evidence/T-55-fresh-clone.md); say it only once that file exists.
+        </aside>
+      </section>
+    </main>
+    <script>
+      (() => {
+        const slides = [...document.querySelectorAll('section.slide')];
+        let i = 0;
+        const go = (n) => {
+          i = Math.max(0, Math.min(slides.length - 1, n));
+          slides[i].scrollIntoView({ behavior: 'smooth', block: 'start' });
+        };
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') {
+            e.preventDefault();
+            go(i + 1);
+          } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+            e.preventDefault();
+            go(i - 1);
+          } else if (e.key === 'n') {
+            document.body.classList.toggle('show-notes');
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>

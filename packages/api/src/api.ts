@@ -243,7 +243,11 @@ export interface CreateRunRequest {
   wallet: AdapterId;
   verifier: AdapterId;
   grant: Grant;
-  presentationMode: PresentationMode;
+  /**
+   * null = credential-level verification without OID4VP (FLOW-40 / FLOW-41, 04 §4.2 row 2; ADR-94):
+   * the held credential goes to the verifier's `verifyCredential`, no wallet presentation
+   */
+  presentationMode: PresentationMode | null;
   format: CredentialFormat;
   /** default: API-08 default for (issuer, format) */
   configurationId?: string;

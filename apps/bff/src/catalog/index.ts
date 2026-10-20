@@ -23,6 +23,9 @@ import type {
   PresetListResponse,
 } from '@interop-playground/api';
 import { COMPAT_RULES } from '../orchestrator/rules.js';
+import { NOT_IN_RELEASE_REASON, inRelease } from './release.js';
+
+export { NOT_IN_RELEASE_REASON, RELEASE_ADAPTERS, inRelease } from './release.js';
 
 export { applicableTamperCases, tamperInapplicability, TAMPER_CASES } from './tamper.js';
 export {
@@ -44,8 +47,17 @@ const NOT_PROBED: Availability = {
   versionFingerprint: 'unprobed',
 };
 
+const NOT_IN_RELEASE: Availability = {
+  available: false,
+  reason: NOT_IN_RELEASE_REASON,
+  versionFingerprint: 'not-in-release',
+};
+
 export function adapterList(view: AvailabilityView): AdapterListResponse {
   const entry = (id: AdapterId): AdapterEntry => {
+    // ADR-95: adapters outside this release are shown unavailable with the decision's reason
+    if (!inRelease(id))
+      return { descriptor: descriptorOf(id), availability: NOT_IN_RELEASE, probedAt: null };
     const a = view(id);
     return {
       descriptor: descriptorOf(id),

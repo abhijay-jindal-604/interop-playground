@@ -15,6 +15,8 @@ import type {
 } from '@interop-playground/api';
 
 export type Role = 'issuer' | 'wallet' | 'verifier';
+/** the selector's mode: an OID4VP presentation mode, or credential-level (no OID4VP, ADR-94) */
+export type UiMode = PresentationMode | 'credential-level';
 export type Scope = 'full' | 'issuance';
 
 export interface Selection {
@@ -22,8 +24,10 @@ export interface Selection {
   wallet: AdapterId;
   verifier: AdapterId;
   format: CredentialFormat;
-  mode: PresentationMode;
+  mode: UiMode;
   scope: Scope;
+  /** `issuer.fixture` only: the REQ-23 case (`?config=`); null = the API-08 default */
+  configurationId: string | null;
   /** set only by a deep link; otherwise derived from the issuer */
   grant: Grant | null;
 }
@@ -56,7 +60,14 @@ export const COLUMN_ORDER: Record<Role, AdapterId[]> = {
 } as unknown as Record<Role, AdapterId[]>;
 
 export const FORMATS: CredentialFormat[] = ['dc+sd-jwt', 'ldp_vc', 'mso_mdoc'];
-export const MODES: PresentationMode[] = ['cross-device', 'same-device', 'dc-api'];
+export const MODES: UiMode[] = ['cross-device', 'same-device', 'dc-api', 'credential-level'];
+/** the `issuer.fixture` configurations (catalog API-08 rows; T-47 REQ-23 cases) */
+export const FIXTURE_CONFIGS = [
+  'PlaygroundSdJwt',
+  'PlaygroundSdJwtExpired',
+  'PlaygroundSdJwtInvalid',
+] as const;
+const FIXTURE = 'issuer.fixture' as AdapterId;
 export const SCOPES: Scope[] = ['full', 'issuance'];
 const GRANTS: Grant[] = ['pre-authorized_code', 'authorization_code'];
 
@@ -69,6 +80,7 @@ export function defaultSelection(env: EnvSnapshot | null): Selection {
     mode: 'cross-device',
     scope: 'full',
     grant: null,
+    configurationId: null,
   };
 }
 
@@ -84,22 +96,30 @@ export const grantOf = (s: Selection): Grant => s.grant ?? derivedGrant(s.issuer
 const known = <T extends string>(list: readonly T[], v: string | null): T | undefined =>
   v !== null && (list as readonly string[]).includes(v) ? (v as T) : undefined;
 
-/** apply `?issuer&wallet&verifier&format&grant&mode` (and `scope`) over a base selection */
+/** apply `?issuer&wallet&verifier&format&grant&mode` (and `scope`, `config`) over a base selection */
 export function fromQuery(params: URLSearchParams, base: Selection): Selection {
   const pick = (role: Role) => known(COLUMN_ORDER[role], params.get(role)) ?? base[role];
+  const issuer = pick('issuer');
   return {
-    issuer: pick('issuer'),
+    issuer,
     wallet: pick('wallet'),
     verifier: pick('verifier'),
     format: known(FORMATS, params.get('format')) ?? base.format,
     mode: known(MODES, params.get('mode')) ?? base.mode,
     scope: known(SCOPES, params.get('scope')) ?? base.scope,
     grant: known(GRANTS, params.get('grant')) ?? base.grant,
+    configurationId:
+      issuer === FIXTURE
+        ? (known(FIXTURE_CONFIGS, params.get('config')) ??
+          (issuer === base.issuer ? base.configurationId : null))
+        : null,
   };
 }
 
 export const hasSelectionQuery = (params: URLSearchParams): boolean =>
-  ['issuer', 'wallet', 'verifier', 'format', 'grant', 'mode', 'scope'].some((k) => params.has(k));
+  ['issuer', 'wallet', 'verifier', 'format', 'grant', 'mode', 'scope', 'config'].some((k) =>
+    params.has(k),
+  );
 
 export const STORAGE_KEY = 'pg.selection.v1';
 
@@ -119,7 +139,15 @@ export function store(s: Selection): void {
     const { issuer, wallet, verifier, format, mode, scope } = s;
     localStorage.setItem(
       STORAGE_KEY,
-      JSON.stringify({ issuer, wallet, verifier, format, mode, scope }),
+      JSON.stringify({
+        issuer,
+        wallet,
+        verifier,
+        format,
+        mode,
+        scope,
+        ...(s.configurationId ? { config: s.configurationId } : {}),
+      }),
     );
   } catch {
     // storage blocked: the defaults apply next time
@@ -132,16 +160,20 @@ export function toRequest(s: Selection): CreateRunRequest {
     wallet: s.wallet,
     verifier: s.verifier,
     grant: grantOf(s),
-    presentationMode: s.mode,
+    presentationMode: s.mode === 'credential-level' ? null : s.mode,
     format: s.format,
     scope: s.scope,
+    ...(s.issuer === FIXTURE && s.configurationId ? { configurationId: s.configurationId } : {}),
   };
 }
 
 /** the request for card `id` in column `role`, the other columns as selected (UI-05 step 2) */
 export function cardRequest(s: Selection, role: Role, id: AdapterId): CreateRunRequest {
   const next = { ...s, [role]: id };
-  if (role === 'issuer') next.grant = null;
+  if (role === 'issuer') {
+    next.grant = null;
+    if (id !== s.issuer) next.configurationId = null;
+  }
   return toRequest(next);
 }
 

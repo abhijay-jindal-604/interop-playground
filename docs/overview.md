@@ -27,14 +27,14 @@ When a failure matches a known fingerprint with a proven fix, the playground re-
 
 - The button appears only for an exact match with a proven knob. Several causes, or evidence from a partial hop, give "possible causes" and no button.
 - The child result is `fixed`, `moved`, `not-fixed` or `inconclusive`, with a claim sentence and a compare strip that shows the knob's direct effect first.
-- Worked example: FP-01 + KNOB-01 (walt.id adds `x5Chain`). _Pending (T-44):_ the live parent and child run IDs.
+- Worked example, proven live (T-44): FP-01 + KNOB-01 (walt.id adds `x5Chain`). Parent run `01M5B6KNNY7DC3YK3CR0ETNBN9` fails, child run `01M5B6M723AQ7T818D36816PRV` passes and is classified `fixed` (reports in `docs/reports/`).
 
 ## 5. Coverage on the package date
 
 Unsupported combinations are greyed out with the reason and the gap ID.
 
-- Built and passing live: Inji Certify pre-auth `dc+sd-jwt` → Playground reference wallet → Inji Verify (local), cross-device (T-36, green 3×); walt.id issuance with KNOB-01 (T-43).
-- _Pending:_ fixture issuer and the Valid / Invalid / Valid-but-Expired labels (T-47); `ldp_vc` (T-46, only if T-47 lands).
+- Built and passing live: Inji Certify pre-auth `dc+sd-jwt` → Playground reference wallet → Inji Verify (local), cross-device (T-36, green 3×, and after a clean `scripts/up.sh`); walt.id → Playground reference wallet → Inji Verify as the fix-it pair (T-43, T-44). Combinations and evidence: `docs/interop-report.md`.
+- _Pending:_ the live Valid / Invalid / Valid-but-Expired runs of the fixture issuer (T-47, wave 8); `ldp_vc` (T-46, wave 8 on recorded upstreams, live in wave 9).
 - Not in the package: mDoc, the Inji JVM / Web / phone wallets, Collab Verify, the walt.id and EUDI verifiers, Credo, tamper mode, suites and the matrix (see `docs/decisions.md`).
 
 ## 6. Findings

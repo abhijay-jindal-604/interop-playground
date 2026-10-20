@@ -340,9 +340,16 @@ describe('runs.create (API-20) and scheduling (04 §5.1)', () => {
       ruleId: 'mdoc-at-inji-verify',
       gapId: 'G-09',
     });
+    // ADR-95: an adapter outside the release is refused by the release gate, not at Start
     const unbuilt = await create(app, { ...SLICE, verifier: 'verifier.waltid' });
-    expect(unbuilt.status).toBe(503);
-    expect((unbuilt.json as ErrorEnvelope).error.code).toBe('adapter_unavailable');
+    expect(unbuilt.status).toBe(422);
+    expect((unbuilt.json as ErrorEnvelope).error).toMatchObject({
+      code: 'incompatible_selection',
+      details: {
+        ruleId: 'not-in-release',
+        reason: 'not in this release (docs/decisions.md 2026-10-20)',
+      },
+    });
     const tunnel = await create(app, { ...SLICE, wallet: 'wallet.inji-mobile' });
     expect((tunnel.json as ErrorEnvelope).error.code).toBe('tunnel_required');
   });
@@ -404,8 +411,9 @@ describe('runs.preview (API-03)', () => {
         payload: { ...SLICE, format: 'ldp_vc' },
       })
     ).json<PreviewResponse>();
-    expect(ldp.ok && ldp.spec.issuanceFlowId).toBe('FLOW-01');
-    expect(ldp.ok && ldp.warnings).toContain('FLOW-03 runs as its base FLOW-01');
+    // T-46: FLOW-03 ships (wave 8), no fallback to its base FLOW-01
+    expect(ldp.ok && ldp.spec.issuanceFlowId).toBe('FLOW-03');
+    expect(ldp.ok && ldp.warnings).not.toContain('FLOW-03 runs as its base FLOW-01');
   });
 });
 

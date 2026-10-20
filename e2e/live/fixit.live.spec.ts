@@ -12,6 +12,10 @@
 import { copyFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { expect, test } from '@playwright/test';
+import { maskPrivate } from './take.ts';
+
+// a take (LIVE_TAKE, plan/13 S10) holds each beat long enough to read; the plain e2e does not wait
+const HOLD = process.env.LIVE_TAKE ? 3500 : 0;
 
 const COMBINATION = {
   issuer: 'issuer.waltid',
@@ -25,6 +29,7 @@ test.skip(process.env.PLAYGROUND_LIVE !== '1', 'live bundle only (e2e/playwright
 test('fix-it: walt.id parent fails (FP-01) → one click → child Pass → fixed + claim', async ({
   page,
 }, testInfo) => {
+  await maskPrivate(page);
   let dialogs = 0;
   page.on('dialog', (d) => {
     dialogs += 1;
@@ -75,6 +80,7 @@ test('fix-it: walt.id parent fails (FP-01) → one click → child Pass → fixe
   const result = page.getByRole('region', { name: 'Result' });
   await expect(result).toBeVisible({ timeout: 120_000 });
   await expect(result.locator('.result-word')).toHaveText('Fail');
+  await page.waitForTimeout(HOLD);
 
   // the diagnosis card: FP-01 exact, verifier side, with the KNOB-01 fix-it panel
   const card = page.getByTestId('diagnosis-card');
@@ -87,7 +93,10 @@ test('fix-it: walt.id parent fails (FP-01) → one click → child Pass → fixe
   await expect(card).toContainText('G-55');
   const panel = page.getByRole('region', { name: 'Fix it and re-run' });
   await expect(panel).toContainText('waltid.sdjwt.x5c');
-  await page.waitForTimeout(800); // let the take show the diagnosis
+  await card.scrollIntoViewIfNeeded();
+  await page.waitForTimeout(800 + HOLD); // let the take show the diagnosis
+  await panel.scrollIntoViewIfNeeded();
+  await page.waitForTimeout(HOLD);
 
   // one click derives the child (API-24), no confirm dialog
   const derive = page.waitForResponse(
@@ -122,6 +131,8 @@ test('fix-it: walt.id parent fails (FP-01) → one click → child Pass → fixe
     'Changing only waltid.sdjwt.x5c from absent to present makes it pass.',
   );
   await expect(claim).toContainText(`run ${parentId} vs run ${childId}`);
+  await child.scrollIntoViewIfNeeded();
+  await page.waitForTimeout(HOLD);
 
   // the compact strip: the knob's direct effect (credential header x5c) first
   const strip = page.getByTestId('compare-strip');
@@ -129,7 +140,8 @@ test('fix-it: walt.id parent fails (FP-01) → one click → child Pass → fixe
   const rows = strip.locator('tbody tr');
   await expect(rows.first()).toHaveAttribute('data-step-row', 'vci.credential');
   await expect(rows.first()).toContainText('Changed by KNOB-01');
-  await page.waitForTimeout(1500); // let the take show the result
+  await strip.scrollIntoViewIfNeeded();
+  await page.waitForTimeout(1500 + HOLD); // let the take show the result
 
   const take = process.env.LIVE_TAKE;
   const video = page.video();

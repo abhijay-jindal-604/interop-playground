@@ -8,11 +8,13 @@ ARG NODE_IMAGE=node:22-bookworm-slim@sha256:1b3abbc0bf2421c8733f58c6fd7bbb961a96
 FROM ${NODE_IMAGE} AS build
 WORKDIR /app
 COPY . .
-# Not needed at run time: the JVM sidecar sources, research copies, repo tests and docs.
+# Not needed at run time: the JVM sidecar sources, research copies, repo tests and docs. Of
+# `fixtures/` only `credentials/` stays: `issuer.fixture` signs with its TEST-ONLY keys (T-47).
 # --ignore-scripts: better-sqlite3 13 ships linux-x64 prebuilds in its tarball, but npm 10.9.9
 # would run a default `node-gyp rebuild` (no python/g++ in the slim image); no other dependency
 # needs an install script (esbuild resolves its binary through optionalDependencies).
-RUN rm -rf sidecar fixtures e2e tests docs deliverables .github \
+RUN rm -rf sidecar e2e tests docs deliverables .github \
+ && find fixtures -mindepth 1 -maxdepth 1 ! -name credentials -exec rm -rf {} + \
  && npm ci --no-audit --no-fund --ignore-scripts \
  && node -e "new (require('better-sqlite3'))(':memory:').prepare('select 1').get()"
 # The SPA (session/T-13 output). A broken or missing UI build must not block the BFF image: the

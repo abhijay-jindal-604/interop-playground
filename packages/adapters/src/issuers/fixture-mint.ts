@@ -100,7 +100,7 @@ export function mintSdJwt(o: MintOptions): string {
     ...(o.exp !== undefined ? { exp: o.exp } : {}),
     cnf: { kid: `${o.holder.didJwk}#0` },
     _sd: discs.map((d) => d.digest),
-    _sd_alg: 'sha256',
+    _sd_alg: 'sha-256', // IANA hash name (SD-JWT §4.1.1); Verify rejects "sha256" (ERR_INVALID_SD_ALG, T-47 live)
   };
   const signingInput = `${b64u({ alg: 'ES256', typ: 'dc+sd-jwt', x5c: o.issuer.x5c })}.${b64u(payload)}`;
   const sig = nodeSign('sha256', Buffer.from(signingInput, 'ascii'), {

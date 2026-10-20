@@ -82,9 +82,18 @@ export function resultSentence(
       if (v.verification === null) return runCopy.result.passIssued;
       return runCopy.result.passValid;
     case 'fail': {
-      const f = failureOf(failingKey ? view.steps[failingKey] : undefined);
+      // a verifier that answers "invalid" with every step passed (FLOW-40) names its failing
+      // check at the step that carries it
+      const key =
+        failingKey ??
+        steps.find((s) => view.steps[s.stepKey]?.checks.some((c) => c.outcome === 'fail'))
+          ?.stepKey ??
+        null;
+      const f = failureOf(key ? view.steps[key] : undefined);
+      if (v.verification === 'invalid' && failingKey === null)
+        return runCopy.result.failInvalidChecks(f.code, f.message);
       return v.verification === 'invalid'
-        ? runCopy.result.failInvalid(failing, f.code, f.message)
+        ? runCopy.result.failInvalid(labelOf(key, steps), f.code, f.message)
         : runCopy.result.failAt(failing, f.code, f.message);
     }
     case 'blocked':

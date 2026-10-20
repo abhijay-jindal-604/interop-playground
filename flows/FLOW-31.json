@@ -1,0 +1,59 @@
+{
+  "flowId": "FLOW-31",
+  "kind": "presentation",
+  "extends": "FLOW-30",
+  "title": "Cross-device QR, Inji Verify local, ldp_vc (two tiers)",
+  "targetStepKey": "vp.verdict.evaluate",
+  "lifelines": ["VUI", "V", "W", "L"],
+  "steps": [
+    {
+      "stepKey": "vp.request.create",
+      "order": 1,
+      "from": "VUI",
+      "to": "V",
+      "label": "POST /v2/vp-request (DCQL ldp_vc, type_values, path [fullName])",
+      "kind": "http",
+      "messages": 2
+    },
+    {
+      "stepKey": "vp.credential.match",
+      "order": 5,
+      "from": "W",
+      "to": "L",
+      "label": "DCQL match: type_values, claim paths relative to credentialSubject",
+      "kind": "engine",
+      "messages": 1
+    },
+    {
+      "stepKey": "vp.token.build",
+      "order": 6,
+      "from": "L",
+      "to": "L",
+      "label": "JsonWebSignature2020 VP, ES256 by the issuance key (domain, challenge)",
+      "kind": "engine",
+      "messages": 1
+    },
+    {
+      "stepKey": "vp.response.post",
+      "order": 7,
+      "from": "W",
+      "to": "V",
+      "label": "POST response_uri vp_token={pg:[VP]}",
+      "kind": "http",
+      "messages": 2
+    },
+    {
+      "stepKey": "vp.vc.verify",
+      "order": 12,
+      "from": "VUI",
+      "to": "V",
+      "label": "Tier 1: POST /v2/vc-verification (held ldp_vc)",
+      "kind": "http",
+      "messages": 2,
+      "appliesTo": {
+        "adapters": ["verifier.inji-verify-local", "verifier.vcverifier-offline", "verifier.credo"]
+      },
+      "skipReason": "credential-level verification is not part of this verifier's flow"
+    }
+  ]
+}

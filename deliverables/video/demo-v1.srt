@@ -1,0 +1,118 @@
+1
+00:00:00,500 --> 00:00:06,000
+Interop Playground runs real Inji issuers,
+wallets and verifiers against each other,
+
+2
+00:00:06,000 --> 00:00:11,500
+shows every protocol message, and proves fixes
+for the failures it finds.
+
+3
+00:00:12,500 --> 00:00:29,000
+One script brings up Inji Certify, Verify, Mimoto, eSignet
+and our backend locally, digest-pinned.
+
+4
+00:00:30,500 --> 00:00:38,000
+Pick who plays issuer, wallet and verifier.
+
+5
+00:00:38,000 --> 00:00:51,000
+Combinations that cannot work are greyed out
+with the reason and the gap behind it.
+
+6
+00:00:52,500 --> 00:01:02,000
+Issuance runs over OpenID4VCI 1.0
+with a pre-authorized code.
+
+7
+00:01:02,000 --> 00:01:12,000
+Each arrow is a captured HTTP exchange:
+
+8
+00:01:12,000 --> 00:01:27,000
+here is the credential offer, the token response
+and the issued credential.
+
+9
+00:01:28,500 --> 00:01:34,000
+The wallet now holds the credential.
+
+10
+00:01:34,000 --> 00:01:44,500
+The inspector decodes it: issuer key,
+selective disclosures and the holder binding.
+
+11
+00:01:45,500 --> 00:01:56,000
+Inji Verify creates an OpenID4VP request
+with a DCQL query.
+
+12
+00:01:56,000 --> 00:02:08,000
+The wallet presents with a key-binding JWT,
+
+13
+00:02:08,000 --> 00:02:19,000
+and Verify returns the result JSON: valid.
+
+14
+00:02:20,500 --> 00:02:27,000
+Every run produces a pass/fail report:
+
+15
+00:02:27,000 --> 00:02:34,500
+issuer, wallet, verifier, format, proof type, outcome,
+and the failing check when there is one.
+
+16
+00:02:35,500 --> 00:02:42,000
+Verification distinguishes valid, invalid,
+and valid-but-expired:
+
+17
+00:02:42,000 --> 00:02:49,500
+the signature checks out
+but the credential has expired.
+
+18
+00:02:50,500 --> 00:02:58,000
+A non-Inji issuer, walt.id, fails at Inji Verify.
+
+19
+00:02:58,000 --> 00:03:10,000
+The playground matches the failure to a known cause:
+Verify requires an x5c certificate chain in the SD-JWT header.
+
+20
+00:03:10,000 --> 00:03:18,000
+It offers exactly one change.
+
+21
+00:03:18,000 --> 00:03:30,000
+One click re-runs with that change only,
+and the run passes.
+
+22
+00:03:30,000 --> 00:03:39,500
+That is proof of the fix, not a guess.
+
+23
+00:03:40,500 --> 00:03:52,000
+The interop report lists every combination we ran
+and its outcome.
+
+24
+00:03:52,000 --> 00:04:04,500
+The gaps write-up documents the Inji defects we found,
+with reproduction steps, ready to file.
+
+25
+00:04:05,500 --> 00:04:12,000
+Interop Playground.
+
+26
+00:04:12,000 --> 00:04:19,500
+Source, setup and every flow are in the README.

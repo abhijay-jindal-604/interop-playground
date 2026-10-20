@@ -25,7 +25,12 @@ import { COMPAT_RULES } from '../orchestrator/rules.js';
 import { createServer } from '../server.js';
 import { openStore } from '../store/index.js';
 import type { Store } from '../store/index.js';
-import { applicableTamperCases, resolveKnobs, tamperInapplicability } from './index.js';
+import {
+  RELEASE_ADAPTERS,
+  applicableTamperCases,
+  resolveKnobs,
+  tamperInapplicability,
+} from './index.js';
 
 const flowsDir = path.join(REPO_ROOT, 'flows');
 const H = { host: '127.0.0.1:3100' };
@@ -105,6 +110,11 @@ const RULE_CASES: Record<string, { body: object; reason: string }> = {
   'mdoc-no-oid4vp': {
     body: { ...SLICE, format: 'mso_mdoc', verifier: 'verifier.credo', delivery: 'qr' },
     reason: 'mso_mdoc is verified at credential level only.',
+  },
+  'jvm-waltid-signed-unbuilt': {
+    body: { ...SLICE, wallet: 'wallet.inji-jvm', verifier: 'verifier.waltid' },
+    reason:
+      'The signed walt.id verifier process for inji-jvm was never smoke-tested in the build (RISK-38 fallback; proven in research only).',
   },
   'ldp-at-eudi': {
     body: { ...SLICE, format: 'ldp_vc', verifier: 'verifier.eudi' },
@@ -199,7 +209,7 @@ const RULE_CASES: Record<string, { body: object; reason: string }> = {
 describe('catalog.rules (04 §4.3 via API-03)', () => {
   it('every rule of the table has a case here', () => {
     expect(Object.keys(RULE_CASES).sort()).toEqual(COMPAT_RULES.map((r) => r.ruleId).sort());
-    expect(COMPAT_RULES).toHaveLength(24);
+    expect(COMPAT_RULES).toHaveLength(25);
   });
   for (const rule of COMPAT_RULES) {
     it(`${rule.ruleId} → its reason and gap ${rule.gapId ?? '—'}`, async () => {
@@ -240,6 +250,54 @@ describe('catalog.routes (API-02/04/07/08/09)', () => {
     expect(verify?.availability).toMatchObject({ available: false, reason: 'not probed yet' });
     const ts = json.wallets.find((e) => e.descriptor.id === 'wallet.playground-ts');
     expect(ts?.availability.available).toBe(true);
+    // ADR-95 (T-40): everything outside the release is unavailable with the decision's reason
+    const all = [...json.issuers, ...json.wallets, ...json.verifiers];
+    const notInRelease = all
+      .filter((e) => e.availability.reason === 'not in this release (docs/decisions.md 2026-10-20)')
+      .map((e) => e.descriptor.id);
+    expect(notInRelease.sort()).toEqual(
+      ADAPTER_IDS.filter((id) => !RELEASE_ADAPTERS.includes(id)).sort(),
+    );
+    expect(
+      all
+        .filter((e) => notInRelease.includes(e.descriptor.id))
+        .every((e) => !e.availability.available),
+    ).toBe(true);
+  });
+
+  it('API-03 refuses an unreleased adapter with the release reason (ADR-95)', async () => {
+    for (const body of [
+      {
+        ...SLICE,
+        wallet: 'wallet.inji-web',
+        grant: 'authorization_code',
+        issuer: 'issuer.certify-authcode',
+      },
+      { ...SLICE, verifier: 'verifier.vcverifier-offline' },
+      { ...SLICE, issuer: 'issuer.certify-mdoc', format: 'mso_mdoc', scope: 'issuance' },
+    ]) {
+      const res = await preview(body);
+      expect(res.status).toBe(200);
+      expect(res.json).toMatchObject({ ok: false });
+      const hit = (res.json as { hit: { ruleId: string; reason: string } }).hit;
+      if (hit.ruleId !== 'not-in-release') continue; // a 04 §4.3 rule names it first
+      expect(hit.reason).toBe('not in this release (docs/decisions.md 2026-10-20)');
+    }
+    const issuanceOnly = await preview({
+      ...SLICE,
+      verifier: 'verifier.waltid',
+      scope: 'issuance',
+    });
+    expect(issuanceOnly.json).toMatchObject({ ok: true });
+    const vc = await preview({ ...SLICE, verifier: 'verifier.vcverifier-offline' });
+    expect(vc.json).toEqual({
+      ok: false,
+      hit: {
+        ruleId: 'not-in-release',
+        reason: 'not in this release (docs/decisions.md 2026-10-20)',
+        gapId: null,
+      },
+    });
   });
 
   it('API-04 serves KNOB-01..10 and filters by adapter and format', async () => {
@@ -289,10 +347,10 @@ describe('catalog.routes (API-02/04/07/08/09)', () => {
     expect(wrongRole.json.error.code).toBe('validation_failed');
   });
 
-  it('API-09 lists the 24 rules with reason templates and gap IDs', async () => {
+  it('API-09 lists the 25 rules with reason templates and gap IDs', async () => {
     const { json } = await get<IncompatibilityListResponse>('/api/v1/incompatibilities');
     expectValid('IncompatibilityListResponse', json);
-    expect(json.rules).toHaveLength(24);
+    expect(json.rules).toHaveLength(25);
     expect(json.rules.find((r) => r.ruleId === 'issuer-grant-mismatch')?.reason).toBe(
       'This issuer only supports <grant>.',
     );
@@ -393,8 +451,8 @@ describe('catalog.resolution (04 §4.1 step 4–5, §4.4, §4.5)', () => {
   it('KNOB-02 normalises the mso_mdoc issuer', async () => {
     const base = { ...SLICE, format: 'mso_mdoc', scope: 'issuance' };
     const dev = await spec(base);
-    expect(dev.ok && dev.spec.issuer).toBe('issuer.certify-mdoc');
-    expect(dev.ok && dev.spec.knobs['KNOB-02']).toBe('develop-spec');
+    // ADR-95: the develop-spec default normalises to certify-mdoc, which is not in this release
+    expect(dev).toMatchObject({ ok: false, hit: { ruleId: 'not-in-release' } });
     const alpha = await spec({ ...base, knobs: { 'KNOB-02': 'alpha1-template' } });
     expect(alpha.ok && alpha.spec.issuer).toBe('issuer.certify-preauth');
     expect(alpha.ok && alpha.spec.knobs['KNOB-02']).toBe('alpha1-template');

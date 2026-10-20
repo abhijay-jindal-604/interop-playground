@@ -151,10 +151,13 @@ const FLOW40 = [
 ];
 const EXPECTED = {
   'FLOW-01': FLOW01,
+  // FLOW-03 (T-46): FLOW-01 + the issuer DID resolution step (ADR-96); FLOW-31 keeps the FLOW-30 layout
+  'FLOW-03': [...FLOW01, ['vci.issuer.did', 2]],
   'FLOW-04': FLOW01,
   'FLOW-08': FLOW08,
   'FLOW-14': FLOW14,
   'FLOW-30': FLOW30,
+  'FLOW-31': FLOW30,
   'FLOW-40': FLOW40,
 };
 

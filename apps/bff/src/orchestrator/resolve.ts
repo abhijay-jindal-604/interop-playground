@@ -21,7 +21,7 @@ import { ApiError, issueDetails } from '../errors/index.js';
 import { requestedKnob, resolveKnobs } from '../catalog/knobs.js';
 import { applicableTamperCases, tamperInapplicability } from '../catalog/tamper.js';
 import type { FlowTable } from './flows.js';
-import { firstHit, type CompatRule, type RuleInput } from './rules.js';
+import { NOT_IN_RELEASE_RULE, firstHit, type CompatRule, type RuleInput } from './rules.js';
 
 export interface ResolveEnv {
   /** last probe of an adapter; null = never probed (T-12 not running): treated as available */
@@ -119,7 +119,10 @@ export function validateCreateRunRequest(body: unknown): CreateRunRequest {
       issues.push({ path: `$.${k}`, message: `one of ${allowed.join(', ')}` });
   };
   oneOf('grant', GRANTS, true);
-  oneOf('presentationMode', MODES, true);
+  // null = credential-level verification, no OID4VP (ADR-94)
+  if (b.presentationMode === undefined)
+    issues.push({ path: '$.presentationMode', message: 'required' });
+  else if (b.presentationMode !== null) oneOf('presentationMode', MODES, true);
   oneOf('format', FORMATS, true);
   oneOf('scope', ['issuance', 'full'], false);
   oneOf('delivery', DELIVERIES, false);
@@ -164,8 +167,8 @@ export function validateCreateRunRequest(body: unknown): CreateRunRequest {
   return b as unknown as CreateRunRequest;
 }
 
-function defaultDelivery(wallet: AdapterId, verifier: AdapterId, mode: string): Delivery {
-  if (CREDENTIAL_LEVEL.includes(verifier)) return 'in-process';
+function defaultDelivery(wallet: AdapterId, verifier: AdapterId, mode: string | null): Delivery {
+  if (CREDENTIAL_LEVEL.includes(verifier) || mode === null) return 'in-process';
   if (wallet === 'wallet.inji-web') return 'web-wallet-redirect';
   if (wallet === 'wallet.inji-mobile') return 'qr';
   return mode === 'same-device' ? 'deep-link' : 'in-process';
@@ -199,10 +202,12 @@ export function presentationFlowOf(
 ): FlowId {
   const v = r.verifier;
   if (r.presentationMode === 'dc-api') return 'FLOW-44';
-  // row 2 (credential level): the credential-level verifiers, and mso_mdoc (ADR-30); Inji Verify
-  // with an OID4VP wallet stays on its OID4VP flow (ADR-65)
+  // row 2 (credential level): the credential-level verifiers, mso_mdoc (ADR-30) and a request
+  // without a presentation mode (ADR-94); Inji Verify with an OID4VP wallet stays on its OID4VP
+  // flow (ADR-65)
   const credentialLevel =
-    delivery === 'in-process' && (CREDENTIAL_LEVEL.includes(v) || r.format === 'mso_mdoc');
+    delivery === 'in-process' &&
+    (CREDENTIAL_LEVEL.includes(v) || r.format === 'mso_mdoc' || r.presentationMode === null);
   if (credentialLevel) return r.format === 'mso_mdoc' ? 'FLOW-41' : 'FLOW-40';
   if (r.wallet === 'wallet.credo') return 'FLOW-42';
   if (r.wallet === 'wallet.inji-mobile') return 'FLOW-43';
@@ -290,6 +295,13 @@ export function resolveRunSpec(
   const withTxCode = req.withTxCode ?? false;
   const withIae = req.withIae ?? false;
   const tunnel = env.tunnel();
+  if (req.presentationMode === null && delivery !== 'in-process')
+    throw validationError([
+      {
+        path: '$.delivery',
+        message: 'a credential-level request (presentationMode null) is in-process',
+      },
+    ]);
   // 3. static compatibility (before the delivery set check: a rule names the reason better)
   const input: RuleInput = {
     issuer,
@@ -340,6 +352,9 @@ export function resolveRunSpec(
     const s = firstHit(input, { stateful: true });
     if (s) return { ok: false, hit: hitOf(s, input), rule: s };
   }
+  // 6b. release gate (ADR-95): adapters outside this release, after every 04 §4.3 rule
+  if (NOT_IN_RELEASE_RULE.applies(input))
+    return { ok: false, hit: hitOf(NOT_IN_RELEASE_RULE, input), rule: NOT_IN_RELEASE_RULE };
   const roles: Role[] = ['issuer', 'wallet', 'verifier'];
   const versions = {} as Record<Role, string>;
   const envs = {} as RunSpec['env'];

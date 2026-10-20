@@ -1144,7 +1144,11 @@ export interface components {
             /** @description omitted knobs take defaults; keys not belonging to a chosen adapter: knob_invalid */
             knobs?: components["schemas"]["KnobValues"];
             label?: string;
-            presentationMode: components["schemas"]["PresentationMode"];
+            /**
+             * @description null = credential-level verification without OID4VP (FLOW-40 / FLOW-41, 04 §4.2 row 2; ADR-94):
+             *     the held credential goes to the verifier's `verifyCredential`, no wallet presentation
+             */
+            presentationMode: ("cross-device" | "dc-api" | "same-device") | null;
             /** @description preset ID of API-07; applied before explicit knobs */
             preset?: string;
             /**

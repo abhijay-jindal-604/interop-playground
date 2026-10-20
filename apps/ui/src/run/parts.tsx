@@ -334,7 +334,11 @@ export function ResultCard({
     [runCopy.facts.format, FORMAT_LABEL[spec.format]],
     [runCopy.result.proofAlg, view.proofAlg ?? 'not recorded'],
     [runCopy.facts.grant, spec.grant ?? 'none'],
-    [runCopy.facts.mode, spec.presentationMode ?? 'issuance only'],
+    [
+      runCopy.facts.mode,
+      spec.presentationMode ??
+        (spec.scope === 'issuance' ? 'issuance only' : 'credential only (no OID4VP)'),
+    ],
     [runCopy.facts.env, [...new Set(Object.values(spec.env))].join(' + ')],
     [runCopy.result.outcome, VERDICT_WORD[v.outcome]],
   ];

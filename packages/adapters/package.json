@@ -9,5 +9,7 @@
       "default": "./src/index.ts"
     }
   },
-  "dependencies": {}
+  "dependencies": {
+    "jsonld": "9.0.0"
+  }
 }

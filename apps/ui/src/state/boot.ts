@@ -140,12 +140,15 @@ export function openEnvStream(s: Store, overrides: Partial<StreamDeps> = {}): ()
       }
     }
   };
+  // the env stream replays its history first: toasts only for events newer than this shell
+  // (a replayed degraded → ready pair must not announce "All services are ready" on every load)
+  const since = Date.now() - 5_000;
   const client = new StreamClient({
     streamId: 'env',
     onEvent: (event) => {
       const prev = s.get();
       s.set((st) => ({ ...st, env: reduceEnv(st.env, event) }));
-      envSideEffects(prev, event, s);
+      if (!(Date.parse(event.ts) < since)) envSideEffects(prev, event, s);
     },
     onStatus,
     ...overrides,

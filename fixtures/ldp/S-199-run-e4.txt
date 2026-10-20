@@ -1,0 +1,5 @@
+submit:
+{"errorCode":"invalid_request","errorMessage":"[credential_id: pg] vp_token ldp_vc credential does not contain a required claim path declared in the DCQL query. Path: [credentialSubject, fullName]"}
+[status 400]
+{"allChecksSuccessful":null,"credentialResults":[]}
+{"errorCode":"NO_VP_SUBMISSION","errorMessage":"No VP submission found for given transaction ID."}

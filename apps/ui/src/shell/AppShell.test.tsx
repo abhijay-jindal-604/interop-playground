@@ -87,10 +87,22 @@ describe('ui.app-shell', () => {
       });
     });
     expect(screen.getByText(copy.env.degradedBanner('certify, mimoto'))).toBeTruthy();
+    // a replayed (historic) env.ready clears the banner without the recovery toast
     act(() => {
       src?.send({ ...ev(2, 'env.ready', 'env'), payload: { upstreams: ['certify', 'mimoto'] } });
     });
     expect(screen.queryByText(copy.env.degradedBanner('certify, mimoto'))).toBeNull();
+    expect(screen.queryByText(copy.env.recovered)).toBeNull();
+    // a live degraded → ready pair toasts
+    const now = new Date().toISOString();
+    act(() => {
+      src?.send({
+        ...ev(3, 'env.degraded', 'env'),
+        ts: now,
+        payload: { upstreams: ['certify'], reasons: {} },
+      });
+      src?.send({ ...ev(4, 'env.ready', 'env'), ts: now, payload: { upstreams: ['certify'] } });
+    });
     expect(screen.getByText(copy.env.recovered)).toBeTruthy();
   });
 

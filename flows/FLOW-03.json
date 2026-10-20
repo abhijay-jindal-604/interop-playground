@@ -1,0 +1,48 @@
+{
+  "flowId": "FLOW-03",
+  "kind": "issuance",
+  "extends": "FLOW-01",
+  "title": "Format delta: ldp_vc via pre-auth (FarmerCredential)",
+  "targetStepKey": "vci.credential",
+  "lifelines": ["IUI", "I", "W", "L"],
+  "steps": [
+    {
+      "stepKey": "vci.offer.mint",
+      "order": 3,
+      "from": "IUI",
+      "to": "I",
+      "label": "POST /pre-authorized-data (fullName, phone, dateOfBirth, gender)",
+      "kind": "http",
+      "messages": 2
+    },
+    {
+      "stepKey": "vci.credential",
+      "order": 10,
+      "from": "W",
+      "to": "I",
+      "label": "POST /issuance/credential (ldp_vc as a JSON object)",
+      "kind": "http",
+      "messages": 2
+    },
+    {
+      "stepKey": "vci.credential.inspect",
+      "order": 11,
+      "from": "W",
+      "to": "L",
+      "label": "decode JSON-LD; lint placeholders, verificationMethod, issuer DID",
+      "kind": "engine",
+      "messages": 1
+    },
+    {
+      "stepKey": "vci.issuer.did",
+      "order": 12,
+      "from": "W",
+      "to": "I",
+      "label": "GET /.well-known/did.json (issuer did:web)",
+      "kind": "http",
+      "messages": 2,
+      "after": "vci.credential.inspect",
+      "skipReason": "issuer is not a did:web"
+    }
+  ]
+}

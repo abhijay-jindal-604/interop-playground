@@ -12,6 +12,7 @@ import type {
   Grant,
   PresentationMode,
 } from '@interop-playground/api';
+import { NOT_IN_RELEASE_REASON, inRelease } from '../catalog/release.js';
 
 export interface RuleInput {
   issuer: AdapterId;
@@ -19,7 +20,8 @@ export interface RuleInput {
   verifier: AdapterId;
   grant: Grant;
   format: CredentialFormat;
-  presentationMode: PresentationMode;
+  /** null: credential-level request, no OID4VP (ADR-94) */
+  presentationMode: PresentationMode | null;
   delivery: Delivery;
   scope: 'issuance' | 'full';
   withTxCode: boolean;
@@ -287,6 +289,15 @@ export const COMPAT_RULES: readonly CompatRule[] = [
       ),
   ),
   rule(
+    'jvm-waltid-signed-unbuilt',
+    'wallet.inji-jvm × verifier.waltid',
+    'The signed walt.id verifier process for inji-jvm was never smoke-tested in the build (RISK-38 fallback; proven in research only).',
+    null,
+    'S-205, ADR-48',
+    (r) => r.wallet === 'wallet.inji-jvm' && r.verifier === 'verifier.waltid',
+    { verifierRule: true },
+  ),
+  rule(
     'mobile-needs-tunnel',
     'wallet.inji-mobile and tunnel down',
     'Start scripts/tunnel.sh first.',
@@ -305,6 +316,21 @@ export const COMPAT_RULES: readonly CompatRule[] = [
     { verifierRule: true, stateful: true },
   ),
 ];
+
+/**
+ * The release gate (ADR-95, docs/decisions.md 2026-10-20): evaluated by the resolver after every
+ * 04 §4.3 rule (stateful ones included), so each table rule can still be a first hit and an
+ * unreleased adapter is refused with this reason instead of `adapter_unavailable` at Start.
+ */
+export const NOT_IN_RELEASE_RULE: CompatRule = rule(
+  'not-in-release',
+  'issuer, wallet or verifier (full runs) outside the release adapters',
+  NOT_IN_RELEASE_REASON,
+  null,
+  'docs/decisions.md 2026-10-20 (T-40), ADR-95',
+  (r) =>
+    !inRelease(r.issuer) || !inRelease(r.wallet) || (r.scope === 'full' && !inRelease(r.verifier)),
+);
 
 /** first matching rule (04 §4.1 step 3; stateful rules are evaluated last, step 6) */
 export function firstHit(r: RuleInput, opts: { stateful: boolean }): CompatRule | null {

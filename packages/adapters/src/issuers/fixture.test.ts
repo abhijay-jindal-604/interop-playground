@@ -40,6 +40,8 @@ describe('fixture credentials (committed)', () => {
     expect((d.header.x5c as string[]).length).toBe(1);
     expect(d.payload.exp).toBeUndefined();
     expect(d.payload.vct).toBe('PlaygroundSdJwt');
+    // IANA hash name; local Inji Verify rejects "sha256" with ERR_INVALID_SD_ALG (T-47 live run)
+    expect(d.payload._sd_alg).toBe('sha-256');
     expect((d.payload.cnf as { kid: string }).kid).toBe(`${loadHolderKey().ref.didJwk}#0`);
     expect(signatureValid(raw)).toBe(true);
   });
