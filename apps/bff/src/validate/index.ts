@@ -6,6 +6,7 @@ import { loadFlows } from './flows.js';
 export { validateFlowFile, loadFlows, isRegisteredStepKey } from './flows.js';
 export { validateFingerprint, validateKnobs, loadFingerprints } from './fingerprints.js';
 
+/** Thrown at start-up when any flow or fingerprint file is invalid; lists every problem per file. */
 export class StartupValidationError extends Error {
   readonly problems: { file: string; errors: string[] }[];
   constructor(problems: { file: string; errors: string[] }[]) {
@@ -23,6 +24,7 @@ export interface ContentFiles {
   fingerprintCount: number;
 }
 
+/** Loads and checks all flow and fingerprint files; throws `StartupValidationError` if any is invalid. */
 export function validateContent(flowsDir: string, fingerprintsDir: string): ContentFiles {
   const f = loadFlows(flowsDir);
   const fp = loadFingerprints(fingerprintsDir);

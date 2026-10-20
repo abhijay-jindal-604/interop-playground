@@ -35,6 +35,7 @@ export function snapshotProjections(db: SqlDriver, runIds: string[]): Projection
   return out;
 }
 
+/** Lists the differences between two projection snapshots; empty means a replay reproduced the same rows. */
 export function diffSnapshots(a: ProjectionSnapshot, b: ProjectionSnapshot): string[] {
   const diffs: string[] = [];
   for (const table of new Set([...Object.keys(a), ...Object.keys(b)])) {
@@ -46,6 +47,7 @@ export function diffSnapshots(a: ProjectionSnapshot, b: ProjectionSnapshot): str
   return diffs;
 }
 
+/** Read-only queries over the store; re-inlines stored bodies so callers get complete events. */
 export class StoreReader {
   constructor(private readonly db: SqlDriver) {}
 

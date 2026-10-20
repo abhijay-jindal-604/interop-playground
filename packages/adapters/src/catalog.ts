@@ -21,6 +21,7 @@ export type AdapterCatalogEntry = Omit<AdapterDescriptor, 'knobs'> & {
 
 const noPartial = { partialHops: [] } as const;
 
+/** The static list of every adapter the playground knows, with role, vendor, tier and formats. Availability is checked separately at run time. */
 export const ADAPTER_CATALOG: readonly AdapterCatalogEntry[] = [
   // ---------- issuers ----------
   {
@@ -236,10 +237,12 @@ export const ADAPTER_CATALOG: readonly AdapterCatalogEntry[] = [
   },
 ];
 
+/** All catalogue entries for one role (issuer, wallet or verifier). */
 export function catalogByRole(role: Role): readonly AdapterCatalogEntry[] {
   return ADAPTER_CATALOG.filter((entry) => entry.role === role);
 }
 
+/** Looks up one adapter's catalogue entry; throws for an id that is not in the catalogue. */
 export function catalogEntry(id: AdapterId): AdapterCatalogEntry {
   const entry = ADAPTER_CATALOG.find((e) => e.id === id);
   if (entry === undefined) throw new Error(`unknown adapter id ${id}`);
@@ -263,6 +266,7 @@ export interface KnobCatalogEntry {
   readonly requiresWallet?: AdapterId;
 }
 
+/** Every knob: its definition, allowed values, default and which adapters and formats it applies to. */
 export const KNOB_CATALOG: readonly KnobCatalogEntry[] = [
   {
     def: {
@@ -426,6 +430,7 @@ export const KNOB_CATALOG: readonly KnobCatalogEntry[] = [
   },
 ];
 
+/** Looks up a knob (definition plus the adapters and formats it applies to) by id. */
 export function knobEntry(id: string): KnobCatalogEntry | undefined {
   return KNOB_CATALOG.find((k) => k.def.id === id);
 }
@@ -449,6 +454,7 @@ export interface PresetDef {
   readonly knobs: Readonly<Record<KnobId, string>>;
 }
 
+/** Named bundles of knob settings, used for the baseline and for the one-knob fix-it variants. */
 export const PRESETS: readonly PresetDef[] = [
   {
     presetId: 'inji-shipped-samples',
@@ -554,6 +560,7 @@ export const CREDENTIAL_CONFIGURATIONS: readonly CredentialConfigurationDef[] = 
   },
 ];
 
+/** The credential configurations an issuer offers in the given format. */
 export function configurationsOf(
   issuer: AdapterId,
   format: CredentialFormat,

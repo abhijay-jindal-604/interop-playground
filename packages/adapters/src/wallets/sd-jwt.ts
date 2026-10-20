@@ -34,6 +34,7 @@ function jsonOf(b64: string): unknown {
   return JSON.parse(Buffer.from(b64, 'base64url').toString('utf8')) as unknown;
 }
 
+/** The base64url SHA-256 digest used for a disclosure in the `_sd` array. */
 export function digestOf(raw: string): string {
   return createHash('sha256').update(raw, 'ascii').digest('base64url');
 }
@@ -98,6 +99,7 @@ export interface SdJwtInspection {
   };
 }
 
+/** Decodes an SD-JWT and runs the structural lint checks on it; returns the decoded view and one check result per lint. */
 export function inspectSdJwt(
   compact: string,
   stepExchangeIds: readonly string[] = [],
@@ -190,6 +192,7 @@ export function presentationOf(d: DecodedSdJwt, chosen: readonly Disclosure[]): 
   return [d.issuerJwt, ...chosen.map((x) => x.raw)].join('~') + '~';
 }
 
+/** The `sd_hash` the key-binding JWT must carry for the presented SD-JWT string. */
 export function sdHashOf(presented: string): string {
   return createHash('sha256').update(presented, 'ascii').digest('base64url');
 }

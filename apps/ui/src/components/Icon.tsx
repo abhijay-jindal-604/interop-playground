@@ -223,6 +223,7 @@ export function IconSprite() {
   );
 }
 
+/** Renders one of the built-in SVG icons by name; hidden from assistive technology, so callers give the control its own text. */
 export function Icon({
   name,
   size = 20,

@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="650" viewBox="0 0 1080 650" role="img" aria-labelledby="t d">
+<title id="t">Fix-it derive flow</title>
+<desc id="d">A failed parent run is diagnosed from its persisted events. An exact fingerprint match with a proven knob offers one Fix it and re-run button. POST /runs/{id}/derive validates the request, builds a child RunSpec with exactly one knob changed, runs it, and classifies the child as fixed, moved, not-fixed or inconclusive.</desc>
+<defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#8a8d94"/></marker><marker id="arrs" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M10,0 L0,5 L10,10 z" fill="#8a8d94"/></marker><marker id="arrA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0f6b5c"/></marker><marker id="arrAs" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M10,0 L0,5 L10,10 z" fill="#0f6b5c"/></marker><marker id="arrW" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#a3341f"/></marker><marker id="arrWs" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M10,0 L0,5 L10,10 z" fill="#a3341f"/></marker><marker id="arrB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#2f4fb5"/></marker><marker id="arrBs" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M10,0 L0,5 L10,10 z" fill="#2f4fb5"/></marker></defs>
+<g font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif">
+<rect x="0" y="0" width="1080" height="650" rx="12" fill="#ffffff"/>
+<text x="24" y="36" font-size="20" font-weight="700" fill="#1c1d21" text-anchor="start">Fix-it re-run: derive a child run with exactly one knob changed</text>
+<text x="24" y="58" font-size="13" font-weight="normal" fill="#5b5e66" text-anchor="start">Worked example (live, 2026-10-20): parent 01M5B6KNNY7DC3YK3CR0ETNBN9 FAIL → child 01M5B6M723AQ7T818D36816PRV PASS, classified fixed.</text>
+<rect x="24" y="90" width="200" height="96" rx="8" fill="#fbeeea" stroke="#a3341f" stroke-width="1.2"/>
+<text x="36" y="112" font-size="14" font-weight="600" fill="#1c1d21" text-anchor="start">Parent run fails</text>
+<text x="36" y="131" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">walt.id → reference wallet</text>
+<text x="36" y="147" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">→ Inji Verify: FAIL at</text>
+<text x="36" y="163" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">vp.verdict.evaluate</text>
+<rect x="264" y="90" width="220" height="96" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="276" y="112" font-size="14" font-weight="600" fill="#1c1d21" text-anchor="start">Diagnosis engine</text>
+<text x="276" y="131" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">reads persisted events only;</text>
+<text x="276" y="147" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">FP-01 matches exactly</text>
+<text x="276" y="163" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">(G-55: x5c required)</text>
+<rect x="524" y="90" width="230" height="96" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="536" y="112" font-size="14" font-weight="600" fill="#1c1d21" text-anchor="start">Decision on the card</text>
+<text x="536" y="131" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">exact match + proven knob</text>
+<text x="536" y="147" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">→ one button, no dialog</text>
+<text x="536" y="163" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">else: list causes, no button</text>
+<rect x="794" y="90" width="262" height="96" rx="8" fill="#e8ecfa" stroke="#2f4fb5" stroke-width="1.2"/>
+<text x="806" y="112" font-size="14" font-weight="600" fill="#1c1d21" text-anchor="start">&quot;Fix it and re-run&quot;</text>
+<text x="806" y="131" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">POST /api/v1/runs/{id}/derive</text>
+<text x="806" y="147" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">{ knobId: KNOB-01,</text>
+<text x="806" y="163" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">  value: present } + Idempotency-Key</text>
+<path d="M224,138 L264,138" fill="none" stroke="#8a8d94" stroke-width="1.6" marker-end="url(#arr)"/>
+<path d="M484,138 L524,138" fill="none" stroke="#8a8d94" stroke-width="1.6" marker-end="url(#arr)"/>
+<path d="M754,138 L794,138" fill="none" stroke="#8a8d94" stroke-width="1.6" marker-end="url(#arr)"/>
+<rect x="24" y="224" width="1032" height="180" rx="8" fill="#fbfaf7" stroke="#0f6b5c" stroke-width="1.4"/>
+<text x="40" y="248" font-size="14.5" font-weight="700" fill="#0f6b5c" text-anchor="start">Derive gate (apps/bff/src/orchestrator/derive.ts), main checks in order: the first failure answers with its error code</text>
+<rect x="40" y="264" width="186" height="50" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="133" y="285" font-size="12.5" font-weight="600" fill="#1c1d21" text-anchor="middle">parent finished</text>
+<text x="133" y="302" font-size="10.5" font-weight="normal" fill="#a3341f" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">run_not_terminal</text>
+<path d="M226,289 L242,289" fill="none" stroke="#8a8d94" stroke-width="1.6" marker-end="url(#arr)"/>
+<rect x="242" y="264" width="186" height="50" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="335" y="285" font-size="12.5" font-weight="600" fill="#1c1d21" text-anchor="middle">not a tamper run</text>
+<text x="335" y="302" font-size="10.5" font-weight="normal" fill="#a3341f" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">tamper_run_not_derivable</text>
+<path d="M428,289 L444,289" fill="none" stroke="#8a8d94" stroke-width="1.6" marker-end="url(#arr)"/>
+<rect x="444" y="264" width="186" height="50" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="537" y="285" font-size="12.5" font-weight="600" fill="#1c1d21" text-anchor="middle">parent failed</text>
+<text x="537" y="302" font-size="10.5" font-weight="normal" fill="#a3341f" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">parent_not_failed</text>
+<path d="M630,289 L646,289" fill="none" stroke="#8a8d94" stroke-width="1.6" marker-end="url(#arr)"/>
+<rect x="646" y="264" width="186" height="50" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="739" y="285" font-size="12.5" font-weight="600" fill="#1c1d21" text-anchor="middle">knob and value exist</text>
+<text x="739" y="302" font-size="10.5" font-weight="normal" fill="#a3341f" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">knob_invalid</text>
+<path d="M832,289 L848,289" fill="none" stroke="#8a8d94" stroke-width="1.6" marker-end="url(#arr)"/>
+<rect x="848" y="264" width="186" height="50" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="941" y="285" font-size="12.5" font-weight="600" fill="#1c1d21" text-anchor="middle">knob applies to the run</text>
+<text x="941" y="302" font-size="10.5" font-weight="normal" fill="#a3341f" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">knob_not_applicable</text>
+<rect x="40" y="330" width="186" height="50" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="133" y="351" font-size="12.5" font-weight="600" fill="#1c1d21" text-anchor="middle">diagnosis offered it</text>
+<text x="133" y="368" font-size="10.5" font-weight="normal" fill="#a3341f" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">fix_not_offered</text>
+<path d="M226,355 L242,355" fill="none" stroke="#8a8d94" stroke-width="1.6" marker-end="url(#arr)"/>
+<rect x="242" y="330" width="186" height="50" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="335" y="351" font-size="12.5" font-weight="600" fill="#1c1d21" text-anchor="middle">not reverted in lineage</text>
+<text x="335" y="368" font-size="10.5" font-weight="normal" fill="#a3341f" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">knob_reverted</text>
+<path d="M428,355 L444,355" fill="none" stroke="#8a8d94" stroke-width="1.6" marker-end="url(#arr)"/>
+<rect x="444" y="330" width="186" height="50" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="537" y="351" font-size="12.5" font-weight="600" fill="#1c1d21" text-anchor="middle">exactly one knob changes</text>
+<text x="537" y="368" font-size="10.5" font-weight="normal" fill="#a3341f" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">derive_not_one_knob</text>
+<path d="M630,355 L646,355" fill="none" stroke="#8a8d94" stroke-width="1.6" marker-end="url(#arr)"/>
+<rect x="646" y="330" width="186" height="50" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="739" y="351" font-size="12.5" font-weight="600" fill="#1c1d21" text-anchor="middle">adapters available</text>
+<text x="739" y="368" font-size="10.5" font-weight="normal" fill="#a3341f" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">adapter_unavailable</text>
+<path d="M941,314 L941,322 L133,322 L133,330" fill="none" stroke="#8a8d94" stroke-width="1.6" marker-end="url(#arr)"/>
+<path d="M925,186 L925,224" fill="none" stroke="#2f4fb5" stroke-width="1.6" marker-end="url(#arrB)"/>
+<rect x="24" y="440" width="300" height="104" rx="8" fill="#e3f1ee" stroke="#0f6b5c" stroke-width="1.2"/>
+<text x="36" y="462" font-size="14" font-weight="600" fill="#1c1d21" text-anchor="start">Child RunSpec</text>
+<text x="36" y="481" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">parent spec, one knob changed:</text>
+<text x="36" y="497" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">KNOB-01 absent → present</text>
+<text x="36" y="513" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">parentRunId, knobDelta,</text>
+<text x="36" y="529" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">causeFingerprintId = FP-01</text>
+<rect x="364" y="440" width="300" height="104" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="376" y="462" font-size="14" font-weight="600" fill="#1c1d21" text-anchor="start">Child run executes</text>
+<text x="376" y="481" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">same issuer, wallet, verifier,</text>
+<text x="376" y="497" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">format and holder key;</text>
+<text x="376" y="513" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">walt.id issues with x5Chain</text>
+<text x="376" y="529" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">→ Inji Verify: PASS</text>
+<rect x="704" y="440" width="352" height="104" rx="8" fill="#eaf4ec" stroke="#1d6b2f" stroke-width="1.2"/>
+<text x="716" y="462" font-size="14" font-weight="600" fill="#1c1d21" text-anchor="start">Classification</text>
+<text x="716" y="481" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">fixed · moved · not-fixed · inconclusive</text>
+<text x="716" y="497" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">compare strip: the knob&#x27;s direct effect first</text>
+<text x="716" y="513" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">claim sentence (fixed only): &quot;Changing only</text>
+<text x="716" y="529" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">waltid.sdjwt.x5c from absent to present makes it pass.&quot;</text>
+<path d="M850,380 L850,392 L174,392 L174,440" fill="none" stroke="#0f6b5c" stroke-width="1.6" marker-end="url(#arrA)"/>
+<text x="184" y="428" font-size="11.5" font-weight="normal" fill="#0f6b5c" text-anchor="start">all checks pass → child</text>
+<path d="M324,492 L364,492" fill="none" stroke="#8a8d94" stroke-width="1.6" marker-end="url(#arr)"/>
+<path d="M664,492 L704,492" fill="none" stroke="#8a8d94" stroke-width="1.6" marker-end="url(#arr)"/>
+<text x="24" y="578" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">Evidence: docs/reports/01M5B6KNNY7DC3YK3CR0ETNBN9.md and 01M5B6M723AQ7T818D36816PRV.md; e2e/live/fixit.live.spec.ts;</text>
+<text x="24" y="598" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">golden replay apps/bff/src/diagnosis/fixit.golden.test.ts. Sources: README &quot;Fix-it re-runs&quot;; apps/bff/src/orchestrator/derive.ts;</text>
+<text x="24" y="618" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">apps/bff/src/diagnosis/classify.ts; fingerprints/FP-01.json.</text>
+</g>
+</svg>

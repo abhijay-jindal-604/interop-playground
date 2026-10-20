@@ -18,9 +18,12 @@ import {
 import { chmodSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
+/** Minimal fetch signature; injected so every bring-up command can be driven by a fake in tests. */
 export type Http = (url: string, init?: RequestInit) => Promise<Response>;
+/** Sink for one progress line (stdout in the container, an array in tests). */
 export type Log = (line: string) => void;
 
+/** Environment of the bring-up commands, with the container-network defaults of the compose file filled in. */
 export interface BringupEnv {
   publicHost: string;
   esignetUrl: string;
@@ -32,6 +35,11 @@ export interface BringupEnv {
 }
 
 /** Internal service URLs on playground_net (compose service names, never published). */
+/**
+ * Reads the bring-up settings from the process environment.
+ * @param env process environment; unset or empty keys fall back to the compose-network defaults
+ * @returns the typed settings; `publicHost` stays empty when `PUBLIC_HOST` is unset (callers reject that)
+ */
 export function bringupEnv(env: NodeJS.ProcessEnv): BringupEnv {
   const v = (k: string, d: string): string => (env[k] !== undefined && env[k] !== '' ? env[k] : d);
   return {
@@ -62,6 +70,7 @@ async function json(res: Response): Promise<Record<string, unknown>> {
 const errorsOf = (body: Record<string, unknown>): { errorCode?: string; message?: string }[] =>
   Array.isArray(body.errors) ? (body.errors as { errorCode?: string; message?: string }[]) : [];
 
+/** A bring-up failure that maps to a process exit code, so `scripts/up.sh` can tell causes apart. */
 export class BringupError extends Error {
   readonly exitCode: number;
   constructor(message: string, exitCode = 1) {
@@ -72,7 +81,10 @@ export class BringupError extends Error {
 }
 
 // ------------------------------------------------------------------ esignet-onboard (S-023) --
-/** The farmer CSV ids, so Certify's MockCSVDataProviderPlugin finds them via `sub` (S-023). */
+/**
+ * The two test personas (individual id, display name) seeded into the mock identity system.
+ * The farmer CSV ids, so Certify's MockCSVDataProviderPlugin finds them via `sub`.
+ */
 export const PERSONAS: readonly [string, string][] = [
   ['2154189532', 'Gorge Cooper'],
   ['8267411578', 'James Rodrigious'],
@@ -81,6 +93,11 @@ export const PERSONAS: readonly [string, string][] = [
 const TINY_JPEG =
   'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP////////////////////////////////////////////////////////////////////////////////////8AAAALCAABAAEBAREA/8QAFAABAAAAAAAAAAAAAAAAAAAACf/EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQEAAD8AKp//2Q==';
 
+/**
+ * Builds the mock-identity "create identity" request for one persona.
+ * @param individualId the UIN used to log in at eSignet
+ * @param name display name, repeated in the eng-language fields
+ */
 export function personaRequest(individualId: string, name: string): Record<string, unknown> {
   const ml = (value: string): { language: string; value: string }[] => [{ language: 'eng', value }];
   return {
@@ -113,6 +130,12 @@ export function personaRequest(individualId: string, name: string): Record<strin
 }
 
 /** The client key: reuse the existing one (S-105, S-150: never a new key under an old p12). */
+/**
+ * Loads the private key used to sign the Mimoto client assertion, generating a 2048-bit RSA key
+ * (mode 0600) on first use so repeated bring-ups keep the same client identity.
+ * @param keyPath where the PEM lives
+ * @param log progress sink
+ */
 export function ensureClientKey(keyPath: string, log: Log): ReturnType<typeof createPrivateKey> {
   if (!existsSync(keyPath)) {
     mkdirSync(path.dirname(keyPath), { recursive: true });
@@ -124,6 +147,11 @@ export function ensureClientKey(keyPath: string, log: Log): ReturnType<typeof cr
   return createPrivateKey(readFileSync(keyPath));
 }
 
+/**
+ * Builds the eSignet OIDC client create/update request for Mimoto.
+ * @param e bring-up settings (client id, redirect URIs)
+ * @param jwk public half of the client key, sent so eSignet can verify `private_key_jwt` assertions
+ */
 export function clientRequest(
   e: BringupEnv,
   jwk: Record<string, unknown>,
@@ -178,6 +206,11 @@ async function csrf(http: Http, base: string): Promise<{ token: string; cookie: 
   return { token, cookie };
 }
 
+/**
+ * `esignet-onboard`: creates or updates the Mimoto OIDC client and seeds the two personas.
+ * Idempotent, so it can run on every `scripts/up.sh`. Throws `BringupError` when `PUBLIC_HOST` is
+ * unset or eSignet rejects a request.
+ */
 export async function esignetOnboard(http: Http, e: BringupEnv, log: Log): Promise<void> {
   if (e.publicHost === '') throw new BringupError('PUBLIC_HOST must be set');
   const key = ensureClientKey(e.clientKeyPath, log);
@@ -246,12 +279,17 @@ export async function esignetOnboard(http: Http, e: BringupEnv, log: Log): Promi
 
 // ------------------------------------------------------------------- certify-didurl (G-20) --
 export const DIDURL_CONFIG = 'FarmerCredential';
+/** The `didUrl` a Certify instance must advertise: the auth-code instance lives under `/authcode`. */
 export function expectedDidUrl(service: string, publicHost: string): string {
   return service === 'certify-authcode'
     ? `did:web:${publicHost}:authcode`
     : `did:web:${publicHost}`;
 }
 
+/**
+ * `certify-didurl`: re-asserts the per-configuration `didUrl` on every Certify instance, because a
+ * restart of Certify resets it to a value that does not match the public host.
+ */
 export async function certifyDidurl(http: Http, e: BringupEnv, log: Log): Promise<void> {
   if (e.publicHost === '') throw new BringupError('PUBLIC_HOST must be set');
   for (const [svc, base] of Object.entries(e.certifyUrls)) {
@@ -279,13 +317,20 @@ export async function certifyDidurl(http: Http, e: BringupEnv, log: Log): Promis
 }
 
 // --------------------------------------------------------------------- guest-smoke (S-025) --
-/** Exit code when the gateway URLs Mimoto needs are missing (8093 issuer, 443 did:web; T-11, G-131). */
+/**
+ * Exit code of `guest-smoke` when the public gateway listener is not up, a setup problem not a product failure.
+ * Exit code when the gateway URLs Mimoto needs are missing (8093 issuer, 443 did:web; T-11, G-131).
+ */
 export const GUEST_SMOKE_GATEWAY_MISSING = 3;
 const GUEST_ISSUER = 'PlaygroundFarmer';
 const GUEST_CONFIG = 'FarmerCredential';
 const GUEST_SCOPE = 'mock_identity_vc_ldp';
 const GUEST_REDIRECT = 'http://localhost:3004/redirect';
 
+/**
+ * `guest-smoke`: drives a Mimoto guest credential download through the eSignet authorization-code
+ * leg to prove the whole auth-code chain works before the first user run.
+ */
 export async function guestSmoke(http: Http, e: BringupEnv, log: Log): Promise<void> {
   const t0 = Date.now();
   // Mimoto reaches the issuer through the advertised gateway URL (http://PUBLIC_HOST:8093, S-025);
@@ -413,7 +458,10 @@ export async function guestSmoke(http: Http, e: BringupEnv, log: Log): Promise<v
 }
 
 // ---------------------------------------------------------------- wait-ready (ADR-05) --
-/** Backend well-knowns through the internal names; expected status (`any` = server answers). */
+/**
+ * One readiness probe per service: the URL to GET and the status that counts as ready ('any' = any response).
+ * Backend well-knowns through the internal names; expected status (`any` = server answers).
+ */
 export const READY_PROBES: Record<string, { url: string; expect: number | 'any' }> = {
   'certify-preauth': {
     url: 'http://certify-preauth:8090/v1/certify/.well-known/openid-credential-issuer',
@@ -478,6 +526,7 @@ export const READY_PROBES: Record<string, { url: string; expect: number | 'any' 
   sidecar: { url: 'http://sidecar:7070/health', expect: 200 },
 };
 
+/** Options of `waitReady`; `sleep` is injectable so tests do not wait in real time. */
 export interface WaitReadyOptions {
   services: string[];
   timeoutMs: number;
@@ -485,6 +534,10 @@ export interface WaitReadyOptions {
   sleep?: (ms: number) => Promise<void>;
 }
 
+/**
+ * Polls the readiness probe of each requested service until it answers or its timeout expires.
+ * @returns the number of services that never became ready (0 means all up)
+ */
 export async function waitReady(http: Http, opts: WaitReadyOptions, log: Log): Promise<number> {
   const sleep = opts.sleep ?? ((ms: number) => new Promise<void>((r) => setTimeout(r, ms)));
   let failed = 0;

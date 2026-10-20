@@ -35,6 +35,7 @@ type Seg =
   | { kind: 'index'; i: number }
   | { kind: 'all'; deep: boolean };
 
+/** Parses the supported JSONPath subset (`$`, `.key`, `[n]`, `[*]`, `..`) into segments; null for anything else. */
 function parsePath(path: string): Seg[] | null {
   if (!path.startsWith('$')) return null;
   const segs: Seg[] = [];
@@ -71,6 +72,7 @@ function parsePath(path: string): Seg[] | null {
   return segs;
 }
 
+/** The value and all values nested inside it, for `..` selection. */
 function descendants(v: unknown): unknown[] {
   const out: unknown[] = [v];
   if (v !== null && typeof v === 'object')
@@ -78,6 +80,7 @@ function descendants(v: unknown): unknown[] {
   return out;
 }
 
+/** Evaluates a small JSONPath-like selector against a value and returns every match (empty for an invalid path). */
 export function selectPath(root: unknown, path: string): unknown[] {
   const segs = parsePath(path);
   if (segs === null) return [];
@@ -105,6 +108,7 @@ export function selectPath(root: unknown, path: string): unknown[] {
 
 const text = (v: unknown): string => (typeof v === 'string' ? v : JSON.stringify(v));
 
+/** Applies a predicate's value operator (exists, equals, contains and so on) to the selected values. */
 function valueOp(found: unknown[], op: string, value: string | undefined, root: unknown): boolean {
   switch (op) {
     case 'exists':
@@ -134,6 +138,7 @@ function valueOp(found: unknown[], op: string, value: string | undefined, root: 
   }
 }
 
+/** Compiles a URL path glob (`*` within a segment, `**` across segments) to a regular expression. */
 function globRe(glob: string): RegExp {
   const esc = glob
     .split('**')
@@ -142,6 +147,7 @@ function globRe(glob: string): RegExp {
   return new RegExp(`^${esc}$`);
 }
 
+/** The path part of a URL, or the input unchanged if it does not parse. */
 function pathOf(url: string): string {
   try {
     return new URL(url).pathname;
@@ -150,6 +156,7 @@ function pathOf(url: string): string {
   }
 }
 
+/** Parses a stored body as JSON; undefined when it is missing or not JSON. */
 function parseBody(body: string | null): unknown {
   if (body === null) return undefined;
   try {
@@ -166,6 +173,11 @@ interface Hit {
 }
 
 /** one predicate over the evidence; `strict` admits only full evidence */
+/**
+ * Evaluates one fingerprint predicate against the evidence. In strict mode only evidence from fully
+ * captured steps counts, so a partial capture can never produce a confident match.
+ * @returns the hit with its evidence references, or null when the predicate does not hold
+ */
 export function evalPredicate(
   p: Predicate,
   ev: RunEvidence,
@@ -280,6 +292,7 @@ export function evalPredicate(
   }
 }
 
+/** Evaluates a fingerprint's rules in order and returns the first hit; in strict mode only fully captured evidence counts. */
 function evalRules(fp: Fingerprint, ev: RunEvidence, strict: boolean): Hit | null {
   let any: Hit | null = null;
   for (const rule of fp.match) {
@@ -297,6 +310,7 @@ function evalRules(fp: Fingerprint, ev: RunEvidence, strict: boolean): Hit | nul
 // ---------- scope and ranking ----------
 const ROLE_OF = { issuer: 'issuer', wallet: 'wallet', verifier: 'verifier' } as const;
 
+/** True when the run's issuer, wallet, verifier, format and client-id scheme all fall inside the fingerprint's scope. */
 export function inScope(fp: Fingerprint, spec: RunSpec): boolean {
   const s = fp.scope;
   if (s.issuers && !s.issuers.includes(spec.issuer)) return false;
@@ -352,7 +366,10 @@ function payload(
   };
 }
 
-/** A5.1: the knob offer for an exact cause, or null */
+/**
+ * Builds the fix-it offer for a matched fingerprint, or null when it has no fix, the run is itself a tamper run, or no adapter in the run owns that knob.
+ * A5.1: the knob offer for an exact cause, or null.
+ */
 export function offerFor(fp: Fingerprint, spec: RunSpec): CounterfactualOfferedPayload | null {
   if (!fp.fix || spec.tamperCase !== null) return null;
   const knob = KNOB_CATALOG.find((k) => k.def.id === fp.fix?.knobId);
@@ -379,7 +396,10 @@ export function offerFor(fp: Fingerprint, spec: RunSpec): CounterfactualOfferedP
   };
 }
 
-/** 09 A9.3 wording key of a closed run from its stored matches and offers */
+/**
+ * Explains, for a failed run with no fix-it offer, why none was made; null when nothing needs explaining.
+ * 09 A9.3 wording key of a closed run from its stored matches and offers.
+ */
 export function noFixReasonOf(
   failed: boolean,
   tamper: boolean,
@@ -396,6 +416,10 @@ export function noFixReasonOf(
 }
 
 /** evaluates the library over one run's evidence (no side effects) */
+/**
+ * Runs the whole fingerprint library over a run's evidence. Pure and deterministic: the same
+ * evidence and terminal state always give the same matches, offers and reasons.
+ */
 export function diagnose(
   library: readonly Fingerprint[],
   ev: RunEvidence,

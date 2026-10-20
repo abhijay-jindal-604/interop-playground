@@ -32,7 +32,10 @@ export interface FxStep {
 
 let n = 0;
 
-/** records a run; `terminal: null` leaves it open (the diagnosis hook runs before the end) */
+/**
+ * Persists a run (start, steps, optional terminal event) through the sink and returns its run id.
+ * Records a run; `terminal: null` leaves it open (the diagnosis hook runs before the end)
+ */
 export function recordRun(
   store: Store,
   spec: RunSpec,
@@ -146,6 +149,7 @@ export function recordRun(
   return runId;
 }
 
+/** Appends the terminal event of a recorded run: completed with a verdict, or failed with a code. */
 export function closeRun(
   store: Store,
   runId: string,
@@ -164,6 +168,7 @@ export function closeRun(
     });
 }
 
+/** Builds a minimal interop verdict for a test run. */
 export function verdictOf(
   outcome: RunVerdict['outcome'],
   failedStepKey: string | null,
@@ -190,6 +195,7 @@ type TraceEntry = {
 
 export const GOLDEN_DIAGNOSIS_DIR = path.join(REPO_ROOT, 'fixtures', 'golden', 'diagnosis');
 
+/** A walt.id-to-Inji-Verify run spec with the KNOB-01 setting given, the combination the live defect run used. */
 export function waltidSpec(knob01: 'absent' | 'present'): RunSpec {
   return sampleSpec({
     issuer: 'issuer.waltid',
@@ -202,7 +208,10 @@ export function waltidSpec(knob01: 'absent' | 'present'): RunSpec {
   });
 }
 
-/** the steps of a waltid → playground-ts → Inji Verify (Collab) run rebuilt from a saved trace */
+/**
+ * Rebuilds the step list of a golden diagnosis run from its saved HTTP trace.
+ * The steps of a waltid → playground-ts → Inji Verify (Collab) run rebuilt from a saved trace.
+ */
 export function goldenSteps(traceFile: string, credentialCapture: Coverage = 'full'): FxStep[] {
   const trace = JSON.parse(
     readFileSync(path.join(GOLDEN_DIAGNOSIS_DIR, traceFile), 'utf8'),

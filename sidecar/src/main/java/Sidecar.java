@@ -70,6 +70,7 @@ public class Sidecar {
   static final long LONG_POLL_MS = Long.getLong("sidecar.longPollMs", 25_000L);
   static final long CALLBACK_WAIT_MS = Long.getLong("sidecar.callbackWaitMs", 120_000L);
 
+  /** Base64url without padding, as JOSE uses. */
   static String b64u(byte[] b) { return Base64.getUrlEncoder().withoutPadding().encodeToString(b); }
 
   /** 26-character ULID (Crockford base32): 48-bit time + 80-bit randomness. */
@@ -82,6 +83,7 @@ public class Sidecar {
     return new String(out);
   }
 
+  /** Plain blocking HTTP call returning the body; any status of 300 or above becomes an exception carrying status and body. */
   static String http(String m, String url, String ct, String body, String bearer) throws Exception {
     var rb = HttpRequest.newBuilder(URI.create(url)).method(m, body == null ? HttpRequest.BodyPublishers.noBody() : HttpRequest.BodyPublishers.ofString(body));
     if (ct != null) rb.header("Content-Type", ct);
@@ -93,6 +95,7 @@ public class Sidecar {
 
   // ---------------------------------------------------------------- formats
 
+  /** Maps a credential format name (wire form or enum name) to the verifier library's enum; unknown names are a 400. */
   static CredentialFormat vcFormat(String f) {
     return switch (f) {
       case "ldp_vc" -> CredentialFormat.LDP_VC;
@@ -104,6 +107,7 @@ public class Sidecar {
     };
   }
 
+  /** Maps a credential format name to the OID4VP library's enum; only formats that can be presented are accepted. */
   static FormatType vpFormat(String f) {
     return switch (f) {
       case "ldp_vc" -> FormatType.LDP_VC;
@@ -113,6 +117,7 @@ public class Sidecar {
     };
   }
 
+  /** Guesses a credential's format from its shape: JSON object is ldp_vc, a JWT or SD-JWT string is dc+sd-jwt, anything else mso_mdoc. */
   static String guessFormat(JsonElement c) {
     if (c.isJsonObject()) return "ldp_vc";
     String s = c.getAsString();
@@ -122,6 +127,7 @@ public class Sidecar {
 
   // ---------------------------------------------------------------- API-69 verify (also used by smoke)
 
+  /** Verifies a credential with the Inji credential verifier library and returns its verdict, error code, message and timing. */
   static JsonObject verify(String format, String cred) {
     long t0 = System.currentTimeMillis();
     var v = new CredentialsVerifier().verify(cred, vcFormat(format), false);
@@ -135,6 +141,7 @@ public class Sidecar {
 
   // ---------------------------------------------------------------- API-61..65 VCIClient sessions
 
+  /** One pending callback of the library (for example a token request or a proof to sign) waiting for the BFF's answer. */
   static final class Cb {
     final String id = ulid();
     final String type;
@@ -143,6 +150,7 @@ public class Sidecar {
     Cb(String type, JsonObject json) { this.type = type; this.json = json; this.json.addProperty("id", id); this.json.addProperty("type", type); }
   }
 
+  /** State of one issuance session: queued callbacks, the thread running the library, and the final result. */
   static final class VciSession {
     final String id = ulid();
     final List<Cb> callbacks = new ArrayList<>();
@@ -152,8 +160,10 @@ public class Sidecar {
     synchronized void finish(JsonObject r) { result = r; notifyAll(); }
   }
 
+  /** Live issuance sessions by id. The library runs on its own thread and blocks on callbacks (token, proof) that the BFF answers over HTTP. */
   static final Map<String, VciSession> VCI = new ConcurrentHashMap<>();
 
+  /** Parks the library thread on a callback until the BFF answers it, or fails after CALLBACK_WAIT_MS. */
   static Object await(VciSession s, Cb c) throws Exception {
     s.add(c);
     try {
@@ -163,6 +173,7 @@ public class Sidecar {
     }
   }
 
+  /** Starts an issuance session for an offer URI on a new thread and returns it; poll or answer callbacks through the session routes. */
   static VciSession startVci(String offerUri, JsonObject clientMetadata) {
     VciSession s = new VciSession();
     VCI.put(s.id, s);
@@ -234,6 +245,7 @@ public class Sidecar {
 
   // ---------------------------------------------------------------- API-66..68 OpenID4VP
 
+  /** State of one presentation session held between the authenticate and token calls. */
   static final class VpSession {
     final String id = ulid();
     OpenID4VP vp;
@@ -241,8 +253,10 @@ public class Sidecar {
     List<UnsignedVPToken> unsigned;
   }
 
+  /** Live presentation sessions by id. */
   static final Map<String, VpSession> VP = new ConcurrentHashMap<>();
 
+  /** Extracts the DCQL query from a parsed request, falling back to the raw URL parameter; JSON null when there is none. */
   static JsonElement dcqlOf(AuthorizationRequest r, String urlEncodedRequest) {
     if (r instanceof AuthorizationDcqlRequest d) {
       try { return G.toJsonTree(d.getDcqlQuery()); } catch (Throwable ignored) { /* fall through to the URL */ }
@@ -254,6 +268,7 @@ public class Sidecar {
     return JsonNull.INSTANCE;
   }
 
+  /** Builds the wallet configuration the OID4VP library needs from the request's wallet metadata, with defaults when fields are absent. */
   static WalletConfig walletConfig(JsonObject req) {
     JsonObject md = req.has("walletMetadata") && req.get("walletMetadata").isJsonObject() ? req.getAsJsonObject("walletMetadata") : new JsonObject();
     List<SignatureAlgorithm> reqAlgs = new ArrayList<>();
@@ -279,11 +294,13 @@ public class Sidecar {
 
   // ---------------------------------------------------------------- HTTP plumbing
 
+  /** Error classes mapped to HTTP statuses in `handle`: Bad 400, NotFound 404, Conflict 409, Engine 422 (the library itself threw). */
   static final class Bad extends RuntimeException { Bad(String m) { super(m); } }
   static final class NotFound extends RuntimeException { NotFound(String m) { super(m); } }
   static final class Conflict extends RuntimeException { Conflict(String m) { super(m); } }
   static final class Engine extends RuntimeException { final Throwable t; Engine(Throwable t) { super(String.valueOf(t.getMessage())); this.t = t; } }
 
+  /** Reads the request body as a JSON object (an empty body counts as {}); anything else is a 400. */
   static JsonObject body(HttpExchange x) {
     try {
       String s = new String(x.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
@@ -293,11 +310,13 @@ public class Sidecar {
     } catch (JsonParseException | IOException e) { throw new Bad("body is not valid JSON"); }
   }
 
+  /** Reads a required string field or throws a 400 naming it. */
   static String str(JsonObject o, String k) {
     if (!o.has(k) || !o.get(k).isJsonPrimitive()) throw new Bad("missing or invalid field: " + k);
     return o.get(k).getAsString();
   }
 
+  /** Writes a JSON response; status 204 has no body. */
   static void reply(HttpExchange x, int code, String json) throws IOException {
     byte[] b = json == null ? new byte[0] : json.getBytes(StandardCharsets.UTF_8);
     x.getResponseHeaders().set("Content-Type", "application/json");
@@ -306,6 +325,7 @@ public class Sidecar {
     x.close();
   }
 
+  /** Writes the standard error envelope (code, message, status, request id) with an X-Request-Id header. */
   static void error(HttpExchange x, int status, String code, String message, JsonObject details) throws IOException {
     String rid = ulid();
     JsonObject e = new JsonObject();
@@ -327,12 +347,14 @@ public class Sidecar {
   static final Pattern VCI_ANSWER = Pattern.compile("^/vci/sessions/([0-9A-Z]{26})/answers/([0-9A-Z]{26})$");
   static final Pattern VCI_RESULT = Pattern.compile("^/vci/sessions/([0-9A-Z]{26})/result$");
 
+  /** Looks up an issuance session or throws a 404. */
   static VciSession vci(String id) {
     VciSession s = VCI.get(id);
     if (s == null) throw new NotFound("no such session");
     return s;
   }
 
+  /** The route table: health, issuance sessions, presentation sessions and credential verification. */
   static void route(HttpExchange x) throws Exception {
     String m = x.getRequestMethod(), p = x.getRequestURI().getPath();
     Matcher g;
@@ -474,6 +496,7 @@ public class Sidecar {
     }
   }
 
+  /** Entry point for every request: runs the route and turns each exception class into its error response. */
   static void handle(HttpExchange x) throws IOException {
     try {
       route(x);
@@ -492,6 +515,7 @@ public class Sidecar {
     }
   }
 
+  /** Starts the HTTP server on the given address and port. */
   static void serve(String bind, int port) throws Exception {
     HttpServer s = HttpServer.create(new InetSocketAddress(bind, port), 0);
     s.createContext("/", Sidecar::handle);
@@ -533,12 +557,14 @@ public class Sidecar {
     return el.isJsonPrimitive() ? el.getAsString() : el.toString();
   }
 
+  /** The P-256 curve parameters, used to rebuild the holder key from its JWK. */
   static ECParameterSpec ec() throws Exception {
     var ap = AlgorithmParameters.getInstance("EC"); ap.init(new ECGenParameterSpec("secp256r1")); return ap.getParameterSpec(ECParameterSpec.class);
   }
 
   // ---------------------------------------------------------------- main
 
+  /** Subcommands: `smoke` verifies sample credentials, `issue` runs one dev issuance, `serve` starts the HTTP server. */
   public static void main(String[] a) throws Exception {
     if (a.length == 0) throw new IllegalArgumentException("smoke|issue|serve");
     switch (a[0]) {

@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="620" viewBox="0 0 1080 620" role="img" aria-labelledby="t d">
+<title id="t">Wireframe: selector</title>
+<desc id="d">Low-fidelity layout of the home page: app shell, recipe strip, three radio-group columns for issuer, wallet and verifier, advanced options and the start bar.</desc>
+<defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#8a8d94"/></marker><marker id="arrs" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M10,0 L0,5 L10,10 z" fill="#8a8d94"/></marker><marker id="arrA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0f6b5c"/></marker><marker id="arrAs" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M10,0 L0,5 L10,10 z" fill="#0f6b5c"/></marker><marker id="arrW" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#a3341f"/></marker><marker id="arrWs" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M10,0 L0,5 L10,10 z" fill="#a3341f"/></marker><marker id="arrB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#2f4fb5"/></marker><marker id="arrBs" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M10,0 L0,5 L10,10 z" fill="#2f4fb5"/></marker></defs>
+<g font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif">
+<rect x="0" y="0" width="1080" height="620" rx="12" fill="#ffffff"/>
+<text x="24" y="36" font-size="20" font-weight="700" fill="#1c1d21" text-anchor="start">Wireframe: selector (&quot;/&quot;)</text>
+<rect x="24" y="56" width="1032" height="540" rx="8" fill="#ffffff" stroke="#9a9ca3" stroke-width="1.2"/>
+<rect x="24" y="56" width="1032" height="40" rx="8" fill="#f1f1f1" stroke="#9a9ca3" stroke-width="1.2"/>
+<text x="40" y="82" font-size="13" font-weight="600" fill="#1c1d21" text-anchor="start">[logo] Interop Playground</text>
+<text x="1040" y="82" font-size="12" font-weight="normal" fill="#5b5e66" text-anchor="end">(env chip: mode · ready · tunnel)   Recent runs   [theme]</text>
+<rect x="24" y="96" width="160" height="500" rx="8" fill="#f7f7f7" stroke="#9a9ca3" stroke-width="1.2"/>
+<text x="40" y="126" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">Playground</text>
+<text x="40" y="152" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">History</text>
+<text x="40" y="178" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">Matrix</text>
+<text x="40" y="204" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">Tamper</text>
+<text x="40" y="230" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">Issue drafts</text>
+<text x="40" y="580" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">Environment</text>
+<text x="208" y="130" font-size="17" font-weight="700" fill="#1c1d21" text-anchor="start">H1  Pick who plays each role</text>
+<text x="208" y="152" font-size="12" font-weight="normal" fill="#5b5e66" text-anchor="start">one-line intro</text>
+<text x="208" y="180" font-size="12" font-weight="600" fill="#1c1d21" text-anchor="start">Format</text>
+<rect x="208" y="188" width="76" height="28" rx="4" fill="#d9d9e8" stroke="#9a9ca3" stroke-width="1.2"/>
+<text x="246" y="207" font-size="11.5" font-weight="normal" fill="#1c1d21" text-anchor="middle">SD-JWT VC</text>
+<rect x="288" y="188" width="76" height="28" rx="4" fill="#ececec" stroke="#9a9ca3" stroke-width="1.2"/>
+<text x="326" y="207" font-size="11.5" font-weight="normal" fill="#1c1d21" text-anchor="middle">JSON-LD</text>
+<rect x="368" y="188" width="76" height="28" rx="4" fill="#ececec" stroke="#9a9ca3" stroke-width="1.2"/>
+<text x="406" y="207" font-size="11.5" font-weight="normal" fill="#1c1d21" text-anchor="middle">mDoc</text>
+<text x="470" y="180" font-size="12" font-weight="600" fill="#1c1d21" text-anchor="start">Mode</text>
+<rect x="470" y="188" width="116" height="28" rx="4" fill="#d9d9e8" stroke="#9a9ca3" stroke-width="1.2"/>
+<text x="528" y="207" font-size="11.5" font-weight="normal" fill="#1c1d21" text-anchor="middle">Cross-device (QR)</text>
+<rect x="590" y="188" width="116" height="28" rx="4" fill="#ececec" stroke="#9a9ca3" stroke-width="1.2"/>
+<text x="648" y="207" font-size="11.5" font-weight="normal" fill="#1c1d21" text-anchor="middle">Same-device</text>
+<rect x="710" y="188" width="116" height="28" rx="4" fill="#ececec" stroke="#9a9ca3" stroke-width="1.2"/>
+<text x="768" y="207" font-size="11.5" font-weight="normal" fill="#1c1d21" text-anchor="middle">DC API (probe)</text>
+<rect x="830" y="188" width="116" height="28" rx="4" fill="#ececec" stroke="#9a9ca3" stroke-width="1.2"/>
+<text x="888" y="207" font-size="11.5" font-weight="normal" fill="#1c1d21" text-anchor="middle">Credential only</text>
+<text x="208" y="240" font-size="12" font-weight="normal" fill="#5b5e66" text-anchor="start">Scope  [Issue, present and verify | Issue only]     chips: Grant · Delivery (derived)</text>
+<rect x="208" y="258" width="268" height="230" rx="8" fill="#fafafa" stroke="#9a9ca3" stroke-width="1.2"/>
+<text x="222" y="282" font-size="14" font-weight="700" fill="#1c1d21" text-anchor="start">Issuer</text>
+<text x="462" y="282" font-size="11" font-weight="normal" fill="#5b5e66" text-anchor="end">n options</text>
+<rect x="222" y="294" width="240" height="84" rx="8" fill="#ffffff" stroke="#4a4ad0" stroke-width="2"/>
+<text x="234" y="314" font-size="11.5" font-weight="normal" fill="#1c1d21" text-anchor="start">(•) Adapter name</text>
+<text x="234" y="330" font-size="11.5" font-weight="normal" fill="#1c1d21" text-anchor="start">one-line blurb</text>
+<text x="234" y="346" font-size="11.5" font-weight="normal" fill="#1c1d21" text-anchor="start">[Local] [Automated] [formats]</text>
+<text x="234" y="362" font-size="11.5" font-weight="normal" fill="#1c1d21" text-anchor="start">status · version</text>
+<rect x="222" y="388" width="240" height="84" rx="8" fill="#f0f0f0" stroke="#9a9ca3" stroke-width="1.2" stroke-dasharray="5 4"/>
+<text x="234" y="408" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">( ) Greyed adapter</text>
+<text x="234" y="424" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">reason as visible text</text>
+<text x="234" y="440" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">+ gap ID   [Why not?]</text>
+<text x="484" y="380" font-size="16" font-weight="normal" fill="#5b5e66" text-anchor="middle">→</text>
+<rect x="492" y="258" width="268" height="230" rx="8" fill="#fafafa" stroke="#9a9ca3" stroke-width="1.2"/>
+<text x="506" y="282" font-size="14" font-weight="700" fill="#1c1d21" text-anchor="start">Wallet</text>
+<text x="746" y="282" font-size="11" font-weight="normal" fill="#5b5e66" text-anchor="end">n options</text>
+<rect x="506" y="294" width="240" height="84" rx="8" fill="#ffffff" stroke="#4a4ad0" stroke-width="2"/>
+<text x="518" y="314" font-size="11.5" font-weight="normal" fill="#1c1d21" text-anchor="start">(•) Adapter name</text>
+<text x="518" y="330" font-size="11.5" font-weight="normal" fill="#1c1d21" text-anchor="start">one-line blurb</text>
+<text x="518" y="346" font-size="11.5" font-weight="normal" fill="#1c1d21" text-anchor="start">[Local] [Automated] [formats]</text>
+<text x="518" y="362" font-size="11.5" font-weight="normal" fill="#1c1d21" text-anchor="start">status · version</text>
+<rect x="506" y="388" width="240" height="84" rx="8" fill="#f0f0f0" stroke="#9a9ca3" stroke-width="1.2" stroke-dasharray="5 4"/>
+<text x="518" y="408" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">( ) Greyed adapter</text>
+<text x="518" y="424" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">reason as visible text</text>
+<text x="518" y="440" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">+ gap ID   [Why not?]</text>
+<text x="768" y="380" font-size="16" font-weight="normal" fill="#5b5e66" text-anchor="middle">→</text>
+<rect x="776" y="258" width="268" height="230" rx="8" fill="#fafafa" stroke="#9a9ca3" stroke-width="1.2"/>
+<text x="790" y="282" font-size="14" font-weight="700" fill="#1c1d21" text-anchor="start">Verifier</text>
+<text x="1030" y="282" font-size="11" font-weight="normal" fill="#5b5e66" text-anchor="end">n options</text>
+<rect x="790" y="294" width="240" height="84" rx="8" fill="#ffffff" stroke="#4a4ad0" stroke-width="2"/>
+<text x="802" y="314" font-size="11.5" font-weight="normal" fill="#1c1d21" text-anchor="start">(•) Adapter name</text>
+<text x="802" y="330" font-size="11.5" font-weight="normal" fill="#1c1d21" text-anchor="start">one-line blurb</text>
+<text x="802" y="346" font-size="11.5" font-weight="normal" fill="#1c1d21" text-anchor="start">[Local] [Automated] [formats]</text>
+<text x="802" y="362" font-size="11.5" font-weight="normal" fill="#1c1d21" text-anchor="start">status · version</text>
+<rect x="790" y="388" width="240" height="84" rx="8" fill="#f0f0f0" stroke="#9a9ca3" stroke-width="1.2" stroke-dasharray="5 4"/>
+<text x="802" y="408" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">( ) Greyed adapter</text>
+<text x="802" y="424" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">reason as visible text</text>
+<text x="802" y="440" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">+ gap ID   [Why not?]</text>
+<rect x="208" y="500" width="160" height="28" rx="4" fill="#ffffff" stroke="#9a9ca3" stroke-width="1.2"/>
+<text x="288" y="519" font-size="12" font-weight="normal" fill="#1c1d21" text-anchor="middle">Advanced options</text>
+<rect x="208" y="540" width="832" height="44" rx="8" fill="#fafafa" stroke="#9a9ca3" stroke-width="1.2"/>
+<text x="222" y="567" font-size="12" font-weight="normal" fill="#1c1d21" text-anchor="start">Start bar: issuer → wallet → verifier · format · grant · mode   (warnings inline)</text>
+<rect x="950" y="548" width="76" height="28" rx="4" fill="#d9d9e8" stroke="#4a4ad0" stroke-width="1.2"/>
+<text x="988" y="567" font-size="12.5" font-weight="700" fill="#1c1d21" text-anchor="middle">Run</text>
+</g>
+</svg>

@@ -4,6 +4,7 @@ import { announce } from '../lib/announce.js';
 import { copy } from '../copy.js';
 import { Icon } from './Icon.js';
 
+/** Copies text to the clipboard and briefly confirms. */
 export function CopyButton({ text, label }: { text: string; label: string }) {
   const [done, setDone] = useState(false);
   useEffect(() => {

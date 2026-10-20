@@ -23,6 +23,7 @@ import {
 import type { RailStep } from './flows.js';
 import type { RunView, ViewState } from './reduce.js';
 
+/** Returns a function that turns an adapter id into its display name, falling back to the id while the catalogue loads. */
 export function useAdapterName(): (id: AdapterId) => string {
   const adapters = useStore((s) => s.catalog.adapters);
   return (id) => {
@@ -66,6 +67,7 @@ export interface HeaderActions {
   onDelete: () => void;
 }
 
+/** The facts line under the run title: adapters, format, grant and environment. */
 export function RunHeaderFacts({ view, run }: { view: RunView; run: Run | null }) {
   const name = useAdapterName();
   const spec = view.spec;
@@ -131,6 +133,7 @@ export function RunHeaderFacts({ view, run }: { view: RunView; run: Run | null }
   );
 }
 
+/** State badge shown beside the run title. */
 export function RunTitleChips({ vs, view }: { vs: ViewState; view: RunView }) {
   if (vs === 'loading') return null;
   const s = stateBadge(vs);
@@ -144,6 +147,7 @@ export function RunTitleChips({ vs, view }: { vs: ViewState; view: RunView }) {
   );
 }
 
+/** The run's action buttons (cancel while running; pin, note and export), shown according to the run state. */
 export function RunActions({
   runId,
   vs,

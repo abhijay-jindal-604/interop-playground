@@ -51,6 +51,7 @@ export function checkRequest(
   return null;
 }
 
+/** Rejects any request whose `Host` is not the loopback address, and any non-GET with a foreign `Origin` (DNS-rebinding and CSRF defence). */
 export function registerGuard(app: FastifyInstance, opts: GuardOptions = {}): void {
   const allowed = opts.allowedHosts ?? ALLOWED_HOSTS;
   app.addHook('onRequest', async (request, reply) => {

@@ -61,10 +61,12 @@ export async function jsonBody(res: Response): Promise<unknown> {
   }
 }
 
+/** Type guard for a plain JSON object (not null, not an array). */
 export function isRecord(v: unknown): v is Record<string, unknown> {
   return typeof v === 'object' && v !== null && !Array.isArray(v);
 }
 
+/** Returns the value if it is a string, else null. */
 export function str(v: unknown): string | null {
   return typeof v === 'string' ? v : null;
 }
@@ -79,6 +81,7 @@ export function callSignal(ctx: { signal: AbortSignal }, timeoutMs: number): Abo
   return AbortSignal.any([ctx.signal, AbortSignal.timeout(timeoutMs)]);
 }
 
+/** Removes trailing slashes so base URLs concatenate cleanly. */
 export function trimSlash(s: string): string {
   return s.replace(/\/+$/, '');
 }

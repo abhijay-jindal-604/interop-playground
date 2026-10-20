@@ -41,6 +41,7 @@ export interface BundleAdapterOptions {
   wallets?: Readonly<Record<string, WalletAdapter>>;
 }
 
+/** Constructs the real adapters (and their shared HTTP, correlation and key services) from the environment; roles not yet built answer undefined and surface as `adapter_unavailable`. */
 export function bundleAdapters(o: BundleAdapterOptions): AdapterSetLike & {
   certifyPreauth: CertifyPreauthIssuer;
   injiVerifyLocal: InjiVerifyLocalVerifier;

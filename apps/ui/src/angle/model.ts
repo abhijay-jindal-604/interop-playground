@@ -33,6 +33,7 @@ export const SIDE_WORD: Record<DeviatingSide, string> = {
   playground: 'Playground',
 };
 
+/** Display word for the side a diagnosis blames (issuer, wallet or verifier). */
 export const sideWord = (side: string): string => SIDE_WORD[side as DeviatingSide] ?? side;
 
 export type DiagnosisCase = 'exact' | 'possible' | 'observed' | 'unclassified';
@@ -90,6 +91,7 @@ export function fixItDecision(
   return { offer: null, noFix: byCase[view.kind] ?? null };
 }
 
+/** Finds a knob by id in the loaded catalogue. */
 export function knobEntry(knobs: readonly KnobEntry[], knobId: string): KnobEntry | null {
   return knobs.find((k) => k.def.id === knobId) ?? null;
 }

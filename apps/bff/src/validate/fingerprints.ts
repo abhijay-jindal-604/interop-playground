@@ -34,6 +34,7 @@ const ENUMS: Record<string, readonly string[]> = {
   status: ['active', 'historical'],
 };
 
+/** Checks one fingerprint file against the closed schema; returns human-readable errors (empty when valid). */
 export function validateFingerprint(fp: unknown, fileName: string): string[] {
   const errs: string[] = [];
   if (!isObj(fp)) return ['$: must be an object'];
@@ -57,6 +58,7 @@ export function validateFingerprint(fp: unknown, fileName: string): string[] {
   return errs;
 }
 
+/** Checks a knob catalogue file; accepts a bare array or an object with a `knobs` array. */
 export function validateKnobs(k: unknown): string[] {
   const list = Array.isArray(k) ? k : isObj(k) && Array.isArray(k.knobs) ? k.knobs : null;
   if (list === null) return ['$: must be an array of knobs (or {knobs:[...]})'];
@@ -73,6 +75,7 @@ export interface FingerprintLoadResult {
   errors: { file: string; errors: string[] }[];
 }
 
+/** Loads and validates every fingerprint file in `dir`; a missing directory is an empty library, not an error. */
 export function loadFingerprints(dir: string): FingerprintLoadResult {
   const errors: FingerprintLoadResult['errors'] = [];
   if (!existsSync(dir)) return { count: 0, errors };

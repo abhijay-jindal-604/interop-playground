@@ -10,6 +10,7 @@ import { ApiError, sendError } from '../errors/index.js';
 
 const NON_SPA_PREFIXES = ['/api/', '/proxy/', '/return/'];
 
+/** Serves the built UI from `uiDistDir` when it exists; otherwise a plain notice that the UI is not built. */
 export async function registerStatic(app: FastifyInstance, uiDistDir: string): Promise<void> {
   const present = uiDistPresent(uiDistDir);
   if (present) {

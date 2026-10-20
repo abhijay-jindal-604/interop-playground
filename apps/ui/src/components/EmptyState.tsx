@@ -1,6 +1,7 @@
 /** `EmptyState({title, body, action?})` (06 UI-50, UI-34: always say why and offer a next action). */
 import type { ReactNode } from 'react';
 
+/** Message for a list or page with nothing to show, with an optional action. */
 export function EmptyState({
   title,
   body,

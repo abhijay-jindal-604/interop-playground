@@ -38,6 +38,7 @@ export interface InspectorFocus {
 }
 const TAB_KEY = 'pg.inspector.tab';
 
+/** The last chosen inspector tab, from session storage. */
 function readTab(): TabId {
   try {
     const v = sessionStorage.getItem(TAB_KEY);
@@ -46,6 +47,7 @@ function readTab(): TabId {
     return 'messages';
   }
 }
+/** Remembers the chosen tab; storage errors are ignored. */
 function writeTab(t: TabId): void {
   try {
     sessionStorage.setItem(TAB_KEY, t);
@@ -57,6 +59,7 @@ function writeTab(t: TabId): void {
 const header = (headers: [string, string][], name: string): string | null =>
   headers.find(([k]) => k.toLowerCase() === name)?.[1] ?? null;
 
+/** Splits a URL into origin and the rest, so the host can be shown separately. */
 function splitUrl(url: string): { origin: string; rest: string } {
   try {
     const u = new URL(url);
@@ -67,6 +70,7 @@ function splitUrl(url: string): { origin: string; rest: string } {
 }
 
 const shq = (s: string) => `'${s.replace(/'/g, `'\\''`)}'`;
+/** Builds a copy-pasteable `curl` command that reproduces a captured exchange. */
 export function curlOf(x: ExchangeView): string {
   const parts = [`curl -X ${x.method} ${shq(x.url)}`];
   for (const [k, v] of x.request.headers) parts.push(`-H ${shq(`${k}: ${v}`)}`);
@@ -76,6 +80,7 @@ export function curlOf(x: ExchangeView): string {
 
 // ---------------------------------------------------------------- Messages (UI-19)
 
+/** A table of header names and values. */
 function HeadersTable({ headers }: { headers: [string, string][] }) {
   if (headers.length === 0) return <p className="muted small">{c.messages.noHeaders}</p>;
   return (
@@ -99,6 +104,7 @@ function HeadersTable({ headers }: { headers: [string, string][] }) {
   );
 }
 
+/** One captured exchange: request, response, timings and the actions on it. */
 function ExchangeCard({
   x,
   runId,
@@ -221,6 +227,7 @@ function ExchangeCard({
   );
 }
 
+/** The messages tab: all exchanges in order, grouped by step. */
 function MessagesTab({
   list,
   runId,
@@ -298,6 +305,7 @@ function MessagesTab({
   );
 }
 
+/** A group of exchanges under a step heading. */
 function ExchangeGroup({ head, children }: { head: string | null; children: React.ReactNode }) {
   return (
     <>
@@ -323,6 +331,7 @@ const TITLES: Record<string, string> = {
   id_token: 'ID token (JWT)',
 };
 
+/** Display title of a decoded item. */
 function titleOf(item: DecodedItem): string {
   const base =
     (item.field && TITLES[item.field]) ??
@@ -338,6 +347,7 @@ function titleOf(item: DecodedItem): string {
 
 const show = (v: unknown) => (typeof v === 'string' ? v : JSON.stringify(v));
 
+/** Chips for the header fields of a JOSE object (algorithm, type, key id). */
 function JoseChips({ h }: { h: Record<string, unknown> }) {
   return (
     <p className="jose-chips">
@@ -353,6 +363,7 @@ function JoseChips({ h }: { h: Record<string, unknown> }) {
   );
 }
 
+/** One decoded credential, token or document with its parts. */
 function ArtifactCard({ item, from }: { item: DecodedItem; from: string }) {
   return (
     <article className="artifact-card" data-artifact={item.kind}>
@@ -455,6 +466,7 @@ function EngineArtifactCard({ row }: { row: EngineRowView }) {
 
 const ENGINE_ARTIFACT_OPS = new Set(['inspect-credential', 'build-kb-jwt']);
 
+/** The decoded tab: every credential and token seen in the run, decoded for reading. */
 function DecodedTab({ list, engines }: { list: ExchangeView[]; engines: EngineRowView[] }) {
   const fromEngines = engines.filter((r) => r.call && ENGINE_ARTIFACT_OPS.has(r.call.op));
   const items = useMemo(() => {
@@ -492,6 +504,7 @@ function DecodedTab({ list, engines }: { list: ExchangeView[]; engines: EngineRo
 
 // ---------------------------------------------------------------- Checks (UI-22)
 
+/** The checks tab: each check with its result and the evidence it points to. */
 function ChecksTab({
   model,
   keys,
@@ -586,6 +599,7 @@ function ChecksTab({
 
 // ---------------------------------------------------------------- Engine (UI-23)
 
+/** Shows a URI's query parameters as a table. */
 export function QueryTable({ uri }: { uri: string }) {
   const q = uri.indexOf('?');
   if (q < 0) return null;
@@ -614,6 +628,7 @@ export function QueryTable({ uri }: { uri: string }) {
   );
 }
 
+/** The engine tab: calls made to product libraries rather than over HTTP. */
 function EngineTab({
   rows,
   events,
@@ -684,6 +699,7 @@ const GROUPS: Record<string, string> = {
   counterfactual: 'diagnosis',
 };
 
+/** One-line description of an event for the events table. */
 function summary(e: EventEnvelope): string {
   const p = e.payload as Record<string, unknown>;
   switch (e.type) {
@@ -713,6 +729,7 @@ const hms = (iso: string) => {
   return `${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}.${p(d.getMilliseconds(), 3)}`;
 };
 
+/** The events tab: the raw event log, filterable by type group. */
 function EventsTab({ events }: { events: readonly EventEnvelope[] }) {
   const [group, setGroup] = useState('');
   const [step, setStep] = useState('');
@@ -769,6 +786,7 @@ function EventsTab({ events }: { events: readonly EventEnvelope[] }) {
   );
 }
 
+/** One row of the events table. */
 function EventRow({
   e,
   open,
@@ -805,6 +823,7 @@ function EventRow({
 
 // ---------------------------------------------------------------- the pane (UI-18)
 
+/** The inspector: lists the run's captured exchanges and engine calls, and shows the selected one's request, response and decoded credential. */
 export function Inspector({
   events,
   view,

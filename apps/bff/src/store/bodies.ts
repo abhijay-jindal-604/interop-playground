@@ -42,6 +42,11 @@ function isUtf8(b: Uint8Array): boolean {
 }
 
 /** redact first, then hash, then cap (05 §6 order) */
+/**
+ * Turns a raw captured body into its stored form: secrets redacted first, then the 256 KiB cap
+ * applied, with the SHA-256 and size of the full redacted body kept. Order matters: hashing and
+ * truncating happen after redaction so no secret ever reaches a blob.
+ */
 export function prepareBody(raw: RawBody, registry: SecretRegistry): PreparedBody {
   const ct = raw.contentType ?? null;
   let full: Buffer;
@@ -92,7 +97,10 @@ export interface BlobRecord {
   data: Buffer;
 }
 
-/** gzip level 6 for ≥ 1 KiB, identity below (05 §4.3) */
+/**
+ * Content-addresses a stored body; gzips it when large enough to benefit.
+ * Gzip level 6 for ≥ 1 KiB, identity below (05 §4.3)
+ */
 export function encodeBlob(stored: Buffer): BlobRecord {
   const gz = stored.length >= LIMITS.gzipFromBytes;
   return {
@@ -103,6 +111,7 @@ export function encodeBlob(stored: Buffer): BlobRecord {
   };
 }
 
+/** Inverse of `encodeBlob`: returns the stored bytes whether or not they were gzipped. */
 export function decodeBlob(enc: string, data: Uint8Array): Buffer {
   const b = Buffer.from(data.buffer, data.byteOffset, data.byteLength);
   return enc === 'gzip' ? gunzipSync(b) : b;
@@ -127,7 +136,10 @@ export function toBodyRef(
   };
 }
 
-/** RFC 8785-style canonical JSON: object keys sorted recursively, no whitespace (05 §1) */
+/**
+ * JSON with object keys sorted recursively, so equal values always serialise to the same text (stable hashes).
+ * RFC 8785-style canonical JSON: object keys sorted recursively, no whitespace (05 §1)
+ */
 export function canonicalJson(v: unknown): string {
   return JSON.stringify(sortKeys(v));
 }

@@ -30,7 +30,10 @@ export const ELLIPSIS = '…';
 /** synthetic header that carries the full-body SHA-256 of a truncated body (05 §4.3) */
 export const BODY_SHA_HEADER = 'x-playground-body-sha256';
 
-/** cut to at most `max` characters, the last one being `…` */
+/**
+ * Truncates to at most `max` characters, ending with an ellipsis when something was cut.
+ * Cut to at most `max` characters, the last one being `…`.
+ */
 export function cut(s: string, max: number): string {
   return s.length <= max ? s : s.slice(0, Math.max(0, max - 1)) + ELLIPSIS;
 }
@@ -59,6 +62,7 @@ export function capHeaders(headers: HeaderList): HeaderList {
   return out;
 }
 
+/** Caps a URL to the stored length limit. */
 export function capUrl(url: string): string {
   return cut(url, LIMITS.urlChars);
 }
@@ -114,7 +118,10 @@ function longestString(root: unknown): { value: string; set: (s: string) => void
   return best;
 }
 
-/** textual content types are stored and shown as UTF-8, everything else as base64 (05 §4.3) */
+/**
+ * True for content types whose bodies are stored as UTF-8 text; a missing type is treated as text.
+ * Textual content types are stored and shown as UTF-8, everything else as base64 (05 §4.3)
+ */
 export function isTextual(contentType: string | null | undefined): boolean {
   if (!contentType) return true;
   const ct = contentType.toLowerCase();

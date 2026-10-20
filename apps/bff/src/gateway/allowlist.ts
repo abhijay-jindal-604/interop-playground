@@ -60,6 +60,7 @@ export function normalisePath(rawPath: string): string | null {
   return collapsed;
 }
 
+/** Compiles a path prefix with `*` wildcards to an anchored regular expression. */
 function prefixPattern(p: string): RegExp {
   const esc = p
     .split('*')
@@ -75,6 +76,7 @@ export function hardDenyRule(l: ListenerSpec, path: string): string | null {
   return null;
 }
 
+/** True when the rule allows the request method. */
 function methodOk(rule: StaticRule, method: string): boolean {
   return rule.methods === '*' || rule.methods.includes(method);
 }
@@ -120,6 +122,7 @@ interface Loaded {
   lastTry: number;
 }
 
+/** Per-listener allowlists of paths a caller may reach, built from fixed rules plus the upstream's own advertised metadata. */
 export class Allowlists {
   private readonly loaded = new Map<number, Loaded>();
   private readonly activeRoutes: (r: PathRoute) => boolean;
@@ -146,6 +149,7 @@ export class Allowlists {
     return (this.loaded.get(port)?.loadedAt ?? null) !== null;
   }
 
+  /** Loads a listener's dynamic (M1) rules from the upstream's own advertised metadata, keeping the previous rules if the fetch fails. */
   private async load(l: ListenerSpec): Promise<void> {
     const prev = this.loaded.get(l.port);
     const entry: Loaded = prev ?? { rules: [], loadedAt: null, lastTry: 0 };
@@ -160,12 +164,19 @@ export class Allowlists {
     entry.loadedAt = this.now();
   }
 
+  /** The listener's dynamic rules, retrying a failed first load at most once per retry interval. */
   private async m1Rules(l: ListenerSpec): Promise<StaticRule[]> {
     const e = this.loaded.get(l.port);
     if (!e || (e.loadedAt === null && this.now() - e.lastTry >= LAZY_RETRY_MS)) await this.load(l);
     return this.loaded.get(l.port)?.rules ?? [];
   }
 
+  /**
+   * Decides what to do with one inbound request. Order: malformed path is denied; hard-deny rules
+   * win over everything; exact routes forward to their own upstream; relay paths hand to the run;
+   * static rules forward; M1 listeners also allow well-known GETs and the upstream's advertised
+   * paths. Anything else is denied (default deny).
+   */
   async decide(l: ListenerSpec, method: string, rawPath: string): Promise<Decision> {
     const m = method.toUpperCase();
     const defaultDeny: Decision = { kind: 'deny', rule: `allowlist:${l.allow}` };

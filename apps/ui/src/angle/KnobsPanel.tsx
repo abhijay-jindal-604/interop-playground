@@ -27,6 +27,7 @@ export function applicableKnobs(
   );
 }
 
+/** Whether a knob can be set for the chosen adapters and format, and why not when it cannot. */
 export function knobStatus(
   k: KnobEntry,
   format: CredentialFormat,
@@ -56,6 +57,7 @@ export function changedKnobs(choice: KnobChoice, list: readonly KnobEntry[]): Kn
   return out;
 }
 
+/** The panel of knobs on the selector, grouped by adapter. */
 export function KnobsPanel({
   adapters,
   format,

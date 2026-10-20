@@ -13,6 +13,7 @@ import type { RunView, StepView } from './reduce.js';
 
 type Word = keyof typeof runCopy.rail.outcome;
 
+/** The status word shown for a step: pending, running, or its final outcome. */
 export function outcomeWord(s: StepView | undefined): Word {
   if (!s || s.state === 'pending') return 'pending';
   if (s.state === 'running') return 'running';
@@ -34,6 +35,7 @@ const TONE: Record<Word, string> = {
   skipped: 'skipped',
 };
 
+/** Marks a step whose traffic was only partly captured (or not at all), with the reason as its hover note. */
 export function CaptureBadge({
   capture,
   note,
@@ -139,6 +141,7 @@ function Row({
   );
 }
 
+/** The left-hand list of the run's steps with their status; selecting one focuses it in the inspector and diagram. */
 export function StepRail({
   steps,
   view,

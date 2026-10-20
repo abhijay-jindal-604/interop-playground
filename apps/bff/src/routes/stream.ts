@@ -31,15 +31,18 @@ interface ParsedQuery {
   types: Set<string> | null;
 }
 
+/** A validation error for a bad query parameter. */
 function bad(path: string, message: string): ApiError {
   return new ApiError('validation_failed', undefined, issueDetails([{ path, message }]));
 }
 
+/** Parses a non-negative integer parameter or throws a validation error. */
 function nonNegInt(v: string, path: string): number {
   if (!/^\d{1,15}$/.test(v)) throw bad(path, 'must be a non-negative integer');
   return Number(v);
 }
 
+/** Validates the stream query (`after`, `format`, and so on) and applies defaults. */
 function parseQuery(req: FastifyRequest<{ Querystring: Record<string, string> }>): ParsedQuery {
   const q = req.query;
   for (const k of Object.keys(q))
@@ -67,10 +70,12 @@ function parseQuery(req: FastifyRequest<{ Querystring: Record<string, string> }>
   return { json: q.format === 'json', after, limit, types };
 }
 
+/** One SSE frame: the sequence number as `id`, so a client can resume with `Last-Event-ID`. */
 function frame(ev: EventEnvelope): string {
   return `id: ${ev.seq}\nevent: ${ev.type}\ndata: ${JSON.stringify(ev)}\n\n`;
 }
 
+/** The final SSE frame, telling the client the stream is complete. */
 function endFrame(end: StreamEndFrame): string {
   return `event: stream.end\ndata: ${JSON.stringify(end)}\n\n`;
 }
@@ -79,6 +84,7 @@ interface OpenStream {
   close(reason: StreamEndFrame['reason'], lastSeq?: number): void;
 }
 
+/** Registers the SSE endpoint: replays stored events after `Last-Event-ID` (or `?after=`), then tails live ones, with heartbeats. */
 export function registerStream(app: FastifyInstance, opts: StreamRouteOptions): void {
   const { store, bus } = opts;
   const heartbeatMs = opts.heartbeatMs ?? HEARTBEAT_MS;

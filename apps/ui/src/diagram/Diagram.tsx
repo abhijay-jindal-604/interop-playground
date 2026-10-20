@@ -65,6 +65,7 @@ function applyStates(
   });
 }
 
+/** Inserts the rendered Mermaid SVG and wires its messages to step selection and state attributes. */
 function MermaidSvg({
   svg,
   flow,
@@ -99,6 +100,7 @@ function MermaidSvg({
   );
 }
 
+/** One flow's diagram with its title, rendered by Mermaid or the fallback. */
 function SequenceBlock({
   title,
   flow,
@@ -182,6 +184,7 @@ function SequenceBlock({
 
 const NO_BASES: Record<string, FlowDefinition> = {};
 
+/** The sequence diagram pane: one diagram per flow, drawn once with Mermaid when it is available and passes its integrity check, else by the built-in SVG renderer. Run events only change state attributes; the diagram is never redrawn. */
 export function DiagramPane({
   flows,
   view,

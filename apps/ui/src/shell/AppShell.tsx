@@ -26,6 +26,7 @@ const NAV: { to: string; label: string; icon: IconName; end?: boolean }[] = [
   { to: '/drafts', label: copy.nav.drafts, icon: 'drafts' },
 ];
 
+/** Hidden live regions that screen readers use for announcements. */
 function LiveRegions() {
   return (
     <>
@@ -47,6 +48,7 @@ function LiveRegions() {
   );
 }
 
+/** The product name and mark in the header. */
 function Brand() {
   return (
     <Link to="/" className="brand">
@@ -93,6 +95,7 @@ function BootFailure({ kind }: { kind: 'unreachable' | 'guard' }) {
   );
 }
 
+/** The frame around every page: header, navigation, banners, toasts and shortcuts. Shows a full-page failure notice instead of a page when the backend is unreachable or the address is wrong. */
 export function AppShell() {
   const bootState = useStore((s) => s.boot);
   const [menuOpen, setMenuOpen] = useState(false);

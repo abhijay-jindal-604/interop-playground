@@ -39,6 +39,7 @@ export interface FixtureIssuerOptions {
   now?: () => number;
 }
 
+/** Offline issuer: signs a fixture SD-JWT at run time (valid, expired or tampered by configuration) with no network traffic. */
 export class FixtureIssuer implements IssuerAdapter {
   readonly descriptor: AdapterDescriptor;
   private key: FixtureIssuerKey | null = null;
@@ -47,11 +48,13 @@ export class FixtureIssuer implements IssuerAdapter {
     this.descriptor = descriptorOf('issuer.fixture');
   }
 
+  /** Loads the throwaway issuer key on first use. */
   private issuerKey(): FixtureIssuerKey {
     this.key ??= loadIssuerKey(this.opts.dir ?? DEFAULT_FIXTURES_DIR);
     return this.key;
   }
 
+  /** Available whenever the fixture key files can be read. */
   probe(): Promise<Availability> {
     try {
       this.issuerKey();
@@ -65,14 +68,17 @@ export class FixtureIssuer implements IssuerAdapter {
     }
   }
 
+  /** The fixture has no issuer-side knobs, so the baseline configuration is the variant. */
   resolveVariant(_ctx: AdapterContext, baselineConfigurationId: string): Promise<string> {
     return Promise.resolve(baselineConfigurationId);
   }
 
+  /** There is no issuer to fetch metadata from. */
   metadata(): Promise<{ issuer: unknown; authorizationServer: unknown; exchangeIds: string[] }> {
     return Promise.resolve({ issuer: null, authorizationServer: null, exchangeIds: [] });
   }
 
+  /** Signs the fixture credential for the run's holder key; only `dc+sd-jwt` is built. */
   async fixture(ctx: AdapterContext, format: CredentialFormat): Promise<HeldCredential> {
     if (format !== 'dc+sd-jwt')
       throw new Error(`issuer.fixture: no ${format} fixture (mso_mdoc fixtures are cut with T-48)`);

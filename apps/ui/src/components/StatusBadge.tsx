@@ -19,6 +19,7 @@ const TOKEN: Record<BadgeState, string> = {
   failed: 'warn',
 };
 
+/** A status chip with a word and a colour; the word is always shown so colour is never the only signal. */
 export function StatusBadge({ state, size = 'sm' }: { state: BadgeState; size?: 'sm' | 'md' }) {
   const meaning = STATE_MEANINGS[state];
   return (

@@ -66,9 +66,11 @@ export type Iso = string;
 /** A run ULID | 'env' | 'unattributed'. */
 // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents -- 04 §3.1 spells out the named streams
 export type StreamId = Ulid | 'env' | 'unattributed';
+// Lifecycle of a run as the API reports it. Terminal states: completed, failed, cancelled.
 export type RunState = 'queued' | 'running' | 'completed' | 'failed' | 'cancelled';
 /** step outcome (02 §4.2) */
 export type Outcome = 'pass' | 'fail' | 'skipped';
+// One page of a list endpoint; `nextCursor` is null on the last page.
 export type Page<T> = { items: T[]; nextCursor: string | null };
 
 // ---------- 3.2 Run ----------
@@ -150,6 +152,7 @@ export interface Step {
   checks: CheckResult[];
   fingerprintIds: FingerprintId[];
 }
+// A captured HTTP body: inline text (cut at the size limit), the full size and the SHA-256 of the full body.
 export interface BodyRef {
   encoding: 'utf8' | 'base64';
   /** inline up to 64 KiB in events; up to 256 KiB (the stored cap) in API-27 (ADR-37) */
@@ -198,6 +201,7 @@ export interface CapturedMessage {
   poll: PollInfo | null;
   capture: Coverage;
 }
+// A captured credential, token or document, stored once and referenced from events.
 export interface Artifact {
   /** `<runId>:<n>` */
   artifactId: string;
@@ -227,17 +231,20 @@ export interface Health {
   sidecar: { reachable: boolean; version: string | null };
   adapters: { id: AdapterId; available: boolean; reason: string | null }[];
 }
+// An adapter as the selector shows it: descriptor plus current availability.
 export interface AdapterEntry {
   descriptor: AdapterDescriptor;
   availability: Availability;
   probedAt: Iso | null;
 }
+// Response of the adapter list endpoint.
 export interface AdapterListResponse {
   issuers: AdapterEntry[];
   wallets: AdapterEntry[];
   verifiers: AdapterEntry[];
 }
 
+// The user's choices for a run: the three adapters plus format, grant, mode, knobs and optional tamper case. The server resolves it into a full `RunSpec`.
 export interface CreateRunRequest {
   issuer: AdapterId;
   wallet: AdapterId;
@@ -269,7 +276,9 @@ export interface CreateRunRequest {
   /** @maxLength 80 */
   label?: string;
 }
+// A known incompatible combination that blocks a run, with the reason and the gap it comes from.
 export type IncompatibilityHit = { ruleId: string; reason: string; gapId: string | null };
+// Result of a dry resolution: either the resolved spec and plan, or why the combination cannot run.
 export type PreviewResponse =
   | {
       ok: true;
@@ -280,6 +289,7 @@ export type PreviewResponse =
     }
   | { ok: false; hit: IncompatibilityHit | { ruleId: 'validation'; reason: string; gapId: null } };
 
+// A knob with the adapters and formats it applies to.
 export interface KnobEntry {
   def: KnobDef;
   adapters: AdapterId[];
@@ -290,9 +300,11 @@ export interface KnobEntry {
   /** A4 report label */
   label: string;
 }
+// Response of the knob catalogue endpoint.
 export interface KnobCatalogResponse {
   knobs: KnobEntry[];
 }
+// Summary line of one flow file.
 export interface FlowIndexEntry {
   flowId: FlowId;
   kind: 'issuance' | 'presentation';
@@ -301,6 +313,7 @@ export interface FlowIndexEntry {
   formats: CredentialFormat[];
   stepKeys: string[];
 }
+// Response of the flow index endpoint.
 export interface FlowIndexResponse {
   flows: FlowIndexEntry[];
 }
@@ -310,9 +323,11 @@ export interface Preset {
   description: string;
   knobs: Partial<KnobValues>;
 }
+// Response of the preset list endpoint.
 export interface PresetListResponse {
   presets: Preset[];
 }
+// A credential configuration an issuer offers.
 export interface ConfigurationEntry {
   issuer: AdapterId;
   format: CredentialFormat;
@@ -320,6 +335,7 @@ export interface ConfigurationEntry {
   default: boolean;
   vctOrDoctypeOrType: string;
 }
+// Response of the configuration list endpoint.
 export interface ConfigurationListResponse {
   configurations: ConfigurationEntry[];
 }
@@ -330,10 +346,12 @@ export interface Incompatibility {
   gapId: string | null;
   evidence: string[];
 }
+// Response of the incompatibility list endpoint.
 export interface IncompatibilityListResponse {
   rules: Incompatibility[];
 }
 
+// Result of probing one upstream product: reachable or not, and its version fingerprint.
 export interface UpstreamProbe {
   upstream: string;
   ok: boolean;
@@ -341,6 +359,7 @@ export interface UpstreamProbe {
   detail: string | null;
   versionFingerprint: string | null;
 }
+// The current environment: which upstreams are up, their versions, and the public host settings.
 export interface EnvSnapshot {
   mode: 'full-local' | 'collab';
   ready: boolean;
@@ -386,6 +405,7 @@ export interface RunListQuery {
   from?: Iso;
   to?: Iso;
 }
+// Response of the run list endpoint.
 export type RunListResponse = Page<Run>;
 /** API-80 */
 export interface VersionListQuery {
@@ -419,19 +439,23 @@ export interface DeriveRequest {
   knobId: KnobId;
   value: string;
 }
+// Response of the step list endpoint.
 export interface StepListResponse {
   steps: Step[];
 }
+// What a person reports for a manually driven step (for example what the phone wallet showed).
 export type ObservationRequest =
   | ManualObservation
   /** FLOW-44 holder attribution (ADR-16) */
   | { step: 'dcapi-holder'; holder: 'none' | 'google-wallet' | `other:${string}` }
   /** the URI the SDK built in the browser (FLOW-37), uiDriven runs only */
   | { step: 'sdk-request-uri'; uri: string };
+// Acknowledgement of a recorded observation.
 export interface ObservationAck {
   accepted: true;
   seq: number;
 }
+// Diagnosis of a run: fingerprint matches, fix-it offers, and the reason when no fix is offered.
 export interface DiagnosisResponse {
   /** 04 §7.2 */
   matches: FingerprintMatchedPayload[];
@@ -441,6 +465,7 @@ export interface DiagnosisResponse {
   /** every partial/none hop by name (RISK-22) */
   coverageBanner: { stepKey: string; capture: Coverage; reason: string | null }[];
 }
+// A step-aligned diff of two runs, parent first.
 export interface CompareResponse {
   parent: Run;
   child: Run;
@@ -458,6 +483,7 @@ export interface CompareResponse {
     directEffect: boolean;
   }[];
 }
+// A self-contained export of a run: the run, all its events and the artifacts they reference.
 export interface RunExport {
   exportVersion: 1;
   run: Run;
@@ -466,6 +492,7 @@ export interface RunExport {
   artifacts: Artifact[];
   diagnosis: DiagnosisResponse;
 }
+// A run's parent and children (derived fix-it and tamper runs).
 export interface LineageResponse {
   chain: {
     runId: Ulid;
@@ -474,6 +501,7 @@ export interface LineageResponse {
     state: RunState;
   }[];
 }
+// Body of the wallet's return call for the same-device presentation flow.
 export interface ReturnVpRequest {
   /**
    * @minLength 1
@@ -493,6 +521,7 @@ export interface StreamQuery {
   limit?: number;
   type?: string;
 }
+// One page of a run's stored events.
 export interface EventPage {
   streamId: StreamId;
   events: EventEnvelope[];
@@ -542,6 +571,7 @@ export interface TamperCase {
   observed: 'observed' | 'untested';
   applicability: TamperApplicabilityRow[];
 }
+// Filters for the tamper case list.
 export interface TamperCaseQuery {
   block?: string;
   target?: string;
@@ -551,6 +581,7 @@ export interface TamperCaseQuery {
   verifier?: AdapterId;
   observed?: 'observed' | 'untested';
 }
+// Response of the tamper case list endpoint.
 export interface TamperCaseListResponse {
   cases: TamperCase[];
 }
@@ -573,6 +604,7 @@ export interface TamperBaselineConfirm {
   version: string;
   code: string | null;
 }
+// Response of the tamper baseline list endpoint.
 export interface TamperBaselineListResponse {
   baselines: TamperBaseline[];
 }
@@ -618,7 +650,9 @@ export interface Suite {
     hit: IncompatibilityHit;
   }[];
 }
+// Response of the suite list endpoint (suite summaries without per-run detail).
 export type SuiteListResponse = Page<Omit<Suite, 'runs' | 'skipped'> & { runCount: number }>;
+// Filters for the compatibility matrix.
 export interface MatrixQuery {
   issuer?: AdapterId[];
   wallet?: AdapterId[];
@@ -650,11 +684,13 @@ export interface MatrixCell {
   /** snapshots only: the referenced run was pruned, deleted ("run pruned" in the UI) */
   runDeleted?: true;
 }
+// Request to freeze the current matrix as a named snapshot.
 export interface SnapshotCreateRequest {
   name?: string;
   scope?: MatrixQuery;
   suiteId?: Ulid;
 }
+// A saved compatibility matrix.
 export interface MatrixSnapshot {
   snapshotId: Ulid;
   createdAt: Iso;
@@ -663,13 +699,16 @@ export interface MatrixSnapshot {
   trigger: 'manual' | 'nightly' | 'ci';
   cells: MatrixCell[];
 }
+// Response of the snapshot list endpoint.
 export type MatrixSnapshotListResponse = Page<
   Omit<MatrixSnapshot, 'cells'> & { cellCount: number }
 >;
+// The compatibility matrix: one cell per adapter combination.
 export interface MatrixResponse {
   generatedAt: Iso;
   cells: MatrixCell[];
 }
+// The per-run report: verdict, claim, evidence references and diagnosis, ready to render as JSON or Markdown.
 export interface RunReport {
   reportVersion: 1;
   runId: Ulid;
@@ -699,6 +738,7 @@ export interface RunReport {
   tamper: CheckResult['tamper'] | null;
   steps: Pick<Step, 'stepKey' | 'outcome' | 'capture' | 'skipReason'>[];
 }
+// The report of a suite, with its matrix.
 export interface SuiteReport {
   reportVersion: 1;
   suite: Suite;
@@ -706,12 +746,14 @@ export interface SuiteReport {
   failures: RunReport[];
   generatedAt: Iso;
 }
+// Filters for the statistics endpoint.
 export interface StatsQuery {
   groupBy: 'adapter' | 'format' | 'flow' | 'version' | 'day';
   from?: Iso;
   to?: Iso;
   kind?: 'interop' | 'tamper';
 }
+// Aggregate pass and fail counts.
 export interface StatsResponse {
   groupBy: StatsQuery['groupBy'];
   rows: {
@@ -749,6 +791,7 @@ export interface IssueDraft {
   /** drafts for private-disclosure gaps are never created (09 A9.6) */
   privateDisclosure: false;
 }
+// Response of the issue draft list endpoint.
 export type IssueDraftListResponse = Page<IssueDraft>;
 /** 08: the five human checks (the fifth matters for tamper-derived drafts, RISK-27) */
 export interface IssueDraftChecklist {
@@ -780,9 +823,11 @@ export interface VciSessionCreate {
   offerUri: string;
   clientMetadata?: { [key: string]: unknown };
 }
+// The JVM sidecar started an issuance session; poll it by this id.
 export interface VciSessionCreated {
   sessionId: Ulid;
 }
+// A request the sidecar's issuance client makes back to the BFF (for example to sign a proof), answered through the callback endpoint.
 export type VciCallback =
   | {
       id: string;
@@ -809,15 +854,18 @@ export interface VciAnswer {
   jws?: string;
   txCode?: string;
 }
+// State of a sidecar issuance session: running, done with the credential, or failed with the exception.
 export type VciResult =
   | { state: 'running' }
   | { state: 'done'; credential: unknown; configId: string; format: CredentialFormat }
   | { state: 'failed'; exceptionClass: string; message: string };
+// Request to the sidecar's OID4VP library to parse and authenticate a verifier's request.
 export interface VpAuthenticateRequest {
   urlEncodedRequest: string;
   trustedVerifiers: { clientId: string; responseUris: string[] }[];
   walletMetadata?: { [key: string]: unknown };
 }
+// The sidecar's parse of an authorisation request.
 export interface VpAuthenticateResponse {
   authorizationRequest: {
     clientId: string;
@@ -829,6 +877,7 @@ export interface VpAuthenticateResponse {
   };
   sessionId: Ulid;
 }
+// Request to the sidecar to build the unsigned VP token for a credential and disclosure choice.
 export interface VpUnsignedTokenRequest {
   sessionId: Ulid;
   credential: { format: CredentialFormat; raw: string };
@@ -851,10 +900,12 @@ export interface VpResponseResponse {
   state: string;
   responseUri: string;
 }
+// Request to the sidecar's credential verification library.
 export interface VcVerifyRequest {
   format: CredentialFormat;
   raw: string;
 }
+// The sidecar library's verification verdict.
 export interface VcVerifyResponse {
   verificationStatus: boolean;
   code: string | null;
@@ -907,6 +958,7 @@ export const ERROR_STATUS = {
   internal_error: 500,
 } as const satisfies Record<string, number>;
 
+// Stable error codes of the API; each maps to one HTTP status in `ERROR_STATUS`.
 export type ErrorCode =
   | 'validation_failed'
   | 'request_guard_failed'
@@ -949,6 +1001,7 @@ export type ErrorCode =
   | 'callback_not_pending'
   | 'internal_error';
 
+// All error codes, derived from the status table so the two cannot drift apart.
 export const ERROR_CODES = Object.keys(ERROR_STATUS) as ErrorCode[];
 
 /** Run-level values of `Run.errorCode` beyond the HTTP table (04 §6.2 closing paragraph). */
@@ -960,6 +1013,7 @@ export type RunErrorCode =
   | 'bff_restarted'
   | 'internal_error';
 
+// The one error body every failed API call returns.
 export interface ErrorEnvelope {
   error: {
     /** stable snake_case, 04 §6.2 */
@@ -995,8 +1049,11 @@ export interface StreamEndFrame {
   lastSeq: number;
 }
 
+// Every event type name.
 export type EventType = keyof PayloadMap;
+// The payload type of one event type.
 export type PayloadOf<T extends EventType> = PayloadMap[T];
+// Event types and their payloads. Every event of a run is one of these, wrapped in an `EventEnvelope`.
 export interface PayloadMap {
   // run lifecycle
   'run.created': { spec: RunSpec; label: string | null; queuePosition: number };
@@ -1111,6 +1168,7 @@ export interface PollInfo {
   index: number;
   total: number | null;
 }
+// Operations a product library or engine can be asked to perform in an `engine.call` event.
 export type EngineOp =
   | 'sign-proof'
   | 'deliver-offer'
@@ -1137,6 +1195,7 @@ export type EngineOp =
   | 'validate-request'
   | 'match-credential'
   | 'build-kb-jwt';
+// Payload of a matched fingerprint: what was found, how confident, and the evidence references.
 export interface FingerprintMatchedPayload {
   fingerprintId: FingerprintId;
   gapIds: string[];
@@ -1159,6 +1218,7 @@ export interface FingerprintMatchedPayload {
     versions: string;
   };
 }
+// Payload of a fix-it offer: the single knob to change and the value to try.
 export interface CounterfactualOfferedPayload {
   fingerprintId: FingerprintId;
   knobId: KnobId;
@@ -1183,6 +1243,7 @@ export interface EngineOpOutputSummaries {
 
 // ---------- 10 Flow definition files (API-72) ----------
 export type Lifeline = 'IUI' | 'I' | 'VUI' | 'V' | 'W' | 'L';
+// A flow file: the ordered steps of one issuance or presentation flow, optionally extending another.
 export interface FlowDefinition {
   /** 'FLOW-01'..'FLOW-14' (issuance) | 'FLOW-30'..'FLOW-44' (presentation); equals the file name */
   flowId: FlowId;
@@ -1196,6 +1257,7 @@ export interface FlowDefinition {
   lifelines: Lifeline[];
   steps: FlowStep[];
 }
+// One step of a flow file: its key, order and the conditions under which it applies.
 export interface FlowStep {
   /** a key of the registry (03 §1.15 `vci.*`, §2.0 `vp.*`, `vci.prereq.<suffix>`) */
   stepKey: string;

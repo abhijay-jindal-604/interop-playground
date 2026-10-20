@@ -19,6 +19,7 @@ export const TERMINAL_TYPES: ReadonlySet<string> = new Set([
   'run.cancelled',
 ]);
 
+/** Stream key of one run's event stream. */
 export function runStreamKey(runId: string): StreamKey {
   return `run:${runId}`;
 }
@@ -104,6 +105,10 @@ export interface EventBusOptions {
   pageSize?: number;
 }
 
+/**
+ * Fan-out of committed events to live subscribers, keyed by stream. Nothing is stored here: the
+ * store is the source of truth and the bus only carries what was already committed.
+ */
 export class EventBus {
   private readonly listeners = new Map<StreamKey, Set<Listener>>();
   private source: StreamSource | null;

@@ -7,13 +7,21 @@ import type { JsonWebKey } from 'node:crypto';
 
 // ---------- shared ----------
 export type Role = 'issuer' | 'wallet' | 'verifier';
+// Where a product runs: `local` in our compose stack, or `collab` on a shared collab host.
 export type EnvClass = 'local' | 'collab';
+// Credential formats the playground can issue, hold or verify.
 export type CredentialFormat = 'ldp_vc' | 'dc+sd-jwt' | 'mso_mdoc' | 'jwt_vc_json';
+// OID4VCI grant types.
 export type Grant = 'pre-authorized_code' | 'authorization_code';
+// How a presentation request reaches the wallet.
 export type PresentationMode = 'cross-device' | 'same-device' | 'dc-api';
+// OID4VP `client_id` schemes the verifier request may use.
 export type ClientIdScheme = 'plain' | 'decentralized_identifier' | 'x509_san_dns' | 'redirect_uri';
+// How much of a product we can drive and observe without a person.
 export type Tier = 'automated' | 'best-effort' | 'manual'; // ADR-13, ADR-15
+// How completely a step's traffic was captured. Only `full` evidence may support a confident diagnosis.
 export type Coverage = 'full' | 'partial' | 'none'; // 02 §3.3
+// The organisation behind a product, used for grouping in the selector.
 export type Vendor = 'inji' | 'waltid' | 'eudi' | 'credo' | 'playground';
 
 /** The 18 adapter ids of 02 §5.3, in table order. */
@@ -66,6 +74,7 @@ export type KnobId = `KNOB-${string}`;
 /** Every knob of every chosen adapter, explicit. */
 export type KnobValues = Readonly<Record<KnobId, string>>;
 
+// A tunable setting of an adapter; the full definition lives in the knob catalogue.
 export interface KnobDef {
   id: KnobId;
   /** like 'waltid.sdjwt.x5c' */
@@ -84,6 +93,7 @@ export interface KnobDef {
   formats: readonly CredentialFormat[];
 }
 
+// Labels attached to one captured HTTP call: which run and step it belongs to and who talks to whom.
 export interface CaptureContext {
   runId: string;
   stepKey: string;
@@ -95,12 +105,14 @@ export interface CaptureContext {
   cookieJar?: boolean;
 }
 
+// The only way adapters make HTTP calls. Each call is recorded, so evidence cannot be skipped.
 export interface CapturingHttp {
   fetch(ctx: CaptureContext, url: string | URL, init?: RequestInit): Promise<Response>;
   /** flushes the last unpersisted poll (04 §8.3) */
   closePoll(ctx: CaptureContext, group: string): Promise<void>;
 }
 
+// A value seen in traffic (token, code, state, id) that lets the gateway attribute inbound requests to a run.
 export type CorrelationKey =
   | {
       kind:
@@ -129,6 +141,7 @@ export interface GatewayCorrelation {
   ): void;
 }
 
+// Everything an adapter may use during one run: the spec, knob values, captured HTTP, event emission and the holder key service.
 export interface AdapterContext {
   readonly runId: string;
   readonly spec: RunSpec;
@@ -225,6 +238,7 @@ export interface Availability {
   versionFingerprint: string;
 }
 
+// Static facts about an adapter: id, role, vendor, tier, supported formats, knobs and capture coverage.
 export interface AdapterDescriptor {
   id: AdapterId;
   role: Role;
@@ -236,11 +250,13 @@ export interface AdapterDescriptor {
   knobs: readonly KnobDef[];
   coverage: CoverageDecl;
 }
+// Declared capture coverage: the default, plus the hops where capture is only partial and why.
 export interface CoverageDecl {
   default: Coverage;
   partialHops: readonly { stepKey: string; reason: string; evidence: string }[];
 }
 
+// What every adapter has: a descriptor and a probe that reports whether the product is reachable.
 export interface AdapterBase {
   readonly descriptor: AdapterDescriptor;
   probe(ctx: Omit<AdapterContext, 'spec' | 'knobs' | 'holderKey' | 'sign'>): Promise<Availability>;
@@ -262,6 +278,7 @@ export interface AuthCodeTarget {
   scope: string;
   configurationId: string;
 }
+// Contract of an issuer product: metadata, offer creation (pre-authorized issuers) or auth-code target, and variant setup.
 export interface IssuerAdapter extends AdapterBase {
   metadata(
     ctx: AdapterContext,
@@ -283,6 +300,7 @@ export interface IssuerAdapter extends AdapterBase {
 /** mDoc envelope shapes recognised by the normaliser (02 §5.5, ADR-25). */
 export type MdocEnvelope = 'issuer-signed' | 'document' | 'device-response';
 
+// A credential a wallet holds, kept as received, with the key it is bound to and where it came from.
 export interface HeldCredential {
   format: CredentialFormat;
   /** compact SD-JWT, JSON-LD as JSON text, mDoc as base64url (as received) */
@@ -293,11 +311,13 @@ export interface HeldCredential {
   issuerAdapter: AdapterId;
   configurationId: string;
 }
+// Result of a wallet receiving a credential, with its structural checks.
 export interface IssuanceOutcome {
   ok: boolean;
   credential?: HeldCredential;
   checks: readonly CheckResult[];
 }
+// An OID4VP request in the form the wallet receives it, plus the parameters needed to answer it.
 export interface PresentationRequestRef {
   verifierAdapter: AdapterId;
   /** 'openid4vp://authorize?…' as the wallet would receive it (QR / deep link) */
@@ -310,14 +330,17 @@ export interface PresentationRequestRef {
   dcqlQuery: unknown;
   mode: PresentationMode;
 }
+// Which claims the wallet chooses to disclose.
 export interface DisclosureSelection {
   claimPaths: readonly (readonly string[])[];
 }
+// Result of a wallet answering a request; `walletError` is set when it refused or failed.
 export interface PresentationOutcome {
   submitted: boolean;
   checks: readonly CheckResult[];
   walletError?: { dispatched: boolean; error: string };
 }
+// Contract of a wallet: receive a credential (pre-authorized or auth-code), present it, and for manual-tier wallets record what a person saw.
 export interface WalletAdapter extends AdapterBase {
   receiveOffer?(ctx: AdapterContext, offer: CredentialOffer): Promise<IssuanceOutcome>;
   receiveAuthCode?(ctx: AdapterContext, target: AuthCodeTarget): Promise<IssuanceOutcome>;
@@ -330,6 +353,7 @@ export interface WalletAdapter extends AdapterBase {
   /** manual tier only (inji-mobile): the user's recorded observation of the phone screen. */
   recordManualObservation?(ctx: AdapterContext, obs: ManualObservation): Promise<void>;
 }
+// What a person reports seeing on a manually driven wallet.
 export type ManualObservation =
   | { step: 'issuance'; shown: 'card-added' | 'error'; text?: string }
   | { step: 'presentation'; shown: 'shared' | 'no-matching-credentials' | 'error'; text?: string }
@@ -343,6 +367,7 @@ export interface PresentationQuery {
   claimPaths: readonly (readonly string[])[];
   mode: PresentationMode;
 }
+// A verifier's verdict with its checks and its own result kept verbatim.
 export interface VerificationOutcome {
   verdict: 'valid' | 'invalid' | 'valid-but-expired' | 'no-submission';
   checks: readonly CheckResult[];
@@ -350,6 +375,7 @@ export interface VerificationOutcome {
   rawResult: unknown;
   exchangeIds: readonly string[];
 }
+// Contract of a verifier: create a presentation request and await the result (OID4VP), and/or verify a credential directly.
 export interface VerifierAdapter extends AdapterBase {
   createRequest?(ctx: AdapterContext, q: PresentationQuery): Promise<PresentationRequestRef>;
   awaitResult?(

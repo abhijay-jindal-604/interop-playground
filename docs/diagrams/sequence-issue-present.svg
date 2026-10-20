@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="840" viewBox="0 0 1080 840" role="img" aria-labelledby="t d">
+<title id="t">Issuance and presentation sequence</title>
+<desc id="d">OID4VCI 1.0 pre-authorized code issuance from Inji Certify to the reference wallet, then OID4VP 1.0 cross-device presentation to Inji Verify, step by step with the step keys used in flows/.</desc>
+<defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#8a8d94"/></marker><marker id="arrs" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M10,0 L0,5 L10,10 z" fill="#8a8d94"/></marker><marker id="arrA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0f6b5c"/></marker><marker id="arrAs" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M10,0 L0,5 L10,10 z" fill="#0f6b5c"/></marker><marker id="arrW" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#a3341f"/></marker><marker id="arrWs" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M10,0 L0,5 L10,10 z" fill="#a3341f"/></marker><marker id="arrB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#2f4fb5"/></marker><marker id="arrBs" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M10,0 L0,5 L10,10 z" fill="#2f4fb5"/></marker></defs>
+<g font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif">
+<rect x="0" y="0" width="1080" height="840" rx="12" fill="#ffffff"/>
+<text x="24" y="36" font-size="19" font-weight="700" fill="#1c1d21" text-anchor="start">Issuance (OID4VCI 1.0, pre-authorized code) and presentation (OID4VP 1.0, cross-device)</text>
+<text x="24" y="58" font-size="13" font-weight="normal" fill="#5b5e66" text-anchor="start">FLOW-04 + FLOW-30: Inji Certify → Playground reference wallet → Inji Verify (local). Step keys in grey are those of flows/*.json.</text>
+<text x="24" y="96" font-size="15" font-weight="700" fill="#0f6b5c" text-anchor="start">1. Issue: SD-JWT VC (dc+sd-jwt)</text>
+<rect x="40" y="112" width="180" height="34" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="130.0" y="134.0" font-size="13" font-weight="600" fill="#1c1d21" text-anchor="middle">Issuer admin (BFF)</text>
+<rect x="310" y="112" width="180" height="34" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="400.0" y="134.0" font-size="13" font-weight="600" fill="#1c1d21" text-anchor="middle">Inji Certify</text>
+<rect x="550" y="112" width="180" height="34" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="640.0" y="134.0" font-size="13" font-weight="600" fill="#1c1d21" text-anchor="middle">Reference wallet</text>
+<rect x="770" y="112" width="180" height="34" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="860.0" y="134.0" font-size="13" font-weight="600" fill="#1c1d21" text-anchor="middle">Wallet library</text>
+<line x1="130" y1="146" x2="130" y2="428" stroke="#8a8d94" stroke-dasharray="3 4"/>
+<line x1="400" y1="146" x2="400" y2="428" stroke="#8a8d94" stroke-dasharray="3 4"/>
+<line x1="640" y1="146" x2="640" y2="428" stroke="#8a8d94" stroke-dasharray="3 4"/>
+<line x1="860" y1="146" x2="860" y2="428" stroke="#8a8d94" stroke-dasharray="3 4"/>
+<path d="M130,176 L400,176" fill="none" stroke="#0f6b5c" stroke-width="1.6" marker-end="url(#arrA)"/>
+<text x="265.0" y="170" font-size="12.5" font-weight="normal" fill="#1c1d21" text-anchor="middle">POST /pre-authorized-data (mint offer)</text>
+<text x="1060" y="174" font-size="11" font-weight="normal" fill="#5b5e66" text-anchor="end" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">vci.offer.mint</text>
+<path d="M640,210 L400,210" fill="none" stroke="#0f6b5c" stroke-width="1.6" marker-end="url(#arrA)"/>
+<text x="520.0" y="204" font-size="12.5" font-weight="normal" fill="#1c1d21" text-anchor="middle">GET credential-offer-data/{uuid}</text>
+<text x="1060" y="208" font-size="11" font-weight="normal" fill="#5b5e66" text-anchor="end" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">vci.offer.fetch</text>
+<path d="M640,244 L400,244" fill="none" stroke="#0f6b5c" stroke-width="1.6" marker-end="url(#arrA)"/>
+<text x="520.0" y="238" font-size="12.5" font-weight="normal" fill="#1c1d21" text-anchor="middle">GET /.well-known/openid-credential-issuer</text>
+<text x="1060" y="242" font-size="11" font-weight="normal" fill="#5b5e66" text-anchor="end" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">vci.metadata.issuer</text>
+<path d="M640,278 L400,278" fill="none" stroke="#0f6b5c" stroke-width="1.6" marker-end="url(#arrA)"/>
+<text x="520.0" y="272" font-size="12.5" font-weight="normal" fill="#1c1d21" text-anchor="middle">GET /.well-known/oauth-authorization-server</text>
+<text x="1060" y="276" font-size="11" font-weight="normal" fill="#5b5e66" text-anchor="end" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">vci.metadata.as</text>
+<path d="M640,312 L400,312" fill="none" stroke="#0f6b5c" stroke-width="1.6" marker-end="url(#arrA)"/>
+<text x="520.0" y="306" font-size="12.5" font-weight="normal" fill="#1c1d21" text-anchor="middle">POST /oauth/token (pre-authorized_code)</text>
+<text x="1060" y="310" font-size="11" font-weight="normal" fill="#5b5e66" text-anchor="end" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">vci.token</text>
+<path d="M640,346 L400,346" fill="none" stroke="#0f6b5c" stroke-width="1.6" marker-end="url(#arrA)"/>
+<text x="520.0" y="340" font-size="12.5" font-weight="normal" fill="#1c1d21" text-anchor="middle">POST /nonce</text>
+<text x="1060" y="344" font-size="11" font-weight="normal" fill="#5b5e66" text-anchor="end" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">vci.nonce</text>
+<path d="M640,380 L860,380" fill="none" stroke="#0f6b5c" stroke-width="1.6" marker-end="url(#arrA)"/>
+<text x="750.0" y="374" font-size="12.5" font-weight="normal" fill="#1c1d21" text-anchor="middle">sign proof JWT (ES256)</text>
+<text x="1060" y="378" font-size="11" font-weight="normal" fill="#5b5e66" text-anchor="end" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">vci.proof.sign</text>
+<path d="M640,414 L400,414" fill="none" stroke="#0f6b5c" stroke-width="1.6" marker-end="url(#arrA)"/>
+<text x="520.0" y="408" font-size="12.5" font-weight="normal" fill="#1c1d21" text-anchor="middle">POST /issuance/credential</text>
+<text x="1060" y="412" font-size="11" font-weight="normal" fill="#5b5e66" text-anchor="end" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">vci.credential</text>
+<text x="24" y="474" font-size="15" font-weight="700" fill="#0f6b5c" text-anchor="start">2. Present and verify: cross-device (QR)</text>
+<rect x="40" y="490" width="180" height="34" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="130.0" y="512.0" font-size="13" font-weight="600" fill="#1c1d21" text-anchor="middle">Verifier side (BFF)</text>
+<rect x="310" y="490" width="180" height="34" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="400.0" y="512.0" font-size="13" font-weight="600" fill="#1c1d21" text-anchor="middle">Inji Verify service</text>
+<rect x="550" y="490" width="180" height="34" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="640.0" y="512.0" font-size="13" font-weight="600" fill="#1c1d21" text-anchor="middle">Reference wallet</text>
+<rect x="770" y="490" width="180" height="34" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="860.0" y="512.0" font-size="13" font-weight="600" fill="#1c1d21" text-anchor="middle">Wallet library</text>
+<line x1="130" y1="524" x2="130" y2="772" stroke="#8a8d94" stroke-dasharray="3 4"/>
+<line x1="400" y1="524" x2="400" y2="772" stroke="#8a8d94" stroke-dasharray="3 4"/>
+<line x1="640" y1="524" x2="640" y2="772" stroke="#8a8d94" stroke-dasharray="3 4"/>
+<line x1="860" y1="524" x2="860" y2="772" stroke="#8a8d94" stroke-dasharray="3 4"/>
+<path d="M130,554 L400,554" fill="none" stroke="#0f6b5c" stroke-width="1.6" marker-end="url(#arrA)"/>
+<text x="265.0" y="548" font-size="12.5" font-weight="normal" fill="#1c1d21" text-anchor="middle">POST /v2/vp-request (DCQL query)</text>
+<text x="1060" y="552" font-size="11" font-weight="normal" fill="#5b5e66" text-anchor="end" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">vp.request.create</text>
+<path d="M130,588 L640,588" fill="none" stroke="#0f6b5c" stroke-width="1.6" marker-end="url(#arrA)"/>
+<text x="385.0" y="582" font-size="12.5" font-weight="normal" fill="#1c1d21" text-anchor="middle">openid4vp://authorize?… (QR / link)</text>
+<text x="1060" y="586" font-size="11" font-weight="normal" fill="#5b5e66" text-anchor="end" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">vp.request.deliver</text>
+<path d="M640,622 L400,622" fill="none" stroke="#0f6b5c" stroke-width="1.6" marker-end="url(#arrA)"/>
+<text x="520.0" y="616" font-size="12.5" font-weight="normal" fill="#1c1d21" text-anchor="middle">GET request_uri (request object)</text>
+<text x="1060" y="620" font-size="11" font-weight="normal" fill="#5b5e66" text-anchor="end" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">vp.request.fetch</text>
+<path d="M640,656 L860,656" fill="none" stroke="#0f6b5c" stroke-width="1.6" marker-end="url(#arrA)"/>
+<text x="750.0" y="650" font-size="12.5" font-weight="normal" fill="#1c1d21" text-anchor="middle">validate request, DCQL match, sign KB-JWT</text>
+<text x="1060" y="654" font-size="11" font-weight="normal" fill="#5b5e66" text-anchor="end" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">vp.request.validate … vp.token.build</text>
+<path d="M640,690 L400,690" fill="none" stroke="#0f6b5c" stroke-width="1.6" marker-end="url(#arrA)"/>
+<text x="520.0" y="684" font-size="12.5" font-weight="normal" fill="#1c1d21" text-anchor="middle">POST response_uri vp_token (direct_post)</text>
+<text x="1060" y="688" font-size="11" font-weight="normal" fill="#5b5e66" text-anchor="end" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">vp.response.post</text>
+<path d="M130,724 L400,724" fill="none" stroke="#0f6b5c" stroke-width="1.6" marker-end="url(#arrA)"/>
+<text x="265.0" y="718" font-size="12.5" font-weight="normal" fill="#1c1d21" text-anchor="middle">POST vp-results</text>
+<text x="1060" y="722" font-size="11" font-weight="normal" fill="#5b5e66" text-anchor="end" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">vp.result.poll</text>
+<path d="M130,750 L170,750 L170,762 L134,762" fill="none" stroke="#0f6b5c" stroke-width="1.6" marker-end="url(#arrA)"/>
+<text x="180" y="758" font-size="12.5" font-weight="normal" fill="#1c1d21" text-anchor="start">normalise to checks → Valid / Invalid / Valid-but-Expired</text>
+<text x="180" y="772" font-size="11" font-weight="normal" fill="#5b5e66" text-anchor="start" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">vp.verdict.evaluate</text>
+<text x="24" y="818" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">Every arrow is one captured exchange or engine call, shown in the inspector. Source: flows/FLOW-01.json, FLOW-04.json, FLOW-30.json; README &quot;Shipped flows&quot;.</text>
+</g>
+</svg>

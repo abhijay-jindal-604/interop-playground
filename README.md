@@ -2,6 +2,8 @@
 
 Interop Playground lets you run Inji issuer → wallet → verifier combinations, inspect every protocol message, and prove the fix for a failure with a re-run that changes one knob.
 
+Team Bhrinjal (Abhijay Jindal), MOSIP Decode 2026, problem statement PS02.
+
 > **v1 (2026-10-20).** This README describes only what is built and tested on that date. Demo video: [`deliverables/video/demo-v1.mp4`](deliverables/video/demo-v1.mp4).
 
 ![The combination selector: issuer, wallet and verifier columns, with unavailable combinations greyed out](docs/screenshots/selector.png)
@@ -16,16 +18,30 @@ Interop Playground lets you run Inji issuer → wallet → verifier combinations
 
 ## Quickstart
 
-Host prerequisites: Docker 29 with the compose plugin, bash, openssl, `ss` and curl. Port 443 must be free on the host. With rootless Docker, allow binding port 443 first (`scripts/up.sh` prints the sysctl command if it is needed).
+1. **Check the prerequisites.**
+   - Linux host with Docker 29 and the compose plugin, bash, git, openssl, `ss` and curl.
+   - Memory: the full bundle wants about 4.5 GiB; `scripts/up.sh` warns below 12 GiB free.
+   - Port 443 and port 3100 free on the host (`scripts/up.sh` stops with the owning process if not). With rootless Docker, allow binding port 443 first; `scripts/up.sh` prints the sysctl command if it is needed.
+   - Only for the tests and the live end-to-end specs: Node.js 22 (`>=22.22.2 <23`, see `package.json` `engines`) and npm.
+2. **Clone the repository.**
 
-```bash
-git clone https://github.com/abhijay-jindal-604/interop-playground
-cd interop-playground
-scripts/up.sh            # idempotent; a second run on a healthy bundle changes nothing
-# open http://127.0.0.1:3100
-```
+   ```bash
+   git clone https://github.com/abhijay-jindal-604/interop-playground
+   cd interop-playground
+   ```
 
-`scripts/up.sh --help` lists the flags (`--mode local|collab`, `--with peers|mdoc-spec|iae|debug`, `--reset`, `--no-build`, …). `--with peers` adds the walt.id issuer used by the fix-it example. `scripts/down.sh` stops the bundle and keeps the volumes.
+3. **Start the bundle.**
+
+   ```bash
+   scripts/up.sh
+   ```
+
+   On the first run it creates `.env` (with this machine's LAN address as `PUBLIC_HOST`) and `.env.local` (generated secrets, mode 0600), generates a local certificate authority in `certs/`, pulls the images pinned in [`versions.lock`](versions.lock), builds the local images, starts the `local` profile, onboards eSignet and runs a smoke download. It ends with `ready`. It is idempotent: a second run on a healthy bundle changes nothing. Add `--with peers` for the walt.id issuer used by the fix-it example. `scripts/up.sh --help` lists every flag (`--mode local|collab`, `--with peers|mdoc-spec|iae|debug`, `--reset`, `--no-build`, …).
+
+4. **Open the UI** at <http://127.0.0.1:3100> and do [your first run](#your-first-run). The Environment page shows each service's state.
+5. **Stop the bundle** with `scripts/down.sh`. It keeps the volumes, so the next `scripts/up.sh` is faster. `scripts/up.sh --reset` rebuilds the Inji state from scratch.
+
+Sample data (identities, credential configurations, test keys) is described in [`docs/test-data.md`](docs/test-data.md); you do not need to create any account.
 
 **What has been verified.**
 
@@ -168,23 +184,32 @@ We reproduced or relied on known gaps in the Inji stack while building, and docu
 npm ci
 npm run lint        # eslint + no-GitHub-write lint + secret scan + flow validation
 npm run typecheck   # tsc -b
-npm test            # vitest: unit, contract, integration, repo projects
-npm run test:ui     # UI component tests
+npm test            # vitest: unit, contract, integration, repo and ui projects
+npm run test:ui     # only the UI component tests
 npm run e2e         # Playwright on fixture routes (axe, 320–1440 px, light + dark)
 npm run e2e:live    # Playwright against the running bundle (needs --with peers; one spec: -- slice | labels)
 ```
 
-At the build wave 9 merge (commit `2f162cd`), `npm test` reported 682 tests passing and 8 skipped (60 files), and the fixture Playwright suite 54 passing. `npm run e2e:live` needs `npm ci` and `npx playwright install chromium` first; `apps/bff/src/server.test.ts` needs port 3100 free, so run `npm test` with the bundle down. Bundle integration tests are opt-in (`BUNDLE_IT=1`).
+On 2026-10-21, in a fresh clone of commit `aaffa79`, `npm run lint` and `npm run typecheck` were clean, `npm test` reported 682 tests passing and 8 skipped (60 files), and the fixture Playwright suite 54 passing. The test cases, the edge cases they cover and the live results are in [`docs/testing.md`](docs/testing.md). `npm run e2e:live` needs `npm ci` and `npx playwright install chromium` first; `apps/bff/src/server.test.ts` needs port 3100 free, so run `npm test` with the bundle down. Bundle integration tests are opt-in (`BUNDLE_IT=1`).
 
-## Documents and deliverables
+## Documents
 
+- [`docs/overview.md`](docs/overview.md): 1–2 page overview of the problem, the approach and the results
+- [`docs/architecture.md`](docs/architecture.md): architecture diagrams (components, data flow of a run, issuance and presentation sequence, fix-it derive)
+- [`docs/design.md`](docs/design.md): screenshots, wireframes and user flows
+- [`docs/api.md`](docs/api.md): API documentation (endpoints, request and response formats, authentication, SSE events, examples, external APIs used)
+- [`docs/testing.md`](docs/testing.md): test cases, edge cases and results
+- [`docs/test-data.md`](docs/test-data.md): sample data needed to test (identities, credential configurations, test keys, recorded runs)
 - [`docs/interop-report.md`](docs/interop-report.md): interop report v1 (combinations, outcomes, evidence)
-- [`docs/reports/`](docs/reports/): committed run reports (JSON and Markdown)
-- [`docs/gaps.md`](docs/gaps.md): gaps write-up v1
-- [`docs/overview.md`](docs/overview.md): 1–2 page overview (v1)
+- [`docs/gaps.md`](docs/gaps.md): gaps we found in the Inji stack, with drafted issues
 - [`docs/decisions.md`](docs/decisions.md): dated decision log
-- [`deliverables/deck-v1.html`](deliverables/deck-v1.html): pitch deck v1 (6 slides, self-contained; press `n` for speaker notes)
-- [`deliverables/video/demo-v1.mp4`](deliverables/video/demo-v1.mp4): demo video v1, with its script [`demo-v1-script.md`](deliverables/video/demo-v1-script.md) and captions [`demo-v1.srt`](deliverables/video/demo-v1.srt)
+- [`deliverables/deck-v2.html`](deliverables/deck-v2.html): pitch deck (self-contained; arrow keys to move, `n` for speaker notes). The earlier [`deck-v1.html`](deliverables/deck-v1.html) is kept.
+- [`deliverables/video/demo-v1.mp4`](deliverables/video/demo-v1.mp4): demo video, with its script [`demo-v1-script.md`](deliverables/video/demo-v1-script.md) and captions [`demo-v1.srt`](deliverables/video/demo-v1.srt)
+- [`packages/api/openapi.yaml`](packages/api/openapi.yaml): the machine-readable API contract (OpenAPI 3.1)
+
+### Supporting material
+
+- [`docs/reports/`](docs/reports/): committed run reports (JSON and Markdown)
 - Shot takes in [`deliverables/takes/`](deliverables/takes/) (1440 px, host masked, QR blurred): [`s02-environment`](deliverables/takes/s02-environment.webm), [`s03-select`](deliverables/takes/s03-select.webm), [`s04-issuance`](deliverables/takes/s04-issuance.webm), [`s05-decoded`](deliverables/takes/s05-decoded.webm), [`s06-present`](deliverables/takes/s06-present.webm), [`s07-report`](deliverables/takes/s07-report.webm) (cut from [`s03-s07-slice`](deliverables/takes/s03-s07-slice.webm)), [`s09-labels`](deliverables/takes/s09-labels.webm), [`s10-fixit`](deliverables/takes/s10-fixit.webm). Earlier recordings: [`m1-slice`](deliverables/takes/m1-slice.webm), [`m2-fixit`](deliverables/takes/m2-fixit.webm).
 - Live evidence in [`docs/evidence/`](docs/evidence/): [REQ-23 labels](docs/evidence/T-47-labels.md), [VP-level expired credential](docs/evidence/T-47-vp-expired.md), [fresh-clone timing](docs/evidence/T-55-fresh-clone.md), [final fresh-clone check at `2f162cd`](docs/evidence/T-55-final-check.md), [`ldp_vc` live](docs/evidence/T-46-ldp.md)
 
@@ -211,7 +236,7 @@ Repositories:
 
 ## Credits
 
-Built by Abhijay Jindal.
+Team Bhrinjal: Abhijay Jindal. Built for MOSIP Decode 2026, problem statement PS02.
 
 ## License
 

@@ -36,12 +36,14 @@ export interface InboundProbe {
   body: Buffer | null;
 }
 
+/** The stable correlation key for a bearer token: its SHA-256, so the token itself is never kept. */
 export function tokenKey(token: string): string {
   return `sha256:${createHash('sha256').update(token).digest('hex')}`;
 }
 
 const MIN_KEY = 8;
 
+/** The form or JSON field values of a request body, as candidate correlation keys; large or empty bodies yield none. */
 function bodyValues(body: Buffer | null, contentType: string): string[] {
   if (!body || body.length === 0 || body.length > 256 * 1024) return [];
   const text = body.toString('utf8');
@@ -67,6 +69,7 @@ function bodyValues(body: Buffer | null, contentType: string): string[] {
   return [];
 }
 
+/** Maps keys seen in requests (tokens, codes, state values) to the run and step that produced them, so inbound gateway traffic is attributed to the right run. */
 export class CorrelationIndex {
   private readonly keys = new Map<string, KeyEntry>();
   private readonly byRun = new Map<string, Set<string>>();
@@ -81,10 +84,12 @@ export class CorrelationIndex {
     s.add(key);
   }
 
+  /** Registers a bearer token (stored only as its hash) for a run and step. */
   registerToken(runId: string, token: string, stepKey: string, actor: string | null = null): void {
     this.register(runId, tokenKey(token), stepKey, actor);
   }
 
+  /** Sets the run's inbound route table, used to name the step an inbound call belongs to. */
   setRoutes(runId: string, table: RouteEntry[]): void {
     this.routes.set(runId, table);
   }
@@ -100,6 +105,7 @@ export class CorrelationIndex {
     return this.keys.size;
   }
 
+  /** Attributes an inbound request to a run: tries the bearer token first, then path segments, query values and body fields against the registered keys. The route table decides the step; otherwise the key's own step is used. Returns null when nothing matches. */
   resolve(p: InboundProbe): Attribution | null {
     if (this.keys.size === 0) return null;
     const u = new URL(p.url, 'http://gateway.invalid');
@@ -125,6 +131,7 @@ export class CorrelationIndex {
   }
 }
 
+/** URL-decodes, returning the input unchanged if it is malformed. */
 function safeDecode(s: string): string {
   try {
     return decodeURIComponent(s);
@@ -133,6 +140,7 @@ function safeDecode(s: string): string {
   }
 }
 
+/** First value of a header that may be repeated. */
 function headerValue(v: string | string[] | undefined): string {
   return Array.isArray(v) ? (v[0] ?? '') : (v ?? '');
 }

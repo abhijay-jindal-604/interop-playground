@@ -6,6 +6,7 @@
 
 export type Json = null | boolean | number | string | Json[] | { [k: string]: Json };
 
+/** Decodes base64url text to bytes; null if the text is not valid base64url. */
 export function base64urlToBytes(s: string): Uint8Array | null {
   if (!/^[A-Za-z0-9_-]*={0,2}$/.test(s)) return null;
   const b64 = s.replace(/-/g, '+').replace(/_/g, '/').replace(/=+$/, '');
@@ -20,6 +21,7 @@ export function base64urlToBytes(s: string): Uint8Array | null {
   }
 }
 
+/** Decodes base64url text to a UTF-8 string; null if it is not valid. */
 export function base64urlToText(s: string): string | null {
   const bytes = base64urlToBytes(s);
   if (!bytes) return null;
@@ -30,6 +32,7 @@ export function base64urlToText(s: string): string | null {
   }
 }
 
+/** Parses JSON text; undefined when it is not JSON. */
 export function parseJson(text: string): Json | undefined {
   try {
     return JSON.parse(text) as Json;
@@ -112,6 +115,7 @@ export function decodeSdJwt(token: string): DecodedSdJwt | null {
   return { issuerJwt, disclosures, kbJwt };
 }
 
+/** Parses `a=b&c=d` form text into pairs; null when the text does not look like a form body. */
 export function parseForm(text: string): [string, string][] | null {
   if (!/^[^=&\s]+=[^\s]*$/.test(text.trim())) return null;
   try {
@@ -123,6 +127,7 @@ export function parseForm(text: string): [string, string][] | null {
 
 export type BodyKind = 'json' | 'form' | 'jwt' | 'sd-jwt' | 'text';
 
+/** Classifies a body so the viewer picks the right display: SD-JWT, JWT, JSON, form, or plain text. */
 export function bodyKind(text: string): BodyKind {
   const t = text.trim();
   if (decodeSdJwt(t)) return 'sd-jwt';
@@ -206,6 +211,7 @@ export function splitRedactions(s: string): ({ text: string } | { redacted: stri
   return out;
 }
 
+/** Pretty-prints a value as indented JSON. */
 export function pretty(v: unknown): string {
   return JSON.stringify(v, null, 2);
 }

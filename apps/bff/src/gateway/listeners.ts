@@ -264,6 +264,7 @@ export const LISTENERS: readonly ListenerSpec[] = [
   },
 ];
 
+/** Looks up the listener for a port; throws if the table has none (a programming error, not a runtime condition). */
 export function listenerFor(
   port: number,
   table: readonly ListenerSpec[] = LISTENERS,

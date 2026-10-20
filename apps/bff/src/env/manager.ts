@@ -67,6 +67,7 @@ const HOST_RE =
 
 const sha12 = (s: string): string => createHash('sha256').update(s).digest('hex').slice(0, 12);
 
+/** Whether an upstream's HTTP status counts as healthy: the expected code, or any non-5xx when the upstream accepts any answer. */
 function statusOk(def: UpstreamDef, status: number): boolean {
   if (def.expect === 'any') return status < 500;
   if (typeof def.expect === 'number') return status === def.expect;
@@ -84,6 +85,7 @@ function collabShape(status: number, body: unknown): string {
   return `collab:${sha12(JSON.stringify({ status, keys }))}`;
 }
 
+/** Tracks which upstream products are reachable and at what version, with a rate-limited manual probe. */
 export class EnvManager implements ResolveEnv {
   private readonly o: EnvManagerOptions;
   private readonly defs: readonly UpstreamDef[];
@@ -129,6 +131,7 @@ export class EnvManager implements ResolveEnv {
     this.handle = this.timers.set(tick, 0);
   }
 
+  /** Stops periodic probing. */
   stop(): void {
     if (this.handle !== null) this.timers.clear(this.handle);
     this.handle = null;
@@ -160,6 +163,7 @@ export class EnvManager implements ResolveEnv {
     return this.running;
   }
 
+  /** Probes every upstream once and emits events only for what changed (or all of it when verbose): probe state, ready/degraded flips and version fingerprint changes. Calls `onReady` when the environment becomes ready. */
   private async doRound(verbose: boolean): Promise<EnvSnapshot> {
     const results = await Promise.all(this.defs.map((d) => this.probeOne(d)));
     for (const r of results) {
@@ -212,6 +216,7 @@ export class EnvManager implements ResolveEnv {
     return this.snapshot();
   }
 
+  /** Probes one upstream with a GET and a timeout; a network error becomes a failed probe with its cause as detail. */
   private async probeOne(def: UpstreamDef): Promise<ProbeState> {
     const t = this.now();
     const checkedAt = new Date(t).toISOString();
@@ -247,6 +252,7 @@ export class EnvManager implements ResolveEnv {
     }
   }
 
+  /** Builds the upstream's version fingerprint from its reply, its image digest, or its JSON `version`. */
   private fingerprint(def: UpstreamDef, status: number, body: unknown): string | null {
     if (def.fingerprintFrom === 'collab-shape') return collabShape(status, body);
     if (def.fingerprintFrom === 'json-version') {
@@ -315,6 +321,7 @@ export class EnvManager implements ResolveEnv {
     return this.probedEntry(id)?.availability ?? null;
   }
 
+  /** Whether the public tunnel is registered and up, and its host. */
   tunnel(): { up: boolean; host: string | null } {
     const t = this.currentTunnel();
     return t.state === 'up' ? { up: true, host: t.host } : { up: false, host: null };
@@ -332,10 +339,12 @@ export class EnvManager implements ResolveEnv {
     });
   }
 
+  /** True once every required upstream has probed healthy. */
   ready(): boolean {
     return this.readyState === true;
   }
 
+  /** The current environment as the API reports it. Also trims the collab call window to the last minute. */
   snapshot(): EnvSnapshot {
     const t = this.now();
     while (this.collabCalls.length > 0 && (this.collabCalls[0] ?? 0) <= t - 60_000)
@@ -363,6 +372,7 @@ export class EnvManager implements ResolveEnv {
     return this.tunnelState;
   }
 
+  /** Records the tunnel host registered by `scripts/tunnel.sh` after validating it. */
   registerTunnel(body: unknown): EnvSnapshot {
     const reg = validateTunnel(body);
     const current = this.currentTunnel();
@@ -390,11 +400,13 @@ export class EnvManager implements ResolveEnv {
     return this.snapshot();
   }
 
+  /** Appends an environment event to the sink, when one is attached. */
   private emit<T extends EnvType>(type: T, payload: PayloadMap[T]): void {
     this.o.sink?.appendEnv(type, payload);
   }
 }
 
+/** Validates a tunnel registration body and throws a validation error listing every problem. */
 function validateTunnel(body: unknown): TunnelRegistration {
   const issues: { path: string; message: string }[] = [];
   if (body === null || typeof body !== 'object' || Array.isArray(body))

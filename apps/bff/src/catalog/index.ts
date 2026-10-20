@@ -53,6 +53,7 @@ const NOT_IN_RELEASE: Availability = {
   versionFingerprint: 'not-in-release',
 };
 
+/** Lists every adapter with its tier and current availability; adapters outside this release are shown unavailable with the reason. */
 export function adapterList(view: AvailabilityView): AdapterListResponse {
   const entry = (id: AdapterId): AdapterEntry => {
     // ADR-95: adapters outside this release are shown unavailable with the decision's reason
@@ -74,6 +75,7 @@ export function adapterList(view: AvailabilityView): AdapterListResponse {
   };
 }
 
+/** Lists the knobs, optionally narrowed to one adapter and credential format. */
 export function knobCatalog(filter: {
   adapter?: AdapterId;
   format?: CredentialFormat;
@@ -94,6 +96,7 @@ export function knobCatalog(filter: {
   };
 }
 
+/** Lists the named knob presets. */
 export function presetList(): PresetListResponse {
   return {
     presets: PRESETS.map((p) => ({
@@ -105,6 +108,7 @@ export function presetList(): PresetListResponse {
   };
 }
 
+/** Lists the credential configurations, optionally narrowed by issuer and format. */
 export function configurationList(filter: {
   issuer?: AdapterId;
   format?: CredentialFormat;
@@ -118,6 +122,7 @@ export function configurationList(filter: {
   };
 }
 
+/** Lists the known incompatible adapter combinations, which the run resolver also enforces. */
 export function incompatibilityList(): IncompatibilityListResponse {
   return {
     rules: COMPAT_RULES.map((r) => ({

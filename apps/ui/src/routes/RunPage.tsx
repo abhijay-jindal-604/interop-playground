@@ -36,6 +36,7 @@ export async function replayRunLog(
   return { events, view: reduceAll(events) };
 }
 
+/** Rebuilds a finished run's view by paging through its stored events. */
 export const replayRun = (runId: string) => replayRunLog((after) => defaultFetchPage(runId, after));
 
 type RunLoad =
@@ -44,6 +45,7 @@ type RunLoad =
   | { status: 'not-found' }
   | { status: 'error' };
 
+/** Route component for `/runs/:runId`: loads the run, attaches its event stream, and renders the run screen. */
 export function RunPage() {
   const { runId = '' } = useParams();
   const { slice, client } = useRunStream(runId);

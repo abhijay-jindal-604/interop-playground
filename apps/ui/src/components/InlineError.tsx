@@ -7,6 +7,7 @@ import { ApiError, NetworkError } from '../api/client.js';
 import { copy, errorText } from '../copy.js';
 import { Disclosure } from './Disclosure.js';
 
+/** Shows an error in place, with a retry button when a retry is possible. */
 export function InlineError({
   error,
   onRetry,

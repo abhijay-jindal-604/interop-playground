@@ -8,6 +8,7 @@ import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 
 export const SELF_HEADER = 'x-playground-self';
 
+/** A fresh random token for this process, kept in memory only. */
 export function generateSelfToken(): string {
   return randomBytes(32).toString('base64url');
 }

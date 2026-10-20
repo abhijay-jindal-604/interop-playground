@@ -24,6 +24,7 @@ interface TrafficRow {
   rule: string | null;
 }
 
+/** Turns a gateway event into a row of the unattributed-traffic table; other events give null. */
 function toRow(e: EventEnvelope): TrafficRow | null {
   if (e.type === 'gateway.denied') {
     const p = (e as EventEnvelope<'gateway.denied'>).payload;
@@ -50,6 +51,7 @@ function toRow(e: EventEnvelope): TrafficRow | null {
   return null;
 }
 
+/** Follows the unattributed stream and keeps the rows for display. */
 function useUnattributed(): TrafficRow[] {
   const [rows, setRows] = useState<TrafficRow[]>([]);
   useEffect(() => {
@@ -66,6 +68,7 @@ function useUnattributed(): TrafficRow[] {
   return rows;
 }
 
+/** Card stating the environment mode and health. */
 function ModeCard({ env }: { env: EnvSnapshot }) {
   const { mode, healthWord } = envSummary(env, false);
   return (
@@ -89,6 +92,7 @@ function ModeCard({ env }: { env: EnvSnapshot }) {
   );
 }
 
+/** Card showing whether the public tunnel is registered. */
 function TunnelCard({ env }: { env: EnvSnapshot }) {
   const t = env.tunnel;
   return (
@@ -103,6 +107,7 @@ function TunnelCard({ env }: { env: EnvSnapshot }) {
   );
 }
 
+/** Card showing the calls made to the shared collab environment in the last minute against its limit. */
 function CollabBudget({ env }: { env: EnvSnapshot }) {
   const { used, limit } = env.collabBudget;
   return (
@@ -128,6 +133,7 @@ function CollabBudget({ env }: { env: EnvSnapshot }) {
   );
 }
 
+/** The environment screen: upstream versions and health, and traffic the gateway saw that belongs to no run. */
 export function EnvironmentPage() {
   const snapshot = useStore((s) => s.env.snapshot);
   const traffic = useUnattributed();

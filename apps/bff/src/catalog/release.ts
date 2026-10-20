@@ -15,4 +15,5 @@ export const RELEASE_ADAPTERS: readonly AdapterId[] = [
 
 export const NOT_IN_RELEASE_REASON = 'not in this release (docs/decisions.md 2026-10-20)';
 
+/** True when the adapter ships in this release. */
 export const inRelease = (id: AdapterId): boolean => RELEASE_ADAPTERS.includes(id);

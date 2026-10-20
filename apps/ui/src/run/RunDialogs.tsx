@@ -8,6 +8,7 @@ import { RunLink, shortId } from '../components/RunLink.js';
 import { runDialogCopy as c } from '../copy.js';
 import { pushToast } from '../state/store.js';
 
+/** Confirmation dialog for cancelling a run. */
 export function CancelDialog({
   runId,
   open,
@@ -48,6 +49,7 @@ export function CancelDialog({
   );
 }
 
+/** Dialog for editing the run's short note (label). */
 export function NoteDialog({
   runId,
   note,
@@ -109,6 +111,7 @@ export function NoteDialog({
   );
 }
 
+/** Confirmation dialog for deleting a run; warns when the run is pinned. */
 export function DeleteDialog({
   runId,
   pinned,

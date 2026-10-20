@@ -34,10 +34,12 @@ type RunRow = {
   counterfactual_result: Run['counterfactualResult'];
 };
 
+/** Maps the stored run state to the API state (stored `created` is reported as `queued`). */
 export function apiState(dbState: string): RunState {
   return dbState === 'created' ? 'queued' : (dbState as RunState);
 }
 
+/** True once a run can no longer change state. */
 export const isTerminal = (s: RunState): boolean =>
   s === 'completed' || s === 'failed' || s === 'cancelled';
 
@@ -54,6 +56,7 @@ function eventPayload<T>(
   return r ? { ts: r.ts, payload: JSON.parse(r.payload_json) as T } : null;
 }
 
+/** Builds the API `Run` object from a stored row plus its events. */
 export function toRun(store: Store, row: RunRow): Run {
   const runId = row.run_id;
   const spec = JSON.parse(row.spec_json) as RunSpec;
@@ -115,12 +118,14 @@ export function toRun(store: Store, row: RunRow): Run {
   };
 }
 
+/** Fetches a run row or throws `not_found`. */
 export function getRunRow(store: Store, runId: string): RunRow {
   const row = store.driver.get<RunRow>('SELECT * FROM runs WHERE run_id = ?', runId);
   if (!row) throw new ApiError('not_found', 'No such run.', { resource: 'run', id: runId });
   return row;
 }
 
+/** Fetches a run as the API object or throws `not_found`. */
 export function getRun(store: Store, runId: string): Run {
   return toRun(store, getRunRow(store, runId));
 }
@@ -244,6 +249,7 @@ function bad(path: string, message: string): ApiError {
   return new ApiError('validation_failed', undefined, issueDetails([{ path, message }]));
 }
 
+/** Lists runs with validated filters and cursor paging; unknown query keys are rejected. */
 export function listRuns(store: Store, q: Record<string, string | undefined>): RunListResponse {
   const where: string[] = [];
   const args: SqlValue[] = [];

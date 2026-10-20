@@ -87,6 +87,7 @@ export const PREAUTH_ROUTES = [
   { method: 'POST', pattern: /\/v1\/certify\/issuance\/credential$/, stepKey: 'vci.credential' },
 ] as const;
 
+/** Short stable name for a knob setting, used in variant configuration ids. */
 function knobSlug(knobId: string, value: string): string {
   return `${knobId.replace('-', '').toLowerCase()}-${value}`;
 }
@@ -96,12 +97,14 @@ export function variantId(baseline: string, differing: readonly [string, string]
   return [baseline, ...differing.map(([k, v]) => `${k}_${v}`)].join('__');
 }
 
+/** The issuer knobs set to something other than their default; any difference means a variant configuration is needed. */
 export function differingIssuerKnobs(knobs: Readonly<Record<string, string>>): [string, string][] {
   return Object.entries(ISSUER_KNOB_DEFAULTS)
     .filter(([k, d]) => knobs[k as KnobId] !== undefined && knobs[k as KnobId] !== d)
     .map(([k]) => [k, knobs[k as KnobId] as string]);
 }
 
+/** Extracts the offer id from a by-reference offer URI, or null if it cannot be parsed. */
 export function offerIdOf(offerUri: string): string | null {
   try {
     const u = new URL(offerUri);
@@ -114,6 +117,7 @@ export function offerIdOf(offerUri: string): string | null {
   }
 }
 
+/** Drives Inji Certify (pre-authorized grant): creates the offer through the internal admin API and registers the gateway routes that attribute the wallet's hops to the run. */
 export class CertifyPreauthIssuer implements IssuerAdapter {
   readonly descriptor: AdapterDescriptor;
   private readonly internal: string;
@@ -127,6 +131,7 @@ export class CertifyPreauthIssuer implements IssuerAdapter {
     this.publicBase = trimSlash(opts.publicBase);
   }
 
+  /** Capture labels for a call made by this adapter. */
   private cap(ctx: { runId: string }, stepKey: string) {
     return {
       runId: ctx.runId,
@@ -160,6 +165,7 @@ export class CertifyPreauthIssuer implements IssuerAdapter {
         };
   }
 
+  /** Returns the configuration id to issue with. When no issuer knob differs from its default the baseline is used and the step is skipped; otherwise a variant configuration is looked up and created once if missing. */
   async resolveVariant(ctx: AdapterContext, baselineConfigurationId: string): Promise<string> {
     const differing = differingIssuerKnobs(ctx.knobs);
     if (differing.length === 0) {
@@ -317,6 +323,7 @@ export class CertifyPreauthIssuer implements IssuerAdapter {
   }
 }
 
+/** A random six-digit code, used as the transaction code. */
 function sixDigits(): string {
   const n = new Uint32Array(1);
   crypto.getRandomValues(n);

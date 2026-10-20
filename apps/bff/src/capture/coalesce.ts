@@ -18,6 +18,7 @@ interface Group<T> {
   pending: PollPair<T> | null;
 }
 
+/** Persists only the first, the changed and the last poll of a polling group and counts the rest, so a long wait does not flood the log. */
 export class PollCoalescer<T> {
   private readonly groups = new Map<string, Group<T>>();
 

@@ -10,6 +10,7 @@ const OPTIONS: { value: ThemePref; label: string; icon: IconName }[] = [
   { value: 'system', label: copy.theme.system, icon: 'system' },
 ];
 
+/** Light, dark or system theme chooser. */
 export function ThemeSwitch() {
   const [pref, setPref] = useState<ThemePref>(() => readTheme());
   return (

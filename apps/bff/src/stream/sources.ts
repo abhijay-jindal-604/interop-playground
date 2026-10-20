@@ -48,6 +48,7 @@ function inlineBody(store: Store, sha: string | null): { body: BodyRef | null; s
   };
 }
 
+/** Turns a stored unattributed exchange into the request and response events the stream carries. */
 export function unattributedEvents(store: Store, row: UnattributedRow): EventEnvelope[] {
   const exchangeId = `unattributed:${row.id}`;
   const req = inlineBody(store, row.req_blob_sha);
@@ -104,6 +105,7 @@ export function unattributedEvents(store: Store, row: UnattributedRow): EventEnv
   return out;
 }
 
+/** Reads one unattributed-exchange row by id. */
 export function readUnattributedRow(store: Store, id: number): UnattributedRow | undefined {
   return store.driver.get<UnattributedRow>('SELECT * FROM unattributed_exchanges WHERE id = ?', id);
 }

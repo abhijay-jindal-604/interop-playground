@@ -4,6 +4,7 @@ import { copy } from '../copy.js';
 import { EmptyState } from '../components/EmptyState.js';
 import { PageFrame } from './PageFrame.js';
 
+/** Stand-in for a screen that is planned but not part of this release; states its purpose. */
 export function PlaceholderPage({
   title,
   docTitle,

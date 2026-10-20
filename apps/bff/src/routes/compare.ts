@@ -12,6 +12,7 @@ export interface CompareRouteOptions {
   flows: FlowTable;
 }
 
+/** Registers `GET /api/v1/runs/:runId/compare/:otherRunId`: a step-by-step diff of two runs. */
 export function registerCompare(app: FastifyInstance, opts: CompareRouteOptions): void {
   app.get<{
     Params: { runId: string; otherRunId: string };

@@ -26,6 +26,7 @@ function pathMatches(reqPath: string, cookiePath: string): boolean {
   return cookiePath.endsWith('/') || reqPath.charAt(cookiePath.length) === '/';
 }
 
+/** A minimal per-run cookie store for the multi-request login legs; only what those flows need. */
 export class CookieJar {
   private readonly cookies = new Map<string, Cookie>();
 

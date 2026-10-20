@@ -126,6 +126,7 @@ export function mermaidText(flow: DiagramFlow, names: Record<string, string>): s
 }
 
 const MAX_LABEL = 48;
+/** Shortens a diagram label to fit, ending with an ellipsis. */
 export function cut(text: string, n = MAX_LABEL): string {
   return text.length > n ? `${text.slice(0, n - 1)}…` : text;
 }
@@ -263,6 +264,7 @@ export function stepFacts(events: readonly EventEnvelope[]): Map<string, StepFac
   return facts;
 }
 
+/** Fills a message template's placeholders from the step's captured facts and the run spec; unknown placeholders become an ellipsis. */
 export function fillLabel(
   template: string,
   f: StepFacts | undefined,
@@ -284,6 +286,7 @@ export function notReachedReason(view: RunView): string | null {
   return null;
 }
 
+/** Works out the state of every diagram message (pending, done, failed) from the run view and events. */
 export function diagramStates(
   flow: DiagramFlow,
   view: RunView,

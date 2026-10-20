@@ -18,6 +18,10 @@ export interface DeriveRouteOptions {
   now?: () => number;
 }
 
+/**
+ * Registers the fix-it endpoint that starts a child run from a parent run with exactly one knob
+ * changed. Idempotent per `Idempotency-Key`.
+ */
 export function registerDerive(app: FastifyInstance, opts: DeriveRouteOptions): void {
   const { store, orchestrator } = opts;
   const now = opts.now ?? Date.now;

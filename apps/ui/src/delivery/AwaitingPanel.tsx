@@ -13,16 +13,19 @@ import { DeliveryBlock } from './Delivery.js';
 type Expect = keyof typeof d.headings;
 const ANNOUNCE_AT = [60, 30, 10];
 
+/** Formats seconds as mm:ss. */
 export function mmss(totalSeconds: number): string {
   const s = Math.max(0, Math.ceil(totalSeconds));
   return `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
 }
 
+/** Whole seconds until an ISO deadline, never below zero; 0 for an invalid date. */
 export function secondsLeft(deadline: string, now: number): number {
   const t = Date.parse(deadline);
   return Number.isNaN(t) ? 0 : Math.max(0, Math.ceil((t - now) / 1000));
 }
 
+/** A once-a-second countdown to an ISO deadline. */
 export function useCountdown(deadline: string): number {
   const [left, setLeft] = useState(() => secondsLeft(deadline, Date.now()));
   useEffect(() => {
@@ -33,6 +36,7 @@ export function useCountdown(deadline: string): number {
   return left;
 }
 
+/** Shown while a run waits for a person or device: the QR code and link to hand over, and the time left. */
 export function AwaitingPanel({
   awaiting,
   delivery,

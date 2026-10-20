@@ -32,6 +32,7 @@ function needles(
   return out;
 }
 
+/** Searches every text column and blob of the store for registered secrets; any hit means redaction failed. */
 export function scanStore(db: SqlDriver, registry: SecretRegistry): ScanHit[] {
   const hits: ScanHit[] = [];
   const ns = needles(registry);

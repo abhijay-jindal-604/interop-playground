@@ -25,6 +25,7 @@ function write(kind: Politeness, text: string): void {
   }, ANNOUNCE_DELAY_MS);
 }
 
+/** Sends a message to the screen-reader live region (polite by default, assertive for errors). */
 export function announce(text: string, kind: Politeness = 'polite'): void {
   if (kind === 'assertive') {
     write('assertive', text);

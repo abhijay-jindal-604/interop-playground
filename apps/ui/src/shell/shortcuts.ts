@@ -17,6 +17,7 @@ export const OTHER_KEYS = [
   { keys: 'Esc', action: 'Close the topmost dialog, drawer or menu' },
 ] as const;
 
+/** True when the key event came from a field the user is typing in, where shortcuts must not fire. */
 export function inTextField(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) return false;
   if (target.isContentEditable) return true;
@@ -33,6 +34,7 @@ export function inTextField(target: EventTarget | null): boolean {
 
 export type ShortcutHit = { kind: 'navigate'; to: string } | { kind: 'help' } | null;
 
+/** Maps an Alt+Shift key event to a shortcut action, or null when it is not one of ours. */
 export function matchShortcut(
   e: Pick<KeyboardEvent, 'altKey' | 'shiftKey' | 'ctrlKey' | 'metaKey' | 'code' | 'target'>,
 ): ShortcutHit {

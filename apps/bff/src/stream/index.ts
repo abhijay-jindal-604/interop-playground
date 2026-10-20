@@ -26,10 +26,12 @@ export { storeSource } from './sources.js';
 
 export const defaultBus = new EventBus();
 
+/** Publishes a committed event on the process-wide bus. */
 export function publish(streamKey: StreamKey, event: EventEnvelope): void {
   defaultBus.publish(streamKey, event);
 }
 
+/** Subscribes to a stream on the process-wide bus, replaying stored events after `after` first. */
 export function subscribe(streamKey: StreamKey, after?: number): Subscription {
   return defaultBus.subscribe(streamKey, after);
 }

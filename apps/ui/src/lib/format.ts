@@ -5,6 +5,7 @@ export function hhmm(iso: string): string {
   return d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', hour12: false });
 }
 
+/** Formats an ISO timestamp as a local date and time; returns the input unchanged if it is not a date. */
 export function localDateTime(iso: string): string {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return iso;

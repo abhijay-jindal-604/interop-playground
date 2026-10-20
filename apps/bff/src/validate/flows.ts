@@ -65,6 +65,7 @@ const VP = new Set([
   'vp.dcapi.response.post',
   'vp.dcapi.holder',
 ]);
+/** True for a step key the platform knows: a VCI or VP step, or a `vci.prereq.*` prerequisite step. */
 export const isRegisteredStepKey = (k: string): boolean =>
   VCI.has(k) || VP.has(k) || /^vci\.prereq\.[a-z0-9][a-z0-9.-]*$/.test(k);
 

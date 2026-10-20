@@ -65,6 +65,10 @@ interface Active {
 
 const touchesCollab = (spec: RunSpec): boolean => Object.values(spec.env).includes('collab');
 
+/**
+ * Accepts runs, queues them and executes them through `RunExecution`, limiting how many run at
+ * once. Owns cancellation and the per-run correlation keys the gateway uses to attribute traffic.
+ */
 export class Orchestrator {
   private readonly queue: { runId: string; spec: RunSpec }[] = [];
   private readonly active = new Map<string, Active>();
@@ -230,14 +234,17 @@ export class Orchestrator {
     }
   }
 
+  /** True while the run waits for a free slot. */
   isQueued(runId: string): boolean {
     return this.queue.some((q) => q.runId === runId);
   }
 
+  /** True while the run is executing. */
   isActive(runId: string): boolean {
     return this.active.has(runId);
   }
 
+  /** Number of running and queued runs. */
   counts(): { running: number; queued: number } {
     return { running: this.active.size, queued: this.queue.length };
   }
@@ -259,6 +266,7 @@ export class Orchestrator {
     await this.idle();
   }
 
+  /** Starts queued runs while slots are free. A run touching the shared collab environment waits if the collab limit is reached, without blocking other queued runs behind it. */
   private pump(): void {
     for (let i = 0; i < this.queue.length && this.active.size < this.limits.maxRunning;) {
       const q = this.queue[i] as { runId: string; spec: RunSpec };
@@ -275,6 +283,7 @@ export class Orchestrator {
     }
   }
 
+  /** Starts one run: writes `run.started`, builds its execution and runs it; when it ends the slot is freed and the queue pumped. */
   private start(runId: string, spec: RunSpec): void {
     const controller = new AbortController();
     this.opts.store.sink.append(runId, {

@@ -21,6 +21,7 @@ function suffix(st: StepDiagramState | undefined, m: DiagramMessage): string {
   return bits.length ? ` · ${bits.join(' · ')}` : '';
 }
 
+/** Fallback renderer: draws the flow as SVG (one lifeline per actor, one row per message) when Mermaid is unavailable. */
 export function BuiltinSequence({
   flow,
   names,

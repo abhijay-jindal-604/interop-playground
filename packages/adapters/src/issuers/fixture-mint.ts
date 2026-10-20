@@ -47,6 +47,7 @@ function p8(v: unknown, file: string): KeyObject {
   return createPrivateKey({ key: Buffer.from(v, 'base64'), format: 'der', type: 'pkcs8' });
 }
 
+/** Loads the TEST-ONLY throwaway issuer key from `fixtures/credentials`. */
 export function loadIssuerKey(dir: string = DEFAULT_FIXTURES_DIR): FixtureIssuerKey {
   const file = path.join(dir, 'fixture-issuer.json');
   const j = readJson(file);
@@ -55,6 +56,7 @@ export function loadIssuerKey(dir: string = DEFAULT_FIXTURES_DIR): FixtureIssuer
   return { privateKey: p8(j.pkcs8Der, file), x5c };
 }
 
+/** Loads the TEST-ONLY fixed holder key from `fixtures/credentials`. */
 export function loadHolderKey(dir: string = DEFAULT_FIXTURES_DIR): FixtureHolderKey {
   const file = path.join(dir, 'fixture-holder.json');
   const j = readJson(file);

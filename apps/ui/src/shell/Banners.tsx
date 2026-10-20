@@ -7,6 +7,7 @@ import { store, useStore } from '../state/store.js';
 import { Icon } from '../components/Icon.js';
 import { ProbeButton } from './ProbeButton.js';
 
+/** Banners under the header: backend unreachable, or environment degraded (dismissible). */
 export function ShellBanners({ onRetry }: { onRetry: () => void }) {
   const offline = useStore((s) => s.env.offline);
   const degraded = useStore((s) => s.env.degraded);

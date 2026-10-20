@@ -5,6 +5,7 @@
 export type ThemePref = 'light' | 'dark' | 'system';
 const KEY = 'interop-playground.theme';
 
+/** The saved theme preference, or `system` when none is saved or storage is unavailable. */
 export function readTheme(): ThemePref {
   try {
     const v = localStorage.getItem(KEY);
@@ -14,12 +15,14 @@ export function readTheme(): ThemePref {
   }
 }
 
+/** Sets the theme on the document; `system` removes the override so the OS preference applies. */
 export function applyTheme(pref: ThemePref): void {
   const root = document.documentElement;
   if (pref === 'system') delete root.dataset.theme;
   else root.dataset.theme = pref;
 }
 
+/** Applies the theme and remembers it (or clears the memory for `system`). */
 export function saveTheme(pref: ThemePref): void {
   applyTheme(pref);
   try {

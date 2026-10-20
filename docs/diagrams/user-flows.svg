@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="560" viewBox="0 0 1080 560" role="img" aria-labelledby="t d">
+<title id="t">User flows</title>
+<desc id="d">Three user flows: the first run from the selector to a passing result, the fix-it journey from a failed run to a fixed child run, and reading a report.</desc>
+<defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#8a8d94"/></marker><marker id="arrs" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M10,0 L0,5 L10,10 z" fill="#8a8d94"/></marker><marker id="arrA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0f6b5c"/></marker><marker id="arrAs" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M10,0 L0,5 L10,10 z" fill="#0f6b5c"/></marker><marker id="arrW" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#a3341f"/></marker><marker id="arrWs" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M10,0 L0,5 L10,10 z" fill="#a3341f"/></marker><marker id="arrB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#2f4fb5"/></marker><marker id="arrBs" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M10,0 L0,5 L10,10 z" fill="#2f4fb5"/></marker></defs>
+<g font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif">
+<rect x="0" y="0" width="1080" height="560" rx="12" fill="#ffffff"/>
+<text x="24" y="36" font-size="20" font-weight="700" fill="#1c1d21" text-anchor="start">User flows</text>
+<text x="24" y="72" font-size="15" font-weight="700" fill="#0f6b5c" text-anchor="start">A. First run</text>
+<rect x="24.0" y="84" width="152.0" height="92" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="36.0" y="106" font-size="13" font-weight="600" fill="#1c1d21" text-anchor="start">scripts/up.sh</text>
+<text x="36.0" y="125" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">bundle ready;</text>
+<text x="36.0" y="141" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">open 127.0.0.1:3100</text>
+<path d="M176.0,130 L200.0,130" fill="none" stroke="#0f6b5c" stroke-width="1.6" marker-end="url(#arrA)"/>
+<rect x="200.0" y="84" width="152.0" height="92" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="212.0" y="106" font-size="13" font-weight="600" fill="#1c1d21" text-anchor="start">Pick three roles</text>
+<text x="212.0" y="125" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">Inji Certify (pre-auth) →</text>
+<text x="212.0" y="141" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">Playground wallet →</text>
+<text x="212.0" y="157" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">Inji Verify (local)</text>
+<path d="M352.0,130 L376.0,130" fill="none" stroke="#0f6b5c" stroke-width="1.6" marker-end="url(#arrA)"/>
+<rect x="376.0" y="84" width="152.0" height="92" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="388.0" y="106" font-size="13" font-weight="600" fill="#1c1d21" text-anchor="start">Format + mode</text>
+<text x="388.0" y="125" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">SD-JWT VC,</text>
+<text x="388.0" y="141" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">Cross-device (QR)</text>
+<text x="388.0" y="157" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">→ Run</text>
+<path d="M528.0,130 L552.0,130" fill="none" stroke="#0f6b5c" stroke-width="1.6" marker-end="url(#arrA)"/>
+<rect x="552.0" y="84" width="152.0" height="92" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="564.0" y="106" font-size="13" font-weight="600" fill="#1c1d21" text-anchor="start">Watch it run</text>
+<text x="564.0" y="125" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">diagram animates;</text>
+<text x="564.0" y="141" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">banner &quot;Step n of N&quot;</text>
+<path d="M704.0,130 L728.0,130" fill="none" stroke="#0f6b5c" stroke-width="1.6" marker-end="url(#arrA)"/>
+<rect x="728.0" y="84" width="152.0" height="92" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="740.0" y="106" font-size="13" font-weight="600" fill="#1c1d21" text-anchor="start">Result: Pass</text>
+<text x="740.0" y="125" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">Valid; open a step</text>
+<text x="740.0" y="141" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">in the inspector</text>
+<path d="M880.0,130 L904.0,130" fill="none" stroke="#0f6b5c" stroke-width="1.6" marker-end="url(#arrA)"/>
+<rect x="904.0" y="84" width="152.0" height="92" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="916.0" y="106" font-size="13" font-weight="600" fill="#1c1d21" text-anchor="start">Report</text>
+<text x="916.0" y="125" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">Markdown / JSON tabs,</text>
+<text x="916.0" y="141" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">downloads</text>
+<text x="24" y="232" font-size="15" font-weight="700" fill="#2f4fb5" text-anchor="start">B. Fix-it journey</text>
+<rect x="24.0" y="244" width="152.0" height="92" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="36.0" y="266" font-size="13" font-weight="600" fill="#1c1d21" text-anchor="start">Run fails</text>
+<text x="36.0" y="285" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">walt.id → wallet →</text>
+<text x="36.0" y="301" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">Inji Verify: FAIL</text>
+<path d="M176.0,290 L200.0,290" fill="none" stroke="#2f4fb5" stroke-width="1.6" marker-end="url(#arrB)"/>
+<rect x="200.0" y="244" width="152.0" height="92" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="212.0" y="266" font-size="13" font-weight="600" fill="#1c1d21" text-anchor="start">Diagnosis card</text>
+<text x="212.0" y="285" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">FP-01, Exact match,</text>
+<text x="212.0" y="301" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">deviating side, G-55</text>
+<path d="M352.0,290 L376.0,290" fill="none" stroke="#2f4fb5" stroke-width="1.6" marker-end="url(#arrB)"/>
+<rect x="376.0" y="244" width="152.0" height="92" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="388.0" y="266" font-size="13" font-weight="600" fill="#1c1d21" text-anchor="start">Fix-it panel</text>
+<text x="388.0" y="285" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">KNOB-01 absent →</text>
+<text x="388.0" y="301" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">present; one click,</text>
+<text x="388.0" y="317" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">no dialog</text>
+<path d="M528.0,290 L552.0,290" fill="none" stroke="#2f4fb5" stroke-width="1.6" marker-end="url(#arrB)"/>
+<rect x="552.0" y="244" width="152.0" height="92" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="564.0" y="266" font-size="13" font-weight="600" fill="#1c1d21" text-anchor="start">Child run</text>
+<text x="564.0" y="285" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">banner &quot;Re-run of …&quot;;</text>
+<text x="564.0" y="301" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">runs live</text>
+<path d="M704.0,290 L728.0,290" fill="none" stroke="#2f4fb5" stroke-width="1.6" marker-end="url(#arrB)"/>
+<rect x="728.0" y="244" width="152.0" height="92" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="740.0" y="266" font-size="13" font-weight="600" fill="#1c1d21" text-anchor="start">&quot;The change fixed it.&quot;</text>
+<text x="740.0" y="285" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">classified fixed;</text>
+<text x="740.0" y="301" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">claim sentence</text>
+<path d="M880.0,290 L904.0,290" fill="none" stroke="#2f4fb5" stroke-width="1.6" marker-end="url(#arrB)"/>
+<rect x="904.0" y="244" width="152.0" height="92" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="916.0" y="266" font-size="13" font-weight="600" fill="#1c1d21" text-anchor="start">Compare</text>
+<text x="916.0" y="285" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">strip: direct effect</text>
+<text x="916.0" y="301" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">first; lineage</text>
+<text x="24" y="392" font-size="15" font-weight="700" fill="#a3341f" text-anchor="start">C. Reading a report</text>
+<rect x="24.0" y="404" width="152.0" height="92" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="36.0" y="426" font-size="13" font-weight="600" fill="#1c1d21" text-anchor="start">Open</text>
+<text x="36.0" y="445" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">run screen → Report, or</text>
+<text x="36.0" y="461" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">GET /api/v1/reports/</text>
+<text x="36.0" y="477" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">runs/{runId}</text>
+<path d="M176.0,450 L200.0,450" fill="none" stroke="#a3341f" stroke-width="1.6" marker-end="url(#arrW)"/>
+<rect x="200.0" y="404" width="152.0" height="92" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="212.0" y="426" font-size="13" font-weight="600" fill="#1c1d21" text-anchor="start">Combination</text>
+<text x="212.0" y="445" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">issuer, wallet, verifier,</text>
+<text x="212.0" y="461" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">format, grant, versions</text>
+<path d="M352.0,450 L376.0,450" fill="none" stroke="#a3341f" stroke-width="1.6" marker-end="url(#arrW)"/>
+<rect x="376.0" y="404" width="152.0" height="92" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="388.0" y="426" font-size="13" font-weight="600" fill="#1c1d21" text-anchor="start">Outcome</text>
+<text x="388.0" y="445" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">verdict + label;</text>
+<text x="388.0" y="461" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">failed step and</text>
+<text x="388.0" y="477" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">error detail</text>
+<path d="M528.0,450 L552.0,450" fill="none" stroke="#a3341f" stroke-width="1.6" marker-end="url(#arrW)"/>
+<rect x="552.0" y="404" width="152.0" height="92" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="564.0" y="426" font-size="13" font-weight="600" fill="#1c1d21" text-anchor="start">Checks + diagnosis</text>
+<text x="564.0" y="445" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">failing checks,</text>
+<text x="564.0" y="461" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">matched fingerprint,</text>
+<text x="564.0" y="477" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">fix-it result</text>
+<path d="M704.0,450 L728.0,450" fill="none" stroke="#a3341f" stroke-width="1.6" marker-end="url(#arrW)"/>
+<rect x="728.0" y="404" width="152.0" height="92" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="740.0" y="426" font-size="13" font-weight="600" fill="#1c1d21" text-anchor="start">Coverage + steps</text>
+<text x="740.0" y="445" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">capture full / partial /</text>
+<text x="740.0" y="461" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">none per hop</text>
+<path d="M880.0,450 L904.0,450" fill="none" stroke="#a3341f" stroke-width="1.6" marker-end="url(#arrW)"/>
+<rect x="904.0" y="404" width="152.0" height="92" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="916.0" y="426" font-size="13" font-weight="600" fill="#1c1d21" text-anchor="start">Share</text>
+<text x="916.0" y="445" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">download Markdown</text>
+<text x="916.0" y="461" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">or JSON (examples in</text>
+<text x="916.0" y="477" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">docs/reports/)</text>
+<text x="24" y="540" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">Sources: README &quot;Your first run&quot;, &quot;Fix-it re-runs&quot;, &quot;Reports&quot;; e2e/angle.spec.ts; e2e/live/slice.live.spec.ts.</text>
+</g>
+</svg>

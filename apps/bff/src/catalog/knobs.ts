@@ -23,6 +23,7 @@ export function knobApplies(k: KnobCatalogEntry, t: KnobTarget): boolean {
   return true;
 }
 
+/** Finds a preset by id. */
 export function presetOf(presetId: string): PresetDef | undefined {
   return PRESETS.find((p) => p.presetId === presetId);
 }

@@ -55,6 +55,7 @@ function norm<T>(row: unknown): T {
   return out as T;
 }
 
+/** Thin wrapper over a raw SQLite handle: prepared-statement cache and nestable transactions. */
 class Driver implements SqlDriver {
   private readonly cache = new Map<string, Stmt>();
   private depth = 0;
@@ -65,6 +66,7 @@ class Driver implements SqlDriver {
   get inTransaction(): boolean {
     return this.depth > 0;
   }
+  /** Returns the prepared statement for this SQL, preparing it once. */
   private stmt(sql: string): Stmt {
     let s = this.cache.get(sql);
     if (!s) {
@@ -73,21 +75,26 @@ class Driver implements SqlDriver {
     }
     return s;
   }
+  /** Runs SQL without parameters or results (pragmas, DDL). */
   exec(sql: string): void {
     this.db.exec(sql);
   }
+  /** Runs a write and reports how many rows changed. */
   run(sql: string, ...params: SqlValue[]): { changes: number } {
     return { changes: Number(this.stmt(sql).run(...bind(params)).changes) };
   }
+  /** First row of a query, or undefined. */
   get<T extends Row = Row>(sql: string, ...params: SqlValue[]): T | undefined {
     const r = this.stmt(sql).get(...bind(params));
     return r === undefined || r === null ? undefined : norm<T>(r);
   }
+  /** All rows of a query. */
   all<T extends Row = Row>(sql: string, ...params: SqlValue[]): T[] {
     return this.stmt(sql)
       .all(...bind(params))
       .map((r) => norm<T>(r));
   }
+  /** Runs `fn` in a transaction. The outermost call is `BEGIN IMMEDIATE`; nested calls are savepoints, so an inner failure rolls back only the inner work. */
   transaction<T>(fn: () => T): T {
     const sp = `sp${this.depth}`;
     this.db.exec(this.depth === 0 ? 'BEGIN IMMEDIATE' : `SAVEPOINT ${sp}`);
@@ -103,6 +110,7 @@ class Driver implements SqlDriver {
       throw err;
     }
   }
+  /** Closes the connection and drops the statement cache. */
   close(): void {
     this.cache.clear();
     this.db.close();
@@ -118,6 +126,7 @@ const PRAGMAS = [
   'PRAGMA trusted_schema=OFF',
 ];
 
+/** Opens the database file with the named SQLite driver. */
 export function openDriver(file: string, name: DriverName = defaultDriverName()): SqlDriver {
   let raw: RawDb;
   if (name === 'better-sqlite3') {
@@ -132,7 +141,10 @@ export function openDriver(file: string, name: DriverName = defaultDriverName())
   return new Driver(name, raw);
 }
 
-/** `PLAYGROUND_DB_DRIVER=node:sqlite` switches the driver (RISK-29 fallback). */
+/**
+ * `PLAYGROUND_DB_DRIVER` selects the fallback driver; anything else means better-sqlite3.
+ * `PLAYGROUND_DB_DRIVER=node:sqlite` switches the driver (RISK-29 fallback).
+ */
 export function defaultDriverName(env: NodeJS.ProcessEnv = process.env): DriverName {
   const v = env.PLAYGROUND_DB_DRIVER;
   return v === 'node:sqlite' || v === 'node-sqlite' ? 'node:sqlite' : 'better-sqlite3';

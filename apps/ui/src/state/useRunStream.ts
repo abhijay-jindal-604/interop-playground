@@ -12,6 +12,7 @@ import { StreamClient, type StreamDeps } from './stream.js';
 
 const TERMINAL_STATES: ReadonlySet<Run['state']> = new Set(['completed', 'failed', 'cancelled']);
 
+/** Subscribes the component to a run's event stream and returns its slice of the store and the stream client. */
 export function useRunStream(runId: string, overrides: Partial<StreamDeps> = {}) {
   const slice = useStore((s): RunSlice | undefined => s.runs[runId]);
   const [client, setClient] = useState<StreamClient | null>(null);

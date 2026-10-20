@@ -71,6 +71,7 @@ const FIXTURE = 'issuer.fixture' as AdapterId;
 export const SCOPES: Scope[] = ['full', 'issuance'];
 const GRANTS: Grant[] = ['pre-authorized_code', 'authorization_code'];
 
+/** The starting selection: the fully automated issuer, wallet and verifier. */
 export function defaultSelection(env: EnvSnapshot | null): Selection {
   return {
     issuer: 'issuer.certify-preauth',
@@ -91,6 +92,7 @@ export function derivedGrant(issuer: AdapterId): Grant {
     ? 'authorization_code'
     : 'pre-authorized_code';
 }
+/** The grant in effect: the user's choice, or the one the chosen issuer implies. */
 export const grantOf = (s: Selection): Grant => s.grant ?? derivedGrant(s.issuer);
 
 const known = <T extends string>(list: readonly T[], v: string | null): T | undefined =>
@@ -116,6 +118,7 @@ export function fromQuery(params: URLSearchParams, base: Selection): Selection {
   };
 }
 
+/** True when the URL already carries a selection, which then takes priority over the remembered one. */
 export const hasSelectionQuery = (params: URLSearchParams): boolean =>
   ['issuer', 'wallet', 'verifier', 'format', 'grant', 'mode', 'scope', 'config'].some((k) =>
     params.has(k),
@@ -123,6 +126,7 @@ export const hasSelectionQuery = (params: URLSearchParams): boolean =>
 
 export const STORAGE_KEY = 'pg.selection.v1';
 
+/** Restores the last selection from localStorage; falls back to `base` when storage is empty or unavailable. */
 export function loadStored(base: Selection): Selection {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -134,6 +138,7 @@ export function loadStored(base: Selection): Selection {
   }
 }
 
+/** Remembers the selection in localStorage; ignores storage errors (private windows). */
 export function store(s: Selection): void {
   try {
     const { issuer, wallet, verifier, format, mode, scope } = s;
@@ -154,6 +159,7 @@ export function store(s: Selection): void {
   }
 }
 
+/** Converts the selection into a `CreateRunRequest`. */
 export function toRequest(s: Selection): CreateRunRequest {
   return {
     issuer: s.issuer,
@@ -177,6 +183,7 @@ export function cardRequest(s: Selection, role: Role, id: AdapterId): CreateRunR
   return toRequest(next);
 }
 
+/** Orders a column's adapter cards in the fixed display order. */
 export function ordered(entries: readonly AdapterEntry[], role: Role): AdapterEntry[] {
   const order = COLUMN_ORDER[role];
   const at = (e: AdapterEntry) => {
@@ -188,6 +195,7 @@ export function ordered(entries: readonly AdapterEntry[], role: Role): AdapterEn
 
 /** UI-05: the two stateful rules the UI evaluates itself against `EnvSnapshot.tunnel` (OI-5) */
 export type TunnelRule = 'phone' | 'collab-ldp';
+/** Which tunnel rule a card needs (the phone wallet, or a public verifier), or null when none. */
 export function cardTunnel(s: Selection, role: Role, id: AdapterId): TunnelRule | null {
   if (role === 'wallet' && id === ('wallet.inji-mobile' as AdapterId)) return 'phone';
   if (
@@ -199,5 +207,6 @@ export function cardTunnel(s: Selection, role: Role, id: AdapterId): TunnelRule 
     return 'collab-ldp';
   return null;
 }
+/** The tunnel rule the whole selection needs, or null. */
 export const selectionTunnel = (s: Selection): TunnelRule | null =>
   cardTunnel(s, 'wallet', s.wallet) ?? cardTunnel(s, 'verifier', s.verifier);

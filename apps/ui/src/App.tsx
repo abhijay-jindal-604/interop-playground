@@ -4,6 +4,7 @@ import { routes } from './routes/routes.js';
 
 const router = createBrowserRouter(routes);
 
+/** Root component: mounts the router, which renders the app shell and the page for the current URL. */
 export function App() {
   return <RouterProvider router={router} />;
 }

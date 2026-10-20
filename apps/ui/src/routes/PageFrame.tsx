@@ -9,6 +9,7 @@ import { pageTitle } from '../copy.js';
 
 let firstRoute = true;
 
+/** Common page layout: title, breadcrumbs and document title. */
 export function PageFrame({
   title,
   docTitle,

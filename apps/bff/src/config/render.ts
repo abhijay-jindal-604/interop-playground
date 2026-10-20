@@ -29,7 +29,10 @@ export const RENDER_VARS = [
 type RenderVar = (typeof RENDER_VARS)[number];
 export type RenderEnv = Partial<Record<RenderVar, string>>;
 
-/** Certify instances and their per-instance did:web (G-20, ADR-24, ADR-50). */
+/**
+ * The Certify instances and the `did:web` each one must advertise for the given public host.
+ * Certify instances and their per-instance did:web (G-20, ADR-24, ADR-50).
+ */
 export function certifyInstances(publicHost: string): [string, string][] {
   return [
     ['certify-preauth', `did:web:${publicHost}`],
@@ -51,6 +54,7 @@ export const PLAIN_SERVICES = [
   'eudi',
 ];
 
+/** A config-rendering failure (missing variable, unresolved placeholder). */
 export class RenderError extends Error {
   constructor(message: string) {
     super(`render-config: ${message}`);
@@ -101,6 +105,10 @@ function renderDir(src: string, dst: string, env: RenderEnv): void {
 const SURVIVOR = /\$\{(PUBLIC_HOST|CERTIFY_DID_URL|WALTID_VERIFIER_DID|WALTID_VERIFIER_KEY_JWK)\}/;
 
 /** Renders `<srcDir>` (default `docker/config`) into `<outDir>`; returns the number of files. */
+/**
+ * Renders every service's config templates into `outDir`, replacing the previous output.
+ * @returns the number of files written
+ */
 export function renderConfig(srcDir: string, outDir: string, env: RenderEnv): number {
   const publicHost = env.PUBLIC_HOST ?? '';
   if (publicHost === '') throw new RenderError('PUBLIC_HOST must be set');
@@ -124,7 +132,10 @@ export function renderConfig(srcDir: string, outDir: string, env: RenderEnv): nu
   return files.length;
 }
 
-/** The env of `up.sh`: PUBLIC_HOST plus the walt.id verifier DID/JWK from certs/peers. */
+/**
+ * Picks the three variables the renderer substitutes out of a process environment.
+ * The env of `up.sh`: PUBLIC_HOST plus the walt.id verifier DID/JWK from certs/peers.
+ */
 export function renderEnvFrom(env: NodeJS.ProcessEnv): RenderEnv {
   return {
     PUBLIC_HOST: env.PUBLIC_HOST,

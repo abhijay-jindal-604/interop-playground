@@ -47,6 +47,7 @@ const HOP_BY_HOP = new Set([
   'upgrade',
 ]);
 
+/** Where an inbound connection came from; decides how strictly the allowlist treats it. */
 export type Remote = 'loopback' | 'lan' | 'tunnel';
 
 /** one unattributed inbound exchange (02 §3.3), after it was persisted */
@@ -71,22 +72,26 @@ export interface DeniedRequest {
 }
 export type UnattributedItem = UnattributedExchange | DeniedRequest;
 
+/** A buffered inbound request handed to the relay. */
 export interface RelayRequest {
   method: string;
   headers: http.IncomingHttpHeaders;
   body: Buffer;
 }
+/** An upstream (or synthesised) response relayed back to the caller. */
 export interface RelayResponse {
   status: number;
   headers: Record<string, string>;
   body: Buffer | string;
 }
 
+/** Logger the gateway writes listener and relay notices to. */
 export interface GatewayLog {
   info(msg: string): void;
   warn(msg: string): void;
 }
 
+/** Everything `startGateway` needs; the optional hooks exist so tests can bind free ports and fake upstreams. */
 export interface GatewayOptions {
   sink: EventSink;
   /** `X-Playground-Self` token of this process (the one CaptureHttp sends) */
@@ -114,12 +119,14 @@ export interface GatewayOptions {
   log?: GatewayLog;
 }
 
+/** A listener that bound: its configured port, the actual port (differs when tests ask for port 0) and scheme. */
 export interface BoundListener {
   port: number;
   boundPort: number;
   scheme: 'http' | 'https';
 }
 
+/** Handle to the running gateway: the bound/failed listeners, shared allowlists and correlation index, and shutdown. */
 export interface Gateway {
   readonly listening: readonly BoundListener[];
   readonly failed: readonly { port: number; error: string }[];
@@ -130,6 +137,10 @@ export interface Gateway {
   close(): Promise<void>;
 }
 
+/**
+ * Classifies a peer address. The tunnel port (9000) is always 'tunnel'; loopback addresses are
+ * 'loopback'; everything else, including a missing address, is 'lan'.
+ */
 export function remoteClass(addr: string | undefined, listenerPort: number): Remote {
   if (listenerPort === 9000) return 'tunnel';
   if (!addr) return 'lan';
@@ -148,7 +159,10 @@ function headerList(h: http.IncomingHttpHeaders | http.OutgoingHttpHeaders): Hea
   return out;
 }
 
-/** default metadata fetch: plain GET on playground_net, 3 s, JSON or null */
+/**
+ * Fetches an upstream's issuer metadata over plain HTTP (3 s timeout); null on any failure or non-200.
+ * Default metadata fetch: plain GET on playground_net, 3 s, JSON or null.
+ */
 export const defaultFetchMetadata: MetadataFetch = (upstream, path) =>
   new Promise((resolve) => {
     const req = http.get(new URL(path, upstream), { timeout: 3000 }, (res) => {
@@ -214,6 +228,12 @@ function sendEnvelope(
   res.end(text);
 }
 
+/**
+ * Starts one listener per entry of the listener table, each forwarding to exactly one upstream.
+ * Every inbound exchange is persisted through the event sink before it is published, secrets are
+ * redacted by the sink, and anything off the allowlist is denied and recorded as `gateway.denied`.
+ * A listener that cannot bind is reported in `failed` instead of aborting the others.
+ */
 export async function startGateway(opts: GatewayOptions): Promise<Gateway> {
   const table = opts.listeners ?? LISTENERS;
   const wanted = table.filter((l) => !opts.ports || opts.ports.includes(l.port));

@@ -166,6 +166,7 @@ function directSteps(knobId: string | undefined): string[] {
   }
 }
 
+/** Builds a step-aligned diff of two runs, ordered parent first, with volatile fields (nonces, ids, signatures) dropped unless asked for. */
 export function compareRuns(
   store: Store,
   flows: FlowTable,

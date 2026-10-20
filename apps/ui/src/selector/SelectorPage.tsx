@@ -112,6 +112,7 @@ function useCompatibility(sel: Selection, entries: Record<Role, AdapterEntry[]> 
 /** research-log S-IDs are internal; the UI shows only public evidence (ADR-98, ADR-100) */
 const isResearchId = (e: string): boolean => /^S-\d+$/.test(e);
 
+/** Expandable explanation of why a card is unavailable: the reason and its public evidence references. */
 function WhyNot({ hit, evidence: all }: { hit: IncompatibilityHit; evidence: string[] }) {
   const evidence = all.filter((e) => !isResearchId(e));
   const [open, setOpen] = useState(false);
@@ -151,6 +152,7 @@ function WhyNot({ hit, evidence: all }: { hit: IncompatibilityHit; evidence: str
   );
 }
 
+/** One selectable adapter card with its tier, availability and, when blocked, the reason. */
 function AdapterCard({
   entry,
   role,
@@ -243,6 +245,7 @@ function AdapterCard({
   );
 }
 
+/** One role's column of adapter cards, behaving as a radio group. */
 function Column({
   role,
   entries,
@@ -306,6 +309,7 @@ function Column({
   );
 }
 
+/** A small segmented choice control (for example the credential format or the scope). */
 function Segmented<T extends string>({
   label,
   name,
@@ -345,6 +349,7 @@ function Segmented<T extends string>({
   );
 }
 
+/** The home screen: choose an issuer, wallet and verifier, see whether the combination can run, and start the run. */
 export function SelectorPage() {
   const adapters = useStore((s) => s.catalog.adapters);
   const envLoad = useStore((s) => s.env.snapshot);

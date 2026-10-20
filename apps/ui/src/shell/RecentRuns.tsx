@@ -18,6 +18,7 @@ import { shortId } from '../components/RunLink.js';
 import { Skeleton } from '../components/Skeleton.js';
 import { StatusBadge } from '../components/StatusBadge.js';
 
+/** The "recent runs" menu in the header; loads the latest runs when opened. */
 export function RecentRuns() {
   const [open, setOpen] = useState(false);
   const [runs, setRuns] = useState<Load<Run[]>>({ status: 'idle' });

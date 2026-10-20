@@ -98,6 +98,7 @@ export interface ParsedRequest {
   requestUriRef: string | null;
 }
 
+/** Parses an `openid4vp://` request URI into the fields the wallet needs, decoding the DCQL query when present. */
 export function parseRequestUri(uri: string): ParsedRequest {
   const q = new URL(uri).searchParams;
   let dcql: unknown = null;
@@ -154,6 +155,7 @@ interface DcqlCredentialQuery {
   claims: { path: string[] }[];
 }
 
+/** The credential queries of a DCQL query, or none if the shape is wrong. */
 function dcqlCredentials(q: unknown): DcqlCredentialQuery[] {
   if (!isRecord(q) || !Array.isArray(q.credentials)) return [];
   return q.credentials.filter(isRecord).map((c) => ({
@@ -168,6 +170,7 @@ function dcqlCredentials(q: unknown): DcqlCredentialQuery[] {
   }));
 }
 
+/** Our reference wallet: receives credentials over OID4VCI and presents SD-JWT or ldp_vc credentials over OID4VP, signing with the key service so the private key never leaves it. */
 export class PlaygroundTsWallet implements WalletAdapter {
   readonly descriptor: AdapterDescriptor;
 
@@ -175,6 +178,7 @@ export class PlaygroundTsWallet implements WalletAdapter {
     this.descriptor = descriptorOf('wallet.playground-ts');
   }
 
+  /** Current time in whole seconds, from the injectable clock. */
   private nowS(): number {
     return Math.floor((this.opts.now ?? Date.now)() / 1000);
   }
@@ -184,6 +188,7 @@ export class PlaygroundTsWallet implements WalletAdapter {
     return Promise.resolve({ available: true, versionFingerprint: PLAYGROUND_TS_VERSION });
   }
 
+  /** Capture labels for a call made by this wallet. */
   private cap(ctx: AdapterContext, stepKey: string, counterpart: string) {
     return { runId: ctx.runId, stepKey, actor: ACTOR, counterpart };
   }

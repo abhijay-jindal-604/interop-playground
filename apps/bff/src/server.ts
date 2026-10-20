@@ -88,6 +88,7 @@ export interface CreateServerOptions {
   logger?: boolean | { level: string };
 }
 
+/** The BFF package version, or `unknown` if it cannot be read. */
 function bffVersion(): string {
   try {
     const here = path.dirname(fileURLToPath(import.meta.url));
@@ -100,6 +101,7 @@ function bffVersion(): string {
   }
 }
 
+/** Probes the JVM sidecar's `/health`; any failure is reported as unreachable. */
 function defaultSidecarProbe(baseUrl: string): SidecarProbe {
   return async () => {
     const res = await fetch(`${baseUrl}/health`, { signal: AbortSignal.timeout(1500) });
@@ -127,6 +129,7 @@ export function envProbeHttp(
   };
 }
 
+/** Reads the pinned image digests used to fingerprint upstream versions; a missing file gives none. */
 function imageDigests(file: string): Record<string, string> {
   try {
     const lock = JSON.parse(readFileSync(file, 'utf8')) as { images?: Record<string, string> };
@@ -142,6 +145,11 @@ const NO_ADAPTERS: AdapterSet = {
   verifier: () => undefined,
 };
 
+/**
+ * Builds the API/UI server without listening, so tests can drive it with `inject`. Validates the
+ * flow and fingerprint files first (an invalid content file stops start-up), opens the store,
+ * installs the host/origin guard and the standard error envelope, then registers every route group.
+ */
 export async function createServer(opts: CreateServerOptions = {}): Promise<FastifyInstance> {
   const config: BffConfig = { ...loadConfig(), ...opts.config };
   const content = opts.content ?? validateContent(config.flowsDir, config.fingerprintsDir);

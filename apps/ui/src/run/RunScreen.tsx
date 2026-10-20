@@ -45,6 +45,7 @@ export function useStepHash(): [string | null, (key: string) => void] {
 
 const NO_EVENTS: readonly EventEnvelope[] = [];
 
+/** The run screen: header, step rail, diagram, inspector and the diagnosis and fix-it panel, all driven by one run view. */
 export function RunScreen({
   view,
   events = NO_EVENTS,

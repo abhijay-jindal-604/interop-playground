@@ -24,6 +24,7 @@ export const DEFAULT_SIDECAR_URL = 'http://sidecar:7070';
 /** Repository root as seen from this file (apps/bff/src/config -> repo). */
 export const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../..');
 
+/** Resolved runtime settings of the BFF process. */
 export interface BffConfig {
   /** listen address: 127.0.0.1 on the host; 0.0.0.0 inside the bff container (10 §7.3) */
   listenHost: string;
@@ -50,7 +51,10 @@ function pick(env: NodeJS.ProcessEnv, key: string, fallback: string): string {
   return v !== undefined && v !== '' ? v : fallback;
 }
 
-/** Reads the 10 §8.3 keys; defaults are the host layout (repo-relative paths). */
+/**
+ * Builds the config from environment variables, using repo-relative defaults for host-mode runs.
+ * Reads the 10 §8.3 keys; defaults are the host layout (repo-relative paths).
+ */
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): BffConfig {
   const mode = pick(env, 'PLAYGROUND_MODE', 'local');
   return {
@@ -77,6 +81,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): BffConfig {
   };
 }
 
+/** True when a built UI (an index.html) exists in `dir`, so the BFF can serve it. */
 export function uiDistPresent(dir: string): boolean {
   return existsSync(path.join(dir, 'index.html'));
 }

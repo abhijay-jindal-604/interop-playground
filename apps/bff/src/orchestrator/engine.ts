@@ -77,7 +77,10 @@ export interface EngineDeps {
   classify?: (runId: string, verdict: RunVerdict) => Run['counterfactualResult'];
 }
 
-/** an error that carries a `Run.errorCode` (04 §6.2 closing paragraph) */
+/**
+ * A run-level failure carrying the stable `run.error` code that ends the run.
+ * An error that carries a `Run.errorCode` (04 §6.2 closing paragraph)
+ */
 export class RunFault extends Error {
   constructor(
     readonly runErrorCode: string,
@@ -88,10 +91,12 @@ export class RunFault extends Error {
   }
 }
 
+/** Internal signal thrown between steps when a run was cancelled; never leaves the engine. */
 class Cancelled extends Error {}
 
 const TIER_RANK = { manual: 0, 'best-effort': 1, automated: 2 } as const;
 
+/** The run's evidence tier is its weakest participant: manual < best-effort < automated. */
 export function evidenceTierOf(spec: RunSpec): 'automated' | 'best-effort' | 'manual' {
   const tiers = [spec.issuer, spec.wallet, spec.verifier].map((id) => catalogEntry(id).tier);
   return tiers.reduce((lo, t) => (TIER_RANK[t] < TIER_RANK[lo] ? t : lo), 'automated');
@@ -113,11 +118,17 @@ export function queryTypeOf(held: HeldCredential, configurationId: string): stri
   }
 }
 
+/** Error text for the `run.failed` event, cut to 500 characters so a stack or body cannot flood the log. */
 function safeMessage(e: unknown): string {
   const m = e instanceof Error ? e.message : String(e);
   return m.slice(0, 500);
 }
 
+/**
+ * Executes one run end to end. Walks the planned steps in order, calls the chosen adapters, and
+ * writes every event through the sink. A step that does not apply is still emitted as started plus
+ * skipped, never omitted, so every run has the same step list. Cancellation is checked between steps.
+ */
 export class RunExecution {
   private readonly plan: PlannedStep[];
   private readonly byKey = new Map<string, PlannedStep>();
@@ -142,6 +153,7 @@ export class RunExecution {
     this.target = targetOf(deps.flows, spec).stepKey;
   }
 
+  /** Writes one event through the sink (persisted before it is published). */
   private append(ev: SinkEvent): void {
     this.deps.sink.append(this.runId, ev);
   }
@@ -178,10 +190,12 @@ export class RunExecution {
     }
   }
 
+  /** Completes the step that is still open, if any, with the given outcome. */
   private async closeOpen(outcome: Outcome, note: string | null): Promise<void> {
     if (this.openStep !== null) await this.completeStep(this.openStep, outcome, 'full', note);
   }
 
+  /** Emits `step.started`. Rejects a step that is unknown, does not apply, was already emitted, or is started while another is open; earlier planned steps nobody performed are skipped first. */
   startStep(stepKey: string): void {
     const s = this.byKey.get(stepKey);
     if (!s) throw new RunFault('engine_exception', `step ${stepKey} is not in the run's flows`);
@@ -233,14 +247,17 @@ export class RunExecution {
     if (outcome === 'fail' && this.firstFail === null) this.firstFail = stepKey;
   }
 
+  /** The planned steps whose key starts with any of the given prefixes. */
   private stepsOf(prefixes: string[]): PlannedStep[] {
     return this.plan.filter((s) => prefixes.some((p) => s.stepKey.startsWith(p)));
   }
 
+  /** True when the step applies to this run's adapters, format and grant. */
   private applies(stepKey: string): boolean {
     return this.byKey.get(stepKey)?.applies === true;
   }
 
+  /** Throws the cancellation signal if the run was cancelled; called between steps so cancellation never cuts a step in half. */
   private checkAbort(): void {
     if (this.signal.aborted) throw new Cancelled();
   }
@@ -267,6 +284,7 @@ export class RunExecution {
     };
   }
 
+  /** Receives the events adapters emit during a call, keeps the step bookkeeping consistent, and forwards them to the sink. */
   private async onAdapterEvent(ev: AdapterEvent): Promise<void> {
     this.checkAbort();
     switch (ev.type) {
@@ -320,6 +338,7 @@ export class RunExecution {
     return a;
   }
 
+  /** Runs the issuance half of the plan with the chosen issuer and wallet and returns the credential the wallet holds, or null when issuance failed. */
   private async issuance(ctx: AdapterContext): Promise<HeldCredential | null> {
     const issuer = this.adapter((id) => this.deps.adapters.issuer(id), this.spec.issuer);
     // FLOW-14 (ADR-13, ADR-94): the fixture issuer hands the held credential over, no traffic and
@@ -376,6 +395,7 @@ export class RunExecution {
     return this.issuanceOk && outcome.credential ? outcome.credential : null;
   }
 
+  /** Runs the presentation half: the verifier creates a request, the wallet answers it, and the verifier's result is awaited. */
   private async presentation(ctx: AdapterContext, held: HeldCredential): Promise<void> {
     const verifier = this.adapter((id) => this.deps.adapters.verifier(id), this.spec.verifier);
     const wallet = this.adapter((id) => this.deps.adapters.wallet(id), this.spec.wallet);
@@ -460,6 +480,11 @@ export class RunExecution {
     }
   }
 
+  /**
+   * Derives the run verdict from what happened. Order matters: a failure before the target step that
+   * left it skipped is `blocked`, a silent verifier is `no-submission`, any other failure is `fail`.
+   * Only automated or best-effort interop runs count toward the pass rate.
+   */
   private verdict(): RunVerdict {
     const kind: RunVerdict['kind'] = this.spec.presentationMode === 'dc-api' ? 'probe' : 'interop';
     const targetOutcome = this.outcomes.get(this.target) ?? null;
@@ -489,6 +514,7 @@ export class RunExecution {
     };
   }
 
+  /** Lets the diagnosis engine write its events just before the terminal event. A fault there is swallowed so the run still ends. */
   private diagnose(terminal: 'completed' | 'failed'): void {
     try {
       this.deps.beforeTerminal?.(this.runId, terminal);
@@ -497,6 +523,7 @@ export class RunExecution {
     }
   }
 
+  /** For a fix-it child run, asks the diagnosis side whether the single change helped; any fault is reported as inconclusive. */
   private classify(verdict: RunVerdict): Run['counterfactualResult'] {
     if (this.spec.parentRunId === null) return null;
     try {
@@ -532,6 +559,10 @@ export class RunExecution {
     }
   }
 
+  /**
+   * Closes a run that ended by cancellation or by an exception. Always writes exactly one terminal
+   * event (`run.cancelled` or `run.failed`), skipping every step that never ran.
+   */
   private async terminate(e: unknown): Promise<void> {
     const at = this.openStep;
     try {

@@ -7,6 +7,7 @@ import type { RunSpec } from '@interop-playground/adapters';
 import type { RunVerdict } from '@interop-playground/api';
 import type { EventSink } from './sink.js';
 
+/** A complete valid run spec for tests and fixtures, with any field overridable. */
 export function sampleSpec(over: Partial<RunSpec> = {}): RunSpec {
   return {
     issuer: 'issuer.certify-preauth',

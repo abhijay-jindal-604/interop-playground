@@ -51,14 +51,17 @@ interface PollData {
   ctx: CaptureContext;
 }
 
+/** `host:port` of a URL with the default port filled in, for comparing destinations. */
 function hostPort(u: URL): string {
   const port = u.port || (u.protocol === 'https:' ? '443' : u.protocol === 'http:' ? '80' : '');
   return `${u.hostname.toLowerCase()}:${port}`;
 }
+/** The same form for a bare origin string such as a configured gateway host. */
 function normaliseOrigin(o: string): string {
   return hostPort(new URL(o.includes('://') ? o : `https://${o}`));
 }
 
+/** The request body as bytes for hashing and storage, or null when there is none. */
 async function requestBytes(body: RequestInit['body']): Promise<Buffer | null> {
   if (body === undefined || body === null) return null;
   if (typeof body === 'string') return Buffer.from(body, 'utf8');
@@ -75,6 +78,11 @@ async function requestBytes(body: RequestInit['body']): Promise<Buffer | null> {
   return Buffer.from(await r.arrayBuffer());
 }
 
+/**
+ * The HTTP client every adapter uses. It records each request and response through the sink,
+ * refuses destinations outside the allowed set, and marks calls to the gateway with the self
+ * token so they are recorded once rather than twice.
+ */
 export class CaptureHttp implements CapturingHttp {
   private readonly sink: EventSink;
   private readonly token: string;
@@ -102,6 +110,7 @@ export class CaptureHttp implements CapturingHttp {
     return j;
   }
 
+  /** Makes the call, then records request and response through the sink. Refuses denied destinations before any traffic leaves; polling reads are coalesced. */
   async fetch(ctx: CaptureContext, url: string | URL, init: RequestInit = {}): Promise<Response> {
     const u = new URL(url);
     if (DENIED_HOSTS.some((re) => re.test(u.hostname))) throw new EgressDeniedError(u.hostname);
@@ -204,6 +213,7 @@ export class CaptureHttp implements CapturingHttp {
     });
   }
 
+  /** Feeds one poll response to the coalescer, which decides which polls are worth persisting. */
   private observePoll(ctx: CaptureContext, signature: string, data: PollData): void {
     const group = ctx.poll?.group ?? '';
     const key = PollCoalescer.key(ctx.runId, ctx.stepKey, group);
@@ -211,6 +221,7 @@ export class CaptureHttp implements CapturingHttp {
     for (const p of persist) this.persistPoll(p.data, group, p.index, null);
   }
 
+  /** Writes a poll's request and response events, with the poll index and total. */
   private persistPoll(d: PollData, group: string, index: number, total: number | null): void {
     const { ctx } = d;
     const exchangeId = this.sink.nextExchangeId(ctx.runId);

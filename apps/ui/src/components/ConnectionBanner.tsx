@@ -6,6 +6,7 @@ import { copy } from '../copy.js';
 import type { StreamStatus } from '../state/stream.js';
 import { Icon } from './Icon.js';
 
+/** Banner showing the event stream's connection state, with a retry action when it dropped. */
 export function ConnectionBanner({
   status,
   onRetry,

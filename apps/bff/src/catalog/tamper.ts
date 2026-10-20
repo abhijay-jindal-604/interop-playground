@@ -28,6 +28,7 @@ export const TAMPER_CASES: readonly TmpId[] = Object.values(BLOCK_CASES)
   .sort((a, b) => a - b)
   .map((n): TmpId => `TMP-${String(n).padStart(2, '0')}`);
 
+/** The block (group) a tamper case id such as TMP-07 belongs to, or null for an id that does not parse. */
 export function blockOf(tmpId: string): TamperBlock | null {
   const m = /^TMP-(\d{2})$/.exec(tmpId);
   if (!m) return null;
@@ -145,6 +146,7 @@ export function tamperInapplicability(tmpId: string, t: TamperTarget): string | 
   }
 }
 
+/** Every tamper case that can be applied to the given issuer, wallet, verifier and format. */
 export function applicableTamperCases(t: TamperTarget): TmpId[] {
   return TAMPER_CASES.filter((id) => tamperInapplicability(id, t) === null);
 }

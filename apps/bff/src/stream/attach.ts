@@ -14,6 +14,7 @@ const ATTACHED = Symbol.for('interop-playground.bus-attached');
 
 type Marked = { [ATTACHED]?: EventBus };
 
+/** Wires the sink to the bus so every committed event is published; attaching a second, different bus is an error. */
 export function attachBus(store: Store, bus: EventBus): void {
   const sink = store.sink as typeof store.sink & Marked;
   if (sink[ATTACHED] === bus) return;

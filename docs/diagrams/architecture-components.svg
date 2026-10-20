@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="640" viewBox="0 0 1080 640" role="img" aria-labelledby="t d">
+<title id="t">Interop Playground: system components</title>
+<desc id="d">Browser UI talks to one BFF process over REST and SSE. The BFF hosts the orchestrator, adapters, capture layer, edge gateway, event sink with the SQLite event log, diagnosis and derive, and the report generator. Inji Certify, Inji Verify, Mimoto, eSignet, Inji Web, the walt.id peers and the JVM sidecar run in Docker behind the gateway.</desc>
+<defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#8a8d94"/></marker><marker id="arrs" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M10,0 L0,5 L10,10 z" fill="#8a8d94"/></marker><marker id="arrA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0f6b5c"/></marker><marker id="arrAs" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M10,0 L0,5 L10,10 z" fill="#0f6b5c"/></marker><marker id="arrW" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#a3341f"/></marker><marker id="arrWs" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M10,0 L0,5 L10,10 z" fill="#a3341f"/></marker><marker id="arrB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#2f4fb5"/></marker><marker id="arrBs" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M10,0 L0,5 L10,10 z" fill="#2f4fb5"/></marker></defs>
+<g font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif">
+<rect x="0" y="0" width="1080" height="640" rx="12" fill="#ffffff"/>
+<text x="24" y="36" font-size="20" font-weight="700" fill="#1c1d21" text-anchor="start">System and components</text>
+<text x="24" y="58" font-size="13" font-weight="normal" fill="#5b5e66" text-anchor="start">One BFF process drives every role; the browser only talks to the BFF; Inji services publish no host ports.</text>
+<rect x="24" y="110" width="210" height="130" rx="8" fill="#e8ecfa" stroke="#2f4fb5" stroke-width="1.2"/>
+<text x="36" y="132" font-size="14" font-weight="600" fill="#1c1d21" text-anchor="start">Browser</text>
+<text x="36" y="151" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">React 18 UI (Vite build)</text>
+<text x="36" y="167" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">served by the BFF at</text>
+<text x="36" y="183" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">127.0.0.1:3100</text>
+<text x="36" y="199" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">selector · run screen ·</text>
+<text x="36" y="215" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">inspector · report</text>
+<rect x="270" y="80" width="520" height="470" rx="8" fill="#fbfaf7" stroke="#0f6b5c" stroke-width="1.6"/>
+<text x="286" y="104" font-size="15" font-weight="700" fill="#0f6b5c" text-anchor="start">BFF: one Node 22 process (TypeScript, Fastify)</text>
+<rect x="290" y="120" width="480" height="46" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="530.0" y="148.0" font-size="13.5" font-weight="600" fill="#1c1d21" text-anchor="middle">REST routes /api/v1/…  +  SSE stream /api/v1/streams/{id}/events</text>
+<rect x="290" y="184" width="230" height="70" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="302" y="206" font-size="14" font-weight="600" fill="#1c1d21" text-anchor="start">Orchestrator + scheduler</text>
+<text x="302" y="225" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">immutable RunSpecs;</text>
+<text x="302" y="241" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">steps from flows/*.json</text>
+<rect x="540" y="184" width="230" height="70" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="552" y="206" font-size="14" font-weight="600" fill="#1c1d21" text-anchor="start">Diagnosis + derive</text>
+<text x="552" y="225" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">fingerprints/ (FP-01 …);</text>
+<text x="552" y="241" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">one-knob re-runs (KNOB-01)</text>
+<rect x="290" y="272" width="230" height="70" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="302" y="294" font-size="14" font-weight="600" fill="#1c1d21" text-anchor="start">Adapters</text>
+<text x="302" y="313" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">issuers · wallets · verifiers</text>
+<text x="302" y="329" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">(reference wallet in-process)</text>
+<rect x="540" y="272" width="230" height="70" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="552" y="294" font-size="14" font-weight="600" fill="#1c1d21" text-anchor="start">Capture: CapturingHttp</text>
+<text x="552" y="313" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">every outbound call the BFF</text>
+<text x="552" y="329" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">makes (full capture)</text>
+<rect x="290" y="360" width="230" height="70" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="302" y="382" font-size="14" font-weight="600" fill="#1c1d21" text-anchor="start">Report generator</text>
+<text x="302" y="401" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">per-run JSON + Markdown,</text>
+<text x="302" y="417" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">built from stored events</text>
+<rect x="540" y="360" width="230" height="70" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="552" y="382" font-size="14" font-weight="600" fill="#1c1d21" text-anchor="start">Edge gateway</text>
+<text x="552" y="401" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">inbound legs; allowlist;</text>
+<text x="552" y="417" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">admin paths hard-denied</text>
+<rect x="290" y="450" width="480" height="80" rx="8" fill="#e3f1ee" stroke="#0f6b5c" stroke-width="1.2"/>
+<text x="302" y="472" font-size="14" font-weight="600" fill="#1c1d21" text-anchor="start">Event sink → SQLite event log (better-sqlite3)</text>
+<text x="302" y="491" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">redacts secrets before any write; persisted, then published;</text>
+<text x="302" y="507" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">read by diagnosis and reports; holder keys never exported</text>
+<rect x="830" y="80" width="226" height="470" rx="8" fill="#fbfaf7" stroke="#5b5e66" stroke-width="1.4" stroke-dasharray="6 4"/>
+<text x="846" y="104" font-size="15" font-weight="700" fill="#1c1d21" text-anchor="start">Docker network</text>
+<text x="846" y="122" font-size="12" font-weight="normal" fill="#5b5e66" text-anchor="start">scripts/up.sh, digest-pinned</text>
+<rect x="846" y="136" width="194" height="56" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="858" y="158" font-size="13" font-weight="600" fill="#1c1d21" text-anchor="start">Inji Certify</text>
+<text x="858" y="177" font-size="12" font-weight="normal" fill="#5b5e66" text-anchor="start">1.0.0-alpha.1, pre-auth</text>
+<rect x="846" y="202" width="194" height="56" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="858" y="224" font-size="13" font-weight="600" fill="#1c1d21" text-anchor="start">Inji Verify service</text>
+<text x="858" y="243" font-size="12" font-weight="normal" fill="#5b5e66" text-anchor="start">1.0.0-alpha.1</text>
+<rect x="846" y="268" width="194" height="56" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="858" y="290" font-size="13" font-weight="600" fill="#1c1d21" text-anchor="start">Mimoto + Inji Web</text>
+<text x="858" y="309" font-size="12" font-weight="normal" fill="#5b5e66" text-anchor="start">1.0.0-alpha.1</text>
+<rect x="846" y="334" width="194" height="56" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="858" y="356" font-size="13" font-weight="600" fill="#1c1d21" text-anchor="start">eSignet + mock identity</text>
+<text x="858" y="375" font-size="12" font-weight="normal" fill="#5b5e66" text-anchor="start">1.8.0</text>
+<rect x="846" y="400" width="194" height="56" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="858" y="422" font-size="13" font-weight="600" fill="#1c1d21" text-anchor="start">walt.id issuer/verifier</text>
+<text x="858" y="441" font-size="12" font-weight="normal" fill="#5b5e66" text-anchor="start">api2 1.1.0 (--with peers)</text>
+<rect x="846" y="466" width="194" height="56" rx="8" fill="#f6f5f1" stroke="#8a8d94" stroke-width="1.2"/>
+<text x="858" y="488" font-size="13" font-weight="600" fill="#1c1d21" text-anchor="start">JVM sidecar</text>
+<text x="858" y="507" font-size="12" font-weight="normal" fill="#5b5e66" text-anchor="start">Inji Kotlin libs (not in v1 flows)</text>
+<path d="M234,160 L290,156" fill="none" stroke="#8a8d94" stroke-width="1.6" marker-end="url(#arr)" marker-start="url(#arrs)"/>
+<text x="24" y="262" font-size="12" font-weight="normal" fill="#5b5e66" text-anchor="start">REST commands ⇄ SSE events</text>
+<path d="M405,254 L405,272" fill="none" stroke="#8a8d94" stroke-width="1.6" marker-end="url(#arr)"/>
+<path d="M520,307 L540,307" fill="none" stroke="#8a8d94" stroke-width="1.6" marker-end="url(#arr)"/>
+<path d="M540,219 L520,219" fill="none" stroke="#8a8d94" stroke-width="1.6" stroke-dasharray="4 3" marker-end="url(#arr)"/>
+<path d="M770,300 L846,300" fill="none" stroke="#0f6b5c" stroke-width="1.6" marker-end="url(#arrA)"/>
+<text x="808" y="292" font-size="11.5" font-weight="normal" fill="#0f6b5c" text-anchor="middle">out</text>
+<path d="M770,395 L846,395" fill="none" stroke="#2f4fb5" stroke-width="1.6" marker-end="url(#arrB)" marker-start="url(#arrBs)"/>
+<text x="808" y="387" font-size="11.5" font-weight="normal" fill="#2f4fb5" text-anchor="middle">in</text>
+<path d="M540,330 L530,330 L530,450" fill="none" stroke="#0f6b5c" stroke-width="1.6" marker-end="url(#arrA)"/>
+<path d="M655,430 L655,450" fill="none" stroke="#0f6b5c" stroke-width="1.6" marker-end="url(#arrA)"/>
+<path d="M405,450 L405,430" fill="none" stroke="#8a8d94" stroke-width="1.6" stroke-dasharray="4 3" marker-end="url(#arr)"/>
+<path d="M290,500 L280,500 L280,132 L290,132" fill="none" stroke="#8a8d94" stroke-width="1.6" stroke-dasharray="4 3" marker-end="url(#arr)"/>
+<text x="276" y="316" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="end">publish</text>
+<text x="24" y="580" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">Solid green: captured traffic (recorded as exchange.* events). Blue: wallet/verifier legs and service-to-service calls through the gateway.</text>
+<text x="24" y="600" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">Dashed: report reads, derive requests and publish to the SSE stream (only after the write). Diagnosis reads only persisted events.</text>
+<text x="24" y="620" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">Sources: README &quot;Architecture&quot;; apps/bff/src (orchestrator, capture, gateway, store, stream, diagnosis, report); compose.yaml; versions.lock.</text>
+</g>
+</svg>

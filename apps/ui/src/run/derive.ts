@@ -3,6 +3,7 @@ import { runCopy } from '../copy.js';
 import type { RailStep, RunFlows } from './flows.js';
 import type { RunView, StepView } from './reduce.js';
 
+/** The display label of a step key, or a neutral phrase when no step is known. */
 export function labelOf(stepKey: string | null, steps: readonly RailStep[]): string {
   if (!stepKey) return 'an earlier step';
   return steps.find((s) => s.stepKey === stepKey)?.label ?? stepKey;
@@ -16,17 +17,20 @@ export function runningText(view: RunView, steps: readonly RailStep[]): string |
   return runCopy.banner.running(at + 1, steps.length, steps[at]?.label ?? '');
 }
 
+/** The banner text explaining why a run is still queued (a shared collab environment is slower to free up). */
 export function queuedReason(view: RunView): string {
   const env = view.spec?.env;
   const collab = env ? Object.values(env).includes('collab') : false;
   return collab ? runCopy.banner.queuedCollab : runCopy.banner.queuedLocal;
 }
 
+/** The banner text telling the user what the run is waiting for. */
 export function awaitingText(view: RunView): string {
   const first = view.awaiting?.expects[0] ?? '';
   return runCopy.banner.awaiting(runCopy.awaitingHeading[first] ?? '');
 }
 
+/** The user-facing explanation of why a run failed, chosen by its error code; includes the request id for internal errors. */
 export function errorDetail(view: RunView, requestId = 'not given'): string {
   const f = view.failed;
   if (!f) return runCopy.errorCode.internal_error(requestId);
@@ -152,6 +156,7 @@ export function defaultStep(view: RunView, steps: readonly RailStep[]): string |
   );
 }
 
+/** Reads the selected step from a `#step=<key>` URL hash. */
 export function stepFromHash(hash: string): string | null {
   const m = /(?:^#|&)step=([^&]+)/.exec(hash);
   return m?.[1] ? decodeURIComponent(m[1]) : null;

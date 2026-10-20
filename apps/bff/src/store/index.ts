@@ -48,6 +48,10 @@ export function defaultDbPath(env: NodeJS.ProcessEnv = process.env): string {
   return path.join(env.DATA_DIR ?? '/data', 'playground.db');
 }
 
+/**
+ * Opens (creating if needed) the SQLite store, applies migrations and returns the writer (sink),
+ * reader and raw driver. File mode is restrictive because the holder keys live in this file.
+ */
 export function openStore(file: string, opts: OpenStoreOptions = {}): Store {
   const memory = file === ':memory:';
   if (!memory) {

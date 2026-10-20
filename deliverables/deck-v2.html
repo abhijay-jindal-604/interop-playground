@@ -1,0 +1,572 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Interop Playground deck</title>
+    <!--
+      Deck v2 (2026-10-21). Nine slides: problem, solution, how it works, the original angle,
+      results, technology stack, target audience, potential impact, run it yourself.
+      Self-contained except repository images (../docs/screenshots/, ../docs/diagrams/): no
+      external fonts or scripts. Keys: arrow keys or space to move, "n" toggles the speaker notes.
+      Print gives one slide per page. Deck v1 (deck-v1.html) is kept unchanged.
+    -->
+    <style>
+      :root {
+        --bg: #f6f5f1;
+        --fg: #1c1d21;
+        --muted: #5b5e66;
+        --slide: #ffffff;
+        --line: #d9d7cf;
+        --accent: #0f6b5c;
+        --fail: #a3341f;
+        --pass: #1d6b2f;
+        --code: #eceae3;
+        --future: #6a4c93;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme='light']) {
+          --bg: #141517;
+          --fg: #e9e8e4;
+          --muted: #a4a6ad;
+          --slide: #1d1f22;
+          --line: #34373c;
+          --accent: #5fc4b0;
+          --fail: #f08a72;
+          --pass: #7fd18e;
+          --code: #2a2c30;
+          --future: #c5a8ee;
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--fg);
+        font:
+          18px/1.45 system-ui,
+          -apple-system,
+          'Segoe UI',
+          sans-serif;
+      }
+      main {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 24px 16px 64px;
+      }
+      section.slide {
+        background: var(--slide);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        aspect-ratio: 16 / 9;
+        padding: 40px 56px;
+        margin: 0 0 24px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .num {
+        color: var(--muted);
+        font-size: 14px;
+        letter-spacing: 0.04em;
+      }
+      h1,
+      h2 {
+        margin: 8px 0 12px;
+        line-height: 1.15;
+      }
+      h1 {
+        font-size: 52px;
+      }
+      h2 {
+        font-size: 34px;
+      }
+      .message {
+        font-size: 22px;
+        color: var(--accent);
+        margin: 0 0 20px;
+      }
+      .visual {
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        gap: 16px;
+        align-items: stretch;
+      }
+      .box {
+        flex: 1;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 14px 16px;
+        font-size: 16px;
+      }
+      .box b {
+        display: block;
+        margin-bottom: 6px;
+      }
+      .box ul {
+        margin: 0;
+        padding-left: 18px;
+      }
+      .box li {
+        margin-bottom: 4px;
+      }
+      .arrow {
+        align-self: center;
+        color: var(--muted);
+        font-size: 28px;
+      }
+      .fail {
+        color: var(--fail);
+        font-weight: 600;
+      }
+      .pass {
+        color: var(--pass);
+        font-weight: 600;
+      }
+      .future {
+        display: inline-block;
+        border: 1px solid var(--future);
+        color: var(--future);
+        border-radius: 999px;
+        padding: 0 8px;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.03em;
+        vertical-align: 2px;
+      }
+      code {
+        background: var(--code);
+        padding: 1px 5px;
+        border-radius: 4px;
+        font-size: 0.9em;
+      }
+      .big {
+        font-size: 42px;
+        font-weight: 700;
+        line-height: 1;
+      }
+      .shot {
+        display: block;
+        max-width: 100%;
+        max-height: 100%;
+        margin: 0 auto;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        object-fit: contain;
+      }
+      table.stack {
+        border-collapse: collapse;
+        width: 100%;
+        font-size: 16px;
+      }
+      table.stack th,
+      table.stack td {
+        text-align: left;
+        border-bottom: 1px solid var(--line);
+        padding: 6px 10px 6px 0;
+        vertical-align: top;
+      }
+      table.stack th {
+        color: var(--muted);
+        font-weight: 600;
+        width: 18%;
+      }
+      .credits {
+        color: var(--muted);
+        margin-top: auto;
+      }
+      aside.notes {
+        display: none;
+        margin-top: 16px;
+        padding-top: 12px;
+        border-top: 1px solid var(--line);
+        font-size: 14px;
+        color: var(--muted);
+      }
+      body.show-notes aside.notes {
+        display: block;
+      }
+      body.show-notes section.slide {
+        aspect-ratio: auto;
+      }
+      @media (max-width: 760px) {
+        section.slide {
+          aspect-ratio: auto;
+          padding: 24px 20px;
+        }
+        h1 {
+          font-size: 34px;
+        }
+        h2 {
+          font-size: 26px;
+        }
+        .visual {
+          flex-direction: column;
+        }
+        .arrow {
+          transform: rotate(90deg);
+        }
+      }
+      @media print {
+        body {
+          background: #fff;
+        }
+        main {
+          padding: 0;
+          max-width: none;
+        }
+        section.slide {
+          page-break-after: always;
+          border: 0;
+          margin: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="slide" id="s1">
+        <div class="num">1 / 9</div>
+        <h1>Interop Playground</h1>
+        <p class="message">
+          Run Inji issuer → wallet → verifier combinations, see every message, and prove the fix for
+          a failure with one changed setting.
+        </p>
+        <div class="visual">
+          <img
+            class="shot"
+            src="../docs/screenshots/selector.png"
+            alt="The combination selector: issuer, wallet and verifier columns, with unavailable combinations greyed out"
+          />
+        </div>
+        <p class="credits">
+          Team Bhrinjal (Abhijay Jindal) · MOSIP Decode 2026, PS02 ·
+          https://github.com/abhijay-jindal-604/interop-playground
+        </p>
+        <aside class="notes">
+          Speaker: "We are Team Bhrinjal. Interop Playground runs Inji issuers, wallets and
+          verifiers against each other, shows every message on the wire, and proves fixes with a
+          re-run." Sources: README "What it does"; image
+          <code>docs/screenshots/selector.png</code> (the live selector).
+        </aside>
+      </section>
+
+      <section class="slide" id="s2">
+        <div class="num">2 / 9</div>
+        <h2>The problem</h2>
+        <p class="message">
+          A failed presentation is one opaque error; the cause sits in a message two hops earlier.
+        </p>
+        <div class="visual">
+          <div class="box">
+            <b>What the verifier says</b>
+            Inji Verify: <span class="fail">invalid</span><br />
+            <code>ERR_SIGNATURE_VERIFICATION_FAILED</code><br />
+            "getX509CertChain(...) must not be null"
+          </div>
+          <div class="arrow">→</div>
+          <div class="box">
+            <b>Where the cause is</b>
+            The walt.id credential, issued two hops earlier, carries no <code>x5c</code> chain in
+            its SD-JWT header, and Inji Verify requires one (gap G-55).
+          </div>
+          <div class="arrow">→</div>
+          <div class="box">
+            <b>Why it is slow today</b>
+            Issuer, wallet and verifier come from different teams. Nobody sees all the messages of
+            one journey in one place, so each failure is debugged by hand.
+          </div>
+        </div>
+        <aside class="notes">
+          Speaker: "When a credential fails at a verifier, you get one code. The cause is in an
+          earlier message that no single component shows." Source: run
+          <code>01M5B6KNNY7DC3YK3CR0ETNBN9</code>, report
+          <code>docs/reports/01M5B6KNNY7DC3YK3CR0ETNBN9.md</code> (live, 2026-10-20);
+          docs/overview.md "The problem".
+        </aside>
+      </section>
+
+      <section class="slide" id="s3">
+        <div class="num">3 / 9</div>
+        <h2>The solution</h2>
+        <p class="message">
+          Pick three roles, run the real protocols, inspect every payload, get a report.
+        </p>
+        <div class="visual">
+          <div class="box">
+            <b>Select</b>Issuer, wallet, verifier, format, mode. Impossible combinations are greyed
+            out with the reason and the gap ID.
+          </div>
+          <div class="arrow">→</div>
+          <div class="box">
+            <b>Run</b>OpenID4VCI 1.0 pre-authorized issuance and OpenID4VP 1.0 cross-device
+            presentation, live against Inji in Docker.
+          </div>
+          <div class="arrow">→</div>
+          <div class="box">
+            <b>Inspect</b>Every HTTP exchange, decoded SD-JWT disclosures and JOSE headers; each hop
+            labelled full / partial / none capture.
+          </div>
+          <div class="arrow">→</div>
+          <div class="box">
+            <b>Report and fix</b>Per-run JSON and Markdown report; a diagnosis card, and a one-click
+            fix-it re-run when the fix is proven.
+          </div>
+        </div>
+        <p>
+          Two formats live: SD-JWT VC (<code>dc+sd-jwt</code>) and W3C VC JSON-LD
+          (<code>ldp_vc</code>). Verifier labels <b>Valid</b>, <b>Invalid</b> and
+          <b>Valid-but-Expired</b>.
+        </p>
+        <aside class="notes">
+          Speaker: "Pick an issuer, a wallet and a verifier; we run OpenID4VCI and OpenID4VP for
+          real and hand you a report." Say "two formats live"; mDoc was cut (docs/decisions.md
+          2026-10-20). Sources: README "What it does", "Formats and labels"; screens in
+          docs/design.md.
+        </aside>
+      </section>
+
+      <section class="slide" id="s4">
+        <div class="num">4 / 9</div>
+        <h2>How it works</h2>
+        <p class="message">
+          One backend drives every role and records each exchange in an event log the UI replays.
+        </p>
+        <div class="visual">
+          <img
+            class="shot"
+            src="../docs/diagrams/architecture-components.svg"
+            alt="Component diagram: the browser talks to one BFF process (routes, orchestrator, adapters, capture, edge gateway, event sink with the SQLite event log, diagnosis and derive, report generator); Inji Certify, Inji Verify, Mimoto, eSignet, Inji Web, the walt.id peers and the JVM sidecar run in Docker behind the gateway"
+          />
+        </div>
+        <aside class="notes">
+          Speaker: "The backend makes every outbound call itself; the wallet's inbound legs pass
+          through an allowlisting gateway. Every event is redacted, persisted, then streamed to the
+          UI over Server-Sent Events, so a finished run replays exactly." Sources: README
+          "Architecture"; docs/architecture.md (four diagrams: components, data flow of one run,
+          issuance and presentation sequence, fix-it derive flow).
+        </aside>
+      </section>
+
+      <section class="slide" id="s5">
+        <div class="num">5 / 9</div>
+        <h2>The original angle: fix-it re-runs</h2>
+        <p class="message">
+          We do not only diagnose: we prove the fix by re-running with exactly one change.
+        </p>
+        <div class="visual">
+          <div class="box">
+            <b>Parent</b>walt.id → reference wallet → Inji Verify: <span class="fail">FAIL</span
+            ><br />
+            run <code>01M5B6KNNY7DC3YK3CR0ETNBN9</code>
+          </div>
+          <div class="arrow">→</div>
+          <div class="box">
+            <b>Diagnosis</b>FP-01, exact match, gap G-55. One offer: KNOB-01 <code>absent</code> →
+            <code>present</code>. No button when the cause is uncertain.
+          </div>
+          <div class="arrow">→</div>
+          <div class="box">
+            <b>Child</b>Same run, one knob changed: <span class="pass">PASS</span>, classified
+            <b>fixed</b>.<br />
+            run <code>01M5B6M723AQ7T818D36816PRV</code>
+          </div>
+        </div>
+        <p>"Changing only waltid.sdjwt.x5c from absent to present makes it pass."</p>
+        <aside class="notes">
+          Speaker: "A diagnosis with a proven fix gets one button. One knob changes, the run
+          repeats, and the result proves the fix." Proven live on 2026-10-20. Sources: reports
+          <code>docs/reports/01M5B6KNNY7DC3YK3CR0ETNBN9.md</code> and
+          <code>docs/reports/01M5B6M723AQ7T818D36816PRV.md</code>; live e2e
+          <code>e2e/live/fixit.live.spec.ts</code> (green 3× on
+          <code>scripts/up.sh --with peers</code>); golden replay
+          <code>apps/bff/src/diagnosis/fixit.golden.test.ts</code>; take
+          <code>deliverables/takes/s10-fixit.webm</code>.
+        </aside>
+      </section>
+
+      <section class="slide" id="s6">
+        <div class="num">6 / 9</div>
+        <h2>Results (v1, 2026-10-20)</h2>
+        <p class="message">Every number below has a run ID or a test in the repository.</p>
+        <div class="visual">
+          <div class="box">
+            <span class="big">75 %</span><b>pass rate (3 of 4)</b>Presentation cells: SD-JWT 2 of 3,
+            JSON-LD 1 of 1. The one failure is the walt.id cell, fixed by one knob.
+          </div>
+          <div class="box">
+            <span class="big">3 / 3</span><b>verifier labels</b>Valid, Invalid and
+            Valid-but-Expired, exactly as expected at the real Inji Verify.
+          </div>
+          <div class="box">
+            <span class="big">16</span><b>defect write-ups (D-01..D-16)</b>Drafted for the Inji
+            repositories, to be filed by hand. D-04 is reproduced live by the fix-it pair.
+          </div>
+          <div class="box">
+            <span class="big">682</span><b>automated tests passing</b>Plus 54 fixture Playwright
+            tests (axe, 320–1440 px, light and dark) and 6 CI jobs.
+          </div>
+        </div>
+        <aside class="notes">
+          Sources: docs/interop-report.md "Summary" (75 %, 3/4); docs/evidence/T-47-labels.md (runs
+          <code>01M5CBEB3M9ANDEDPFBQD5D0NX</code>, <code>01M5CBEB4BW718XJ7VW09CB7EF</code>,
+          <code>01M5CBEB5F7W1Z8G14VNN0PK3Q</code>); docs/gaps.md group (a), D-01..D-16; README
+          "Development and tests" (682 passing, 8 skipped, 60 files, and 54 fixture Playwright tests
+          at commit <code>2f162cd</code>); <code>.github/workflows/ci.yml</code> (jobs static, unit,
+          integration, sidecar, ui, ci-fast). The write-ups are drafts; most are research
+          reproductions, and only D-04 was re-run in the build. Current counts: docs/testing.md.
+        </aside>
+      </section>
+
+      <section class="slide" id="s7">
+        <div class="num">7 / 9</div>
+        <h2>Technology stack</h2>
+        <p class="message">TypeScript backend and UI, real Inji services, every image pinned.</p>
+        <div class="visual">
+          <table class="stack">
+            <tbody>
+              <tr>
+                <th>Backend</th>
+                <td>Node 22, TypeScript, Fastify 5, <code>better-sqlite3</code> event log</td>
+              </tr>
+              <tr>
+                <th>UI</th>
+                <td>
+                  React 18, Vite 7, React Router, Mermaid sequence diagrams, plain CSS tokens (light
+                  and dark)
+                </td>
+              </tr>
+              <tr>
+                <th>Live data</th>
+                <td>REST commands, Server-Sent Events (no WebSocket); OpenAPI 3.1 contract</td>
+              </tr>
+              <tr>
+                <th>Protocols</th>
+                <td>OpenID4VCI 1.0, OpenID4VP 1.0 with DCQL, SD-JWT VC, W3C VC (JSON-LD)</td>
+              </tr>
+              <tr>
+                <th>Inji stack</th>
+                <td>
+                  Inji Certify, Inji Verify, Mimoto, Inji Web <code>1.0.0-alpha.1</code>; eSignet
+                  <code>1.8.0</code>; walt.id <code>1.1.0</code> as an external peer
+                </td>
+              </tr>
+              <tr>
+                <th>Libraries</th>
+                <td>
+                  JVM sidecar (Gradle) with the Inji Kotlin libraries (built; not used by v1 flows)
+                </td>
+              </tr>
+              <tr>
+                <th>Ops and tests</th>
+                <td>
+                  Docker Compose, one <code>scripts/up.sh</code>, digests in
+                  <code>versions.lock</code>; Vitest, Playwright, axe-core, GitHub Actions CI
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <aside class="notes">
+          Sources: README "Tech stack", "Spec targets and versions";
+          <code>apps/bff/package.json</code>, <code>apps/ui/package.json</code>, root
+          <code>package.json</code>; <code>versions.lock</code>;
+          <code>packages/api/openapi.yaml</code>.
+        </aside>
+      </section>
+
+      <section class="slide" id="s8">
+        <div class="num">8 / 9</div>
+        <h2>Target audience</h2>
+        <p class="message">Anyone who has to make Inji work with something it did not ship with.</p>
+        <div class="visual">
+          <div class="box">
+            <b>Inji / MOSIP developers and integrators</b>See where a change breaks interop, with
+            the exact exchange and spec clause.
+          </div>
+          <div class="box">
+            <b>Wallet, issuer and verifier vendors</b>Test an implementation against real Inji
+            services before integrating; the walt.id issuer is the worked example.
+          </div>
+          <div class="box">
+            <b>Country ID programmes and system integrators</b>Check which issuer, wallet and
+            verifier combinations work, with evidence, before a rollout.
+          </div>
+          <div class="box">
+            <b>Conformance and QA teams</b>Repeatable runs from digest-pinned images, per-run
+            reports, and fixture credentials for Valid, Invalid and Expired.
+          </div>
+        </div>
+        <aside class="notes">
+          Speaker: "The playground is for people who integrate, not only for people who build Inji."
+          Each box maps to a shipped feature: selector and inspector (README "What it does"), the
+          walt.id flows (FLOW-08), versions.lock, the fixture issuer (FLOW-14, FLOW-40).
+        </aside>
+      </section>
+
+      <section class="slide" id="s9">
+        <div class="num">9 / 9</div>
+        <h2>Potential impact, and run it yourself</h2>
+        <p class="message">Faster interop debugging today; a shared compatibility record next.</p>
+        <div class="visual">
+          <div class="box">
+            <b>Faster interop debugging</b>The failing exchange, its decoded payload and a matched
+            cause in one screen; a proven fix in one click (FP-01 / KNOB-01).
+          </div>
+          <div class="box">
+            <b>Evidence-backed bug reports</b>16 drafted Inji defects in <code>docs/gaps.md</code>,
+            each with its evidence; filed upstream by hand.
+          </div>
+          <div class="box">
+            <b>Compatibility matrix</b> <span class="future">FUTURE</span><br />A nightly
+            cross-vendor matrix from the same runs. Not in v1.
+          </div>
+          <div class="box">
+            <b>Back to MOSIP</b> <span class="future">FUTURE</span><br />More fingerprints and
+            knobs, and fixes contributed upstream. Open source under MPL-2.0.
+          </div>
+        </div>
+        <p>
+          <code>git clone https://github.com/abhijay-jindal-604/interop-playground</code> →
+          <code>scripts/up.sh</code> → open <code>http://127.0.0.1:3100</code>. First Pass 3 min 1 s
+          after the clone (images cached). Docs: <code>README.md</code>,
+          <code>docs/architecture.md</code>, <code>docs/design.md</code>.
+        </p>
+        <p class="credits">Team Bhrinjal (Abhijay Jindal).</p>
+        <aside class="notes">
+          Speaker: "Clone, run one script, and your first combination passes in minutes." Sources:
+          docs/gaps.md group (a) D-01..D-16 and its "Filed issues" section (none filed yet); README
+          "Known limitations" (the interop matrix and nightly CI are not in v1);
+          <code>LICENSE</code> (MPL-2.0); docs/evidence/T-55-fresh-clone.md (git clone →
+          <code>scripts/up.sh</code> 2 min 40 s → first run Pass,
+          <code>01M5CCC4FZRMCCWMVQF5038EYS</code>, 3 min 1 s on a host with every image cached; a
+          new host adds the image pulls). Demo video: deliverables/video/demo-v1.mp4.
+        </aside>
+      </section>
+    </main>
+    <script>
+      (() => {
+        const slides = [...document.querySelectorAll('section.slide')];
+        let i = 0;
+        const go = (n) => {
+          i = Math.max(0, Math.min(slides.length - 1, n));
+          slides[i].scrollIntoView({ behavior: 'smooth', block: 'start' });
+        };
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') {
+            e.preventDefault();
+            go(i + 1);
+          } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+            e.preventDefault();
+            go(i - 1);
+          } else if (e.key === 'n') {
+            document.body.classList.toggle('show-notes');
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>

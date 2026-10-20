@@ -139,8 +139,15 @@ interface RunCaps {
 
 type StoredPayload = Record<string, unknown>;
 
+/** Thrown inside a transaction to roll it back deliberately without reporting an error. */
 class RollbackSignal extends Error {}
 
+/**
+ * The single writer of the event tables. `append` redacts secrets, applies the size caps, stores
+ * bodies as content-addressed blobs and inserts the event inside one transaction; only after the
+ * commit is anything handed to subscribers, so a published event is always already persisted.
+ * Per-run caps (bodies, exchanges, artifacts) are tracked here and rebuilt from the DB on first use.
+ */
 export class EventSink {
   readonly registry: SecretRegistry;
   private readonly now: () => Date;
@@ -154,10 +161,12 @@ export class EventSink {
     this.now = opts.now ?? (() => new Date());
   }
 
+  /** Current time as an ISO string, from the injectable clock. */
   private ts(): string {
     return this.now().toISOString();
   }
 
+  /** Per-run size counters (bodies, exchanges, artifacts), rebuilt from the database the first time a run is seen after a restart. */
   private runCaps(runId: string): RunCaps {
     let c = this.caps.get(runId);
     if (!c) {
@@ -186,6 +195,7 @@ export class EventSink {
     return c;
   }
 
+  /** Marks the run (and the step) as having hit a size cap, so the truncation can be reported. */
   private limit(runId: string, stepKey: string | undefined): void {
     const c = this.runCaps(runId);
     c.anyLimited = true;
@@ -272,6 +282,7 @@ export class EventSink {
     });
   }
 
+  /** Stores the product versions the run was created against, one row per role. */
   private insertRunVersions(runId: string, spec: RunSpec): void {
     for (const role of ['issuer', 'wallet', 'verifier'] as const) {
       const v = spec.versions[role];
@@ -348,6 +359,7 @@ export class EventSink {
     );
   }
 
+  /** Inserts a body blob; identical content is stored once. */
   private putBlob(stored: Buffer): void {
     const b = encodeBlob(stored);
     this.db.run(
@@ -859,23 +871,27 @@ function versionsKey(spec: RunSpec): string {
   return sha256Hex(tuples.join('\u001e'));
 }
 
+/** Body state stored on an exchange row: stored, truncated, dropped by the run cap, or none. */
 function bodyState(ref: StoredBodyRef | null, state: unknown): string {
   if (ref) return ref.truncated ? 'truncated' : 'stored';
   return state === 'dropped_run_cap' ? 'dropped_run_cap' : 'none';
 }
 
+/** Case-insensitive lookup of one header value in a stored header list. */
 function headerValue(headers: unknown, name: string): string | null {
   if (!Array.isArray(headers)) return null;
   const h = (headers as [string, string][]).find(([n]) => n.toLowerCase() === name);
   return h ? h[1] : null;
 }
 
+/** Coerces an unknown value to a string, or null. */
 function str(v: unknown): string | null {
   if (v === undefined || v === null) return null;
   if (typeof v === 'string') return v;
   if (typeof v === 'number' || typeof v === 'boolean' || typeof v === 'bigint') return `${v}`;
   return JSON.stringify(v) ?? null;
 }
+/** Coerces an unknown value to a finite number, or null. */
 function num(v: unknown): number | null {
   return typeof v === 'number' && Number.isFinite(v) ? v : null;
 }

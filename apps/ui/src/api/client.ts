@@ -12,6 +12,7 @@ import type { ErrorEnvelope } from '@interop-playground/api';
 
 export const API_BASE = '/api/v1';
 
+/** An API failure carrying the server's error code, HTTP status and request id. */
 export class ApiError extends Error {
   /** an ErrorCode, or an unknown code from a newer server (UI-31 fallback) */
   readonly code: string;
@@ -56,6 +57,7 @@ function isEnvelope(value: unknown): value is ErrorEnvelope {
 
 export type Query = Record<string, string | number | boolean | undefined | null>;
 
+/** Appends the non-empty query parameters to a path. */
 export function withQuery(path: string, query?: Query): string {
   if (!query) return path;
   const params = new URLSearchParams();
@@ -101,10 +103,12 @@ async function request<T>(
   return data as T;
 }
 
+/** GET a JSON resource from the BFF; throws `ApiError` on a non-2xx response. */
 export function apiGet<T>(path: string, query?: Query, signal?: AbortSignal): Promise<T> {
   return request<T>('GET', withQuery(path, query), undefined, signal);
 }
 
+/** Send a JSON body with POST, PATCH or DELETE; throws `ApiError` on a non-2xx response. */
 export function apiSend<T>(
   method: 'POST' | 'PATCH' | 'DELETE',
   path: string,

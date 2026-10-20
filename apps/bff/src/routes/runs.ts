@@ -18,6 +18,10 @@ export interface RunRouteOptions {
   now?: () => number;
 }
 
+/**
+ * Registers the run endpoints: preview, create (idempotent per `Idempotency-Key`), get, list and
+ * cancel. Creation resolves the request into a run spec before anything is persisted.
+ */
 export function registerRuns(app: FastifyInstance, opts: RunRouteOptions): void {
   const { store, orchestrator } = opts;
   const now = opts.now ?? Date.now;

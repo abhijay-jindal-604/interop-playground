@@ -24,11 +24,15 @@ const DEFAULT_MESSAGE: Partial<Record<ErrorCode, string>> = {
   internal_error: 'The playground hit an unexpected fault; see the BFF log for this request id.',
 };
 
-/** `details` of `validation_failed` (04 §6.2): `{issues:[{path, message}]}`. */
+/**
+ * Wraps validation issues into the `details` field of an error.
+ * `details` of `validation_failed` (04 §6.2): `{issues:[{path, message}]}`.
+ */
 export function issueDetails(list: { path: string; message: string }[]): Record<string, unknown> {
   return { issues: list };
 }
 
+/** The fixed HTTP status of an error code. */
 export function statusOf(code: ErrorCode): number {
   return ERROR_STATUS[code];
 }
@@ -38,6 +42,7 @@ export function isRetryable(status: number): boolean {
   return status === 429 || status === 503;
 }
 
+/** An error that maps to the standard error envelope: a stable code, its HTTP status, and optional details. */
 export class ApiError extends Error {
   readonly code: ErrorCode;
   readonly status: number;
@@ -59,6 +64,7 @@ export class ApiError extends Error {
   }
 }
 
+/** Builds the standard error body, including the request id for correlation with the server log. */
 export function envelope(err: ApiError, requestId: string): ErrorEnvelope {
   const body: ErrorEnvelope = {
     error: {
@@ -73,6 +79,7 @@ export function envelope(err: ApiError, requestId: string): ErrorEnvelope {
   return body;
 }
 
+/** Sends an `ApiError` as the standard envelope, adding `Retry-After` for rate-limit and unavailable codes. */
 export function sendError(reply: FastifyReply, err: ApiError): FastifyReply {
   if (RETRY_AFTER_CODES.has(err.code)) {
     const s =
@@ -125,7 +132,10 @@ function fromFastifyError(err: FastifyError): ApiError {
   return new ApiError('internal_error');
 }
 
-/** Installs the error and not-found handlers (04 §6.1 rules 3, 4). */
+/**
+ * Installs the error handler so every failure, including framework errors, leaves as the standard envelope; internal error text is logged, never sent.
+ * Installs the error and not-found handlers (04 §6.1 rules 3, 4).
+ */
 export function registerErrorHandling(app: FastifyInstance): void {
   app.setErrorHandler((err: FastifyError, request: FastifyRequest, reply: FastifyReply) => {
     const apiErr = err instanceof ApiError ? err : fromFastifyError(err);

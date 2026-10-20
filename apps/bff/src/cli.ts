@@ -80,6 +80,10 @@ async function guarded(io: CliIo, fn: () => Promise<void> | void): Promise<numbe
   }
 }
 
+/**
+ * Runs one `playground` subcommand and returns its exit code (2 means a usage error). I/O and the
+ * environment come in through `io` so every command is testable without a process.
+ */
 export async function runCli(argvIn: string[], io: CliIo): Promise<number> {
   const argv = [...argvIn];
   const cmd = argv.shift();

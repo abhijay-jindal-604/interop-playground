@@ -17,6 +17,7 @@ export const REGISTRY_ENV_KEYS = [
 /** values shorter than this would corrupt unrelated data when substituted (05 §6) */
 export const MIN_SECRET_LENGTH = 4;
 
+/** The placeholder written in place of a secret; names the secret, never reveals it. */
 export const marker = (name: string): string => `«redacted:${name}»`;
 
 interface Entry {
@@ -42,6 +43,12 @@ function formsOf(value: string): string[] {
     .sort((x, y) => y.length - x.length);
 }
 
+/**
+ * The set of secret values (admin token, client secrets, private keys from the env files) that must
+ * never reach storage or the wire. Each secret is matched in its plain, URL-encoded, JSON-escaped,
+ * base64 and base64url forms. Protocol test material such as tokens and credentials is deliberately
+ * not registered.
+ */
 export class SecretRegistry {
   private readonly entries: Entry[] = [];
 
@@ -112,7 +119,10 @@ export class SecretRegistry {
   }
 }
 
-/** minimal `.env` parser: KEY=VALUE lines, `#` comments, optional surrounding quotes */
+/**
+ * Parses `KEY=value` lines (optional `export`, optional quotes); comments and malformed lines are skipped.
+ * Minimal `.env` parser: KEY=VALUE lines, `#` comments, optional surrounding quotes.
+ */
 export function parseEnvFile(text: string): Record<string, string> {
   const out: Record<string, string> = {};
   for (const line of text.split(/\r?\n/)) {
@@ -134,7 +144,10 @@ export interface RegistrySources {
   adminTokenFile?: string;
 }
 
-/** Builds the registry from the process env, `.env` / `.env.local` and the admin token file. Empty values are skipped. */
+/**
+ * Builds the registry from env files, the process env and the admin token file; missing files are ignored.
+ * Builds the registry from the process env, `.env` / `.env.local` and the admin token file. Empty values are skipped.
+ */
 export function loadRegistry(src: RegistrySources = {}): SecretRegistry {
   const merged: Record<string, string | undefined> = {};
   for (const f of src.envFiles ?? []) {
@@ -152,7 +165,10 @@ export function loadRegistry(src: RegistrySources = {}): SecretRegistry {
   return reg;
 }
 
-/** the default sources inside the repo / container: `.env`, `.env.local`, `certs/bff-admin.token` */
+/**
+ * The standard places secrets live, relative to the repo root: `.env`, `.env.local` and `certs/bff-admin.token`.
+ * The default sources inside the repo / container: `.env`, `.env.local`, `certs/bff-admin.token`.
+ */
 export function defaultRegistrySources(root: string = process.cwd()): RegistrySources {
   return {
     env: process.env,

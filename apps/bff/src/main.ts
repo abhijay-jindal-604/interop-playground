@@ -80,7 +80,10 @@ function readTls(env: NodeJS.ProcessEnv): { cert: Buffer; key: Buffer } | null {
   return { cert: readFileSync(cert), key: readFileSync(key) };
 }
 
-/** the adapters' view of the gateway index; route tables are merged per run (issuer + verifier) */
+/**
+ * Adapts the gateway's correlation index to the narrower interface the orchestrator uses, remembering each run's routes.
+ * The adapters' view of the gateway index; route tables are merged per run (issuer + verifier)
+ */
 export function gatewayCorrelation(index: CorrelationIndex): GatewayCorrelation {
   const tables = new Map<string, RouteEntry[]>();
   return {
@@ -93,7 +96,10 @@ export function gatewayCorrelation(index: CorrelationIndex): GatewayCorrelation 
   };
 }
 
-/** the `holder_keys` / `run_keys` repository (05 §4.1; the only reader of `private_jwk_json`) */
+/**
+ * Holder key storage backed by the SQLite store: one holder key per run.
+ * The `holder_keys` / `run_keys` repository (05 §4.1; the only reader of `private_jwk_json`)
+ */
 export function sqlHolderKeyStore(
   db: SqlDriver,
   now: () => Date = () => new Date(),
@@ -140,7 +146,10 @@ export function sqlHolderKeyStore(
   };
 }
 
-/** the orchestrator's key service over a store */
+/**
+ * Holder-key service over the store's database.
+ * The orchestrator's key service over a store.
+ */
 export function holderKeysFor(store: Pick<Store, 'driver'>): HolderKeyService {
   const repo = sqlHolderKeyStore(store.driver);
   return new HolderKeyService(() => repo);
@@ -167,7 +176,10 @@ export interface MainOptions {
   wallets?: Readonly<Record<string, WalletAdapter>>;
 }
 
-/** the AdapterSet registered with the orchestrator (env overrides are for host-side runs) */
+/**
+ * Builds the adapter set from the environment; tests may override parts through `opts`.
+ * The AdapterSet registered with the orchestrator (env overrides are for host-side runs)
+ */
 export function adaptersFor(
   env: NodeJS.ProcessEnv,
   correlation: CorrelationIndex,
@@ -186,6 +198,10 @@ export function adaptersFor(
   });
 }
 
+/**
+ * Starts the whole BFF process: store, event bus, gateway listeners and API/UI server, sharing
+ * one store and one self-call token. The returned handle stops everything.
+ */
 export async function main(
   env: NodeJS.ProcessEnv = process.env,
   opts: MainOptions = {},

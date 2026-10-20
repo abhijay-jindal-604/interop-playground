@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { copy } from '../copy.js';
 import { PageFrame } from './PageFrame.js';
 
+/** Shown for any URL that matches no route. */
 export function NotFoundPage() {
   const { pathname } = useLocation();
   return (

@@ -15,6 +15,7 @@ export interface EnvRouteDeps {
   adminToken: () => string | null;
 }
 
+/** Returns a reader for a token file that yields null when the file is missing or empty. */
 export function fileToken(file: string): () => string | null {
   return () => {
     try {
@@ -32,6 +33,7 @@ function sameToken(given: string, expected: string): boolean {
   return a.length === b.length && timingSafeEqual(a, b);
 }
 
+/** Registers the environment endpoints: current snapshot and the rate-limited upstream probe. */
 export function registerEnv(app: FastifyInstance, deps: EnvRouteDeps): void {
   app.get('/api/v1/env', (_request, reply) =>
     reply.header('Cache-Control', 'no-cache').send(deps.env.snapshot()),

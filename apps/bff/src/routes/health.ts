@@ -19,6 +19,7 @@ export interface HealthDeps {
   adapters?: () => Health['adapters'];
 }
 
+/** Registers `GET /api/v1/health`: BFF liveness; status is `degraded` when the JVM sidecar is unreachable. */
 export function registerHealth(app: FastifyInstance, deps: HealthDeps): void {
   app.get('/api/v1/health', async (_request, reply) => {
     const sidecar = await deps.probeSidecar().catch(() => ({ reachable: false, version: null }));

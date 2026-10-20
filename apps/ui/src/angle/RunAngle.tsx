@@ -45,6 +45,7 @@ function useLoad<T>(path: string | null): [Load<T> | null, () => void] {
   return [state && state.path === path ? state.load : { status: 'loading' }, reload];
 }
 
+/** The knob catalogue as a list, empty until it has loaded. */
 export function useKnobs() {
   const knobs = useStore((s) => s.catalog.knobs);
   return useMemo(() => (knobs.status === 'ready' ? knobList(knobs.data) : []), [knobs]);
@@ -75,6 +76,7 @@ export function ChildBannerSlot({ view, run }: { view: RunView; run: Run | null 
   );
 }
 
+/** The diagnosis and fix-it section of the run screen: shows the matched cause and, when allowed, the one-knob re-run offer. */
 export function RunAngle({
   runId,
   view,

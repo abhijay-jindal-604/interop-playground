@@ -1,6 +1,6 @@
 # Interop Playground: overview
 
-_v1, 2026-10-20. Every fact below is backed by a run ID, a test or an evidence file in this repository._
+_v1, 2026-10-20. Team Bhrinjal (Abhijay Jindal), MOSIP Decode 2026, PS02. Every fact below is backed by a run ID, a test or an evidence file in this repository._
 
 ![The combination selector: issuer, wallet and verifier columns, with unavailable combinations greyed out](screenshots/selector.png)
 
@@ -40,4 +40,6 @@ We found and documented Inji defects with reproduction steps. They are drafted a
 
 Run `scripts/up.sh`, then open `http://127.0.0.1:3100`. The quickstart, the shipped flows and the tests are in the [README](../README.md); the demo video is [`deliverables/video/demo-v1.mp4`](../deliverables/video/demo-v1.mp4).
 
-Built by Abhijay Jindal.
+The API is documented in [`api.md`](api.md), the test cases and results in [`testing.md`](testing.md), and the sample data in [`test-data.md`](test-data.md).
+
+Team Bhrinjal: Abhijay Jindal.

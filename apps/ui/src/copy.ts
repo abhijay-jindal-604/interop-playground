@@ -8,6 +8,7 @@ import type { ErrorCode } from '@interop-playground/api';
 export const APP_NAME = 'Interop Playground';
 export const BFF_ORIGIN_TEXT = 'http://127.0.0.1:3100';
 
+/** Browser tab title for a screen: "<screen> · <app name>", or the app name alone. */
 export const pageTitle = (screen?: string): string =>
   screen ? `${screen} · ${APP_NAME}` : APP_NAME;
 

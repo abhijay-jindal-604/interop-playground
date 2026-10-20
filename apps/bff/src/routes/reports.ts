@@ -15,6 +15,7 @@ export interface ReportRouteOptions {
   now?: () => Date;
 }
 
+/** Registers `GET /api/v1/reports/runs/:runId`: the per-run report as JSON or Markdown. */
 export function registerReports(app: FastifyInstance, opts: ReportRouteOptions): void {
   app.get<{ Params: { runId: string }; Querystring: Record<string, string | undefined> }>(
     '/api/v1/reports/runs/:runId',

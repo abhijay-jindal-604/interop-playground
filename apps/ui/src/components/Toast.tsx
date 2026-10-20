@@ -60,6 +60,7 @@ function Toast({ toast, from }: { toast: ToastItem; from: Store }) {
   );
 }
 
+/** Live region that renders the store's toasts. */
 export function ToastRegion({ from = appStore }: { from?: Store }) {
   const toasts = useStore((s) => s.toasts, from);
   return (

@@ -3,6 +3,7 @@ import { useEffect, useId, useRef } from 'react';
 import { copy } from '../copy.js';
 import { GLOBAL_SHORTCUTS, OTHER_KEYS } from './shortcuts.js';
 
+/** Modal listing the keyboard shortcuts; closes on Escape and returns focus to where it was. */
 export function ShortcutsDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   const ref = useRef<HTMLDialogElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);

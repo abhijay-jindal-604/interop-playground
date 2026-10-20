@@ -122,6 +122,7 @@ export function offerByValue(uri: string): unknown {
   }
 }
 
+/** Drives the walt.id issuer-api2 peer: mints an offer by value for the SD-JWT profile and, for KNOB-01 `present`, sends the issuer key and certificate chain as runtime overrides. */
 export class WaltidIssuer implements IssuerAdapter {
   readonly descriptor: AdapterDescriptor;
   private readonly internal: string;

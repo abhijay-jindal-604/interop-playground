@@ -7,6 +7,7 @@ import { store, useStore } from '../state/store.js';
 import { InlineError } from '../components/InlineError.js';
 import { Icon } from '../components/Icon.js';
 
+/** Button that asks the BFF to re-probe the upstream products, and shows the error if that fails. */
 export function ProbeButton({ label = copy.env.probeNow, size }: { label?: string; size?: 'sm' }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<unknown>(null);

@@ -67,6 +67,7 @@ export interface InspectorModel {
   events: readonly EventEnvelope[];
 }
 
+/** Builds the inspector's exchange and engine-call lists from the event log; each request is joined to its response by exchange id. */
 export function buildModel(events: readonly EventEnvelope[]): InspectorModel {
   const exchanges: ExchangeView[] = [];
   const byId = new Map<string, ExchangeView>();
@@ -244,6 +245,7 @@ export interface DeliveryOutput {
   uriSha256: string | null;
 }
 
+/** The most recent offer or request delivery, which the awaiting panel shows as a QR code and link. */
 export function latestDelivery(events: readonly EventEnvelope[]): DeliveryOutput | null {
   for (let i = events.length - 1; i >= 0; i--) {
     const e = events[i];
@@ -254,6 +256,7 @@ export function latestDelivery(events: readonly EventEnvelope[]): DeliveryOutput
   return null;
 }
 
+/** Reads a delivery (channel and URI) from an `engine.call` event, or null for other operations. */
 export function deliveryOf(e: EventEnvelope<'engine.call'>): DeliveryOutput | null {
   const p = e.payload;
   if (p.op !== 'deliver-offer' && p.op !== 'deliver-request') return null;

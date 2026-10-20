@@ -37,6 +37,7 @@ const ARTIFACT_KINDS = [
 ];
 const VALUE_OPS = ['eq', 'contains', 'regex', 'count-eq', 'equals-path', 'differs-from-path'];
 
+/** Checks one fingerprint predicate against the field set its kind allows. */
 export function validatePredicate(p: unknown, at: string): string[] {
   if (!isObj(p) || typeof p.on !== 'string') return [`${at}: must be an object with "on"`];
   const shape = PRED_FIELDS[p.on];
@@ -102,6 +103,7 @@ export interface LibraryLoad {
   errors: { file: string; errors: string[] }[];
 }
 
+/** Reads every fingerprint file in `dir`, collecting errors instead of stopping at the first. */
 export function readLibrary(dir: string): LibraryLoad {
   const out: LibraryLoad = { fingerprints: [], errors: [] };
   if (!existsSync(dir)) return out;
@@ -123,6 +125,7 @@ export function readLibrary(dir: string): LibraryLoad {
   return out;
 }
 
+/** Thrown when the fingerprint library has any invalid file. */
 export class LibraryError extends Error {
   constructor(readonly problems: LibraryLoad['errors']) {
     super(

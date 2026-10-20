@@ -18,6 +18,7 @@ export interface DiagnosisRouteOptions {
   env: ResolveEnv;
 }
 
+/** Builds the diagnosis response for a run: matches, plus fix-it offers only when the offer is still valid in the current environment. */
 export function diagnosisOf(store: Store, env: ResolveEnv, runId: string): DiagnosisResponse {
   const row = getRunRow(store, runId);
   const d = readDiagnosis(store, runId);
@@ -29,6 +30,7 @@ export function diagnosisOf(store: Store, env: ResolveEnv, runId: string): Diagn
   return d;
 }
 
+/** Registers `GET /api/v1/runs/:runId/diagnosis`. */
 export function registerDiagnosis(app: FastifyInstance, opts: DiagnosisRouteOptions): void {
   app.get<{ Params: { runId: string } }>('/api/v1/runs/:runId/diagnosis', (request, reply) => {
     void reply.header('Cache-Control', 'no-cache');

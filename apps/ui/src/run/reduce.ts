@@ -55,6 +55,7 @@ export interface RunView {
   lastSeq: number;
 }
 
+/** An empty run view, before any event has arrived. */
 export function initialRunView(): RunView {
   return {
     runId: null,
@@ -251,6 +252,7 @@ export function reduceRunView(view: RunView, event: EventEnvelope): RunView {
   return next;
 }
 
+/** Folds a list of events into a run view. The same events always produce the same view, which is what makes replay equal live. */
 export function reduceAll(
   events: readonly EventEnvelope[],
   from: RunView = initialRunView(),
@@ -289,5 +291,6 @@ export function viewStateOf(view: RunView, flowsReady: boolean): ViewState {
   }
 }
 
+/** True once the run can no longer change. */
 export const isTerminal = (v: RunView): boolean =>
   v.state === 'completed' || v.state === 'failed' || v.state === 'cancelled';

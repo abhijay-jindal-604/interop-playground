@@ -66,6 +66,7 @@ export interface AppState {
 
 const idle = { status: 'idle' } as const;
 
+/** The state of the app store before anything has loaded. */
 export function initialState(): AppState {
   return {
     boot: 'loading',
@@ -154,6 +155,7 @@ export interface Store {
   subscribe: (listener: Listener) => () => void;
 }
 
+/** A minimal external store (get, set, subscribe) for `useSyncExternalStore`; tests create their own. */
 export function createStore(state: AppState = initialState()): Store {
   let current = state;
   const listeners = new Set<Listener>();
@@ -174,6 +176,7 @@ export function createStore(state: AppState = initialState()): Store {
 
 export const store = createStore();
 
+/** Reads a selected part of the store and re-renders only when that part changes. */
 export function useStore<T>(selector: (s: AppState) => T, from: Store = store): T {
   return useSyncExternalStore(
     from.subscribe,
@@ -186,6 +189,7 @@ export function useStore<T>(selector: (s: AppState) => T, from: Store = store): 
 let toastId = 0;
 export const MAX_TOASTS = 3;
 
+/** Shows a toast; keeps only the most recent few. Returns its id. */
 export function pushToast(toast: Omit<ToastItem, 'id'>, into: Store = store): number {
   toastId += 1;
   const id = toastId;
@@ -193,6 +197,7 @@ export function pushToast(toast: Omit<ToastItem, 'id'>, into: Store = store): nu
   return id;
 }
 
+/** Removes a toast by id. */
 export function dismissToast(id: number, into: Store = store): void {
   into.set((s) => ({ ...s, toasts: s.toasts.filter((t) => t.id !== id) }));
 }

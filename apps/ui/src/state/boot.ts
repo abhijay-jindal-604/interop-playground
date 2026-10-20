@@ -24,6 +24,7 @@ function settle<T>(r: PromiseSettledResult<T>): Load<T> {
     : { status: 'error', error: r.reason };
 }
 
+/** Loads the environment snapshot into the store; marks the backend as offline on failure. */
 export async function loadEnv(s: Store): Promise<void> {
   try {
     const data = await apiGet<EnvSnapshot>('/env');
@@ -33,6 +34,7 @@ export async function loadEnv(s: Store): Promise<void> {
   }
 }
 
+/** Start-up sequence: loads the environment and the catalogue, and reports whether the app is ready. */
 export async function boot(s: Store): Promise<AppState['boot']> {
   const loading = { status: 'loading' } as const;
   s.set((st) => ({

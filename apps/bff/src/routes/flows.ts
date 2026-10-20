@@ -26,6 +26,7 @@ function indexEntry(def: FlowDefinition): FlowIndexEntry {
   };
 }
 
+/** Registers `GET /api/v1/flows`: the loaded flow definitions, optionally filtered by query. */
 export function registerFlows(app: FastifyInstance, flows: Map<string, FlowDefinition>): void {
   app.get<{ Querystring: Record<string, string | undefined> }>(
     '/api/v1/flows',

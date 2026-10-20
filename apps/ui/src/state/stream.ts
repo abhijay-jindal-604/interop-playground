@@ -62,15 +62,18 @@ const TERMINAL: ReadonlySet<EventType> = new Set(['run.completed', 'run.failed',
 const CONNECTING = 0;
 const CLOSED = 2;
 
+/** URL of a stream's SSE endpoint, resuming after event `after`. */
 export function streamUrl(streamId: StreamId, after: number): string {
   const base = `${API_BASE}/streams/${encodeURIComponent(streamId)}/events`;
   return after > 0 ? `${base}?after=${after}` : base;
 }
 
+/** Opens the browser's native EventSource. */
 function defaultSource(url: string): EventSourceLike {
   return new EventSource(url);
 }
 
+/** Client for one event stream. It replays what the server stored, then tails live events over SSE, and reconnects from the last received sequence number so nothing is missed or doubled. */
 export class StreamClient {
   private readonly deps: StreamDeps;
   private source: EventSourceLike | null = null;
@@ -102,6 +105,7 @@ export class StreamClient {
     return this.status;
   }
 
+  /** Opens the stream. */
   start(): void {
     this.open();
   }
@@ -142,11 +146,13 @@ export class StreamClient {
     }
   }
 
+  /** Closes the SSE connection, if open. */
   private closeSource(): void {
     this.source?.close();
     this.source = null;
   }
 
+  /** The connection opened: cancel pending reconnect timers and mark the stream live, or caught up after a drop. */
   private onOpen(): void {
     if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
     this.reconnectTimer = null;
@@ -162,6 +168,7 @@ export class StreamClient {
     }
   }
 
+  /** The connection errored. While the browser is still retrying this shows "reconnecting"; once it gave up without an end frame, fall back to polling. */
   private onError(source: EventSourceLike): void {
     if (this.isFinal()) return;
     if (source.readyState === CLOSED) {
@@ -188,6 +195,7 @@ export class StreamClient {
     }, RECONNECT_BANNER_MS);
   }
 
+  /** Handles the server's `stream.end` frame: closes for good, first paging in any events the stream promised but we never received. */
   private async onEnd(e: MessageEvent<string>): Promise<void> {
     let end: StreamEndFrame = { reason: 'closed', lastSeq: this.status.lastSeq };
     try {
@@ -203,6 +211,7 @@ export class StreamClient {
     this.set({ state: 'closed', end });
   }
 
+  /** Applies one event. Duplicates (already seen sequence numbers) are dropped and a gap triggers recovery by paging, so each event is applied exactly once and in order. */
   private onMessage(e: MessageEvent<string>): void {
     let envelope: EventEnvelope;
     try {
@@ -229,6 +238,7 @@ export class StreamClient {
     return 'applied';
   }
 
+  /** After a gap in sequence numbers, pages the missing events as JSON, then reopens the live stream. */
   private async recoverGap(): Promise<void> {
     this.recovering = true;
     this.closeSource();
@@ -273,11 +283,13 @@ export class StreamClient {
     this.pollTimer = setInterval(() => void this.pollOnce(), POLL_MS);
   }
 
+  /** Stops the JSON polling fallback. */
   private stopPolling(): void {
     if (this.pollTimer) clearInterval(this.pollTimer);
     this.pollTimer = null;
   }
 
+  /** One round of the polling fallback: fetches events after the last seen. */
   private async pollOnce(): Promise<void> {
     if (this.status.state !== 'polling') return;
     try {
@@ -317,6 +329,7 @@ export class StreamClient {
     }
   }
 
+  /** A 410 `gone` (the run's events were pruned) ends the stream for good; returns true when it did. */
   private handleGone(err: unknown): boolean {
     if (err instanceof ApiError && err.code === 'gone') {
       this.closeSource();
@@ -332,6 +345,7 @@ export class StreamClient {
     return this.status.state === 'closed' || this.status.state === 'gone';
   }
 
+  /** Cancels the reconnect and polling timers. */
   private clearTimers(): void {
     if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
     if (this.caughtUpTimer) clearTimeout(this.caughtUpTimer);
@@ -340,6 +354,7 @@ export class StreamClient {
     this.stopPolling();
   }
 
+  /** Updates the connection status and notifies the listener. */
   private set(patch: Partial<StreamStatus>): void {
     this.status = { ...this.status, ...patch };
     if (this.status.state === 'closed' || this.status.state === 'gone') this.clearTimers();
@@ -347,6 +362,7 @@ export class StreamClient {
   }
 }
 
+/** Fetches one page of stored events as JSON, used for replay and as the fallback when SSE is unavailable. */
 export function defaultFetchPage(streamId: StreamId, after: number): Promise<EventPage> {
   return apiGet<EventPage>(`/streams/${encodeURIComponent(streamId)}/events`, {
     format: 'json',

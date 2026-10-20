@@ -19,6 +19,7 @@ export interface Migration {
   checksum: string;
 }
 
+/** Store-level failure with a stable `code` (bad migration state, unknown or closed run, oversized spec). */
 export class StoreError extends Error {
   constructor(
     readonly code:
@@ -37,10 +38,12 @@ export class StoreError extends Error {
   }
 }
 
+/** Lowercase hex SHA-256; used for migration checksums and blob addressing. */
 export function sha256Hex(data: string | Uint8Array): string {
   return createHash('sha256').update(data).digest('hex');
 }
 
+/** Reads the numbered `NNNN_name.sql` files of `dir` in order and checksums each; other files are ignored. */
 export function loadMigrations(dir: string = MIGRATIONS_DIR): Migration[] {
   const out: Migration[] = [];
   for (const file of readdirSync(dir).sort()) {
@@ -72,6 +75,12 @@ export interface MigrateResult {
   backup: string | null;
 }
 
+/**
+ * Brings the database to the newest schema. Forward-only: applied migrations are checksum-verified
+ * (an edited or missing one throws), a database newer than this build is refused, and each pending
+ * migration runs in its own transaction that rolls back on failure. A backup is taken first when
+ * the database already holds data.
+ */
 export function migrate(db: SqlDriver, opts: MigrateOptions = {}): MigrateResult {
   const migrations = loadMigrations(opts.migrationsDir);
   const newest = migrations.length;

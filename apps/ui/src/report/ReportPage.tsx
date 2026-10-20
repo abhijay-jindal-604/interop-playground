@@ -33,6 +33,7 @@ type Tab = (typeof TABS)[number];
 
 const verdictWord = (r: RunReport) => r.fields.verdict.outcome.toUpperCase();
 
+/** Saves text as a file through a temporary link. */
 function download(name: string, text: string, type: string): void {
   const url = URL.createObjectURL(new Blob([text], { type }));
   const a = document.createElement('a');
@@ -44,6 +45,7 @@ function download(name: string, text: string, type: string): void {
   setTimeout(() => URL.revokeObjectURL(url), 0);
 }
 
+/** A titled report section. */
 function Section({
   id,
   title,
@@ -63,6 +65,7 @@ function Section({
   );
 }
 
+/** The tested combination: issuer, wallet and verifier with their versions. */
 function Combination({ r, run }: { r: RunReport; run: Run | null }) {
   const name = useAdapterName();
   const f = r.fields;
@@ -125,6 +128,7 @@ function Combination({ r, run }: { r: RunReport; run: Run | null }) {
   );
 }
 
+/** The failing checks, each linking to its step in the run. */
 function FailingChecks({ checks, runId }: { checks: CheckResult[]; runId: string }) {
   if (checks.length === 0) return <p className="muted">{c.noFailing}</p>;
   return (
@@ -166,6 +170,7 @@ function FailingChecks({ checks, runId }: { checks: CheckResult[]; runId: string
   );
 }
 
+/** The diagnosis section: matched causes with confidence, or the statement that none matched. */
 function Diagnosis({ r }: { r: RunReport }) {
   const { matches } = r.diagnosis;
   const passing = r.fields.verdict.outcome === 'pass';
@@ -282,6 +287,7 @@ function FixIt({ r, run }: { r: RunReport; run: Run | null }) {
   );
 }
 
+/** The whole report body, with the capture-coverage banner when evidence was partial. */
 function ReportBody({ r, run }: { r: RunReport; run: Run | null }) {
   const cov = r.diagnosis.coverageBanner;
   return (
@@ -339,6 +345,7 @@ function ReportBody({ r, run }: { r: RunReport; run: Run | null }) {
   );
 }
 
+/** The report screen for one run: loads the report and shows it in the chosen format, with copy and download actions. */
 export function ReportPage() {
   const { runId = '' } = useParams();
   const sid = shortId(runId);

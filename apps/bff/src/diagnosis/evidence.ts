@@ -13,6 +13,7 @@ import type {
 } from '@interop-playground/api';
 import type { Store } from '../store/index.js';
 
+/** One step of the run as the rules see it: outcome and how fully it was captured. */
 export interface EvStep {
   stepKey: string;
   seq: number;
@@ -20,6 +21,7 @@ export interface EvStep {
   capture: Coverage;
   note: string | null;
 }
+/** One HTTP exchange, merged from its request and response events. */
 export interface EvExchange {
   exchangeId: string;
   stepKey: string;
@@ -32,12 +34,14 @@ export interface EvExchange {
   body: string | null;
   full: boolean;
 }
+/** A recorded check result; `full` marks evidence from a step captured completely. */
 export interface EvCheck {
   seq: number;
   stepKey: string;
   check: CheckResult;
   full: boolean;
 }
+/** An exception raised inside an engine call. */
 export interface EvException {
   seq: number;
   stepKey: string;
@@ -45,6 +49,7 @@ export interface EvException {
   exceptionClass: string;
   message: string;
 }
+/** A product-library call (sidecar or in-process) with its summarised output. */
 export interface EvCall {
   seq: number;
   stepKey: string;
@@ -52,6 +57,7 @@ export interface EvCall {
   op: string;
   outputSummary: unknown;
 }
+/** A captured credential, token or document with its decoded content. */
 export interface EvArtifact {
   artifactId: string;
   stepKey: string;
@@ -64,6 +70,7 @@ export interface EvArtifact {
   exchangeIds: string[];
   full: boolean;
 }
+/** Result of an upstream health probe taken during the run. */
 export interface EvProbe {
   upstream: string;
   ok: boolean;
@@ -71,6 +78,7 @@ export interface EvProbe {
   versionFingerprint: string | null;
 }
 
+/** The complete, replayable evidence for one run; the only input the diagnosis rules may read. */
 export interface RunEvidence {
   runId: string;
   spec: RunSpec;
@@ -121,7 +129,10 @@ function b64urlJson(seg: string | undefined): unknown {
   }
 }
 
-/** `{header, value}` of a compact JWS / SD-JWT (`h.p.s~d~…~kb`), else the parsed JSON text */
+/**
+ * Decodes stored artifact text: a compact JWS / SD-JWT becomes {header, payload}; JSON is parsed; anything else stays a string.
+ * `{header, value}` of a compact JWS / SD-JWT (`h.p.s~d~…~kb`), else the parsed JSON text.
+ */
 export function parseArtifactText(text: string): { header: unknown; value: unknown } {
   const t = text.trim();
   if (/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]*\.[A-Za-z0-9_-]*(~|$)/.test(t)) {
@@ -135,6 +146,7 @@ export function parseArtifactText(text: string): { header: unknown; value: unkno
   }
 }
 
+/** Reads every persisted event of a run, paging 2000 at a time in sequence order. */
 export function readAllEvents(store: Store, runId: string): EventEnvelope[] {
   const out: EventEnvelope[] = [];
   for (;;) {
@@ -145,6 +157,10 @@ export function readAllEvents(store: Store, runId: string): EventEnvelope[] {
 }
 
 /** pure part: the evidence from an event list and the artifact rows (tests feed fixtures here) */
+/**
+ * Folds a run's events and artifact rows into the evidence view. Pure: the same inputs always give
+ * the same evidence, which is what makes a stored run re-diagnose identically on replay.
+ */
 export function buildEvidence(
   runId: string,
   spec: RunSpec,
@@ -285,7 +301,10 @@ export function buildEvidence(
   };
 }
 
-/** the evidence of a stored run (02 §7: persisted events only) */
+/**
+ * Loads a run from the store and builds its evidence. Throws if the run id is unknown.
+ * The evidence of a stored run (02 §7: persisted events only)
+ */
 export function loadEvidence(store: Store, runId: string): RunEvidence {
   const row = store.driver.get<{ spec_json: string }>(
     'SELECT spec_json FROM runs WHERE run_id = ?',

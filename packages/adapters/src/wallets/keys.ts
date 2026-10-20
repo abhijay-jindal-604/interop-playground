@@ -39,6 +39,7 @@ export function didJwkOf(publicJwk: JsonWebKey): string {
   return `did:jwk:${b64u(JSON.stringify(pub))}`;
 }
 
+/** Generates a holder key pair (ES256 by default) as a stored JWK pair with a `did:jwk`. */
 export function generateHolderKey(alg: 'ES256' | 'EdDSA' = 'ES256'): StoredHolderKey {
   const pair =
     alg === 'ES256'
@@ -84,6 +85,7 @@ export function memoryHolderKeyStore(): HolderKeyStore & { size(): number } {
   };
 }
 
+/** The holder key for a run cannot be found or used; ends the run with `key_unavailable`. */
 export class KeyUnavailable extends Error {
   readonly runErrorCode = 'key_unavailable';
   constructor(message: string) {
@@ -92,6 +94,7 @@ export class KeyUnavailable extends Error {
   }
 }
 
+/** Creates and looks up one holder key per root run and signs with it on request. Derived runs reuse the parent's key so a fix-it re-run holds the same binding. */
 export class HolderKeyService {
   /** `store` is a getter so the BFF can attach its store after the server opened it */
   constructor(private readonly store: () => HolderKeyStore | null) {}

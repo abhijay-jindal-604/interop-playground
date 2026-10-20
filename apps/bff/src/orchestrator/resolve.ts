@@ -85,11 +85,15 @@ const ISSUER_DISCLOSURE: Partial<Record<AdapterId, DisclosureSelection>> = {
 
 const CREDENTIAL_LEVEL: AdapterId[] = ['verifier.vcverifier-offline', 'verifier.credo'];
 
+/** A `validation_failed` error listing every issue. */
 function validationError(issues: { path: string; message: string }[]): ApiError {
   return new ApiError('validation_failed', undefined, issueDetails(issues));
 }
 
-/** 04 §4.1 step 1: the JSON Schema of `CreateRunRequest` (unknown keys rejected, 04 §1) */
+/**
+ * Validates the raw request body shape; collects every issue and throws one validation error listing them.
+ * 04 §4.1 step 1: the JSON Schema of `CreateRunRequest` (unknown keys rejected, 04 §1)
+ */
 export function validateCreateRunRequest(body: unknown): CreateRunRequest {
   const issues: { path: string; message: string }[] = [];
   if (body === null || typeof body !== 'object' || Array.isArray(body)) {
@@ -167,6 +171,7 @@ export function validateCreateRunRequest(body: unknown): CreateRunRequest {
   return b as unknown as CreateRunRequest;
 }
 
+/** How the presentation request reaches the wallet by default: in process for credential-level checks, otherwise by the wallet's usual channel. */
 function defaultDelivery(wallet: AdapterId, verifier: AdapterId, mode: string | null): Delivery {
   if (CREDENTIAL_LEVEL.includes(verifier) || mode === null) return 'in-process';
   if (wallet === 'wallet.inji-web') return 'web-wallet-redirect';
@@ -174,13 +179,17 @@ function defaultDelivery(wallet: AdapterId, verifier: AdapterId, mode: string | 
   return mode === 'same-device' ? 'deep-link' : 'in-process';
 }
 
+/** The delivery channels the chosen wallet supports. */
 function allowedDeliveries(wallet: AdapterId): Delivery[] {
   if (wallet === 'wallet.inji-web') return ['web-wallet-redirect'];
   if (wallet === 'wallet.inji-mobile') return ['qr', 'adb-intent'];
   return ['in-process', 'deep-link'];
 }
 
-/** 04 §4.2 issuance table */
+/**
+ * Picks the issuance flow id from the issuer, wallet and IAE choice.
+ * 04 §4.2 issuance table.
+ */
 export function issuanceFlowOf(r: CreateRunRequest): FlowId {
   if (r.issuer === 'issuer.fixture') return 'FLOW-14';
   if (r.withIae) return 'FLOW-13';
@@ -194,7 +203,10 @@ export function issuanceFlowOf(r: CreateRunRequest): FlowId {
   return r.format === 'ldp_vc' ? 'FLOW-03' : r.format === 'dc+sd-jwt' ? 'FLOW-04' : 'FLOW-05';
 }
 
-/** 04 §4.2 presentation table */
+/**
+ * Picks the presentation flow id from the verifier, delivery mode, client-id scheme and presentation mode.
+ * 04 §4.2 presentation table.
+ */
 export function presentationFlowOf(
   r: CreateRunRequest,
   delivery: Delivery,
@@ -233,12 +245,14 @@ const FALLBACK: Partial<Record<FlowId, FlowId>> = {
   'FLOW-10': 'FLOW-09',
   'FLOW-31': 'FLOW-30',
 };
+/** Returns the flow id if its file ships, else its fallback base flow, else null (the combination is not runnable). */
 export function shippedFlow(flows: FlowTable, id: FlowId): FlowId | null {
   if (flows.has(id)) return id;
   const base = FALLBACK[id];
   return base !== undefined && flows.has(base) ? base : null;
 }
 
+/** Builds the incompatibility record for a rule that matched. */
 function hitOf(rule: CompatRule, input: RuleInput): IncompatibilityHit {
   return { ruleId: rule.ruleId, reason: rule.reason(input), gapId: rule.gapId };
 }
@@ -432,7 +446,10 @@ export function resolveRunSpec(
   return { ok: true, spec, warnings, label: req.label ?? null };
 }
 
-/** API-03 `tamperApplicable`: the TMP cases that apply to a resolved spec (04 §4.5) */
+/**
+ * The tamper cases that can be applied to this resolved run spec.
+ * API-03 `tamperApplicable`: the TMP cases that apply to a resolved spec (04 §4.5)
+ */
 export function tamperApplicableFor(spec: RunSpec): TmpId[] {
   return applicableTamperCases({
     issuer: spec.issuer,

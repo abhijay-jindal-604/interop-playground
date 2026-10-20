@@ -24,6 +24,7 @@ export interface StoredMatch {
   match: FingerprintMatchedPayload;
 }
 
+/** Reads the fingerprint matches already stored for a run, so a replay reuses them instead of re-deriving. */
 export function storedMatches(store: Store, runId: string): StoredMatch[] {
   return store.driver
     .all<{ step_key: string | null; payload_json: string }>(

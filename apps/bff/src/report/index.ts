@@ -28,6 +28,7 @@ const fingerprintPath = (fingerprintId: string): string => `fingerprints/${finge
 
 export const REPORT_GENERATOR_VERSION = 1;
 
+/** Payload of the most recent event of a type for a run, or null. */
 function lastPayload<T>(store: Store, runId: string, type: string): T | null {
   const r = store.driver.get<{ payload_json: string }>(
     'SELECT payload_json FROM run_events WHERE run_id = ? AND type = ? ORDER BY seq DESC LIMIT 1',
@@ -56,6 +57,7 @@ function proofTypeOf(store: Store, runId: string, spec: RunSpec): string {
   return alg ? `jwt (${alg})` : 'jwt';
 }
 
+/** The knobs the run set away from their defaults; reports list these because they change behaviour. */
 function nonDefaultKnobs(spec: RunSpec): KnobId[] {
   return (Object.entries(spec.knobs) as [KnobId, string][])
     .filter(([id, v]) => {
@@ -66,6 +68,7 @@ function nonDefaultKnobs(spec: RunSpec): KnobId[] {
     .sort();
 }
 
+/** The run's verdict: the stored one for a completed run, else a derived one for a run that failed or was cancelled. */
 function terminalVerdict(store: Store, runId: string, spec: RunSpec, state: string): RunVerdict {
   const done = lastPayload<{ verdict: RunVerdict }>(store, runId, 'run.completed');
   if (state === 'completed' && done) return done.verdict;
@@ -111,6 +114,7 @@ function errorDetailOf(
   return verdict.failedStepKey ? `${verdict.failedStepKey} failed` : null;
 }
 
+/** The one-sentence claim a report makes for a run, derived from its verdict and evidence. */
 export function claimSentenceOf(
   store: Store,
   runId: string,
@@ -211,6 +215,7 @@ function cell(v: unknown): string {
   return s.replace(/\|/g, '\\|').replace(/\r?\n/g, ' ');
 }
 
+/** Renders a Markdown table. */
 function table(head: string[], rows: unknown[][]): string[] {
   return [
     `| ${head.join(' | ')} |`,
@@ -221,6 +226,7 @@ function table(head: string[], rows: unknown[][]): string[] {
 
 const roles = ['issuer', 'wallet', 'verifier'] as const;
 
+/** Renders a run report as Markdown, ready to attach to an upstream issue. */
 export function renderRunReportMarkdown(r: RunReport): string {
   const f = r.fields;
   const out: string[] = [`# Run ${r.runId}: ${WORD[f.verdict.outcome]}`, ''];

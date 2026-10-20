@@ -5,6 +5,7 @@
 import { useEffect, useId, useRef, type ReactNode, type RefObject } from 'react';
 import { Icon } from './Icon.js';
 
+/** A side panel dialog with a title and close button. */
 export function Drawer({
   open,
   title,

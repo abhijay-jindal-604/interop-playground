@@ -59,6 +59,7 @@ const Code = ({ text }: { text: string }) => (
   </pre>
 );
 
+/** Shows a decoded JWT as header, payload and signature blocks. */
 export function JwtBlocks({ jwt, title }: { jwt: DecodedJwt; title?: string }) {
   return (
     <div className="body-jwt" data-jwt={title ?? 'jwt'}>
@@ -159,6 +160,7 @@ const decodable = (text: string, mediaType: string | null): boolean => {
   return k === 'jwt' || k === 'sd-jwt' || k === 'form' || mediaType === 'application/cbor';
 };
 
+/** Chip stating how a body was stored: stored, truncated, pruned, dropped by the run's size cap, or not captured. */
 export function BodyStateChip({ state, truncated }: { state: BodyState; truncated: boolean }) {
   const word = state === 'stored' && truncated ? c.body.state.truncated : c.body.state[state];
   const tone =
@@ -176,6 +178,7 @@ export function BodyStateChip({ state, truncated }: { state: BodyState; truncate
   );
 }
 
+/** Fetches and shows one captured body in the best format for its content (JWT, SD-JWT, JSON, form or text). */
 export function BodyViewer({
   runId,
   exchangeId,

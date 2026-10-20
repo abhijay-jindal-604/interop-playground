@@ -26,6 +26,7 @@ export interface RunFlows {
   bases?: Record<string, FlowDefinition>;
 }
 
+/** Resolves a flow's `extends` for display: the base steps with the child's steps replacing same-key ones. */
 export function mergeSteps(def: FlowDefinition, base: FlowDefinition | null): FlowStep[] {
   if (!def.extends || !base) return def.steps;
   const steps = [...base.steps];
@@ -50,6 +51,7 @@ export function plainLabel(label: string, spec: RunSpec | null): string {
   });
 }
 
+/** Builds the step rail: issuance steps then presentation steps, labelled for display. */
 export function railSteps(
   issuance: FlowDefinition | null,
   presentation: FlowDefinition | null,

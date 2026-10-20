@@ -6,6 +6,7 @@
 import { useEffect, useId, useRef, type ReactNode } from 'react';
 import { InlineError } from './InlineError.js';
 
+/** A modal asking the user to confirm or cancel an action. */
 export function ConfirmDialog({
   open,
   heading,

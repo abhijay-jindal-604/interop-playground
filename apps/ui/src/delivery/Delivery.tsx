@@ -12,6 +12,7 @@ import { qrMatrix, qrPath, QUIET_ZONE } from './qr.js';
 const kindOf = (op: DeliveryOutput['op']): 'offer' | 'request' =>
   op === 'deliver-offer' ? 'offer' : 'request';
 
+/** Renders the QR code as SVG, or a notice that the link is too long and must be copied instead. */
 export function QrCode({ uri, kind }: { uri: string; kind: 'offer' | 'request' }) {
   const m = useMemo(() => qrMatrix(uri), [uri]);
   if (!m) return <p className="qr-too-long">{d.tooLong}</p>;
@@ -32,6 +33,7 @@ export function QrCode({ uri, kind }: { uri: string; kind: 'offer' | 'request' }
   );
 }
 
+/** Copies the offer or request link to the clipboard. */
 export function CopyLinkButton({
   uri,
   autoFocusRef,

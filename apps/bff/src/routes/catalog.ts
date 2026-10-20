@@ -37,6 +37,7 @@ const isAdapter =
     (role === undefined || v.startsWith(`${role}.`));
 const isFormat = (v: string): boolean => FORMATS.includes(v);
 
+/** Registers the read-only catalogue endpoints: adapters, knobs, presets, configurations, incompatibilities. */
 export function registerCatalog(
   app: FastifyInstance,
   deps: { availability: AvailabilityView },

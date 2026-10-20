@@ -23,7 +23,10 @@ export interface PlannedStep {
 
 export type FlowTable = ReadonlyMap<string, FlowDefinition>;
 
-/** reads and merges `flows/` (throws on the first invalid file, like the startup validator) */
+/**
+ * Loads and validates the flow files in `dir`; throws on the first invalid file.
+ * Reads and merges `flows/` (throws on the first invalid file, like the startup validator)
+ */
 export function loadFlowTable(dir: string): Map<string, FlowDefinition> {
   const r = loadFlows(dir);
   if (r.errors.length > 0) {
@@ -33,7 +36,10 @@ export function loadFlowTable(dir: string): Map<string, FlowDefinition> {
   return r.flows;
 }
 
-/** the merged step list of a flow (04 §10 rule 5), steps in file order, renumbered 1.. */
+/**
+ * Returns a flow's steps with its `extends` parent resolved; a child step with the same key replaces the parent's step in place.
+ * The merged step list of a flow (04 §10 rule 5), steps in file order, renumbered 1..
+ */
 export function mergedSteps(flows: FlowTable, flowId: string): FlowStep[] {
   const def = flows.get(flowId);
   if (!def) throw new Error(`flow ${flowId} is not loaded`);
@@ -51,7 +57,10 @@ export function mergedSteps(flows: FlowTable, flowId: string): FlowStep[] {
   return merged.filter((s) => s.deprecated !== true).map((s, i) => ({ ...s, order: i + 1 }));
 }
 
-/** 04 §10 `appliesTo`: closed AND-filter, omitted = always applies */
+/**
+ * True when the step's `appliesTo` filter (all listed conditions must hold) matches the run spec; no filter means it applies.
+ * 04 §10 `appliesTo`: closed AND-filter, omitted = always applies.
+ */
 export function stepApplies(step: FlowStep, spec: RunSpec): boolean {
   const f = step.appliesTo;
   if (!f) return true;
@@ -69,7 +78,10 @@ export function stepApplies(step: FlowStep, spec: RunSpec): boolean {
   return true;
 }
 
-/** the run's step plan: issuance flow (unless fixture-only) then presentation flow */
+/**
+ * Lays out the run's steps: issuance flow first, then the presentation flow when the scope is full, each step marked applicable or not.
+ * The run's step plan: issuance flow (unless fixture-only) then presentation flow.
+ */
 export function planRun(flows: FlowTable, spec: RunSpec): PlannedStep[] {
   const ids = [spec.issuanceFlowId, spec.scope === 'full' ? spec.presentationFlowId : null].filter(
     (x): x is FlowDefinition['flowId'] => x !== null,
@@ -92,7 +104,10 @@ export function planRun(flows: FlowTable, spec: RunSpec): PlannedStep[] {
   return out;
 }
 
-/** the flow whose `targetStepKey` answers the run (05 §4.1): presentation for full runs */
+/**
+ * The flow and step a run's diagnosis refers to: the presentation flow for full runs, else the issuance flow.
+ * The flow whose `targetStepKey` answers the run (05 §4.1): presentation for full runs.
+ */
 export function targetOf(flows: FlowTable, spec: RunSpec): { flowId: string; stepKey: string } {
   const flowId =
     spec.scope === 'full' && spec.presentationFlowId !== null

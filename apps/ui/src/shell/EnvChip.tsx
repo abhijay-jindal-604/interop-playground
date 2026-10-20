@@ -12,6 +12,7 @@ import { useStore } from '../state/store.js';
 import { Icon } from '../components/Icon.js';
 import { ProbeButton } from './ProbeButton.js';
 
+/** Summarises the environment for the header chip: mode (local or collab) and health (ready, degraded or offline). */
 export function envSummary(snapshot: EnvSnapshot | null, offline: boolean) {
   const mode = snapshot?.mode === 'collab' ? copy.env.modeCollab : copy.env.modeLocal;
   const health: 'ready' | 'degraded' | 'offline' = offline
@@ -32,6 +33,7 @@ export function envSummary(snapshot: EnvSnapshot | null, offline: boolean) {
   return { mode, health, healthWord, tunnel };
 }
 
+/** Header chip showing environment health; opens a popover with per-upstream status. */
 export function EnvChip() {
   const env = useStore((s) => s.env);
   const [open, setOpen] = useState(false);

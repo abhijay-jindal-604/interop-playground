@@ -122,6 +122,7 @@ function isTimeout(e: unknown): boolean {
   return e instanceof Error && (e.name === 'TimeoutError' || e.name === 'AbortError');
 }
 
+/** Drives Inji Verify's verify-service: creates the OID4VP request, long-polls for the wallet's submission and reads the result. */
 export class InjiVerifyLocalVerifier implements VerifierAdapter {
   readonly descriptor: AdapterDescriptor;
   private readonly base: string;
