@@ -1,1 +1,8 @@
-[["s03-select",0],["s04-issuance",6.945],["s05-decoded",18.532],["s06-present",23.507],["s07-report",35.714],["end",40.655]]
+[
+  ["s03-select", 0],
+  ["s04-issuance", 6.945],
+  ["s05-decoded", 18.532],
+  ["s06-present", 23.507],
+  ["s07-report", 35.714],
+  ["end", 40.655]
+]
