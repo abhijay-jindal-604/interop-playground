@@ -23,6 +23,9 @@ import type { FlowTable } from '../orchestrator/index.js';
 import { apiState, getRunRow, isTerminal, listSteps } from '../runs/index.js';
 import type { Store } from '../store/index.js';
 
+/** public evidence of a fingerprint (ADR-98, ADR-100): its repo file, never a research S-ID */
+const fingerprintPath = (fingerprintId: string): string => `fingerprints/${fingerprintId}.json`;
+
 export const REPORT_GENERATOR_VERSION = 1;
 
 function lastPayload<T>(store: Store, runId: string, type: string): T | null {
@@ -119,21 +122,19 @@ export function claimSentenceOf(
     fingerprint_id: string;
     title: string;
     gap_ids_json: string;
-    evidence_sids_json: string;
   }>(
-    "SELECT fingerprint_id, title, gap_ids_json, evidence_sids_json FROM fingerprint_matches WHERE run_id = ? AND role = 'cause' AND confidence = 'exact' ORDER BY seq LIMIT 1",
+    "SELECT fingerprint_id, title, gap_ids_json FROM fingerprint_matches WHERE run_id = ? AND role = 'cause' AND confidence = 'exact' ORDER BY seq LIMIT 1",
     spec.parentRunId,
   );
   if (!cause) return null;
   const knob = KNOB_CATALOG.find((k) => k.def.id === spec.knobDelta?.knobId);
   const gaps = (JSON.parse(cause.gap_ids_json) as string[]).join(', ');
-  const sids = (JSON.parse(cause.evidence_sids_json) as string[]).join(', ');
   const d = spec.knobDelta;
   return (
     `${spec.issuer} → ${spec.wallet} → ${spec.verifier} (${spec.format}) fails because ${cause.title} ` +
     `[${cause.fingerprint_id}${gaps ? `, ${gaps}` : ''}]. Changing only ${knob?.def.name ?? d.knobId} from ` +
     `${d.from} to ${d.to} makes it pass. Evidence: run ${spec.parentRunId} vs run ${runId}; ` +
-    `original finding ${sids}.${knob ? ` (${knob.label})` : ''}`
+    `fingerprint ${fingerprintPath(cause.fingerprint_id)}.${knob ? ` (${knob.label})` : ''}`
   );
 }
 
@@ -304,7 +305,7 @@ export function renderRunReportMarkdown(r: RunReport): string {
           m.deviatingSide,
           `${m.component.name} ${m.component.versions}`,
           m.specClause,
-          m.evidenceSIds.join(', '),
+          fingerprintPath(m.fingerprintId),
           m.matchedExchangeIds.join(', '),
         ]),
       ),
@@ -326,7 +327,7 @@ export function renderRunReportMarkdown(r: RunReport): string {
     for (const o of d.offers) {
       const knob = KNOB_CATALOG.find((k) => k.def.id === o.knobId);
       out.push(
-        `- ${o.knobId} \`${knob?.def.name ?? o.knobId}\`: ${o.from} → ${o.to} (${knob?.label ?? o.applyKind}); proven by ${o.provenBy.join(', ')}.`,
+        `- ${o.knobId} \`${knob?.def.name ?? o.knobId}\`: ${o.from} → ${o.to} (${knob?.label ?? o.applyKind}); proven by an earlier re-run.`,
       );
     }
   else out.push(d.noFixReason ? `Diagnosis only: ${d.noFixReason}.` : 'Not applicable.');

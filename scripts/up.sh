@@ -29,6 +29,10 @@ JRE_REF="eclipse-temurin:21-jre-jammy"
 INVARIANT_VOLUMES=(esignet-pg esignet-keys mock-identity-keys certify-authcode-pg certify-preauth-keys certify-preauth-pg)
 IAE_VOLUMES=(certify-iae-pg certify-iae-keys)
 MARKER=.generated/state/chain.done
+STAMP_VOLUME="${PROJECT}_state-stamp" # G-166: who built the shared Inji state (scripts/lib/state-check.sh)
+STAMP_LABEL=io.interop-playground.state
+# shellcheck source=lib/state-check.sh
+source "$ROOT/scripts/lib/state-check.sh"
 
 log() { printf '[up] %s\n' "$*"; }
 warn() { printf '[up] WARNING: %s\n' "$*" >&2; }
@@ -82,6 +86,11 @@ lock_digest() { # <key> -> digest from versions.lock
 }
 image_present() { docker image inspect "$1" >/dev/null 2>&1; }
 vol_exists() { docker volume inspect "${PROJECT}_$1" >/dev/null 2>&1; }
+read_stamp() { docker volume inspect -f "{{index .Labels \"$STAMP_LABEL\"}}" "$STAMP_VOLUME" 2>/dev/null || true; }
+write_stamp() { # <marker line>
+  docker volume rm "$STAMP_VOLUME" >/dev/null 2>&1 || true
+  docker volume create --label "$STAMP_LABEL=$(state_stamp_of "$1")" "$STAMP_VOLUME" >/dev/null
+}
 b64url() { openssl base64 -A | tr '+/' '-_' | tr -d '='; }
 
 # --------------------------------------------------------------- preflight --
@@ -194,6 +203,7 @@ remove_state() { # wipe the ADR-14 invariant together (10 §7.6)
   for v in "${INVARIANT_VOLUMES[@]}" "${IAE_VOLUMES[@]}"; do
     vol_exists "$v" && docker volume rm "${PROJECT}_$v" >/dev/null
   done
+  docker volume rm "$STAMP_VOLUME" >/dev/null 2>&1 || true
   rm -f -- "$MARKER"
 }
 [[ $reset -eq 1 ]] && remove_state
@@ -329,11 +339,21 @@ if [[ "$mode" == local ]]; then
   have_marker="$(head -1 "$MARKER" 2>/dev/null || true)"
   state_present=1
   for v in "${INVARIANT_VOLUMES[@]}"; do vol_exists "$v" || state_present=0; done
-  if [[ $state_present -eq 1 && "$have_marker" != "$want_marker" ]]; then
+  state_check="$(state_action "$state_present" "$have_marker" "$want_marker" "$(read_stamp)")"
+  if [[ "$state_check" == wipe ]]; then
     warn "Inji state was created for another PUBLIC_HOST/CA (or the chain never finished): wiping it (10 §7.6)"
     remove_state
     state_present=0
-  elif [[ $state_present -eq 1 && $bff_cli -eq 1 && "$(sed -n 's/^onboard=//p' "$MARKER" 2>/dev/null)" == skipped ]]; then
+  elif [[ "$state_check" == other ]]; then
+    # G-166: the volumes are shared by every checkout of this compose project; another checkout
+    # rebuilt them, so this checkout's Mimoto p12 no longer matches (Mimoto would crash-loop)
+    warn "Inji state was built by another checkout on this host (one checkout per host): rebuilding it for this one (same as scripts/up.sh --reset)"
+    remove_state
+    state_present=0
+  elif [[ "$state_check" == adopt ]]; then
+    write_stamp "$want_marker"
+  fi
+  if [[ $state_present -eq 1 && $bff_cli -eq 1 && "$(sed -n 's/^onboard=//p' "$MARKER" 2>/dev/null)" == skipped ]]; then
     # ADR-54 (3): state from a bring-up without the bff CLI has no onboarding; it is wiped and
     # rebuilt together (10 §7.6 invariant), history (playground-data) is never touched
     warn "Inji state was created without eSignet onboarding (onboard=skipped): rebuilding it with the bff CLI"
@@ -359,6 +379,7 @@ if [[ "$mode" == local ]]; then
     log "ADR-14 chain: down certify-authcode certify-authcode-nginx mimoto inji-web (never restart)"
     dc rm -s -f certify-authcode certify-authcode-nginx mimoto inji-web >/dev/null 2>&1 || true
     printf '%s\nonboard=%s\n' "$want_marker" "$onboard_state" > "$MARKER"
+    write_stamp "$want_marker"
     chain_ran=1
   else
     onboard_state="$(sed -n 's/^onboard=//p' "$MARKER" 2>/dev/null)"

@@ -64,14 +64,7 @@ function CauseBlock({
         <p>{c.card.gaps(m.gapIds.join(', ') || c.card.none)}</p>
         <p>
           {c.card.evidence}
-          {m.evidenceSIds.length === 0
-            ? c.card.none
-            : m.evidenceSIds.map((s, i) => (
-                <span key={s} title={c.card.evidenceTip}>
-                  {i > 0 ? ', ' : ''}
-                  {s}
-                </span>
-              ))}
+          <code title={c.card.evidenceTip}>{c.card.evidencePath(m.fingerprintId)}</code>
         </p>
         {onShowMessages || onShowCheck ? (
           <p className="cause-actions">
@@ -171,7 +164,7 @@ export function FixItPanel({
       {applies === 'peer-runtime-option' && peerName ? (
         <p className="small">{c.fix.peerRuntime(peerName)}</p>
       ) : null}
-      <p className="small muted">{c.fix.provenBy(offer.provenBy.join(', '))}</p>
+      <p className="small muted">{c.fix.provenBy}</p>
       {error ? <InlineError error={error} /> : null}
       <button
         type="button"

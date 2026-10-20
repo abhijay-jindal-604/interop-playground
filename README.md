@@ -2,7 +2,9 @@
 
 Interop Playground lets you run Inji issuer → wallet → verifier combinations, inspect every protocol message, and prove the fix for a failure with a re-run that changes one knob.
 
-> **v1 (2026-10-20).** This README describes only what is built and tested on that date. Results that are still pending are marked _pending_. Screenshot: TODO(wave 9): run screen (UI-09) with the diagram and inspector visible, taken from a wave 8 take (until then, see the recording [`deliverables/takes/m1-slice.webm`](deliverables/takes/m1-slice.webm)).
+> **v1 (2026-10-20).** This README describes only what is built and tested on that date. Results that are still pending are marked _pending_. Demo video: [`deliverables/video/demo-v1.mp4`](deliverables/video/demo-v1.mp4).
+
+![The combination selector: issuer, wallet and verifier columns, with unavailable combinations greyed out](docs/screenshots/selector.png)
 
 ## What it does
 
@@ -30,7 +32,8 @@ scripts/up.sh            # idempotent; a second run on a healthy bundle changes 
 - **Clean `scripts/up.sh`: ready, slice e2e green (2026-10-20).** After `down`, a plain `scripts/up.sh --no-build` reached ready in 1 min 22 s on a host with the images already pulled, and `npm run e2e:live -- slice` passed. With `--with peers`, `npm run e2e:live` (slice and fix-it) passed 2/2.
 - A host whose eSignet database predates 2026-10-20 needs `scripts/up.sh --reset` once (the eSignet and mock-identity keystores moved onto volumes, G-159).
 - `scripts/up.sh --reset` from no containers exits 0 in about 2.5 minutes. It onboards eSignet, re-asserts the Certify `didUrl` and runs the guest-smoke download.
-- _Pending (wave 8 A):_ the "fresh clone to a FLOW-30 Pass in ≤ 30 min" timing, in `docs/evidence/T-55-fresh-clone.md`.
+- **Fresh clone to a FLOW-30 Pass in 3 min 1 s (2026-10-20).** `git clone`, then `scripts/up.sh` with no flags (2 min 40 s), then the first run below gave run `01M5CCC4FZRMCCWMVQF5038EYS`, **Pass**. Every image was already cached on that host; a host without them adds the pull time of the digests in `versions.lock`. Details: [`docs/evidence/T-55-fresh-clone.md`](docs/evidence/T-55-fresh-clone.md).
+- **One checkout per host.** Every checkout uses the same compose project (`interop-playground`) and the same volumes, but keeps its playground CA in its own directory. After you run `scripts/up.sh` from a second checkout (for example a fresh clone), the first checkout's bundle no longer matches its volumes and Mimoto crash-loops. Run `scripts/up.sh --reset` once when you switch checkouts (G-166, our bundle defect).
 
 ## Your first run
 
@@ -40,7 +43,7 @@ scripts/up.sh            # idempotent; a second run on a healthy bundle changes 
 4. Open a step in the inspector. The key-payload bar shows the credential offer, the token, the proof JWT, the SD-JWT with its disclosures, the KB-JWT and the verifier result.
 5. **Report** opens the per-run report (Markdown and JSON tabs, downloads).
 
-The same path runs automatically against the live bundle: `npm run e2e:live -- slice` ([`e2e/live/slice.live.spec.ts`](e2e/live/slice.live.spec.ts)). `npm run e2e:live` with no argument also runs the fix-it spec and needs `scripts/up.sh --with peers`.
+The same path runs automatically against the live bundle: `npm run e2e:live -- slice` ([`e2e/live/slice.live.spec.ts`](e2e/live/slice.live.spec.ts)). The live specs are outside the quickstart: run `npm ci` and `npx playwright install chromium` once first. `npm run e2e:live` with no argument also runs the fix-it spec and needs `scripts/up.sh --with peers`.
 
 ## Architecture
 
@@ -69,16 +72,16 @@ Repository layout: `apps/bff` (BFF and `playground` CLI), `apps/ui` (web UI), `p
 
 A run joins an issuance flow and a presentation flow. Flow definitions are in [`flows/`](flows/).
 
-| Flow    | Picks                                                               | Format      | Grant / mode               | Tier      | Expected and evidence                                                                                                                 |
-| ------- | ------------------------------------------------------------------- | ----------- | -------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| FLOW-01 | Inji Certify (pre-authorized) → Playground reference wallet         | (skeleton)  | pre-authorized, no tx_code | automated | issuance reference skeleton, which FLOW-04 extends                                                                                    |
-| FLOW-04 | Inji Certify (pre-authorized) → Playground reference wallet         | `dc+sd-jwt` | pre-authorized             | automated | credential issued, `capture: full` (the issuance half of the slice)                                                                   |
-| FLOW-30 | … → Inji Verify (local)                                             | `dc+sd-jwt` | cross-device QR            | automated | **Pass**, Valid. Live e2e green 3× (T-36) and after a clean `up.sh`                                                                   |
-| FLOW-08 | walt.id issuer-api2 → Playground reference wallet (`--with peers`)  | `dc+sd-jwt` | pre-authorized (by value)  | automated | issued; KNOB-01 switches the issuer key form (x5c absent/present). With FLOW-30: the fix-it pair below, live e2e green (T-44)         |
-| FLOW-14 | Fixture credential (`issuer.fixture`) → Playground reference wallet | `dc+sd-jwt` | no issuance traffic        | automated | credential signed at run time (valid, invalid or expired); unit-tested. _Pending (wave 8 A):_ live run                                |
-| FLOW-40 | Fixture credential → Inji Verify (local), credential-level          | `dc+sd-jwt` | no OID4VP                  | automated | Valid / Invalid / Valid-but-Expired; mapping unit-tested on recorded Verify answers. _Pending (wave 8 A):_ the three live runs (T-47) |
-| FLOW-03 | Inji Certify (pre-authorized) → Playground reference wallet         | `ldp_vc`    | pre-authorized             | automated | _pending (T-46, wave 8 B; live run wave 9)_                                                                                           |
-| FLOW-31 | … → Inji Verify (local)                                             | `ldp_vc`    | cross-device QR            | automated | _pending (T-46, wave 8 B; live run wave 9)_                                                                                           |
+| Flow    | Picks                                                                                      | Format      | Grant / mode               | Tier      | Expected and evidence                                                                                                                                                                                                                                                                  |
+| ------- | ------------------------------------------------------------------------------------------ | ----------- | -------------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| FLOW-01 | Inji Certify (pre-authorized) → Playground reference wallet                                | (skeleton)  | pre-authorized, no tx_code | automated | issuance reference skeleton, which FLOW-04 extends                                                                                                                                                                                                                                     |
+| FLOW-04 | Inji Certify (pre-authorized) → Playground reference wallet                                | `dc+sd-jwt` | pre-authorized             | automated | credential issued, `capture: full` (the issuance half of the slice)                                                                                                                                                                                                                    |
+| FLOW-30 | … → Inji Verify (local)                                                                    | `dc+sd-jwt` | cross-device QR            | automated | **Pass**, Valid. Live e2e green 3× (T-36), after a clean `up.sh`, and from a fresh clone (run `01M5CCC4FZRMCCWMVQF5038EYS`). With the fixture's expired credential: **Valid-but-Expired** (run `01M5CBC7EQY4ZKHPE50C1PC9CJ`, [evidence](docs/evidence/T-47-vp-expired.md))             |
+| FLOW-08 | walt.id issuer-api2 → Playground reference wallet (`--with peers`)                         | `dc+sd-jwt` | pre-authorized (by value)  | automated | issued; KNOB-01 switches the issuer key form (x5c absent/present). With FLOW-30: the fix-it pair below, live e2e green (T-44)                                                                                                                                                          |
+| FLOW-14 | Fixture credential (`issuer.fixture`) → Playground reference wallet                        | `dc+sd-jwt` | no issuance traffic        | automated | credential signed at run time (valid, invalid or expired); live in the three FLOW-40 runs and the expired-credential FLOW-30 run                                                                                                                                                       |
+| FLOW-40 | Fixture credential → Inji Verify (local), credential-level ("Credential only (no OID4VP)") | `dc+sd-jwt` | no OID4VP                  | automated | **Valid** `01M5CBEB3M9ANDEDPFBQD5D0NX`, **Invalid** `01M5CBEB4BW718XJ7VW09CB7EF`, **Valid-but-Expired** `01M5CBEB5F7W1Z8G14VNN0PK3Q` at the real Inji Verify (T-47, [evidence](docs/evidence/T-47-labels.md)); live e2e [`e2e/live/labels.live.spec.ts`](e2e/live/labels.live.spec.ts) |
+| FLOW-03 | Inji Certify (pre-authorized) → Playground reference wallet                                | `ldp_vc`    | pre-authorized             | automated | built (T-46); unit and golden tests pass on recorded Inji answers. Live result: [`docs/evidence/T-46-ldp.md`](docs/evidence/T-46-ldp.md) (_pending wave 9 A_)                                                                                                                          |
+| FLOW-31 | … → Inji Verify (local)                                                                    | `ldp_vc`    | cross-device QR            | automated | built (T-46); unit and golden tests pass on recorded Inji answers. Live result: [`docs/evidence/T-46-ldp.md`](docs/evidence/T-46-ldp.md) (_pending wave 9 A_)                                                                                                                          |
 
 The selector greys out combinations that the build rules out, each with its gap ID: no `mso_mdoc` at Inji Verify (G-09), pre-auth on Collab (G-06), no credential-offer support in Inji Web (G-08), the VCIClient https rule (G-103), and EdDSA-only request objects in the openid4vp library (G-112). The full list, with the combinations that ran, is in [`docs/interop-report.md`](docs/interop-report.md).
 
@@ -97,17 +100,17 @@ The child run is classified as `fixed`, `moved`, `not-fixed` or `inconclusive`. 
 1. Parent run `01M5B6KNNY7DC3YK3CR0ETNBN9` (KNOB-01 `absent`): **FAIL** at `vp.verdict.evaluate`, `ERR_SIGNATURE_VERIFICATION_FAILED`. FP-01 matches exactly and offers KNOB-01. Report: [`docs/reports/01M5B6KNNY7DC3YK3CR0ETNBN9.md`](docs/reports/01M5B6KNNY7DC3YK3CR0ETNBN9.md).
 2. One click derives child run `01M5B6M723AQ7T818D36816PRV` (KNOB-01 `present`, the walt.id `x5Chain` option): **PASS**, classified `fixed`. Report: [`docs/reports/01M5B6M723AQ7T818D36816PRV.md`](docs/reports/01M5B6M723AQ7T818D36816PRV.md).
 
-Evidence: the live e2e [`e2e/live/fixit.live.spec.ts`](e2e/live/fixit.live.spec.ts) (green 4× on a service subset and 3× on `scripts/up.sh --with peers`), the golden replay of that recorded pair `apps/bff/src/diagnosis/fixit.golden.test.ts` (events in [`fixtures/golden/fixit/`](fixtures/golden/fixit/)), and the recording [`deliverables/takes/m2-fixit.webm`](deliverables/takes/m2-fixit.webm).
+Evidence: the live e2e [`e2e/live/fixit.live.spec.ts`](e2e/live/fixit.live.spec.ts) (green 4× on a service subset and 3× on `scripts/up.sh --with peers`), the golden replay of that recorded pair `apps/bff/src/diagnosis/fixit.golden.test.ts` (events in [`fixtures/golden/fixit/`](fixtures/golden/fixit/)), and the recording [`deliverables/takes/s10-fixit.webm`](deliverables/takes/s10-fixit.webm).
 
 ## Formats and labels
 
-| Label in the UI            | Status in v1                                                                     |
-| -------------------------- | -------------------------------------------------------------------------------- |
-| SD-JWT VC (`dc+sd-jwt`)    | issuance and cross-device presentation, live                                     |
-| W3C VC (JSON-LD, `ldp_vc`) | _pending_: T-46 is built in wave 8 on recorded upstreams; its live run is wave 9 |
-| mDoc (`mso_mdoc`)          | not in v1 (cut 2026-10-20, see [`docs/decisions.md`](docs/decisions.md))         |
+| Label in the UI            | Status in v1                                                                                                                                                                      |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| SD-JWT VC (`dc+sd-jwt`)    | issuance and cross-device presentation, live                                                                                                                                      |
+| W3C VC (JSON-LD, `ldp_vc`) | issuance and cross-device presentation built (FLOW-03, FLOW-31), unit and golden tests; live result _pending wave 9 A_ ([`docs/evidence/T-46-ldp.md`](docs/evidence/T-46-ldp.md)) |
+| mDoc (`mso_mdoc`)          | not in v1 (cut 2026-10-20, see [`docs/decisions.md`](docs/decisions.md))                                                                                                          |
 
-Verifier results use the labels **Valid**, **Invalid** and **Valid-but-Expired** (REQ-23). The mapping is unit-tested on recorded Inji Verify responses. _Pending (wave 8 A):_ the three live fixture runs (T-47).
+Verifier results use the labels **Valid**, **Invalid** and **Valid-but-Expired** (REQ-23). All three were shown live at the real Inji Verify on 2026-10-20 (T-47): the fixture issuer signs a valid, an invalid and an expired SD-JWT at run time, and the credential-level path (FLOW-40) gives exactly Valid, Invalid (`ERR_SIGNATURE_VERIFICATION_FAILED`) and Valid-but-Expired ([`docs/evidence/T-47-labels.md`](docs/evidence/T-47-labels.md)). Presented over OID4VP (FLOW-30), the expired credential is also reported as Valid-but-Expired: Inji Verify accepts the submission and answers `expiryCheck.valid:false` with no error code ([`docs/evidence/T-47-vp-expired.md`](docs/evidence/T-47-vp-expired.md)). The UI shows the label on the result card; the selector mode for the credential-level path is **Credential only (no OID4VP)**.
 
 ## Reports
 
@@ -138,8 +141,8 @@ Every image is pinned in [`versions.lock`](versions.lock). The problem statement
 
 From [`docs/decisions.md`](docs/decisions.md) (decision days 2026-10-13 and 2026-10-20):
 
-- **Built adapters.** Issuers: Inji Certify (pre-authorized), walt.id issuer-api2, the fixture issuer. Wallet: the Playground reference wallet. Verifier: Inji Verify (local). The Inji JVM wallet, Inji Web, the phone wallet, Credo, Collab Verify, the Verify SDK, and the walt.id and EUDI verifiers are not in this release. _Pending (wave 8 A):_ the selector shows them as unavailable with the reason "not in this release"; until then, Start answers `adapter_unavailable`.
-- **Formats.** No mDoc (T-48 cut). `ldp_vc` is pending (see above).
+- **Built adapters.** Issuers: Inji Certify (pre-authorized), walt.id issuer-api2, the fixture issuer. Wallet: the Playground reference wallet. Verifier: Inji Verify (local). The Inji JVM wallet, Inji Web, the phone wallet, Credo, Collab Verify, the Verify SDK, and the walt.id and EUDI verifiers are not in this release. The selector and API-02/API-03 show them as unavailable with the reason "Not in this release (docs/decisions.md 2026-10-20)".
+- **Formats.** No mDoc (T-48 cut). `ldp_vc` is built; its live result is _pending wave 9 A_ (see above).
 - **Fix-it re-runs.** One fingerprint (FP-01) and one knob (KNOB-01) only. The G-59 knob is diagnosis-only, because Certify hardcodes `cnf.kid`.
 - **Not in v1:** tamper mode, suites, the interop matrix, nightly CI against Collab, issue drafts, `tx_code`, auth-code issuance, presentation during issuance, same-device presentation, the tunnel and the DC API probe. If tamper mode ships later, the 33 tamper cells with no observation carry `expectation: unverified`, and the known upstream fails are listed in [`ci/known-fails.json`](ci/known-fails.json).
 - **Collab mode** (`--mode collab`) exists in `up.sh`, but no Collab adapter is built in v1.
@@ -168,22 +171,22 @@ npm run typecheck   # tsc -b
 npm test            # vitest: unit, contract, integration, repo projects
 npm run test:ui     # UI component tests
 npm run e2e         # Playwright on fixture routes (axe, 320–1440 px, light + dark)
-npm run e2e:live    # Playwright against the running bundle (needs --with peers; slice only: -- slice)
+npm run e2e:live    # Playwright against the running bundle (needs --with peers; one spec: -- slice | labels)
 ```
 
-At the build wave 7 merge (commit `d67ab28`), `npm test` reported 640 tests passing and 7 skipped (55 files), and the fixture Playwright suite 54 passing. Re-run on 2026-10-20: 640 passed, 7 skipped. Bundle integration tests are opt-in (`BUNDLE_IT=1`).
+At the build wave 8 merge (commit `50c52ab`), `npm test` reported 677 tests passing and 8 skipped (59 files), and the fixture Playwright suite 54 passing. `npm run e2e:live` needs `npm ci` and `npx playwright install chromium` first; `apps/bff/src/server.test.ts` needs port 3100 free, so run `npm test` with the bundle down. Bundle integration tests are opt-in (`BUNDLE_IT=1`).
 
 ## Documents and deliverables
 
 - [`docs/interop-report.md`](docs/interop-report.md): interop report v1 (combinations, outcomes, evidence)
 - [`docs/reports/`](docs/reports/): committed run reports (JSON and Markdown)
 - [`docs/gaps.md`](docs/gaps.md): gaps write-up v1
-- [`docs/overview.md`](docs/overview.md): 1–2 page overview (v1 outline)
+- [`docs/overview.md`](docs/overview.md): 1–2 page overview (v1)
 - [`docs/decisions.md`](docs/decisions.md): dated decision log
 - [`deliverables/deck-v1.html`](deliverables/deck-v1.html): pitch deck v1 (6 slides, self-contained; press `n` for speaker notes)
-- [`deliverables/video/demo-v1-script.md`](deliverables/video/demo-v1-script.md) and [`demo-v1.srt`](deliverables/video/demo-v1.srt): demo video script and captions (the video is assembled in wave 9)
-- Recordings: [`deliverables/takes/m1-slice.webm`](deliverables/takes/m1-slice.webm) (slice), [`deliverables/takes/m2-fixit.webm`](deliverables/takes/m2-fixit.webm) (fix-it). _Pending (wave 8 A):_ the shot takes `deliverables/takes/s<NN>-*.webm`.
-- _Pending (wave 8 A):_ `docs/evidence/T-47-vp-expired.md` (VP-level expired credential) and `docs/evidence/T-55-fresh-clone.md` (fresh-clone timing).
+- [`deliverables/video/demo-v1.mp4`](deliverables/video/demo-v1.mp4): demo video v1, with its script [`demo-v1-script.md`](deliverables/video/demo-v1-script.md) and captions [`demo-v1.srt`](deliverables/video/demo-v1.srt)
+- Shot takes in [`deliverables/takes/`](deliverables/takes/) (1440 px, host masked, QR blurred): [`s02-environment`](deliverables/takes/s02-environment.webm), [`s03-select`](deliverables/takes/s03-select.webm), [`s04-issuance`](deliverables/takes/s04-issuance.webm), [`s05-decoded`](deliverables/takes/s05-decoded.webm), [`s06-present`](deliverables/takes/s06-present.webm), [`s07-report`](deliverables/takes/s07-report.webm) (cut from [`s03-s07-slice`](deliverables/takes/s03-s07-slice.webm)), [`s09-labels`](deliverables/takes/s09-labels.webm), [`s10-fixit`](deliverables/takes/s10-fixit.webm). Earlier recordings: [`m1-slice`](deliverables/takes/m1-slice.webm), [`m2-fixit`](deliverables/takes/m2-fixit.webm).
+- Live evidence in [`docs/evidence/`](docs/evidence/): [REQ-23 labels](docs/evidence/T-47-labels.md), [VP-level expired credential](docs/evidence/T-47-vp-expired.md), [fresh-clone timing](docs/evidence/T-55-fresh-clone.md), [`ldp_vc` live](docs/evidence/T-46-ldp.md) (_pending wave 9 A_)
 
 ## References
 

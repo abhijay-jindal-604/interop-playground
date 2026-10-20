@@ -6,7 +6,7 @@
     <title>Interop Playground deck</title>
     <!--
       Deck v1 (T-55, 2026-10-20). Six slides, one message each (plan/13 §3).
-      Self-contained: no external fonts, scripts or images.
+      Self-contained except one repository image (../docs/screenshots/selector.png): no external fonts or scripts.
       Keys: arrow keys or space to move, "n" toggles the speaker notes. Print gives one slide per page.
     -->
     <style>
@@ -125,6 +125,11 @@
         font-weight: 700;
         line-height: 1;
       }
+      .shot {
+        max-width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+      }
       .todo {
         border: 1px dashed var(--muted);
         color: var(--muted);
@@ -192,16 +197,18 @@
         <h1>Interop Playground</h1>
         <p class="message">Inji interop becomes something you can run, see and fix.</p>
         <div class="visual">
-          <div class="box todo">
-            TODO(wave 9): run screen screenshot (diagram + inspector), from the take
-            deliverables/takes/s04-*.webm
-          </div>
+          <img
+            class="shot"
+            src="../docs/screenshots/selector.png"
+            alt="The combination selector: issuer, wallet and verifier columns, with unavailable combinations greyed out"
+          />
         </div>
         <p class="credits">Built by TODO(user): names.</p>
         <aside class="notes">
           Speaker: "We built a playground that runs Inji issuers, wallets and verifiers against each
           other and shows every message on the wire." Sources: README "What it does"; the live slice
-          e2e <code>e2e/live/slice.live.spec.ts</code> (T-36, green 2026-10-20).
+          e2e <code>e2e/live/slice.live.spec.ts</code> (T-36, green 2026-10-20). Image:
+          <code>docs/screenshots/selector.png</code> (the selector, README screenshot).
         </aside>
       </section>
 
@@ -256,11 +263,22 @@
           <div class="arrow">→</div>
           <div class="box"><b>Report</b>Per-run pass/fail report, JSON and Markdown.</div>
         </div>
+        <p>
+          Verifier labels <b>Valid</b>, <b>Invalid</b> and <b>Valid-but-Expired</b>, shown live at
+          the real Inji Verify (3 of 3 as expected).
+        </p>
         <aside class="notes">
           Speaker: "Pick an issuer, a wallet and a verifier; we run OpenID4VCI and OpenID4VP for
           real and hand you a pass/fail report." Format scope on 2026-10-20: SD-JWT VC live; W3C
-          JSON-LD (ldp_vc) pending T-46; mDoc cut (docs/decisions.md 2026-10-20). Do not say "three
-          formats". Sources: README flows table; docs/interop-report.md.
+          JSON-LD (ldp_vc) built, live result pending wave 9 A (docs/evidence/T-46-ldp.md); mDoc cut
+          (docs/decisions.md 2026-10-20). Do not say "three formats". Labels: runs
+          <code>01M5CBEB3M9ANDEDPFBQD5D0NX</code> (Valid),
+          <code>01M5CBEB4BW718XJ7VW09CB7EF</code> (Invalid),
+          <code>01M5CBEB5F7W1Z8G14VNN0PK3Q</code> (Valid-but-Expired), docs/evidence/T-47-labels.md;
+          over OID4VP the expired credential is also Valid-but-Expired (run
+          <code>01M5CBC7EQY4ZKHPE50C1PC9CJ</code>, docs/evidence/T-47-vp-expired.md). Pass rate of
+          the presentation cells 66.7 % (2/3), docs/interop-report.md Summary. Sources: README flows
+          table; docs/interop-report.md.
         </aside>
       </section>
 
@@ -292,7 +310,7 @@
           <code>01M5B6KNNY7DC3YK3CR0ETNBN9</code> → <code>01M5B6M723AQ7T818D36816PRV</code>; golden
           <code>apps/bff/src/diagnosis/fixit.golden.test.ts</code>; live e2e
           <code>e2e/live/fixit.live.spec.ts</code> green 3× on the full bundle; take
-          <code>deliverables/takes/m2-fixit.webm</code>.
+          <code>deliverables/takes/s10-fixit.webm</code>.
         </aside>
       </section>
 
@@ -327,7 +345,9 @@
       <section class="slide" id="s6">
         <div class="num">6 / 6</div>
         <h2>Run it yourself</h2>
-        <p class="message">One command, local, digest-pinned.</p>
+        <p class="message">
+          One command, local, digest-pinned. First Pass 3 min 1 s after the clone.
+        </p>
         <div class="visual">
           <div class="box">
             <b>Start</b>
@@ -343,10 +363,11 @@
         </div>
         <p class="credits">Built by TODO(user): names.</p>
         <aside class="notes">
-          Speaker: "Clone, run one script, and run your first combination." Source: clean
-          <code>scripts/up.sh</code> ready in 1 min 22 s on a host with cached images, slice e2e
-          green (2026-10-20). The "fresh clone to a first Pass in under 30 minutes" figure is
-          pending its timing (docs/evidence/T-55-fresh-clone.md); say it only once that file exists.
+          Speaker: "Clone, run one script, and your first combination passes in minutes." Source:
+          docs/evidence/T-55-fresh-clone.md: git clone → <code>scripts/up.sh</code> (2 min 40 s) →
+          first run Pass (<code>01M5CCC4FZRMCCWMVQF5038EYS</code>), 3 min 1 s in total on a host
+          with every image already cached (say "cached images"; a new host adds the image pulls; the
+          target is under 30 minutes). One checkout per host (G-166, README).
         </aside>
       </section>
     </main>

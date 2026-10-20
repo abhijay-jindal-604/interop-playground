@@ -927,7 +927,9 @@ export const angleCopy = {
     spec: (clause: string) => `Spec: ${clause}`,
     gaps: (ids: string) => `Known gaps: ${ids}`,
     evidence: 'Evidence: ',
-    evidenceTip: 'Evidence identifier in the research log',
+    evidenceTip: 'Fingerprint file in the repository; its golden test reproduces the finding',
+    /** public evidence of a fingerprint (ADR-98, ADR-100): its repo file, never a research S-ID */
+    evidencePath: (fingerprintId: string) => `fingerprints/${fingerprintId}.json`,
     showMessages: 'Show matched messages',
     showCheck: 'Show the failing check',
     findings: 'Conformance findings',
@@ -945,7 +947,7 @@ export const angleCopy = {
     walletRuntime:
       "This is a simulated fix: the playground's own wallet is changed, so it shows where the defect is, not a change you can make to Inji.",
     peerRuntime: (name: string) => `This changes an option of the ${name} component, not of Inji.`,
-    provenBy: (ids: string) => `Proven by earlier runs: ${ids}`,
+    provenBy: 'Proven by an earlier re-run (recorded in the repository golden tests).',
     button: 'Fix it and re-run',
     sending: 'Starting…',
   },
@@ -1045,8 +1047,7 @@ export const angleCopy = {
     defaultMark: '(default)',
     status: { proven: 'Proven', unproven: 'Unproven', 'no-value-passes': 'No value passes' },
     statusTip: {
-      proven: (by: string) =>
-        `A re-run with this change was seen to fix the failure it targets (${by}).`,
+      proven: 'A re-run with this change was seen to fix the failure it targets.',
       unproven:
         'No re-run has proven this change yet. It can be set, but the playground will not offer it as a fix.',
       'no-value-passes': 'No value of this setting makes the combination pass.',

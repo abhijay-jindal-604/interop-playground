@@ -137,12 +137,7 @@ export function KnobsPanel({
                       </option>
                     ))}
                   </select>
-                  <span
-                    className={`badge tone-${STATUS_TONE[st]}`}
-                    title={
-                      st === 'proven' ? c.statusTip.proven(k.provenBy.join(', ')) : c.statusTip[st]
-                    }
-                  >
+                  <span className={`badge tone-${STATUS_TONE[st]}`} title={c.statusTip[st]}>
                     {c.status[st]}
                   </span>
                   <span className="small muted">{k.label}</span>

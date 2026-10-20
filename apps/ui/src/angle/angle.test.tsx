@@ -173,6 +173,9 @@ describe('ui.angle DiagnosisCard + FixItPanel (UI-24, UI-25)', () => {
     expect(screen.getByTestId('deviating-side').textContent).toBe(
       'Deviating side: Verifier: inji-verify (vc-verifier) 1.0-alpha.1',
     );
+    // ADR-98/ADR-100: public evidence is the fingerprint file, never a research S-ID
+    expect(screen.getByText('fingerprints/FP-01.json')).toBeTruthy();
+    expect(document.body.textContent).not.toMatch(/S-\d{3}/);
     const panel = screen.getByRole('region', { name: 'Fix it and re-run' });
     expect(within(panel).getByText('waltid.sdjwt.x5c')).toBeTruthy();
     expect(within(panel).getByText(/component, not of Inji/).textContent).toContain(

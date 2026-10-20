@@ -168,7 +168,7 @@ describe('T-44 golden: walt.id → playground-ts → Inji Verify (local), FP-01 
       'issuer.waltid → wallet.playground-ts → verifier.inji-verify-local (dc+sd-jwt) fails because ' +
         'Inji Verify cannot verify an SD-JWT VC whose issuer key is not given as an x5c chain ' +
         '[FP-01, G-55]. Changing only waltid.sdjwt.x5c from absent to present makes it pass. ' +
-        `Evidence: run ${parent.runId} vs run ${child.runId}; original finding S-077, S-120. ` +
+        `Evidence: run ${parent.runId} vs run ${child.runId}; fingerprint fingerprints/FP-01.json. ` +
         '(changed walt.id issuance option)',
     );
     // the knob's direct effect first: the credential header gains x5c

@@ -109,7 +109,11 @@ function useCompatibility(sel: Selection, entries: Record<Role, AdapterEntry[]> 
   return { hits, preview, checking, allFailed };
 }
 
-function WhyNot({ hit, evidence }: { hit: IncompatibilityHit; evidence: string[] }) {
+/** research-log S-IDs are internal; the UI shows only public evidence (ADR-98, ADR-100) */
+const isResearchId = (e: string): boolean => /^S-\d+$/.test(e);
+
+function WhyNot({ hit, evidence: all }: { hit: IncompatibilityHit; evidence: string[] }) {
+  const evidence = all.filter((e) => !isResearchId(e));
   const [open, setOpen] = useState(false);
   const btn = useRef<HTMLButtonElement>(null);
   const id = useId();

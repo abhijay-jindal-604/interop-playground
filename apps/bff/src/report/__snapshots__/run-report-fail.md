@@ -31,11 +31,11 @@ Generated 2026-10-19T12:00:00.000Z (report version 1).
 
 | Fingerprint | Title | Gaps | Confidence | Deviating side | Component | Spec clause | Evidence | Exchanges |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| FP-01 v1 | Inji Verify cannot verify an SD-JWT VC whose issuer key is not given as an x5c chain | G-55 | exact | verifier | inji-verify (vc-verifier) 1.0-alpha.1 | IETF SD-JWT VC (draft-ietf-oauth-sd-jwt-vc-19) §2.5 Issuer Verification Key Discovery and Validation | S-077, S-120 | 01JA0000000000000000000002:4, 01JA0000000000000000000002:1 |
+| FP-01 v1 | Inji Verify cannot verify an SD-JWT VC whose issuer key is not given as an x5c chain | G-55 | exact | verifier | inji-verify (vc-verifier) 1.0-alpha.1 | IETF SD-JWT VC (draft-ietf-oauth-sd-jwt-vc-19) §2.5 Issuer Verification Key Discovery and Validation | fingerprints/FP-01.json | 01JA0000000000000000000002:4, 01JA0000000000000000000002:1 |
 
 ## Fix-it
 
-- KNOB-01 `waltid.sdjwt.x5c`: absent → present (changed walt.id issuance option); proven by S-077, S-120.
+- KNOB-01 `waltid.sdjwt.x5c`: absent → present (changed walt.id issuance option); proven by an earlier re-run.
 
 ## Coverage
 

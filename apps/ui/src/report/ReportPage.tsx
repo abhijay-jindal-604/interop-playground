@@ -211,7 +211,7 @@ function Diagnosis({ r }: { r: RunReport }) {
               </div>
               <div>
                 <dt>{c.match.evidence}</dt>
-                <dd>{m.evidenceSIds.join(', ') || c.fields.none}</dd>
+                <dd className="mono small">{angleCopy.card.evidencePath(m.fingerprintId)}</dd>
               </div>
               <div>
                 <dt>{c.match.exchanges}</dt>

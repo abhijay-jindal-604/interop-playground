@@ -3,8 +3,8 @@
 This report lists every issuer → wallet → verifier combination that Interop Playground ran on the local bundle up to 2026-10-20, with its outcome and the evidence behind it. v1 is an index of per-run reports (API-45). The generated suite and matrix report (API-46) is not part of this release.
 
 - **Environment.** Local Docker bundle (`scripts/up.sh`), no tunnel, no Collab calls. Every image is digest-pinned in [`versions.lock`](../versions.lock).
-- **Evidence.** Each cell names a run ID with its committed report, or the live test that reproduces it and its recording. Results that another build task has not shown yet are marked _pending_. Nothing here is claimed from research alone.
-- **How the run reports were produced.** The two committed run reports come from the live T-44 run pair. Their recorded events ([`fixtures/golden/fixit/`](../fixtures/golden/fixit/)) were replayed through the product's own store, diagnosis engine and report generator, the same replay as `apps/bff/src/diagnosis/fixit.golden.test.ts`. The slice runs' IDs were not kept, so those cells cite the live e2e spec, which creates a new run and checks its report every time it runs.
+- **Evidence.** Each cell names a run ID with its committed report or live evidence file (`docs/evidence/`), and the live test that reproduces it and its recording. Results that another build task has not shown yet are marked _pending_. Nothing here is claimed from research alone.
+- **How the run reports were produced.** The two committed run reports come from the live T-44 run pair. Their recorded events ([`fixtures/golden/fixit/`](../fixtures/golden/fixit/)) were replayed through the product's own store, diagnosis engine and report generator, the same replay as `apps/bff/src/diagnosis/fixit.golden.test.ts`. The other cells cite the run IDs recorded in the live evidence files under [`docs/evidence/`](evidence/) and the live e2e spec that reproduces them; every live spec creates a new run and checks its result each time it runs.
 
 ## Versions
 
@@ -25,33 +25,32 @@ Pass rate = (pass + lenient) / (pass + lenient + fail + blocked), counted per ce
 
 | Format                     | pass | lenient | fail | blocked | rate             | inconclusive / no-submission / not-run / n/a |
 | -------------------------- | ---- | ------- | ---- | ------- | ---------------- | -------------------------------------------- |
-| SD-JWT VC (`dc+sd-jwt`)    | 1    | 0       | 1    | 0       | 50.0 % (1/2)     | 0 / 0 / 2 / 0                                |
+| SD-JWT VC (`dc+sd-jwt`)    | 2    | 0       | 1    | 0       | 66.7 % (2/3)     | 0 / 0 / 0 / 0                                |
 | W3C VC (JSON-LD, `ldp_vc`) | 0    | 0       | 0    | 0       | no denominator   | 0 / 0 / 1 / 0                                |
 | mDoc (`mso_mdoc`)          | 0    | 0       | 0    | 0       | no denominator   | 0 / 0 / 0 / 1                                |
-| **Overall**                | 1    | 0       | 1    | 0       | **50.0 % (1/2)** | 0 / 0 / 3 / 1                                |
+| **Overall**                | 2    | 0       | 1    | 0       | **66.7 % (2/3)** | 0 / 0 / 1 / 1                                |
 
-The one `fail` is the walt.id cell without `x5c`. Changing only KNOB-01 makes it pass, and the cell is shown as fixed below. Issuance-only rows are listed separately and are not counted in the rate.
+The one `fail` is the walt.id cell without `x5c`. Changing only KNOB-01 makes it pass, and the cell is shown as fixed below. The expired fixture credential counts as `pass`: its expected label, Valid-but-Expired, is what Inji Verify reported. Issuance-only rows and the three credential-level label runs are listed separately and are not counted in the rate (the Invalid label run is a correct rejection, not an interop failure).
 
 ## Interop matrix: SD-JWT VC (`dc+sd-jwt`)
 
 Rows are issuer and grant; the column is the wallet → verifier pair. Cross-device (QR) presentation.
 
-| Issuer @ env, grant                              | Playground reference wallet → Inji Verify (local) |
-| ------------------------------------------------ | ------------------------------------------------- |
-| Inji Certify @ local, pre-authorized code        | PASS                                              |
-| walt.id issuer-api2 @ local, pre-authorized code | FAIL FP-01 \* fixed by KNOB-01=present            |
-| `issuer.fixture` @ local, no issuance traffic    | _pending wave 8 A_ (not-run)                      |
-| `issuer.fixture` (expired credential) @ local    | _pending wave 8 A_ (not-run; VP-level expiry)     |
+| Issuer @ env, grant                                                | Playground reference wallet → Inji Verify (local) |
+| ------------------------------------------------------------------ | ------------------------------------------------- |
+| Inji Certify @ local, pre-authorized code                          | PASS                                              |
+| walt.id issuer-api2 @ local, pre-authorized code                   | FAIL FP-01 \* fixed by KNOB-01=present            |
+| `issuer.fixture` (expired credential) @ local, no issuance traffic | PASS (Valid-but-Expired)                          |
 
 ### Evidence per cell
 
-| Cell                                  | Flows             | Evidence                                                                                                                                                                                                                                                                                                                                                                         |
-| ------------------------------------- | ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Inji Certify → playground → Verify    | FLOW-04 + FLOW-30 | Live e2e [`e2e/live/slice.live.spec.ts`](../e2e/live/slice.live.spec.ts): selector → Start → **Pass**, diagram, key payloads, run report. Green 3× on a service subset (T-36, 2026-10-20), then after a clean `scripts/up.sh` (`npm run e2e:live -- slice`, 2026-10-20). Recording: [`deliverables/takes/m1-slice.webm`](../deliverables/takes/m1-slice.webm). Run IDs not kept. |
-| walt.id → playground → Verify, parent | FLOW-08 + FLOW-30 | Run `01M5B6KNNY7DC3YK3CR0ETNBN9`: **FAIL** at `vp.verdict.evaluate`, `vc.signature` = `ERR_SIGNATURE_VERIFICATION_FAILED` ("getX509CertChain(...) must not be null"). FP-01 matches exactly (G-55) and offers KNOB-01. Report: [JSON](reports/01M5B6KNNY7DC3YK3CR0ETNBN9.json), [Markdown](reports/01M5B6KNNY7DC3YK3CR0ETNBN9.md).                                               |
-| walt.id → playground → Verify, child  | FLOW-08 + FLOW-30 | Run `01M5B6M723AQ7T818D36816PRV`, derived from the parent with only KNOB-01 `absent` → `present`: **PASS**, classified `fixed`. Report: [JSON](reports/01M5B6M723AQ7T818D36816PRV.json), [Markdown](reports/01M5B6M723AQ7T818D36816PRV.md).                                                                                                                                      |
-| walt.id pair (both runs)              | as above          | Golden replay `npx vitest run apps/bff/src/diagnosis/fixit.golden.test.ts` (2/2); live e2e [`e2e/live/fixit.live.spec.ts`](../e2e/live/fixit.live.spec.ts) green 4× on a subset and 3× on `scripts/up.sh --with peers` (T-44, 2026-10-20). Recording: [`deliverables/takes/m2-fixit.webm`](../deliverables/takes/m2-fixit.webm).                                                 |
-| `issuer.fixture` cells                | FLOW-14 + FLOW-30 | Unit tests on recorded Inji Verify answers only. Live run pending (T-47, wave 8 A; `docs/evidence/T-47-vp-expired.md` once written).                                                                                                                                                                                                                                             |
+| Cell                                             | Flows             | Evidence                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| ------------------------------------------------ | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Inji Certify → playground → Verify               | FLOW-04 + FLOW-30 | Run `01M5CCC4FZRMCCWMVQF5038EYS`: **PASS**, `valid`, from a fresh clone and a plain `scripts/up.sh` ([`docs/evidence/T-55-fresh-clone.md`](evidence/T-55-fresh-clone.md)). Live e2e [`e2e/live/slice.live.spec.ts`](../e2e/live/slice.live.spec.ts): selector → Start → **Pass**, diagram, key payloads, run report. Green 3× on a service subset (T-36, 2026-10-20), after a clean `scripts/up.sh`, and in the fresh-clone timing. Recordings: [`deliverables/takes/s03-s07-slice.webm`](../deliverables/takes/s03-s07-slice.webm), [`deliverables/takes/m1-slice.webm`](../deliverables/takes/m1-slice.webm). |
+| walt.id → playground → Verify, parent            | FLOW-08 + FLOW-30 | Run `01M5B6KNNY7DC3YK3CR0ETNBN9`: **FAIL** at `vp.verdict.evaluate`, `vc.signature` = `ERR_SIGNATURE_VERIFICATION_FAILED` ("getX509CertChain(...) must not be null"). FP-01 matches exactly (G-55) and offers KNOB-01. Report: [JSON](reports/01M5B6KNNY7DC3YK3CR0ETNBN9.json), [Markdown](reports/01M5B6KNNY7DC3YK3CR0ETNBN9.md).                                                                                                                                                                                                                                                                              |
+| walt.id → playground → Verify, child             | FLOW-08 + FLOW-30 | Run `01M5B6M723AQ7T818D36816PRV`, derived from the parent with only KNOB-01 `absent` → `present`: **PASS**, classified `fixed`. Report: [JSON](reports/01M5B6M723AQ7T818D36816PRV.json), [Markdown](reports/01M5B6M723AQ7T818D36816PRV.md).                                                                                                                                                                                                                                                                                                                                                                     |
+| walt.id pair (both runs)                         | as above          | Golden replay `npx vitest run apps/bff/src/diagnosis/fixit.golden.test.ts` (2/2); live e2e [`e2e/live/fixit.live.spec.ts`](../e2e/live/fixit.live.spec.ts) green 4× on a subset and 3× on `scripts/up.sh --with peers` (T-44, 2026-10-20). Recording: [`deliverables/takes/s10-fixit.webm`](../deliverables/takes/s10-fixit.webm).                                                                                                                                                                                                                                                                              |
+| `issuer.fixture` (expired) → playground → Verify | FLOW-14 + FLOW-30 | Run `01M5CBC7EQY4ZKHPE50C1PC9CJ` (T-47, 2026-10-20): the wallet's submission is accepted (HTTP 200); `vp-results` answers signature valid, holder proof valid, `expiryCheck.valid:false`, no error code → **Valid-but-Expired**; check `chk.vp.sdjwt.expired-credential` = pass (Inji Verify does not collapse expiry into Invalid). [`docs/evidence/T-47-vp-expired.md`](evidence/T-47-vp-expired.md).                                                                                                                                                                                                         |
 
 The claim sentence of the fixed cell, verbatim from the child report: "issuer.waltid → wallet.playground-ts → verifier.inji-verify-local (dc+sd-jwt) fails because Inji Verify cannot verify an SD-JWT VC whose issuer key is not given as an x5c chain [FP-01, G-55]. Changing only waltid.sdjwt.x5c from absent to present makes it pass."
 
@@ -64,19 +63,21 @@ The claim sentence of the fixed cell, verbatim from the child report: "issuer.wa
 
 ## Credential-level verification (Valid / Invalid / Valid-but-Expired)
 
-| Credential (`issuer.fixture`) | Verifier          | Flow    | Expected label    | Result                                   |
-| ----------------------------- | ----------------- | ------- | ----------------- | ---------------------------------------- |
-| `PlaygroundSdJwt`             | Inji Verify local | FLOW-40 | Valid             | _pending wave 8 A_ (unit-tested mapping) |
-| `PlaygroundSdJwtInvalid`      | Inji Verify local | FLOW-40 | Invalid           | _pending wave 8 A_ (unit-tested mapping) |
-| `PlaygroundSdJwtExpired`      | Inji Verify local | FLOW-40 | Valid-but-Expired | _pending wave 8 A_ (unit-tested mapping) |
+| Credential (`issuer.fixture`) | Verifier          | Flow              | Expected label    | Result                       |
+| ----------------------------- | ----------------- | ----------------- | ----------------- | ---------------------------- |
+| Credential (`issuer.fixture`) | Verifier          | Flow              | Expected label    | Run                          | Observed                                                                         |
+| ---                           | ---               | ---               | ---               | ---                          | ---                                                                              |
+| `PlaygroundSdJwt`             | Inji Verify local | FLOW-14 → FLOW-40 | Valid             | `01M5CBEB3M9ANDEDPFBQD5D0NX` | **Valid** (run outcome pass)                                                     |
+| `PlaygroundSdJwtInvalid`      | Inji Verify local | FLOW-14 → FLOW-40 | Invalid           | `01M5CBEB4BW718XJ7VW09CB7EF` | **Invalid**, `ERR_SIGNATURE_VERIFICATION_FAILED` (run outcome fail, as expected) |
+| `PlaygroundSdJwtExpired`      | Inji Verify local | FLOW-14 → FLOW-40 | Valid-but-Expired | `01M5CBEB5F7W1Z8G14VNN0PK3Q` | **Valid-but-Expired** (run outcome pass)                                         |
 
-The label mapping (signature valid and expiry invalid gives Valid-but-Expired) is unit-tested on recorded Inji Verify responses in `packages/adapters/src/verifiers/inji-verify-local.test.ts`. A VP-level expired presentation (FLOW-30 with `PlaygroundSdJwtExpired`) is not claimed until its live run is recorded.
+3 of 3 labels as expected (T-47, 2026-10-20). Each run posts the credential to Inji Verify's `/v1/verify/v2/vc-verification`; the verbatim answers, the request and the UI result cards are in [`docs/evidence/T-47-labels.md`](evidence/T-47-labels.md). Live e2e: [`e2e/live/labels.live.spec.ts`](../e2e/live/labels.live.spec.ts) (selector mode "Credential only (no OID4VP)"); recording [`deliverables/takes/s09-labels.webm`](../deliverables/takes/s09-labels.webm). The real answers have the same shape as the recorded ones the mapping was unit-tested on. One positive conformance finding: Inji Verify validates the SD-JWT `_sd_alg` value strictly and rejected our first fixtures, which carried `sha256` instead of the IANA name `sha-256` (our defect, fixed; G-165 in [`docs/gaps.md`](gaps.md)).
 
 ## W3C VC (JSON-LD, `ldp_vc`)
 
-| Issuer @ env, grant                       | Playground reference wallet → Inji Verify (local)                                                               |
-| ----------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| Inji Certify @ local, pre-authorized code | _pending_ (not-run): T-46, FLOW-03 + FLOW-31, being built in wave 8 B on recorded upstreams; live run in wave 9 |
+| Issuer @ env, grant                       | Playground reference wallet → Inji Verify (local)                                                                                                                                                     |
+| ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Inji Certify @ local, pre-authorized code | _pending wave 9 A_ (not-run): FLOW-03 + FLOW-31 are built and pass unit and golden tests on recorded Inji answers (T-46); the live result goes to [`docs/evidence/T-46-ldp.md`](evidence/T-46-ldp.md) |
 
 ## mDoc (`mso_mdoc`)
 
@@ -102,10 +103,9 @@ The selector shows these as unavailable instead of running them. Rule-based cell
 | Inji JVM wallet → walt.id verifier                                  | kept greyed after the RISK-38 decision (signed-request process never smoke-tested). | `docs/decisions.md` 2026-10-20, RISK-38        |
 | Every adapter not built in this release                             | "not in this release (docs/decisions.md 2026-10-20)"                                | `docs/decisions.md` 2026-10-20 submission cuts |
 
-Adapters built in this release: `issuer.certify-preauth`, `issuer.waltid`, `issuer.fixture`, `wallet.playground-ts`, `verifier.inji-verify-local`. The others in the catalog (Inji Certify auth-code, mDoc and Collab issuers; the Inji JVM, Inji Web, phone and Credo wallets; Collab Verify, the Verify SDK, the offline vc-verifier, and the walt.id, EUDI and Credo verifiers) are not in this release. _Pending wave 8 A:_ the selector and API-02/API-03 show them as unavailable with that reason; until then, Start answers `adapter_unavailable`.
+Adapters built in this release: `issuer.certify-preauth`, `issuer.waltid`, `issuer.fixture`, `wallet.playground-ts`, `verifier.inji-verify-local`. The others in the catalog (Inji Certify auth-code, mDoc and Collab issuers; the Inji JVM, Inji Web, phone and Credo wallets; Collab Verify, the Verify SDK, the offline vc-verifier, and the walt.id, EUDI and Credo verifiers) are not in this release. The selector and API-02/API-03 show them as unavailable with that reason, and Start answers 422 with the rule `not-in-release`.
 
 ## Not run, and why
 
-- `issuer.fixture` cells and the three REQ-23 labels: the live run is wave 8 A's task (T-47).
-- `ldp_vc`: T-46 is being built in wave 8 on recorded upstreams; its live run is wave 9.
+- `ldp_vc`: FLOW-03 and FLOW-31 are built (T-46); their live run is _pending wave 9 A_.
 - Tamper mode, suites, the nightly matrix and Collab Verify are not in this release (`docs/decisions.md` 2026-10-20). The known upstream tamper failures are listed in [`ci/known-fails.json`](../ci/known-fails.json) for when tamper mode ships.
