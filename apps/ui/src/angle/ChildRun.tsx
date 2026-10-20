@@ -16,9 +16,11 @@ import { ApiError, apiSend } from '../api/client.js';
 import { InlineError } from '../components/InlineError.js';
 import { shortId } from '../components/RunLink.js';
 import { Skeleton } from '../components/Skeleton.js';
+import { Icon } from '../components/Icon.js';
 import { StatusBadge } from '../components/StatusBadge.js';
 import { angleCopy as c } from '../copy.js';
 import { announce } from '../lib/announce.js';
+import { screenCopy } from '../run/screen-copy.js';
 import {
   CLASS_TONE,
   changeOf,
@@ -32,6 +34,12 @@ export type Load<T> =
   { status: 'loading' } | { status: 'ready'; data: T } | { status: 'error'; error: unknown };
 
 type Delta = NonNullable<RunSpec['knobDelta']>;
+const CLASS_GLYPH = {
+  fixed: 'st-pass',
+  moved: 'st-inconclusive',
+  'not-fixed': 'st-fail',
+  inconclusive: 'st-inconclusive',
+} as const satisfies Record<Classification, string>;
 const knobName = (knobs: readonly KnobEntry[], d: Delta) =>
   knobEntry(knobs, d.knobId)?.def.name ?? d.knobId;
 
@@ -164,6 +172,9 @@ export function ChildResultCard({
       data-testid="child-result"
     >
       <div className="diagnosis-head">
+        <span className="child-glyph" aria-hidden="true">
+          <Icon name={CLASS_GLYPH[classification]} size={28} />
+        </span>
         <span className={`badge tone-${CLASS_TONE[classification]}`}>
           {c.child.chip[classification]}
         </span>
@@ -290,8 +301,16 @@ export function CompareStrip({
                 <tbody>
                   {rows.map((r) => {
                     const ch = changeOf(r);
+                    const from = r.parent?.outcome ?? null;
+                    const to = r.child?.outcome ?? null;
+                    const flipped = from !== null && to !== null && from !== to;
                     return (
-                      <tr key={r.stepKey} data-step-row={r.stepKey} data-direct={r.directEffect}>
+                      <tr
+                        key={r.stepKey}
+                        data-step-row={r.stepKey}
+                        data-direct={r.directEffect}
+                        data-flip={flipped ? `${from}-${to}` : undefined}
+                      >
                         <th scope="row">
                           {stepLabel(r.stepKey)}
                           {r.directEffect ? (
@@ -304,7 +323,18 @@ export function CompareStrip({
                           <OutcomeCell step={r.parent} />
                         </td>
                         <td>
-                          <OutcomeCell step={r.child} />
+                          <span className="flip-cell">
+                            {flipped ? (
+                              <span
+                                className="flip-arrow"
+                                title={screenCopy.strip.flipped}
+                                aria-hidden="true"
+                              >
+                                →
+                              </span>
+                            ) : null}
+                            <OutcomeCell step={r.child} />
+                          </span>
                         </td>
                         <td>
                           {ch.kind === 'differs' ? (

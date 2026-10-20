@@ -14,6 +14,7 @@ import { RunScreen } from '../run/RunScreen.js';
 import { append, fixtureFlows, logFixture, withoutTerminal } from '../test/run-fixtures.js';
 import { decodeJwt, decodeSdJwt, findDecodable, parseForm, splitRedactions } from './decode.js';
 import { buildModel, chipTarget, CHIPS } from './model.js';
+import { JsonCode } from './JsonCode.js';
 
 const f = logFixture('FLOW-30-pass');
 
@@ -325,5 +326,24 @@ describe('ui.inspector pane on FLOW-30', () => {
     fireEvent.click(tab(pane, 'Events'));
     const rows = ipanel(pane).querySelectorAll('tbody tr');
     expect(rows).toHaveLength(f.events.length);
+  });
+});
+
+describe('ui.inspector JSON colouring (ADR-119)', () => {
+  it('keeps the pretty-printed text exactly and marks keys, strings, numbers and literals', () => {
+    const value = { a: 'x "q"', n: -1.5e3, ok: true, z: null, list: [1, 'two'] };
+    const { container } = render(<JsonCode value={value} />);
+    const pre = container.querySelector('pre.json-code')!;
+    expect(pre.textContent).toBe(JSON.stringify(value, null, 2));
+    expect([...pre.querySelectorAll('.j-key')].map((e) => e.textContent)).toEqual([
+      '"a"',
+      '"n"',
+      '"ok"',
+      '"z"',
+      '"list"',
+    ]);
+    expect(pre.querySelectorAll('.j-str')).toHaveLength(2);
+    expect([...pre.querySelectorAll('.j-num')].map((e) => e.textContent)).toEqual(['-1500', '1']);
+    expect(pre.querySelectorAll('.j-lit')).toHaveLength(2);
   });
 });

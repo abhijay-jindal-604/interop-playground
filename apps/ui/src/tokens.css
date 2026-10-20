@@ -2,33 +2,58 @@
  * Design tokens (06 UI-75, ADR-42). Source of truth for colour, type, spacing, shape and motion.
  * scripts/contrast.mjs parses the two colour blocks below (`:root` = light, `:root[data-theme='dark']`
  * = dark) and checks every pair; the prefers-color-scheme block must repeat the dark block exactly.
- * Plain CSS only: no Tailwind, no web fonts, no CDN.
+ * Plain CSS only: no Tailwind, no web fonts, no CDN. Direction "Ink and Signal" (ADR-117): an ink
+ * chrome band (top bar and rail) in both themes, one violet signal accent that no status colour
+ * shares, and status colours that keep their meaning everywhere.
  */
 
 :root {
   color-scheme: light;
-  /* colour: light */
+  /* colour: light ("Ink and Signal", ADR-117) */
   --bg: #ffffff;
-  --surface: #f8fafc;
-  --sunken: #eef2f7;
-  --border: #cbd5e1;
-  --border-ui: #8392a8;
-  --text: #0f172a;
-  --text-muted: #475569;
-  --accent: #4338ca;
+  --surface: #f6f7fb;
+  --sunken: #eceef5;
+  --border: #d5d9e5;
+  --border-ui: #7f889e;
+  --text: #0b1020;
+  --text-muted: #4a5268;
+  --accent: #5b2bd6;
   --on-accent: #ffffff;
-  --focus: #4338ca;
-  --status-pass: #166534;
-  --status-fail: #b91c1c;
-  --status-warn: #92400e;
-  --status-info: #1d4ed8;
-  --status-neutral: #334e78;
-  --status-skipped: #586880; /* UI-75 lists #5B6B82; its 12 % badge pair is 4.45 (ADR-62) */
-  --shadow-1: 0 1px 2px rgba(15, 23, 42, 0.12);
+  --focus: #5b2bd6;
+  --status-pass: #146c3a;
+  --status-fail: #b42318;
+  --status-warn: #8f3d0b;
+  --status-info: #1f4fc9;
+  --status-neutral: #344d74;
+  --status-skipped: #566078; /* UI-75 listed #5B6B82; its 12 % badge pair was 4.45 (ADR-62) */
+  --shadow-1: 0 1px 2px rgba(11, 16, 32, 0.1), 0 1px 1px rgba(11, 16, 32, 0.06);
+  /* additive (ADR-117) */
+  --accent-strong: #4a1fb8;
+  --accent-soft: rgba(91, 43, 214, 0.08);
+  --surface-raised: #ffffff;
+  --shadow-2: 0 2px 4px rgba(11, 16, 32, 0.06), 0 8px 24px -6px rgba(11, 16, 32, 0.14);
+  --shadow-3: 0 4px 8px rgba(11, 16, 32, 0.08), 0 24px 48px -12px rgba(11, 16, 32, 0.28);
+  /* ink chrome: top bar and rail, dark in both themes */
+  --chrome-bg: #0b1020;
+  --chrome-raised: #161c33;
+  --chrome-border: #262e48;
+  --chrome-border-ui: #6a7591;
+  --chrome-text: #f2f4fa;
+  --chrome-muted: #a3abc2;
+  --chrome-accent: #c6b0ff;
+  --chrome-focus: #c6b0ff;
+  --chrome-pass: #4ade80;
+  --chrome-warn: #fbbf24;
+  --chrome-fail: #ff8a80;
+  --chrome-off: #8a93ab;
 
   /* typography */
   --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+  --font-mono:
+    ui-monospace, 'SF Mono', 'Cascadia Mono', 'JetBrains Mono', Menlo, Consolas, 'Liberation Mono',
+    monospace;
+  --font-display: var(--font-sans);
+  --text-11: 0.6875rem;
   --text-12: 0.75rem;
   --text-13: 0.8125rem;
   --text-14: 0.875rem;
@@ -36,11 +61,16 @@
   --text-20: 1.25rem;
   --text-24: 1.5rem;
   --text-32: 2rem;
+  --text-40: 2.5rem;
   --leading-body: 1.5;
   --leading-heading: 1.25;
   --leading-mono: 1.4;
   --weight-regular: 400;
   --weight-strong: 600;
+  --weight-bold: 700;
+  --tracking-tight: -0.025em;
+  --tracking-display: -0.035em;
+  --tracking-eyebrow: 0.08em;
 
   /* spacing (4 px base) */
   --space-0: 0;
@@ -56,12 +86,15 @@
   /* shape */
   --radius-sm: 4px;
   --radius-md: 8px;
+  --radius-lg: 14px;
   --radius-pill: 999px;
 
   /* motion */
   --duration-fast: 120ms;
   --duration-panel: 200ms;
+  --duration-slow: 320ms;
   --ease: cubic-bezier(0.2, 0, 0, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 
   /* layout (UI-72) */
   --gutter: 16px;
@@ -78,46 +111,80 @@
 :root[data-theme='dark'] {
   color-scheme: dark;
   /* colour: dark */
-  --bg: #0b1220;
-  --surface: #111a2e;
-  --sunken: #070c16;
-  --border: #2a3650;
-  --border-ui: #64748b;
-  --text: #e2e8f0;
-  --text-muted: #a9b6ca;
-  --accent: #a5b4fc;
-  --on-accent: #0b1220;
-  --focus: #a5b4fc;
+  --bg: #090d18;
+  --surface: #10152a;
+  --sunken: #05070f;
+  --border: #252d45;
+  --border-ui: #68728c;
+  --text: #e6e9f2;
+  --text-muted: #a7afc6;
+  --accent: #b9a2ff;
+  --on-accent: #0b0820;
+  --focus: #b9a2ff;
   --status-pass: #4ade80;
-  --status-fail: #f87171;
+  --status-fail: #ff7a72;
   --status-warn: #fbbf24;
-  --status-info: #93c5fd;
-  --status-neutral: #9db4d6;
-  --status-skipped: #94a3b8;
+  --status-info: #8fbcff;
+  --status-neutral: #a0b4d8;
+  --status-skipped: #95a0b8;
   --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --accent-strong: #cbb9ff;
+  --accent-soft: rgba(185, 162, 255, 0.1);
+  --surface-raised: #151b33;
+  --shadow-2: 0 2px 4px rgba(0, 0, 0, 0.4), 0 8px 24px -6px rgba(0, 0, 0, 0.6);
+  --shadow-3: 0 4px 8px rgba(0, 0, 0, 0.45), 0 24px 48px -12px rgba(0, 0, 0, 0.75);
+  --chrome-bg: #05070f;
+  --chrome-raised: #11162a;
+  --chrome-border: #20273d;
+  --chrome-border-ui: #6a7591;
+  --chrome-text: #f2f4fa;
+  --chrome-muted: #a3abc2;
+  --chrome-accent: #c6b0ff;
+  --chrome-focus: #c6b0ff;
+  --chrome-pass: #4ade80;
+  --chrome-warn: #fbbf24;
+  --chrome-fail: #ff8a80;
+  --chrome-off: #8a93ab;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
     color-scheme: dark;
     /* colour: dark (system) */
-    --bg: #0b1220;
-    --surface: #111a2e;
-    --sunken: #070c16;
-    --border: #2a3650;
-    --border-ui: #64748b;
-    --text: #e2e8f0;
-    --text-muted: #a9b6ca;
-    --accent: #a5b4fc;
-    --on-accent: #0b1220;
-    --focus: #a5b4fc;
+    --bg: #090d18;
+    --surface: #10152a;
+    --sunken: #05070f;
+    --border: #252d45;
+    --border-ui: #68728c;
+    --text: #e6e9f2;
+    --text-muted: #a7afc6;
+    --accent: #b9a2ff;
+    --on-accent: #0b0820;
+    --focus: #b9a2ff;
     --status-pass: #4ade80;
-    --status-fail: #f87171;
+    --status-fail: #ff7a72;
     --status-warn: #fbbf24;
-    --status-info: #93c5fd;
-    --status-neutral: #9db4d6;
-    --status-skipped: #94a3b8;
+    --status-info: #8fbcff;
+    --status-neutral: #a0b4d8;
+    --status-skipped: #95a0b8;
     --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.5);
+    --accent-strong: #cbb9ff;
+    --accent-soft: rgba(185, 162, 255, 0.1);
+    --surface-raised: #151b33;
+    --shadow-2: 0 2px 4px rgba(0, 0, 0, 0.4), 0 8px 24px -6px rgba(0, 0, 0, 0.6);
+    --shadow-3: 0 4px 8px rgba(0, 0, 0, 0.45), 0 24px 48px -12px rgba(0, 0, 0, 0.75);
+    --chrome-bg: #05070f;
+    --chrome-raised: #11162a;
+    --chrome-border: #20273d;
+    --chrome-border-ui: #6a7591;
+    --chrome-text: #f2f4fa;
+    --chrome-muted: #a3abc2;
+    --chrome-accent: #c6b0ff;
+    --chrome-focus: #c6b0ff;
+    --chrome-pass: #4ade80;
+    --chrome-warn: #fbbf24;
+    --chrome-fail: #ff8a80;
+    --chrome-off: #8a93ab;
   }
 }
 

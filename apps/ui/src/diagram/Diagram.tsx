@@ -12,7 +12,7 @@ import type { RunFlows } from '../run/flows.js';
 import { isTerminal, type RunView } from '../run/reduce.js';
 import { BuiltinSequence } from './BuiltinSequence.js';
 import { diagramFlow, diagramStates, type DiagramFlow, type StepDiagramState } from './model.js';
-import { DiagramIndexError, indexMessages, renderMermaid } from './render.js';
+import { DiagramIndexError, decorateLanes, indexMessages, renderMermaid } from './render.js';
 
 const c = runCopy.diagram;
 
@@ -44,12 +44,19 @@ function applyStates(
     '[data-msg].messageLine0, [data-msg].messageLine1',
   );
   const texts = root.querySelectorAll<SVGElement>('.messageText[data-msg]');
+  const rows = new Map(
+    [...root.querySelectorAll<SVGElement>('.dg-row[data-msg]')].map((r) => [
+      r.getAttribute('data-msg'),
+      r,
+    ]),
+  );
   flow.messages.forEach((m, i) => {
     const st = states.get(m.stepKey);
     const state = st?.messageStates[m.part] ?? 'pending';
-    for (const el of [lines[i], texts[i]]) {
+    for (const el of [lines[i], texts[i], rows.get(String(i))]) {
       if (!el) continue;
       el.setAttribute('data-state', state);
+      el.setAttribute('data-step-state', st?.state ?? 'pending');
       el.classList.toggle('is-selected', selected === m.stepKey);
     }
     const t = texts[i];
@@ -91,7 +98,8 @@ function MermaidSvg({
       data-renderer="mermaid"
       aria-hidden="true"
       onClick={(e) => {
-        const key = (e.target as Element).closest('[data-step]')?.getAttribute('data-step');
+        const hit = (e.target as Element).closest('[data-step], [data-row-step]');
+        const key = hit?.getAttribute('data-step') ?? hit?.getAttribute('data-row-step');
         if (key) onSelect(key);
       }}
       // the SVG was indexed (data-msg/data-step) before it is mounted; see SequenceBlock
@@ -137,6 +145,7 @@ function SequenceBlock({
         const probe = document.createElement('div');
         probe.innerHTML = svg;
         indexMessages(probe, flow);
+        decorateLanes(probe);
         if (live) setMode({ kind: 'mermaid', svg: probe.innerHTML });
       })
       .catch((err: unknown) => {

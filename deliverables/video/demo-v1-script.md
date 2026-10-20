@@ -1,6 +1,6 @@
 # Demo video v1: script and shot list (2026-10-20)
 
-Narration and timing for the v1 demo video (REQ-39), from plan/13 §2. Captions for the same lines are in [`demo-v1.srt`](demo-v1.srt). The video is assembled from the takes in wave 9.
+Narration and timing for the v1 demo video (REQ-39). Captions for the same lines are in [`demo-v1.srt`](demo-v1.srt). The video is assembled from the takes recorded at `08b2c74`.
 
 ## Cut and format
 
@@ -29,7 +29,7 @@ Browser at 1440 px width, reduced motion off (the diagram animates), local bundl
 | S11 | 3:40–4:05 | title card                                                     | Card naming [`docs/interop-report.md`](../../docs/interop-report.md) and [`docs/gaps.md`](../../docs/gaps.md).                                                                                                                             | The interop report lists every combination we ran and its outcome. The gaps write-up documents the Inji defects we found, with reproduction steps, ready to file.                                                                                                                                       |
 | S12 | 4:05–4:20 | closing card                                                   | Repository URL: https://github.com/abhijay-jindal-604/interop-playground. Credits: Abhijay Jindal.                                                                                                                                         | Interop Playground. Source, setup and every flow are in the README.                                                                                                                                                                                                                                     |
 
-S10 is `s10-fixit.webm`, which supersedes `m2-fixit.webm` (the T-44 recording whose beats flash by under toasts). The current take is the wave 9 re-take (22.0 s, 1440x900, no internal S-IDs on the diagnosis card); `assemble.sh` slows it 2x to 44 s and holds the last frame to the 50 s shot. The assembled `demo-v1.mp4` is 4:20 (259.96 s).
+S10 is `s10-fixit.webm`, which supersedes `m2-fixit.webm` (the T-44 recording whose beats flash by under toasts). The current take is the re-take from `08b2c74` (22.0 s, 1440x900, no internal S-IDs on the diagnosis card); `assemble.sh` slows it 2x to 44 s and holds the last frame to the 50 s shot. The assembled `demo-v1.mp4` is 4:20 (259.96 s).
 
 ## Fallbacks
 

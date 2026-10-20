@@ -6,11 +6,11 @@ Host: Linux, Docker 29.8.1 + compose, 23 GiB RAM (about 10 GiB available; `up.sh
 
 ## Steps (README Quickstart, literally)
 
-| # | Step | Time |
-|---|---|---|
-| 1 | `git clone` of the local repo (HEAD `2f162cd`) | 1 s |
-| 2 | `scripts/up.sh` (no flags), exit 0, `ready` | 2 min 40 s |
-| 3 | `npm ci` 4 s, `npx playwright install chromium` under 1 s (cached), `npx playwright test -c e2e/playwright.live.config.ts slice` 7.4 s | 12 s |
+| #   | Step                                                                                                                                   | Time       |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| 1   | `git clone` of the local repo (HEAD `2f162cd`)                                                                                         | 1 s        |
+| 2   | `scripts/up.sh` (no flags), exit 0, `ready`                                                                                            | 2 min 40 s |
+| 3   | `npm ci` 4 s, `npx playwright install chromium` under 1 s (cached), `npx playwright test -c e2e/playwright.live.config.ts slice` 7.4 s | 12 s       |
 
 FLOW-30 run `01M5CF9XH79FFEVS3N2JBG8MYV`: `pass`, `issuanceOk: true`, verification `valid`.
 
@@ -20,7 +20,7 @@ FLOW-30 run `01M5CF9XH79FFEVS3N2JBG8MYV`: `pass`, `issuanceOk: true`, verificati
 
 ## G-166 two-checkout repro
 
-1. Clone first start. The clone has no `.generated/state/chain.done` marker and its own CA, so the "marker mismatch" path ran (same wording as wave 8), not the stamp path:
+1. Clone first start. The clone has no `.generated/state/chain.done` marker and its own CA, so the "marker mismatch" path ran (same wording as the earlier check, `673cb1e`), not the stamp path:
 
 ```
 [up] WARNING: Inji state was created for another PUBLIC_HOST/CA (or the chain never finished): wiping it (10 §7.6)

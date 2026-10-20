@@ -1,6 +1,6 @@
-# T-47 live acceptance (deferred to wave 8, Docker owner)
+# T-47 live acceptance (deferred to the Docker run)
 
-Built in wave 7 on recorded upstreams (no Docker): `issuer.fixture`, `verifier.inji-verify-local.verifyCredential`, `judgeExpiredCredential` (`chk.vp.sdjwt.expired-credential`), `flows/FLOW-14.json`, `flows/FLOW-40.json`. Not yet run against the real Verify.
+Built (`b4a26de`) on recorded upstreams (no Docker): `issuer.fixture`, `verifier.inji-verify-local.verifyCredential`, `judgeExpiredCredential` (`chk.vp.sdjwt.expired-credential`), `flows/FLOW-14.json`, `flows/FLOW-40.json`. Not yet run against the real Verify.
 
 ## Stack
 
@@ -10,11 +10,11 @@ Built in wave 7 on recorded upstreams (no Docker): `issuer.fixture`, `verifier.i
 
 Against `http://verify-service:8080/v1/verify/v2/vc-verification` (the BFF registers `issuer.fixture` through `bundleAdapters()`; `main.ts` may need no change). Expected labels, exactly:
 
-| configurationId | expected verdict | expected checks |
-|---|---|---|
-| `PlaygroundSdJwt` | valid | `vc.signature` pass, `vc.expiry` pass |
-| `PlaygroundSdJwtInvalid` | invalid | `vc.signature` fail (`ERR_SIGNATURE_VERIFICATION_FAILED`) |
-| `PlaygroundSdJwtExpired` | valid-but-expired | `vc.signature` pass, `vc.expiry` fail |
+| configurationId          | expected verdict  | expected checks                                           |
+| ------------------------ | ----------------- | --------------------------------------------------------- |
+| `PlaygroundSdJwt`        | valid             | `vc.signature` pass, `vc.expiry` pass                     |
+| `PlaygroundSdJwtInvalid` | invalid           | `vc.signature` fail (`ERR_SIGNATURE_VERIFICATION_FAILED`) |
+| `PlaygroundSdJwtExpired` | valid-but-expired | `vc.signature` pass, `vc.expiry` fail                     |
 
 Quick form without the UI (from the repo root, `bff` container or host with the verify port published):
 

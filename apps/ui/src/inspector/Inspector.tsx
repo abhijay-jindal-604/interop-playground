@@ -15,6 +15,8 @@ import { CaptureBadge, outcomeWord } from '../run/StepRail.js';
 import { runCopy } from '../copy.js';
 import { BodyViewer, Redacted } from './BodyViewer.js';
 import { findDecodable, pretty, type DecodedItem } from './decode.js';
+import { JsonCode } from './JsonCode.js';
+import { screenCopy } from '../run/screen-copy.js';
 import {
   buildModel,
   chipTarget,
@@ -363,6 +365,50 @@ function JoseChips({ h }: { h: Record<string, unknown> }) {
   );
 }
 
+/**
+ * One disclosed claim: the visible name and value are styled apart, the full sentence stays in
+ * the text (the "Disclosed claim:" lead-in is visually hidden, read by screen readers).
+ */
+function Disclosure({ name, value }: { name: string; value: string }) {
+  const full = c.decoded.disclosed(name, value);
+  const at = full.lastIndexOf(`${name} = `);
+  if (at < 0) return <li className="disclosure-item mono small">{full}</li>;
+  return (
+    <li className="disclosure-item mono small">
+      <span className="visually-hidden">{full.slice(0, at)}</span>
+      <span className="disc-name">{name}</span>
+      <span className="disc-eq"> = </span>
+      <span className="disc-value">{full.slice(at + name.length + 3)}</span>
+    </li>
+  );
+}
+
+function DisclosureList({ items }: { items: { key: string; name: string; value: string }[] }) {
+  if (items.length === 0) return null;
+  return (
+    <div className="disclosures">
+      <p className="body-block-title">{screenCopy.decoded.disclosures(items.length)}</p>
+      <ul className="disclosure-list">
+        {items.map((d) => (
+          <Disclosure key={d.key} name={d.name} value={d.value} />
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+/** A payload block with its copy button. */
+function Payload({ value }: { value: unknown }) {
+  return (
+    <div className="payload">
+      <JsonCode value={value} />
+      <span className="payload-copy">
+        <CopyButton text={pretty(value)} label={screenCopy.decoded.copyPayload} />
+      </span>
+    </div>
+  );
+}
+
 /** One decoded credential, token or document with its parts. */
 function ArtifactCard({ item, from }: { item: DecodedItem; from: string }) {
   return (
@@ -370,21 +416,21 @@ function ArtifactCard({ item, from }: { item: DecodedItem; from: string }) {
       <h3 className="artifact-title">{titleOf(item)}</h3>
       <p className="muted small">{c.decoded.from(from)}</p>
       <JoseChips h={item.jwt.header} />
-      {item.sdJwt && item.sdJwt.disclosures.length > 0 ? (
-        <ul className="disclosure-list">
-          {item.sdJwt.disclosures.map((d) => (
-            <li key={d.raw} className="mono small">
-              {c.decoded.disclosed(d.name ?? '[array element]', show(d.value))}
-            </li>
-          ))}
-        </ul>
+      {item.sdJwt ? (
+        <DisclosureList
+          items={item.sdJwt.disclosures.map((d) => ({
+            key: d.raw,
+            name: d.name ?? '[array element]',
+            value: show(d.value),
+          }))}
+        />
       ) : null}
-      <pre className="body-code">{pretty(item.jwt.payload)}</pre>
+      <Payload value={item.jwt.payload} />
       {item.sdJwt?.kbJwt ? (
         <>
           <p className="body-block-title">{c.body.kbJwt}</p>
           <JoseChips h={item.sdJwt.kbJwt.header} />
-          <pre className="body-code">{pretty(item.sdJwt.kbJwt.payload)}</pre>
+          <Payload value={item.sdJwt.kbJwt.payload} />
         </>
       ) : null}
       <p className="muted small">{c.decoded.disclaimer}</p>
@@ -414,7 +460,7 @@ function EngineArtifactCard({ row }: { row: EngineRowView }) {
         </h3>
         <p className="muted small">{from}</p>
         <JoseChips h={header} />
-        <pre className="body-code">{pretty(out.payload ?? null)}</pre>
+        <Payload value={out.payload ?? null} />
         {typeof out.jwsSha256 === 'string' ? (
           <p className="muted small mono">{c.decoded.jwsSha256(out.jwsSha256)}</p>
         ) : null}
@@ -434,29 +480,24 @@ function EngineArtifactCard({ row }: { row: EngineRowView }) {
         <p className="tone-fail small">{c.decoded.inspectError(out.error)}</p>
       ) : null}
       {header ? <JoseChips h={header} /> : null}
-      {disclosures.length > 0 ? (
-        <ul className="disclosure-list">
-          {disclosures.map((d, i) => (
-            <li key={typeof d.digest === 'string' ? d.digest : i} className="mono small">
-              {c.decoded.disclosed(
-                typeof d.name === 'string' ? d.name : '[array element]',
-                show(d.value),
-              )}
-            </li>
-          ))}
-        </ul>
-      ) : null}
+      <DisclosureList
+        items={disclosures.map((d, i) => ({
+          key: typeof d.digest === 'string' ? d.digest : String(i),
+          name: typeof d.name === 'string' ? d.name : '[array element]',
+          value: show(d.value),
+        }))}
+      />
       {'payload' in out ? (
-        <pre className="body-code">{pretty(out.payload)}</pre>
+        <Payload value={out.payload} />
       ) : 'credential' in out ? (
-        <pre className="body-code">{pretty(out.credential)}</pre>
+        <Payload value={out.credential} />
       ) : typeof out.bytes === 'number' ? (
         <p className="small">{c.decoded.bytesOnly(out.bytes)}</p>
       ) : null}
       {isRec(out.artifacts) ? (
         <details className="disclosure">
           <summary>{c.decoded.artifacts}</summary>
-          <pre className="body-code">{pretty(out.artifacts)}</pre>
+          <JsonCode value={out.artifacts} />
         </details>
       ) : null}
       {header ? <p className="muted small">{c.decoded.disclaimer}</p> : null}
@@ -673,11 +714,11 @@ function EngineTab({
             ) : null}
             <details className="disclosure">
               <summary>{c.engine.input}</summary>
-              <pre className="body-code">{pretty(call.inputSummary)}</pre>
+              <JsonCode value={call.inputSummary} />
             </details>
             <details className="disclosure">
               <summary>{c.engine.output}</summary>
-              <pre className="body-code">{pretty(call.outputSummary)}</pre>
+              <JsonCode value={call.outputSummary} />
             </details>
           </li>
         );
@@ -813,7 +854,7 @@ function EventRow({
         <tr>
           <td colSpan={5}>
             <CopyButton text={JSON.stringify(e)} label={c.events.copyEvent} />
-            <pre className="body-code">{pretty(e)}</pre>
+            <JsonCode value={e} />
           </td>
         </tr>
       ) : null}

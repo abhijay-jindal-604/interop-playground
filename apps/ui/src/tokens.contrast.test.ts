@@ -22,10 +22,22 @@ describe('contrast', () => {
     const file = path.join(dir, 'tokens.css');
     writeFileSync(
       file,
-      readFileSync(tokens, 'utf8').replace('--text-muted: #475569;', '--text-muted: #94a3b8;'),
+      readFileSync(tokens, 'utf8').replace('--text-muted: #4a5268;', '--text-muted: #94a3b8;'),
     );
     const r = run(file);
     expect(r.status).toBe(1);
     expect(r.stderr).toContain('light: --text-muted on --bg');
+  });
+
+  it('checks the ink chrome pairs (ADR-117)', () => {
+    const dir = mkdtempSync(path.join(tmpdir(), 'contrast-'));
+    const file = path.join(dir, 'tokens.css');
+    writeFileSync(
+      file,
+      readFileSync(tokens, 'utf8').replace('--chrome-muted: #a3abc2;', '--chrome-muted: #3a4258;'),
+    );
+    const r = run(file);
+    expect(r.status).toBe(1);
+    expect(r.stderr).toContain('light: --chrome-muted on --chrome-bg');
   });
 });

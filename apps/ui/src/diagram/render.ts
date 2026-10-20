@@ -36,7 +36,21 @@ function mermaid(): Promise<MermaidApi | null> {
       startOnLoad: false,
       securityLevel: 'strict',
       theme: 'neutral',
-      sequence: { showSequenceNumbers: true, mirrorActors: false },
+      // ADR-119: tighter rows and bolder lifeline heads; colours come from run-screen.css
+      sequence: {
+        showSequenceNumbers: true,
+        mirrorActors: false,
+        actorFontSize: 15,
+        actorFontWeight: 600,
+        messageFontSize: 15,
+        messageMargin: 16,
+        boxMargin: 4,
+        actorMargin: 40,
+        width: 150,
+        height: 52,
+        diagramMarginX: 12,
+        diagramMarginY: 8,
+      },
     });
     return m;
   });
@@ -92,6 +106,66 @@ export function indexMessages(root: ParentNode, flow: DiagramFlow): Element[] {
     texts[i]?.setAttribute('data-step', key);
   });
   return lines;
+}
+
+const SVG_NS = 'http://www.w3.org/2000/svg';
+const nums = (v: string | null): number[] =>
+  (v ?? '')
+    .match(/-?\d+(?:\.\d+)?/g)
+    ?.map(Number)
+    .filter((n) => Number.isFinite(n)) ?? [];
+
+/**
+ * ADR-119: paints a lane band behind each lifeline and a row band behind each message of the
+ * indexed Mermaid SVG (inserted first, so they sit under the drawing). Rows carry `data-msg` and
+ * `data-row-step` (not `data-step`, which stays on the message line and label) so `applyStates`
+ * can tint the running, selected and failed rows. Purely decorative; the SVG stays aria-hidden.
+ */
+export function decorateLanes(root: ParentNode): void {
+  const svg = root.querySelector('svg');
+  if (!svg || svg.querySelector('.dg-decor')) return;
+  const [vx = 0, vy = 0, vw = 0, vh = 0] = nums(svg.getAttribute('viewBox'));
+  if (vw <= 0 || vh <= 0) return;
+  const decor = document.createElementNS(SVG_NS, 'g');
+  decor.setAttribute('class', 'dg-decor');
+  // one band under each lifeline head, as wide as the head, down to the bottom of the drawing
+  [...svg.querySelectorAll('rect.actor-top')].forEach((head, i) => {
+    const x = Number(head.getAttribute('x'));
+    const w = Number(head.getAttribute('width'));
+    const y = Number(head.getAttribute('y'));
+    if (![x, w, y].every(Number.isFinite)) return;
+    const lane = document.createElementNS(SVG_NS, 'rect');
+    lane.setAttribute('class', `dg-lane dg-lane-${i % 2 === 0 ? 'even' : 'odd'}`);
+    lane.setAttribute('x', String(x));
+    lane.setAttribute('y', String(y));
+    lane.setAttribute('width', String(w));
+    lane.setAttribute('height', String(Math.max(0, vy + vh - y)));
+    lane.setAttribute('rx', '8');
+    decor.appendChild(lane);
+  });
+  const { lines, texts } = messageElements(svg);
+  lines.forEach((line, i) => {
+    const ys =
+      line.tagName.toLowerCase() === 'line'
+        ? [Number(line.getAttribute('y1')), Number(line.getAttribute('y2'))]
+        : nums(line.getAttribute('d')).filter((_, k) => k % 2 === 1);
+    const ty = Number(texts[i]?.getAttribute('y'));
+    const all = [...ys, ...(Number.isFinite(ty) ? [ty] : [])].filter((n) => Number.isFinite(n));
+    if (all.length === 0) return;
+    const top = Math.min(...all) - 6;
+    const bottom = Math.max(...ys.filter((n) => Number.isFinite(n)), top + 12) + 10;
+    const row = document.createElementNS(SVG_NS, 'rect');
+    row.setAttribute('class', 'dg-row');
+    row.setAttribute('x', String(vx));
+    row.setAttribute('y', String(top));
+    row.setAttribute('width', String(vw));
+    row.setAttribute('height', String(bottom - top));
+    row.setAttribute('rx', '6');
+    row.setAttribute('data-msg', line.getAttribute('data-msg') ?? String(i));
+    row.setAttribute('data-row-step', line.getAttribute('data-step') ?? '');
+    decor.appendChild(row);
+  });
+  svg.insertBefore(decor, svg.firstChild);
 }
 
 let seq = 0;

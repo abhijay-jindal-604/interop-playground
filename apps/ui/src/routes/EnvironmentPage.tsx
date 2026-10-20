@@ -139,7 +139,12 @@ export function EnvironmentPage() {
   const traffic = useUnattributed();
   const env = snapshot.status === 'ready' ? snapshot.data : null;
   return (
-    <PageFrame title="Environment" docTitle="Environment" actions={<ProbeButton />}>
+    <PageFrame
+      title="Environment"
+      docTitle="Environment"
+      eyebrow={copy.env.eyebrow}
+      actions={<ProbeButton />}
+    >
       {snapshot.status === 'error' ? (
         <InlineError error={snapshot.error} alert={false} />
       ) : !env ? (

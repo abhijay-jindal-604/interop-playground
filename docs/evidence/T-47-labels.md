@@ -1,6 +1,6 @@
 # T-47 live: REQ-23 labels at the real Inji Verify (FLOW-14 + FLOW-40)
 
-Date: 2026-10-20. Stack: `interop-playground` bundle (`verify-service` = `injistack/inji-verify-service:1.0.0-alpha.1@sha256:064fcfa12773`), bff rebuilt from `d67ab28` + wave 8 A changes. Combination: `issuer.fixture` × `wallet.playground-ts` × `verifier.inji-verify-local`, `presentationMode: null` (credential level, ADR-94), format `dc+sd-jwt`.
+Date: 2026-10-20. Stack: `interop-playground` bundle (`verify-service` = `injistack/inji-verify-service:1.0.0-alpha.1@sha256:064fcfa12773`), bff rebuilt from `d67ab28` plus the uncommitted working-tree changes of that day. Combination: `issuer.fixture` × `wallet.playground-ts` × `verifier.inji-verify-local`, `presentationMode: null` (credential level, ADR-94), format `dc+sd-jwt`.
 
 Request (API-20), one per case:
 
@@ -10,11 +10,11 @@ curl -s -X POST http://127.0.0.1:3100/api/v1/runs -H 'host: 127.0.0.1:3100' -H '
   -d '{"issuer":"issuer.fixture","wallet":"wallet.playground-ts","verifier":"verifier.inji-verify-local","grant":"pre-authorized_code","presentationMode":null,"format":"dc+sd-jwt","configurationId":"<case>"}'
 ```
 
-| configurationId | run ID | flows | outcome / verification | UI result card (e2e) |
-|---|---|---|---|---|
-| `PlaygroundSdJwt` | `01M5CBEB3M9ANDEDPFBQD5D0NX` | FLOW-14 → FLOW-40 | pass / `valid` | "Pass", "The verifier accepted the credential: Valid." |
-| `PlaygroundSdJwtInvalid` | `01M5CBEB4BW718XJ7VW09CB7EF` | FLOW-14 → FLOW-40 | fail / `invalid` | "Fail", "Invalid. The verifier rejected the credential: ERR_SIGNATURE_VERIFICATION_FAILED Verification Failed." |
-| `PlaygroundSdJwtExpired` | `01M5CBEB5F7W1Z8G14VNN0PK3Q` | FLOW-14 → FLOW-40 | pass / `valid-but-expired` | "Pass", "Valid but expired. The signature checks out and the credential is past its expiry date." |
+| configurationId          | run ID                       | flows             | outcome / verification     | UI result card (e2e)                                                                                            |
+| ------------------------ | ---------------------------- | ----------------- | -------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `PlaygroundSdJwt`        | `01M5CBEB3M9ANDEDPFBQD5D0NX` | FLOW-14 → FLOW-40 | pass / `valid`             | "Pass", "The verifier accepted the credential: Valid."                                                          |
+| `PlaygroundSdJwtInvalid` | `01M5CBEB4BW718XJ7VW09CB7EF` | FLOW-14 → FLOW-40 | fail / `invalid`           | "Fail", "Invalid. The verifier rejected the credential: ERR_SIGNATURE_VERIFICATION_FAILED Verification Failed." |
+| `PlaygroundSdJwtExpired` | `01M5CBEB5F7W1Z8G14VNN0PK3Q` | FLOW-14 → FLOW-40 | pass / `valid-but-expired` | "Pass", "Valid but expired. The signature checks out and the credential is past its expiry date."               |
 
 Observed `POST http://verify-service:8080/v1/verify/v2/vc-verification` answers (HTTP 200 each), verbatim from the run store:
 

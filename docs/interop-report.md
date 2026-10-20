@@ -4,7 +4,7 @@ This report lists every issuer → wallet → verifier combination that Interop 
 
 - **Environment.** Local Docker bundle (`scripts/up.sh`), no tunnel, no Collab calls. Every image is digest-pinned in [`versions.lock`](../versions.lock).
 - **Evidence.** Each cell names a run ID with its committed report or live evidence file (`docs/evidence/`), and the live test that reproduces it and its recording. Every cell below has a live result. Nothing here is claimed from research alone.
-- **How the run reports were produced.** The committed run reports in [`docs/reports/`](reports/) (JSON and Markdown, API-45) are exported from the live run store: the fresh-clone slice run, the three label runs and the `ldp_vc` run (build wave 9). The T-44 pair's reports are generated from its recorded events ([`fixtures/golden/fixit/`](../fixtures/golden/fixit/)), replayed through the product's own store, diagnosis engine and report generator (the same replay as `apps/bff/src/diagnosis/fixit.golden.test.ts`). The expired-credential VP run has no exported report; its cell cites the live evidence file. Every live e2e spec creates a new run and checks its result each time it runs.
+- **How the run reports were produced.** The committed run reports in [`docs/reports/`](reports/) (JSON and Markdown, API-45) are exported from the live run store: the fresh-clone slice run, the three label runs and the `ldp_vc` run (`08b2c74`). The T-44 pair's reports are generated from its recorded events ([`fixtures/golden/fixit/`](../fixtures/golden/fixit/)), replayed through the product's own store, diagnosis engine and report generator (the same replay as `apps/bff/src/diagnosis/fixit.golden.test.ts`). The expired-credential VP run has no exported report; its cell cites the live evidence file. Every live e2e spec creates a new run and checks its result each time it runs.
 
 ## Versions
 
@@ -56,10 +56,10 @@ The claim sentence of the fixed cell, verbatim from the child report: "issuer.wa
 
 ## Issuance only
 
-| Issuer @ env, grant                              | Wallet                      | Flow    | Result | Evidence                                                                                                                                                                 |
-| ------------------------------------------------ | --------------------------- | ------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Inji Certify @ local, pre-authorized code        | Playground reference wallet | FLOW-04 | PASS   | Issuance half of every slice run above (`vci.*` steps, `capture: full`).                                                                                                 |
-| walt.id issuer-api2 @ local, pre-authorized code | Playground reference wallet | FLOW-08 | PASS   | Both T-44 runs (issuance passed in each); `BUNDLE_IT=1 npx vitest run apps/bff/src/main.waltid.bundle.int.test.ts` 2/2 with x5c absent and present (T-43, build wave 6). |
+| Issuer @ env, grant                              | Wallet                      | Flow    | Result | Evidence                                                                                                                                                              |
+| ------------------------------------------------ | --------------------------- | ------- | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Inji Certify @ local, pre-authorized code        | Playground reference wallet | FLOW-04 | PASS   | Issuance half of every slice run above (`vci.*` steps, `capture: full`).                                                                                              |
+| walt.id issuer-api2 @ local, pre-authorized code | Playground reference wallet | FLOW-08 | PASS   | Both T-44 runs (issuance passed in each); `BUNDLE_IT=1 npx vitest run apps/bff/src/main.waltid.bundle.int.test.ts` 2/2 with x5c absent and present (T-43, `65595de`). |
 
 ## Credential-level verification (Valid / Invalid / Valid-but-Expired)
 

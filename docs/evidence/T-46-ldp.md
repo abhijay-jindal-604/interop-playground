@@ -10,12 +10,12 @@ curl -s -X POST http://127.0.0.1:3100/api/v1/runs -H 'host: 127.0.0.1:3100' -H '
   -d '{"issuer":"issuer.certify-preauth","wallet":"wallet.playground-ts","verifier":"verifier.inji-verify-local","grant":"pre-authorized_code","presentationMode":"cross-device","format":"ldp_vc"}'
 ```
 
-| run ID | how | flows | outcome / verification | steps |
-|---|---|---|---|---|
-| `01M5CDWNQDX53HC3YF288AFFFG` | API-20 (curl above) | FLOW-03 → FLOW-31 | pass / `valid` | 32 total: 20 pass, 0 fail, 12 skipped (DC API, same-device, error and by-value request steps not in this mode) |
-| `01M5CE5ZNPP9Z28SS1BWV3F5B8` | UI e2e `e2e/live/ldp.live.spec.ts` (selector "JSON-LD", Cross-device) | FLOW-03 → FLOW-31 | pass / `valid` | same; spec asserts tier 1, tier 2 and the label |
+| run ID                       | how                                                                   | flows             | outcome / verification | steps                                                                                                          |
+| ---------------------------- | --------------------------------------------------------------------- | ----------------- | ---------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `01M5CDWNQDX53HC3YF288AFFFG` | API-20 (curl above)                                                   | FLOW-03 → FLOW-31 | pass / `valid`         | 32 total: 20 pass, 0 fail, 12 skipped (DC API, same-device, error and by-value request steps not in this mode) |
+| `01M5CE5ZNPP9Z28SS1BWV3F5B8` | UI e2e `e2e/live/ldp.live.spec.ts` (selector "JSON-LD", Cross-device) | FLOW-03 → FLOW-31 | pass / `valid`         | same; spec asserts tier 1, tier 2 and the label                                                                |
 
-What the wallet sent (exchange `:13`, `POST …/v1/verify/v2/vp-submission/direct-post`, form `vp_token` + `state`): `vp_token={"pg":[VP]}`, VP proof `JsonWebSignature2020` (ES256, detached JWS), `verificationMethod` = the issuance holder `did:jwk:…#0`, `proofPurpose: authentication`, `challenge` = the request nonce, **`domain: "interop-playground"`** (the plain client ID). The credential inside keeps Certify's `Ed25519Signature2020` proof (`did:web:<PUBLIC_HOST>#…`). The open risk from build wave 8 (Verify might reject a plain-string `domain`; the research reproduction had only proven a `redirect_uri:` client ID) did not happen: the submission was accepted.
+What the wallet sent (exchange `:13`, `POST …/v1/verify/v2/vp-submission/direct-post`, form `vp_token` + `state`): `vp_token={"pg":[VP]}`, VP proof `JsonWebSignature2020` (ES256, detached JWS), `verificationMethod` = the issuance holder `did:jwk:…#0`, `proofPurpose: authentication`, `challenge` = the request nonce, **`domain: "interop-playground"`** (the plain client ID). The credential inside keeps Certify's `Ed25519Signature2020` proof (`did:web:<PUBLIC_HOST>#…`). The open risk from the earlier build (Verify might reject a plain-string `domain`; the research reproduction had only proven a `redirect_uri:` client ID) did not happen: the submission was accepted.
 
 Verify's answers, verbatim from the run store (the `verifiableCredential` string inside `credentialResults` is left out here):
 
@@ -27,6 +27,7 @@ Verify's answers, verbatim from the run store (the `verifiableCredential` string
 ```
 
 Judged result (ADR-96/97):
+
 - Tier 1 (`vp.vc.verify`, Verify's `/v2/vc-verification` on the held credential): pass (`vc.signature` pass, `vc.expiry` pass).
 - Tier 2 (`vp.result.poll`, the VP Verify received): pass (`vc.signature`, `vc.expiry`, `vp.holder-proof` pass; `allChecksSuccessful:true`, `holderProofCheck.valid:true`).
 - Issuance (FLOW-03): every step pass incl. `vci.issuer.did` (did:web document resolved); the `vc.ldp.*` lints are `info` (Certify's `FarmerCredential` template keeps unfilled `${…}` placeholders for claims the mock identity does not have; reported, not judged).

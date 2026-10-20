@@ -28,7 +28,13 @@ import {
   lifelineNames,
   mermaidText,
 } from './model.js';
-import { MERMAID_IMPORT, MERMAID_VERSION, setMermaidLoader, type MermaidApi } from './render.js';
+import {
+  decorateLanes,
+  MERMAID_IMPORT,
+  MERMAID_VERSION,
+  setMermaidLoader,
+  type MermaidApi,
+} from './render.js';
 
 const NOTICE = 'Using the built-in diagram renderer.';
 
@@ -326,5 +332,32 @@ describe('ui.delivery dialog trigger (UI-16 "Where it appears")', () => {
     show('FLOW-01-pass');
     await screen.findByText(NOTICE);
     expect(screen.queryByRole('button', { name: 'Delivery' })).toBeNull();
+  });
+});
+
+describe('ui.diagram lanes and rows (ADR-119)', () => {
+  it('adds one lane per lifeline head and one row per indexed message, under the drawing', () => {
+    const host = document.createElement('div');
+    host.innerHTML =
+      '<svg viewBox="-50 -10 600 300">' +
+      '<rect class="actor actor-top" x="0" y="0" width="150" height="52"></rect>' +
+      '<rect class="actor actor-top" x="300" y="0" width="150" height="52"></rect>' +
+      '<text class="messageText" y="80" data-msg="0" data-step="a">GET /x</text>' +
+      '<line class="messageLine0" y1="110" y2="110" data-msg="0" data-step="a"></line>' +
+      '<text class="messageText" y="130" data-msg="1" data-step="a">200</text>' +
+      '<line class="messageLine1" y1="160" y2="160" data-msg="1" data-step="a"></line>' +
+      '</svg>';
+    decorateLanes(host);
+    const svg = host.querySelector('svg')!;
+    expect(svg.firstElementChild?.getAttribute('class')).toBe('dg-decor');
+    expect(svg.querySelectorAll('.dg-lane')).toHaveLength(2);
+    const rows = [...svg.querySelectorAll('.dg-row')];
+    expect(rows.map((r) => r.getAttribute('data-row-step'))).toEqual(['a', 'a']);
+    expect(rows.map((r) => r.getAttribute('data-msg'))).toEqual(['0', '1']);
+    // rows never carry data-step: `[data-step]` still finds the message line first
+    expect(svg.querySelector('[data-step]')?.tagName.toLowerCase()).toBe('text');
+    // decorating twice is a no-op
+    decorateLanes(host);
+    expect(svg.querySelectorAll('.dg-row')).toHaveLength(2);
   });
 });

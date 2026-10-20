@@ -471,7 +471,7 @@ export function SelectorPage() {
   ].join(' · ');
 
   return (
-    <PageFrame title={c.title} lead={<p>{c.lead}</p>}>
+    <PageFrame title={c.title} eyebrow={c.eyebrow} lead={<p>{c.lead}</p>}>
       {adapters.status === 'error' ? (
         <EmptyState
           title="No components"

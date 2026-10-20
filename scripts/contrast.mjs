@@ -88,6 +88,13 @@ for (const [name, body] of Object.entries(themes)) {
     check('--border-ui', need('--border-ui'), bg, need(bg), 3);
     check('--focus', need('--focus'), bg, need(bg), 3);
   }
+  // ink chrome (ADR-117): the top bar and rail keep their own dark band in both themes
+  for (const bg of ['--chrome-bg', '--chrome-raised']) {
+    for (const fg of ['--chrome-text', '--chrome-muted', '--chrome-accent'])
+      check(fg, need(fg), bg, need(bg), 4.5);
+    for (const fg of ['--chrome-border-ui', '--chrome-focus', '--chrome-pass', '--chrome-warn'])
+      check(fg, need(fg), bg, need(bg), 3);
+  }
   const surface = need('--surface');
   for (const s of STATUS) {
     const fg = need(s);

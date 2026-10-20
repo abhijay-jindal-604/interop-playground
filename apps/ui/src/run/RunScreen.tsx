@@ -22,6 +22,7 @@ import type { FlowLoad } from './flows.js';
 import { CoverageBanner, ResultCard, StatusBanner, useAdapterName } from './parts.js';
 import { isTerminal, viewStateOf, type RunView } from './reduce.js';
 import { StepRail, useStepAnnouncements } from './StepRail.js';
+import './run-screen.css';
 
 /** `#step=<stepKey>` with replaceState: selecting a step never pushes history (UI-09) */
 export function useStepHash(): [string | null, (key: string) => void] {

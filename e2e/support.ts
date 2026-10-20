@@ -224,7 +224,7 @@ export function hasHorizontalScroll(page: Page): Promise<boolean> {
 /**
  * Waits until every finite CSS animation and transition has finished (the drawer's 200 ms
  * slide-in fades from opacity 0, and axe measuring mid-fade reports a false color-contrast hit;
- * that was the wave-2 360 px flake). Infinite ones (skeleton shimmer) are ignored.
+ * that was the early 360 px flake). Infinite ones (skeleton shimmer) are ignored.
  */
 export async function settleAnimations(page: Page): Promise<void> {
   await page.evaluate(async () => {

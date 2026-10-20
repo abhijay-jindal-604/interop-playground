@@ -15,6 +15,8 @@ import type {
 import { ApiError, apiSend } from '../api/client.js';
 import { InlineError } from '../components/InlineError.js';
 import { angleCopy as c, runCopy } from '../copy.js';
+import { Icon } from '../components/Icon.js';
+import { screenCopy } from '../run/screen-copy.js';
 import {
   diagnosisCase,
   fixItDecision,
@@ -153,10 +155,29 @@ export function FixItPanel({
   };
   return (
     <section className="fixit-panel" aria-label={c.fix.region} data-testid="fixit-panel">
-      <h3 className="fixit-title">{c.fix.title}</h3>
+      <div className="fixit-head">
+        <h3 className="fixit-title">{c.fix.title}</h3>
+        <span className="fixit-count">
+          <span className="fixit-count-n" aria-hidden="true">
+            1
+          </span>
+          {screenCopy.fix.oneChange}
+        </span>
+      </div>
       <p className="fixit-change">
-        <code title={knob?.label ?? undefined}>{name}</code> · <q>{offer.from}</q>{' '}
-        <span title={c.fix.arrowTip}>→</span> <q>{offer.to}</q>
+        <code className="fixit-knob" title={knob?.label ?? undefined}>
+          {name}
+        </code>
+        <span className="fixit-sep"> · </span>
+        <q className="fixit-from" title={screenCopy.fix.from}>
+          {offer.from}
+        </q>{' '}
+        <span className="fixit-arrow" title={c.fix.arrowTip}>
+          →
+        </span>{' '}
+        <q className="fixit-to" title={screenCopy.fix.to}>
+          {offer.to}
+        </q>
       </p>
       {knob?.label ? <p className="chip chip-outline fixit-label">{knob.label}</p> : null}
       <p className="small">{c.fix.explainer}</p>
@@ -173,7 +194,8 @@ export function FixItPanel({
         disabled={sending}
         onClick={() => void start()}
       >
-        {sending ? c.fix.sending : c.fix.button}
+        <Icon name="st-running" size={16} />
+        <span>{sending ? c.fix.sending : c.fix.button}</span>
       </button>
     </section>
   );

@@ -2,7 +2,7 @@
  * UI-07 "Advanced options": the run label and the KnobList (API-04 entries applicable to the
  * selection, 09 A4). Only the knobs that differ from their default are sent (`CreateRunRequest.knobs`);
  * the summary line says when any knob differs. Preset, credential configuration and the tx_code / IAE
- * checkboxes of UI-07 are not part of this panel yet (wave 6 C scope: knobs).
+ * checkboxes of UI-07 are not part of this panel yet (this panel covers the knobs only).
  */
 import { useId, useState } from 'react';
 import type { AdapterId, CredentialFormat, KnobEntry } from '@interop-playground/api';

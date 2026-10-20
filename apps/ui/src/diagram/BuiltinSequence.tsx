@@ -58,6 +58,18 @@ export function BuiltinSequence({
       focusable="false"
       data-renderer="builtin"
     >
+      <g className="dg-decor">
+        {flow.lifelines.map((l, i) => (
+          <rect
+            key={l}
+            className={`dg-lane dg-lane-${i % 2 === 0 ? 'even' : 'odd'}`}
+            x={i * COL}
+            y={0}
+            width={COL}
+            height={height}
+          />
+        ))}
+      </g>
       {flow.lifelines.map((l) => (
         <g key={l} className="dg-lifeline">
           <line x1={xOf(l)} x2={xOf(l)} y1={HEAD} y2={height - 4} />
@@ -88,6 +100,7 @@ export function BuiltinSequence({
             data-msg={m.index}
             data-step={m.stepKey}
             data-state={state}
+            data-step-state={st?.state ?? 'pending'}
             data-dashed={m.dashed || undefined}
             onClick={(e) => {
               e.stopPropagation();
@@ -95,7 +108,14 @@ export function BuiltinSequence({
             }}
           >
             <title>{title}</title>
-            <rect className="dg-hit" x={0} y={ry - 18} width={width} height={self ? SELF : ROW} />
+            <rect
+              className="dg-hit dg-row"
+              x={0}
+              y={ry - 18}
+              width={width}
+              height={self ? SELF : ROW}
+              rx={4}
+            />
             <path className="dg-line" d={path} />
             <path className="dg-head" d={`M${end.x} ${end.y} l${-end.d * 7} -4 v8 z`} />
             {state === 'active' ? <circle className="dg-spin" cx={x1} cy={ry} r={4} /> : null}
