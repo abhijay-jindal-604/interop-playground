@@ -14,9 +14,8 @@ import type {
 } from '@interop-playground/api';
 import { ApiError, apiSend } from '../api/client.js';
 import { InlineError } from '../components/InlineError.js';
-import { angleCopy as c, runCopy } from '../copy.js';
+import { angleCopy as c, runCopy, screenCopy } from '../copy.js';
 import { Icon } from '../components/Icon.js';
-import { screenCopy } from '../run/screen-copy.js';
 import {
   diagnosisCase,
   fixItDecision,

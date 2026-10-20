@@ -12,11 +12,10 @@ import { DeliveryDialog } from '../delivery/Delivery.js';
 import type { RailStep } from '../run/flows.js';
 import type { RunView } from '../run/reduce.js';
 import { CaptureBadge, outcomeWord } from '../run/StepRail.js';
-import { runCopy } from '../copy.js';
+import { runCopy, screenCopy } from '../copy.js';
 import { BodyViewer, Redacted } from './BodyViewer.js';
 import { findDecodable, pretty, type DecodedItem } from './decode.js';
 import { JsonCode } from './JsonCode.js';
-import { screenCopy } from '../run/screen-copy.js';
 import {
   buildModel,
   chipTarget,

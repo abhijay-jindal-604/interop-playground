@@ -18,9 +18,8 @@ import { shortId } from '../components/RunLink.js';
 import { Skeleton } from '../components/Skeleton.js';
 import { Icon } from '../components/Icon.js';
 import { StatusBadge } from '../components/StatusBadge.js';
-import { angleCopy as c } from '../copy.js';
+import { angleCopy as c, screenCopy } from '../copy.js';
 import { announce } from '../lib/announce.js';
-import { screenCopy } from '../run/screen-copy.js';
 import {
   CLASS_TONE,
   changeOf,

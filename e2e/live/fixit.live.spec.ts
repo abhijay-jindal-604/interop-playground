@@ -7,7 +7,7 @@
  * child (KNOB-01 `present`, x5c) → the child passes → the child result card says `fixed` with the
  * API-31 claim sentence, and the compact strip shows the knob's direct effect first.
  * Runs only through e2e/playwright.live.config.ts (PLAYGROUND_LIVE=1); the fixture suite skips it.
- * LIVE_TAKE=<path> saves the video (deliverables/takes/m2-fixit.webm).
+ * LIVE_TAKE=<path> saves the video (deliverables/takes/s10-fixit.webm; m2-fixit.webm is the earlier take).
  */
 import { copyFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';

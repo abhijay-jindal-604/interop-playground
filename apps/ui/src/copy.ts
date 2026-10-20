@@ -1061,3 +1061,19 @@ export const angleCopy = {
       `${n} setting(s) differ from the defaults. Runs with changed settings are kept in history but do not count in the matrix.`,
   },
 } as const;
+
+/** Run-screen words: the decoded view, the one-setting fix-it diff and the compare strip. */
+export const screenCopy = {
+  decoded: {
+    copyPayload: 'Copy payload',
+    disclosures: (n: number) => `${n} disclosed claim${n === 1 ? '' : 's'}`,
+  },
+  fix: {
+    oneChange: 'One setting changes',
+    from: 'Now',
+    to: 'Re-run with',
+  },
+  strip: {
+    flipped: 'Outcome flipped',
+  },
+} as const;

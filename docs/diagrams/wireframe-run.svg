@@ -1,14 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="700" viewBox="0 0 1080 700" role="img" aria-labelledby="t d">
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="960" viewBox="0 0 1080 960" role="img" aria-labelledby="t d">
 <title id="t">Wireframe: run screen</title>
-<desc id="d">Low-fidelity layout of the run screen: header with picks and actions, banners, diagnosis card with the fix-it panel for failed runs, result card, then the split workspace with the sequence diagram and step rail on the left and the protocol inspector on the right.</desc>
+<desc id="d">Low-fidelity layout of the run screen: header with picks and actions, banners, diagnosis card with the fix-it panel for failed runs, result card, then the full-width sequence diagram stage, with the step rail and the sticky protocol inspector below it.</desc>
 <defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#8a8d94"/></marker><marker id="arrs" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M10,0 L0,5 L10,10 z" fill="#8a8d94"/></marker><marker id="arrA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0f6b5c"/></marker><marker id="arrAs" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M10,0 L0,5 L10,10 z" fill="#0f6b5c"/></marker><marker id="arrW" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#a3341f"/></marker><marker id="arrWs" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M10,0 L0,5 L10,10 z" fill="#a3341f"/></marker><marker id="arrB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#2f4fb5"/></marker><marker id="arrBs" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M10,0 L0,5 L10,10 z" fill="#2f4fb5"/></marker></defs>
 <g font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif">
-<rect x="0" y="0" width="1080" height="700" rx="12" fill="#ffffff"/>
+<rect x="0" y="0" width="1080" height="960" rx="12" fill="#ffffff"/>
 <text x="24" y="36" font-size="20" font-weight="700" fill="#1c1d21" text-anchor="start">Wireframe: run screen (&quot;/runs/:runId&quot;)</text>
-<rect x="24" y="56" width="1032" height="620" rx="8" fill="#ffffff" stroke="#9a9ca3" stroke-width="1.2"/>
+<rect x="24" y="56" width="1032" height="880" rx="8" fill="#ffffff" stroke="#9a9ca3" stroke-width="1.2"/>
 <rect x="24" y="56" width="1032" height="40" rx="8" fill="#f1f1f1" stroke="#9a9ca3" stroke-width="1.2"/>
 <text x="40" y="82" font-size="13" font-weight="600" fill="#1c1d21" text-anchor="start">[logo] Interop Playground</text>
-<rect x="24" y="96" width="160" height="580" rx="8" fill="#f7f7f7" stroke="#9a9ca3" stroke-width="1.2"/>
+<rect x="24" y="96" width="160" height="840" rx="8" fill="#f7f7f7" stroke="#9a9ca3" stroke-width="1.2"/>
 <text x="40" y="126" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">Playground</text>
 <text x="40" y="152" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">History</text>
 <text x="40" y="178" font-size="12.5" font-weight="normal" fill="#5b5e66" text-anchor="start">Matrix</text>
@@ -32,25 +32,26 @@
 <rect x="200" y="350" width="840" height="64" rx="8" fill="#f2f8f4" stroke="#9a9ca3" stroke-width="1.2"/>
 <text x="214" y="374" font-size="12.5" font-weight="600" fill="#1c1d21" text-anchor="start">result card: Pass / Fail / Blocked / Inconclusive + one sentence</text>
 <text x="214" y="394" font-size="12" font-weight="normal" fill="#5b5e66" text-anchor="start">(Valid · Invalid · Valid-but-Expired)                                   summary table: picks, format, outcome, failing step</text>
-<rect x="200" y="424" width="500" height="240" rx="8" fill="#fafafa" stroke="#9a9ca3" stroke-width="1.2"/>
-<text x="214" y="446" font-size="12.5" font-weight="700" fill="#1c1d21" text-anchor="start">diagram pane</text>
+<rect x="200" y="424" width="840" height="240" rx="8" fill="#fafafa" stroke="#9a9ca3" stroke-width="1.2"/>
+<text x="214" y="446" font-size="12.5" font-weight="700" fill="#1c1d21" text-anchor="start">diagram stage (full width)</text>
 <text x="214" y="464" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">legend: pass · fail · skipped · pending</text>
-<rect x="220" y="476" width="80" height="22" rx="3" fill="#ececec" stroke="#9a9ca3" stroke-width="1.2"/>
-<line x1="260" y1="498" x2="260" y2="650" stroke="#9a9ca3" stroke-dasharray="3 3"/>
-<rect x="350" y="476" width="80" height="22" rx="3" fill="#ececec" stroke="#9a9ca3" stroke-width="1.2"/>
-<line x1="390" y1="498" x2="390" y2="650" stroke="#9a9ca3" stroke-dasharray="3 3"/>
-<rect x="480" y="476" width="80" height="22" rx="3" fill="#ececec" stroke="#9a9ca3" stroke-width="1.2"/>
-<line x1="520" y1="498" x2="520" y2="650" stroke="#9a9ca3" stroke-dasharray="3 3"/>
-<rect x="600" y="476" width="80" height="22" rx="3" fill="#ececec" stroke="#9a9ca3" stroke-width="1.2"/>
-<line x1="640" y1="498" x2="640" y2="650" stroke="#9a9ca3" stroke-dasharray="3 3"/>
-<path d="M260,516 L390,516" fill="none" stroke="#0f6b5c" stroke-width="1.6" marker-end="url(#arrA)"/>
-<path d="M390,542 L260,542" fill="none" stroke="#0f6b5c" stroke-width="1.6" marker-end="url(#arrA)"/>
-<path d="M390,568 L520,568" fill="none" stroke="#0f6b5c" stroke-width="1.6" marker-end="url(#arrA)"/>
-<path d="M520,594 L390,594" fill="none" stroke="#9a9ca3" stroke-width="1.6" marker-end="url(#arrB)"/>
-<path d="M390,620 L640,620" fill="none" stroke="#9a9ca3" stroke-width="1.6" marker-end="url(#arrB)"/>
-<text x="214" y="660" font-size="11" font-weight="normal" fill="#5b5e66" text-anchor="start">1. Issue  ·  2. Present and verify  (step rail = accessible twin)</text>
-<rect x="716" y="424" width="324" height="240" rx="8" fill="#fafafa" stroke="#9a9ca3" stroke-width="1.2"/>
-<text x="730" y="446" font-size="12.5" font-weight="700" fill="#1c1d21" text-anchor="start">inspector pane</text>
+<rect x="290" y="476" width="80" height="22" rx="3" fill="#ececec" stroke="#9a9ca3" stroke-width="1.2"/>
+<line x1="330" y1="498" x2="330" y2="650" stroke="#9a9ca3" stroke-dasharray="3 3"/>
+<rect x="520" y="476" width="80" height="22" rx="3" fill="#ececec" stroke="#9a9ca3" stroke-width="1.2"/>
+<line x1="560" y1="498" x2="560" y2="650" stroke="#9a9ca3" stroke-dasharray="3 3"/>
+<rect x="750" y="476" width="80" height="22" rx="3" fill="#ececec" stroke="#9a9ca3" stroke-width="1.2"/>
+<line x1="790" y1="498" x2="790" y2="650" stroke="#9a9ca3" stroke-dasharray="3 3"/>
+<rect x="900" y="476" width="80" height="22" rx="3" fill="#ececec" stroke="#9a9ca3" stroke-width="1.2"/>
+<line x1="940" y1="498" x2="940" y2="650" stroke="#9a9ca3" stroke-dasharray="3 3"/>
+<path d="M330,516 L560,516" fill="none" stroke="#0f6b5c" stroke-width="1.6" marker-end="url(#arrA)"/>
+<path d="M560,542 L330,542" fill="none" stroke="#0f6b5c" stroke-width="1.6" marker-end="url(#arrA)"/>
+<path d="M560,568 L790,568" fill="none" stroke="#0f6b5c" stroke-width="1.6" marker-end="url(#arrA)"/>
+<path d="M790,594 L560,594" fill="none" stroke="#9a9ca3" stroke-width="1.6" marker-end="url(#arrB)"/>
+<path d="M560,620 L940,620" fill="none" stroke="#9a9ca3" stroke-width="1.6" marker-end="url(#arrB)"/>
+<text x="214" y="660" font-size="11" font-weight="normal" fill="#5b5e66" text-anchor="start">1. Issue  ·  2. Present and verify</text>
+<g transform="translate(-200,250)">
+<rect x="716" y="424" width="524" height="240" rx="8" fill="#fafafa" stroke="#9a9ca3" stroke-width="1.2"/>
+<text x="730" y="446" font-size="12.5" font-weight="700" fill="#1c1d21" text-anchor="start">inspector (sticky)</text>
 <text x="730" y="466" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">step label · stepKey · outcome · capture badge</text>
 <text x="730" y="486" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">[This step | Whole run]</text>
 <rect x="730" y="496" width="90" height="20" rx="10" fill="#ffffff" stroke="#4a4ad0" stroke-width="1.2"/>
@@ -70,5 +71,10 @@
 <text x="742" y="598" font-size="10.5" font-weight="normal" fill="#5b5e66" text-anchor="start">decoded JOSE header chips (alg, typ, kid, x5c)</text>
 <text x="742" y="614" font-size="10.5" font-weight="normal" fill="#5b5e66" text-anchor="start">payload JSON · disclosures · redaction chips</text>
 <text x="742" y="630" font-size="10.5" font-weight="normal" fill="#5b5e66" text-anchor="start">&quot;Decoded here without checking the signature&quot;</text>
+</g>
+<rect x="200" y="674" width="300" height="240" rx="8" fill="#fafafa" stroke="#9a9ca3" stroke-width="1.2"/>
+<text x="214" y="696" font-size="12.5" font-weight="700" fill="#1c1d21" text-anchor="start">step rail</text>
+<text x="214" y="716" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">numbered steps, outcome, capture badge</text>
+<text x="214" y="734" font-size="11.5" font-weight="normal" fill="#5b5e66" text-anchor="start">(accessible twin of the diagram)</text>
 </g>
 </svg>

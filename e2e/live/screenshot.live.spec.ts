@@ -1,5 +1,5 @@
 /**
- * README screenshot (plan/13 §1; build wave 9): the selector with the slice triple
+ * README screenshot (plan/13 §1): the selector with the slice triple
  * issuer.certify-preauth × wallet.playground-ts × verifier.inji-verify-local, SD-JWT VC,
  * cross-device: the Start bar summarises it with Run enabled, and the run preview resolves the same
  * selection to FLOW-04 → FLOW-30. 1440 px wide, host masked (take.ts).

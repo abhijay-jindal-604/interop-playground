@@ -2,7 +2,7 @@
  * Video shot takes (plan/13 §2.1, §2.2; T-55): S2 (environment after `scripts/up.sh`) and S3–S7 (one
  * continuous FLOW-30 run: selection, issuance, decoded SD-JWT, QR + `vp.*`, result card, report),
  * at 1440 px, reduced-motion off (the diagram animates). S9 is `labels.live.spec.ts`, S10 is
- * `fixit.live.spec.ts` (`m2-fixit.webm`); S8 is cut (T-48/T-49 not built, ADR-92).
+ * `fixit.live.spec.ts` (`s10-fixit.webm`); S8 is cut (T-48/T-49 not built, ADR-92).
  * The LAN host is masked and QR codes blurred (`take.ts`); no OTP, key or `.env` value is shown.
  * Runs only through e2e/playwright.live.config.ts (PLAYGROUND_LIVE=1), on the slice bundle:
  *   LIVE_TAKES=deliverables/takes LIVE_UPLOG=<up.sh output> npx playwright test -c e2e/playwright.live.config.ts takes
@@ -108,6 +108,13 @@ test('S3–S7: selection → issuance → decoded SD-JWT → QR + vp.* → resul
   const result = page.getByRole('region', { name: 'Result' });
   await expect(result).toBeVisible({ timeout: 120_000 });
   await expect(result.locator('.result-word')).toHaveText('Pass');
+  // the full-width diagram stage sits above the step rail and inspector: show its vci.* arrows
+  const diagram = page.locator('[data-slot="diagram"]');
+  await expect(diagram.locator('svg').first()).toBeVisible();
+  await diagram.scrollIntoViewIfNeeded();
+  await page.waitForTimeout(1500);
+  await page.evaluate(() => window.scrollBy({ top: 450, behavior: 'smooth' }));
+  await page.waitForTimeout(2200);
   const inspector = page
     .getByRole('complementary', { name: 'Inspector' })
     .or(page.locator('[data-slot="inspector"]'));
