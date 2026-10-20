@@ -40,4 +40,4 @@ We found and documented Inji defects with reproduction steps. They are drafted a
 
 Run `scripts/up.sh`, then open `http://127.0.0.1:3100`. The quickstart, the shipped flows and the tests are in the [README](../README.md); the demo video is [`deliverables/video/demo-v1.mp4`](../deliverables/video/demo-v1.mp4).
 
-Built by TODO(user): names.
+Built by Abhijay Jindal.

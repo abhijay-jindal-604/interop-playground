@@ -25,7 +25,7 @@ SHOTS=(
 "S9|s09-labels.webm|15"
 "S10|s10-fixit.webm|50"
 "S11|card|25|Interop report and gaps|docs/interop-report.md: every combination we ran and its outcome|docs/gaps.md: Inji defects with reproduction steps"
-"S12|card|15|Interop Playground|Repository: TODO(user)|Credits: TODO(user)"
+"S12|card|15|Interop Playground|Repository: https://github.com/abhijay-jindal-604/interop-playground|Credits: Abhijay Jindal"
 )
 
 for t in ffmpeg ffprobe; do command -v "$t" >/dev/null || { echo "missing $t" >&2; exit 1; }; done

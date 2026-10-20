@@ -19,7 +19,7 @@ Interop Playground lets you run Inji issuer → wallet → verifier combinations
 Host prerequisites: Docker 29 with the compose plugin, bash, openssl, `ss` and curl. Port 443 must be free on the host. With rootless Docker, allow binding port 443 first (`scripts/up.sh` prints the sysctl command if it is needed).
 
 ```bash
-git clone TODO(user): repository URL
+git clone https://github.com/abhijay-jindal-604/interop-playground
 cd interop-playground
 scripts/up.sh            # idempotent; a second run on a healthy bundle changes nothing
 # open http://127.0.0.1:3100
@@ -211,8 +211,8 @@ Repositories:
 
 ## Credits
 
-Built by TODO(user): names.
+Built by Abhijay Jindal.
 
 ## License
 
-TODO(user): license, chosen at publication (T-56).
+Licensed under MPL-2.0; see [LICENSE](LICENSE).

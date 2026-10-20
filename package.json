@@ -1,6 +1,7 @@
 {
   "name": "interop-playground",
   "version": "0.0.0",
+  "license": "MPL-2.0",
   "private": true,
   "type": "module",
   "description": "Inji Interoperability Playground for Verifiable Credentials (MOSIP Decode 2026, PS02)",
