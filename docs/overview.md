@@ -1,6 +1,6 @@
 # Interop Playground: overview
 
-_v1, 2026-10-20. Every fact below is backed by a run ID, a test or an evidence file in this repository; anything not yet shown is marked pending._
+_v1, 2026-10-20. Every fact below is backed by a run ID, a test or an evidence file in this repository._
 
 ![The combination selector: issuer, wallet and verifier columns, with unavailable combinations greyed out](screenshots/selector.png)
 
@@ -28,8 +28,8 @@ Unsupported combinations are greyed out with the reason and the gap ID, and adap
 
 - **SD-JWT VC (`dc+sd-jwt`):** Inji Certify (pre-authorized code) → Playground reference wallet → Inji Verify (local), cross-device QR: Pass (live end-to-end test green three times, then again after a clean `scripts/up.sh`; run `01M5CCC4FZRMCCWMVQF5038EYS` from a fresh clone). walt.id issuer → the same wallet and verifier: the fix-it pair above.
 - **Valid / Invalid / Valid-but-Expired:** a fixture issuer signs a valid credential, one with a bad signature and an expired one at run time, and Inji Verify labels them exactly Valid, Invalid and Valid-but-Expired (runs `01M5CBEB3M9ANDEDPFBQD5D0NX`, `01M5CBEB4BW718XJ7VW09CB7EF`, `01M5CBEB5F7W1Z8G14VNN0PK3Q`; [evidence](evidence/T-47-labels.md)). Presented over OpenID4VP, the expired credential is also reported as Valid-but-Expired (run `01M5CBC7EQY4ZKHPE50C1PC9CJ`).
-- **Pass rate** of the presentation cells: 66.7 % (2 of 3); the one failure is the walt.id cell, fixed by one knob ([interop report](interop-report.md)).
-- **W3C VC (JSON-LD, `ldp_vc`):** issuance and presentation are built and pass unit and golden tests on recorded Inji answers; the live result is _pending wave 9 A_ ([`evidence/T-46-ldp.md`](evidence/T-46-ldp.md)).
+- **W3C VC (JSON-LD, `ldp_vc`):** Inji Certify (pre-authorized code) → Playground reference wallet → Inji Verify (local), cross-device QR: Pass; Inji Verify validated both the credential and the presented VP, including the holder proof (run `01M5CDWNQDX53HC3YF288AFFFG`, [evidence](evidence/T-46-ldp.md)).
+- **Pass rate** of the presentation cells: 75 % (3 of 4: SD-JWT 2 of 3, JSON-LD 1 of 1); the one failure is the walt.id cell, fixed by one knob ([interop report](interop-report.md)).
 - **Not in this package:** mDoc, the Inji JVM, Inji Web and phone wallets, Collab Verify, the walt.id and EUDI verifiers, Credo, tamper mode, suites and the nightly matrix ([`decisions.md`](decisions.md)).
 
 ## Findings
