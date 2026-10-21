@@ -26,19 +26,19 @@ Fixture data differs from the live runs in a few places. The fix-it screens reus
 
 ### Selector (`/`)
 
-![Selector in the light theme: a large title, format, mode and scope controls, then three columns (Issuer, Wallet, Verifier) of radio cards, the verifier card greyed out with its reason in plain text, an Advanced options link, and a rounded start bar with the Run button](screenshots/design-selector.png)
+![Selector on warm paper: a large serif title, format, mode and scope controls, then three columns (Issuer, Wallet, Verifier) of radio options set between hairline rules, the verifier greyed out with its reason in plain text, and a run bar with a sentence describing the combination and the Run button](screenshots/design-selector.png)
 
 Three radio-group columns (with no numbers or arrows between them) let you pick exactly one issuer, one wallet and one verifier. Format, mode and scope sit above them; the grant is derived from the issuer, not picked. Options that cannot work with the current choice stay in place, greyed out but still reachable by keyboard, and one plain note under the column says why; the rule and gap IDs sit behind its "Details". The compatibility rules are checked by the backend for every card, so the UI never keeps its own copy of them. The run bar says the whole choice as one sentence before **Run**.
 
 ### Run screen while running (`/runs/:runId`)
 
-![Run screen mid-run: the title with a Cancel button and an ink Run again button, a Running status with the picks, a grey progress row "Running. Step 18 of 31" with the elapsed time, and the full-width sequence diagram on a grey card with a legend, lanes, numbered step markers and completed steps in green](screenshots/design-run-midrun.png)
+![Run screen mid-run: serif title "Run No." with a run number, a Running status with the picks, one line "Running. Step 18 of 31: Wallet sends the presentation." with the elapsed time, and the sequence diagram with its legend, lanes and numbered step markers](screenshots/design-run-midrun.png)
 
-The run screen is one page for a live run, a finished run and a replay. All three come from one reducer over the run's event log. While the run is going, the banner names the step ("Running. Step n of N: …"), and the diagram animates as messages arrive. The diagram is a full-width stage at the top of the workspace. Below it sit the step rail (a numbered list of steps with outcome and capture badge) and a sticky inspector that follows the running step. The step rail is the accessible twin of the diagram, which is `aria-hidden`.
+The run screen is one page for a live run, a finished run and a replay. All three come from one reducer over the run's event log. While the run is going, the banner names the step ("Running. Step n of N: …"), and the diagram animates as messages arrive. The diagram is a full-width stage at the top of the workspace. Below it sit the step rail (a list of steps with plain titles, each with its outcome; identifiers sit behind "Details") and a sticky inspector that follows the running step. The step rail is the accessible twin of the diagram, which is `aria-hidden`.
 
 ### Inspector, Decoded tab
 
-![Step rail on the left and the sticky inspector on the right, on the POST /issuance/credential step, Decoded tab: the proof JWT with its alg, typ, kid and x5c values and payload, and the issued SD-JWT with its disclosed claims in a table](screenshots/design-inspector-decoded.png)
+![Step rail on the left with plain step titles, and the inspector on the right on the "Request the credential" step, Decoded tab: the credential shown as a document with form fields for name, date of birth, gender and email, then the issuer and signing key](screenshots/design-inspector-decoded.png)
 
 The inspector shows the raw payloads of each step. The key-payload line of links (Offer, Token, Credential, Request link, Request object, vp_token, Presentation query, Verification result) jumps straight to the message that matters. A link is muted when the run has no such message. The Decoded tab shows the JOSE header fields (`alg`, `typ`, `kid`, `x5c`) on one line and lists SD-JWT disclosures. It also says that decoding here does not check the signature; the verifier's own result is on the Checks tab. Each step carries its capture badge (`Full capture`, `Partial capture` or `No capture`).
 
@@ -46,31 +46,31 @@ The inspector shows the raw payloads of each step. The key-payload line of links
 
 | Valid                                                            | Invalid                                                                                                                                          | Valid-but-Expired                                                                                                                                      |
 | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| ![Result card: green Pass with the sentence "The verifier accepted the credential: Valid." beside a summary table of the combination](screenshots/design-result-valid.png) | ![Result card: red Fail with the verifier's error above a summary table that names the failing step](screenshots/design-result-invalid.png) | ![Result card: green Pass, "Valid but expired. The signature checks out and the credential is past its expiry date.", with the summary table](screenshots/design-result-expired.png) |
+| ![Result: a green VALID stamp dated 19 Oct 2026 beside "The verifier accepted the credential.", with the combination as form fields](screenshots/design-result-valid.png) | ![Result: a red INVALID stamp beside "The verifier rejected the credential at Wallet sends the presentation.", with the combination, the failing step and the error detail as form fields](screenshots/design-result-invalid.png) | ![Result: a blue-ink EXPIRED stamp beside "The signature checks out, but the credential is past its expiry date.", with the combination as form fields](screenshots/design-result-expired.png) |
 
-Every terminal run has a result card: an outcome badge with an icon and a word (colour is never the only signal), one sentence, and a summary table. The verifier label decides the sentence: Valid, Invalid with the verifier's own error code and message, or Valid-but-Expired, which is a pass with a warning and is not merged into Invalid. All three labels were shown live at the real Inji Verify ([evidence](evidence/T-47-labels.md)).
+Every terminal run has a verdict: a stamp in the outcome colour with the word VALID, INVALID or EXPIRED and the date (colour is never the only signal), one plain sentence beside it, and the combination as filled-in form fields. The verifier label decides the sentence: Valid, Invalid with the verifier's own error code and message, or Valid-but-Expired, which is a pass with a warning and is not merged into Invalid. All three labels were shown live at the real Inji Verify ([evidence](evidence/T-47-labels.md)).
 
 ### Diagnosis and fix-it panel
 
-![Diagnosis card "Inji Verify cannot verify an SD-JWT VC whose issuer key is not given as an x5c chain", Exact match, with deviating side, spec clause, gap G-55 and evidence; below it the Try the fix panel showing one setting changing, waltid.sdjwt.x5c "absent" struck through → "present", and the Fix it and re-run button](screenshots/design-diagnosis-fixit.png)
+![Diagnosis in serif type ("Inji Verify cannot verify an SD-JWT VC whose issuer key is not given as an x5c chain", Exact match), then the Try the fix part in three columns: what failed in a sentence, the one change (waltid.sdjwt.x5c, "absent" struck through, then "present") and the expected result as a small VALID stamp, above the Fix it and re-run button](screenshots/design-diagnosis-fixit.png)
 
-The diagnosis card sits above the diagram on failed runs, because it is the first thing to read. It names the matched fingerprint, the deviating side, the spec clause, the gap IDs and the evidence. The fix-it panel appears only for an exact match with a proven knob. It shows the single change as a before → after diff ("from" struck through, "to" highlighted), says what stays the same, and has one button with no confirm dialog. When more than one cause fits, the card lists them and offers no button ([`e2e/angle.spec.ts`](../e2e/angle.spec.ts)).
+The diagnosis card sits above the diagram on failed runs, because it is the first thing to read. It names the matched fingerprint, the deviating side, the spec clause, the gap IDs and the evidence. The fix-it panel appears only for an exact match with a proven knob. It has three parts: what failed in one sentence, the single change as a before → after diff ("from" struck through, "to" highlighted) and the expected result as a small stamp. It says what stays the same, and has one button with no confirm dialog. When more than one cause fits, the card lists them and offers no button ([`e2e/angle.spec.ts`](../e2e/angle.spec.ts)).
 
 ### Child run and compare
 
-![Child run: a Fixed card "The change fixed it." with the claim sentence and its buttons, then the compare table listing the changed steps (the knob's direct effect first), a link to unchanged steps and the re-run chain](screenshots/design-child-compare.png)
+![Child run: "The change fixed it." with an INVALID stamp, an arrow and a VALID stamp, the claim sentence in italic serif, then the compare table of changed steps, a link to unchanged steps and the re-run chain](screenshots/design-child-compare.png)
 
 A derived run opens with a banner that links its parent and names the one knob that changed. The result card classifies the child as `fixed`, `moved`, `not-fixed` or `inconclusive`; only `fixed` carries the claim sentence. The compact compare strip lists the knob's direct effect first, then the other changed steps, and hides volatile fields such as nonces and timestamps. Live pair: [parent](reports/01M5B6KNNY7DC3YK3CR0ETNBN9.md), [child](reports/01M5B6M723AQ7T818D36816PRV.md).
 
 ### Report view (`/runs/:runId/report`)
 
-![Report view: Run ZZZZZZZZ: FAIL, a segmented Report, Markdown and JSON switch, download buttons, and the Combination table with issuer, wallet, verifier, format, proof type, grant, mode, environment, versions, settings and outcome](screenshots/design-report.png)
+![Report view: Run No. ZZZZZZZZ with an INVALID stamp and the sentence "The verifier rejected the credential.", the combination as form fields, and the Report, Markdown and JSON switch](screenshots/design-report.png)
 
 The report is the shareable record of one run: the combination, the versions, the outcome, failing checks, diagnosis, fix-it result, coverage and steps. The same content is available as a rendered view, as Markdown and as JSON, with download and copy buttons. Committed examples are in [`reports/`](reports/).
 
 ### Environment page (`/environment`)
 
-![Environment page: three cards for mode (Full local, public host, status Ready), tunnel (down) and Collab budget; the services table with status, version and last check; traffic outside a run](screenshots/design-environment.png)
+![Environment page on paper: Mode, Tunnel and Collab budget as ruled sections in serif headings, the services table with status, version and last check, and traffic outside a run](screenshots/design-environment.png)
 
 The environment page answers "is my bundle healthy?" before you start a run. It shows the mode, the readiness probe of each service with its version, the tunnel state (down by default; the playground never opens one), and any traffic the gateway saw outside a run, with the rule that denied it.
 

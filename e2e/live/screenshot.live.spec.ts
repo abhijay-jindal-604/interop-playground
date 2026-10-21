@@ -31,7 +31,11 @@ test('selector: slice triple resolves to FLOW-30', async ({ page, request }) => 
   await page.getByRole('radio', { name: 'SD-JWT VC', exact: true }).check();
   await page.getByRole('radio', { name: 'Cross-device (QR)', exact: true }).check();
   const start = page.getByRole('region', { name: 'Start' });
-  await expect(start).toContainText('Inji Certify (pre-authorized) → Playground reference wallet');
+  // the run bar says the selection as one plain sentence
+  await expect(start).toContainText(
+    'Inji Certify (pre-authorized) issues to Playground reference wallet, and Inji Verify (local) checks it.',
+  );
+  await expect(start).toContainText('SD-JWT VC · pre-authorized code · Cross-device (QR)');
   const preview = (await (
     await request.post('/api/v1/runs/preview', {
       headers: { host: '127.0.0.1:3100', origin: 'http://127.0.0.1:3100' },

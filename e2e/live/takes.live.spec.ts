@@ -12,7 +12,7 @@
  */
 import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { expect, test, type Page, type TestInfo } from '@playwright/test';
+import { expect, test, type Locator, type Page, type TestInfo } from '@playwright/test';
 import { marker, maskPrivate, publicHost, settled, warmUp } from './take.ts';
 
 const SLICE = {
@@ -62,7 +62,7 @@ test('S2: up.sh ready, then the environment strip is all green', async ({
   page,
 }, testInfo) => {
   await maskPrivate(page);
-  const { mark, marks } = marker(page);
+  const { mark, at, marks } = marker(page);
   // the UI part starts on a painted page (a fresh headless browser can paint its first page late)
   await warmUp(browser, testInfo.project.use.baseURL ?? 'http://127.0.0.1:3100');
   await page.setContent(
@@ -71,14 +71,16 @@ test('S2: up.sh ready, then the environment strip is all green', async ({
      .p{color:#7ee787}</style>
      <pre><span class="p">$ scripts/up.sh</span>\n…\n${escapeHtml(upTail())}</pre>`,
   );
+  // shot times follow the narration (deliverables/video/demo-v1-script.md): the command first,
+  // then from about 1.8 s the services coming up
   await mark('s02-environment');
-  await page.waitForTimeout(3000);
+  await at(1.5);
   await page.goto('/');
-  await settled(page);
+  await settled(page, 0);
   await expect(page.getByText('Ready', { exact: true }).first()).toBeVisible({ timeout: 30_000 });
   // the header strip (UI-02): mode and readiness of the required services
   await page.getByText('Ready', { exact: true }).first().hover();
-  await page.waitForTimeout(4000);
+  await at(10.55);
   await mark('end');
   await save(page, testInfo, 's02-take.webm', marks);
 });
@@ -88,96 +90,141 @@ test('S3–S7: selection → issuance → decoded SD-JWT → QR + vp.* → resul
   page,
 }, testInfo) => {
   await maskPrivate(page);
-  const { mark, marks } = marker(page);
+  const { mark, at, marks } = marker(page);
   await warmUp(browser, testInfo.project.use.baseURL ?? 'http://127.0.0.1:3100');
+  const smooth = async (
+    target: Locator,
+    block: ScrollLogicalPosition = 'center',
+  ): Promise<void> => {
+    await target.evaluate((el, b) => el.scrollIntoView({ behavior: 'smooth', block: b }), block);
+  };
 
-  // S3: pick the slice; the greyed mDoc × Inji Verify card shows its reason and G-09. The shot
+  // S3: pick the slice; then mDoc greys Inji Verify with its one-line reason (G-09). The shot
   // starts once the selector has painted and settled (no blank first frames).
-  await page.goto('/');
+  // the shot opens on another issuer (deep link, UI-50), so the first pick visibly changes it
+  await page.goto('/?issuer=issuer.waltid');
   await settled(page);
   await mark('s03-select');
+  let t = 0.4;
   for (const id of Object.values(SLICE)) {
     const radio = page.locator(`[data-adapter="${id}"] input[type="radio"]`);
     await expect(radio).toBeEnabled({ timeout: 30_000 });
+    await at(t);
     await radio.check();
-    await page.waitForTimeout(700);
+    t += 1.5;
   }
+  await at(4.9);
   await page.getByRole('radio', { name: 'mDoc', exact: true }).check();
   const verifierCard = page.locator(`[data-adapter="${SLICE.verifier}"]`);
-  await expect(verifierCard).toContainText('G-09');
-  await verifierCard.scrollIntoViewIfNeeded();
+  await expect(verifierCard).toHaveClass(/is-conflict/);
+  // the column's one-line note says why (rule and gap G-09 sit in its closed Details)
+  const noteId = await verifierCard
+    .locator('[aria-describedby]')
+    .first()
+    .getAttribute('aria-describedby');
+  const note = page.locator(`[id="${noteId ?? ''}"]`);
+  await expect(note).toContainText('G-09');
+  await expect(note).toBeVisible();
+  await smooth(note);
   await verifierCard.hover();
-  await page.waitForTimeout(2500);
+  await at(9.6);
   await page.getByRole('radio', { name: 'SD-JWT VC', exact: true }).check();
   await page.getByRole('radio', { name: 'Cross-device (QR)', exact: true }).check();
-  await page.waitForTimeout(1200);
-
-  // S4: Start; the diagram animates the vci.* steps; offer, token and credential payloads
   const run = page.getByRole('region', { name: 'Start' }).getByRole('button', { name: 'Run' });
   await expect(run).toBeEnabled({ timeout: 30_000 });
+  await at(10.85);
+
+  // S4: Run; the issuance steps appear, then the diagram's arrows, then the offer, token and
+  // credential messages in the inspector
   await mark('s04-issuance');
+  await at(0.6);
   await run.click();
   await page.waitForURL(/\/runs\/[0-9A-HJKMNP-TV-Z]{26}$/);
   const runId = new URL(page.url()).pathname.split('/').pop()!;
   const result = page.getByRole('region', { name: 'Result' });
   await expect(result).toBeVisible({ timeout: 120_000 });
   await expect(result.locator('.result-word')).toHaveText('Pass');
-  // the full-width diagram stage sits above the step rail and inspector: show its vci.* arrows
   const diagram = page.locator('[data-slot="diagram"]');
   await expect(diagram.locator('svg').first()).toBeVisible();
-  await diagram.scrollIntoViewIfNeeded();
-  await page.waitForTimeout(1500);
-  await page.evaluate(() => window.scrollBy({ top: 450, behavior: 'smooth' }));
-  await page.waitForTimeout(2200);
+  await at(1.2);
+  await smooth(diagram, 'start');
+  await at(6.1);
+  await page.evaluate(() => window.scrollBy({ top: 260, behavior: 'smooth' }));
   const inspector = page
     .getByRole('complementary', { name: 'Inspector' })
     .or(page.locator('[data-slot="inspector"]'));
   const bar = inspector.getByRole('toolbar', { name: 'Key payloads' });
-  const chip = async (name: string): Promise<void> => {
+  const chip = async (name: string, when: number): Promise<void> => {
+    await at(when);
     await bar.locator(`[data-chip="${name}"]`).click();
-    await expect(inspector.locator('.xcard.is-open [data-part-panel]').first()).toBeVisible();
-    await page.waitForTimeout(2200);
+    const open = inspector.locator('.xcard.is-open').first();
+    await expect(open.locator('[data-part-panel]').first()).toBeVisible();
+    await smooth(open, 'start');
   };
-  await chip('offer');
-  await chip('token');
-  await chip('credential');
+  await at(9.7);
+  await smooth(bar);
+  await chip('offer', 10.4);
+  await chip('token', 12.6);
+  await chip('credential', 14.0);
+  await at(15.45);
 
-  // S5: the decoded SD-JWT (header, disclosures, cnf) and the evidence label
+  // S5: the credential as a document (claims), who signed it and the disclosures, then the
+  // holder key (cnf) in the raw payload; the step's Details name it a full capture
   await mark('s05-decoded');
+  await at(0.3);
+  const details = inspector.locator('details.inspector-details');
+  await details.locator('summary').click();
+  await expect(details.getByText('Full capture').first()).toBeVisible();
+  await details.locator('summary').click();
   await inspector.getByRole('tab', { name: 'Decoded' }).click();
-  await page.waitForTimeout(1500);
-  await inspector.evaluate((el) => el.scrollBy({ top: 400, behavior: 'smooth' }));
-  await page.waitForTimeout(1800);
-  await expect(page.getByText('Full capture').first()).toBeVisible();
-  await page.getByText('Full capture').first().scrollIntoViewIfNeeded();
-  await page.waitForTimeout(1500);
+  const doc = inspector.getByTestId('credential-document').first();
+  await expect(doc).toBeVisible();
+  await at(3.2);
+  await smooth(doc.locator('.doc-claims'));
+  await at(6.0);
+  await smooth(doc.locator('.doc-issuing'));
+  await at(9.2);
+  const raw = doc.locator('details.doc-raw');
+  await raw.locator('summary').click();
+  const cnf = raw.getByText('"cnf"').first();
+  await expect(cnf).toBeVisible();
+  await smooth(cnf);
+  await at(11.85);
 
   // S6: the QR of the Inji Verify request (blurred: it carries the LAN host), the vp.* payloads,
-  // the result card "Valid"
+  // then the verdict stamp "Valid"
   await mark('s06-present');
   await inspector.getByRole('tab', { name: 'Messages' }).click();
   const delivery = page.locator('[data-action="delivery"]').first();
   if ((await delivery.count()) > 0) {
+    await at(0.3);
     await delivery.click();
-    await page.waitForTimeout(2500);
+    await at(2.0);
     await page.keyboard.press('Escape');
   }
-  await chip('query');
-  await chip('vp-token');
-  await chip('result');
-  await result.scrollIntoViewIfNeeded();
-  await expect(result).toContainText('Valid');
-  await page.waitForTimeout(2500);
+  await chip('query', 2.3);
+  await chip('vp-token', 4.2);
+  await chip('result', 6.6);
+  await at(8.6);
+  await smooth(result);
+  await expect(result).toContainText('accepted the credential');
+  await expect(result.getByTestId('stamp')).toHaveAttribute('data-stamp', 'valid');
+  await at(11.45);
 
-  // S7: the run report (REQ-26 table)
+  // S7: the run report (REQ-26 table), then its failing-checks section
   await mark('s07-report');
-  await page.goto(`/runs/${runId}/report`);
-  await expect(page.locator('h1')).toContainText(': PASS');
-  await settled(page, 1200);
-  await page.mouse.wheel(0, 500);
-  await page.waitForTimeout(1500);
-  await page.mouse.wheel(0, 700);
-  await page.waitForTimeout(2000);
+  await at(0.3);
+  await page.getByRole('link', { name: 'Report', exact: true }).first().click();
+  await page.waitForURL(new RegExp(`/runs/${runId}/report$`));
+  // the report opens like a document: "Run No." and the run's number, then the verdict stamp
+  await expect(page.locator('h1')).toContainText('Run No.');
+  await expect(page.locator('h1')).toContainText(runId.slice(-8));
+  const reportStamp = page.locator('main').getByTestId('stamp').first();
+  await expect(reportStamp).toHaveAttribute('data-status', 'pass');
+  await expect(reportStamp).toHaveAttribute('data-stamp', 'valid');
+  await at(5.4);
+  await smooth(page.locator('#failing-checks'));
+  await at(9.05);
   await mark('end');
   await save(page, testInfo, 's03-s07-slice.webm', marks);
 });

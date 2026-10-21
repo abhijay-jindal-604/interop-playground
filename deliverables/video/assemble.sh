@@ -3,30 +3,35 @@
 # ffmpeg/ffprobe only, no network. Re-runnable: uses whatever takes exist now.
 # Silent video, captions burned in from demo-v1.srt (the .srt also ships as a side-car).
 # Each shot = take slowed by at most 2x, then last frame held, to the shot length (SHOTS table): the
-# spoken line plus about 2 s, measured on the voice-over recording.
+# spoken line plus a 0.35 s lead and 0.55 s tail, measured on the voice-over recording. The takes are
+# recorded to these lengths, so they play at 1x. Title cards and captions use the product's "Document"
+# look: paper and ink, Source Serif 4 titles, IBM Plex Sans lines (fonts/, SIL OFL 1.1).
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TAKES="$HERE/../takes"
 OUT="$HERE/demo-v1.mp4"
 SRT="$HERE/demo-v1.srt"
-FONT="${FONT:-/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf}"
-FONTB="${FONTB:-/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf}"
+FONTS="$HERE/fonts"
+FONT="${FONT:-$FONTS/IBMPlexSans-Regular.ttf}"
+FONTB="${FONTB:-$FONTS/SourceSerif4-SemiBold.ttf}"
+PAPER=0xf7f5f0; INK=0x1a1c1b; MUTED=0x5a5852; RULE=0xd9d5cc
+CAPTION_STYLE="FontName=IBM Plex Sans Medium,FontSize=9,Bold=0,BorderStyle=3,Outline=2,Shadow=0,MarginV=10,PrimaryColour=&H00F0F5F7,OutlineColour=&H001B1C1A,BackColour=&H001B1C1A"
 W=1440; H=900; FPS=25
 
 # id|take file (or "card")|shot length in seconds|card title|card line 2|card line 3
 SHOTS=(
-"S1|card|13|Interop Playground|Run real Inji issuers, wallets and verifiers against each other.|"
-"S2|s02-environment.webm|12"
-"S3|s03-select.webm|12.5"
-"S4|s04-issuance.webm|19"
-"S5|s05-decoded.webm|13"
-"S6|s06-present.webm|15"
-"S7|s07-report.webm|10.5"
-"S9|s09-labels.webm|12.5"
-"S10|s10-fixit.webm|33"
-"S11|card|13|Interop report and gaps|docs/interop-report.md: every combination we ran and its outcome|docs/gaps.md: Inji defects with reproduction steps"
-"S12|card|10|Interop Playground|Repository: https://github.com/abhijay-jindal-604/interop-playground|Team Bhrinjal (Abhijay Jindal)"
+"S1|card|10.7|Interop Playground|Run real Inji issuers, wallets and verifiers against each other.|"
+"S2|s02-environment.webm|10.7"
+"S3|s03-select.webm|11"
+"S4|s04-issuance.webm|15.6"
+"S5|s05-decoded.webm|12"
+"S6|s06-present.webm|11.6"
+"S7|s07-report.webm|9.2"
+"S9|s09-labels.webm|8.6"
+"S10|s10-fixit.webm|27.3"
+"S11|card|11.4|Interop report and gaps|docs/interop-report.md: every combination we ran and its outcome|docs/gaps.md: Inji defects with reproduction steps"
+"S12|card|8|Interop Playground|Repository: https://github.com/abhijay-jindal-604/interop-playground|Team Bhrinjal (Abhijay Jindal)"
 )
 
 for t in ffmpeg ffprobe; do command -v "$t" >/dev/null || { echo "missing $t" >&2; exit 1; }; done
@@ -43,10 +48,11 @@ for row in "${SHOTS[@]}"; do
   seg="$TMP/$id.mp4"
   if [ "$take" = card ]; then
     printf '%s' "$l1" > "$TMP/$id.1"; printf '%s' "$l2" > "$TMP/$id.2"; printf '%s' "$l3" > "$TMP/$id.3"
-    vf="drawtext=fontfile=$FONTB:textfile=$TMP/$id.1:fontcolor=white:fontsize=72:x=(w-text_w)/2:y=300"
-    vf+=",drawtext=fontfile=$FONT:textfile=$TMP/$id.2:fontcolor=0xcfd8dc:fontsize=34:x=(w-text_w)/2:y=440"
-    [ -n "$l3" ] && vf+=",drawtext=fontfile=$FONT:textfile=$TMP/$id.3:fontcolor=0xcfd8dc:fontsize=34:x=(w-text_w)/2:y=500"
-    ffmpeg -v error -y -f lavfi -i "color=c=0x14181f:s=${W}x${H}:r=$FPS:d=$dur" -vf "$vf" "${ENC[@]}" "$seg"
+    vf="drawtext=fontfile=$FONTB:textfile=$TMP/$id.1:fontcolor=$INK:fontsize=76:x=(w-text_w)/2:y=290"
+    vf+=",drawbox=x=(iw-120)/2:y=408:w=120:h=2:color=$RULE:t=fill"
+    vf+=",drawtext=fontfile=$FONT:textfile=$TMP/$id.2:fontcolor=$MUTED:fontsize=32:x=(w-text_w)/2:y=450"
+    [ -n "$l3" ] && vf+=",drawtext=fontfile=$FONT:textfile=$TMP/$id.3:fontcolor=$MUTED:fontsize=32:x=(w-text_w)/2:y=505"
+    ffmpeg -v error -y -f lavfi -i "color=c=$PAPER:s=${W}x${H}:r=$FPS:d=$dur" -vf "$vf" "${ENC[@]}" "$seg"
   else
     src="$TAKES/$take"
     [ -f "$src" ] || { echo "missing take $src" >&2; exit 1; }
@@ -62,7 +68,7 @@ done
 
 cp "$SRT" "$TMP/sub.srt"
 (cd "$TMP" && ffmpeg -v error -y -f concat -safe 0 -i list.txt \
-  -vf "subtitles=sub.srt:force_style='FontName=DejaVu Sans,FontSize=9,Bold=1,BorderStyle=3,Outline=2,Shadow=0,MarginV=10'" \
+  -vf "subtitles=sub.srt:fontsdir=$FONTS:force_style='$CAPTION_STYLE'" \
   -c:v libx264 -preset medium -crf 23 -pix_fmt yuv420p -movflags +faststart -an "$OUT")
 
 # Checks: duration <= 300 s, size <= 50 MB, srt last cue ends within the video.

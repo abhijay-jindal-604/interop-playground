@@ -10,11 +10,11 @@
  * LIVE_TAKE=<path> saves the video + `.marks.json` (deliverables/takes/s10-take.webm,
  * cut to `s10-fixit.webm` by `scripts/cut-takes.sh`; m2-fixit.webm is the earlier take).
  */
-import { expect, test } from '@playwright/test';
+import { expect, test, type Locator } from '@playwright/test';
 import { marker, maskPrivate, saveTake, settled, warmUp } from './take.ts';
 
-// a take (LIVE_TAKE, plan/13 S10) holds each beat long enough to read; the plain e2e does not wait
-const HOLD = process.env.LIVE_TAKE ? 3500 : 0;
+// a take (LIVE_TAKE, plan/13 S10) paces each beat to the narration; the plain e2e does not wait
+const TAKE = Boolean(process.env.LIVE_TAKE);
 
 const COMBINATION = {
   issuer: 'issuer.waltid',
@@ -30,7 +30,7 @@ test('fix-it: walt.id parent fails (FP-01) → one click → child Pass → fixe
   page,
 }, testInfo) => {
   await maskPrivate(page);
-  const { mark, marks } = marker(page);
+  const { mark, at, marks } = marker(page);
   let dialogs = 0;
   page.on('dialog', (d) => {
     dialogs += 1;
@@ -62,20 +62,31 @@ test('fix-it: walt.id parent fails (FP-01) → one click → child Pass → fixe
     )
     .toBe(true);
 
-  // the selector (UI-03..UI-08), knobs left at their defaults; the take starts on a painted page
+  // the selector (UI-03..UI-08), knobs left at their defaults; the take starts on a painted page.
+  // A take paces each beat to the narration (`at`, seconds into the shot); the plain e2e does not wait.
+  const beat = async (sec: number): Promise<void> => {
+    if (TAKE) await at(sec);
+  };
+  const smooth = async (target: Locator): Promise<void> => {
+    await target.evaluate((el) => el.scrollIntoView({ behavior: 'smooth', block: 'center' }));
+  };
   await warmUp(browser, base);
   await page.goto('/');
   await settled(page);
   await mark('s10-fixit');
+  let t = 0.5;
   for (const id of Object.values(COMBINATION)) {
     const radio = page.locator(`[data-adapter="${id}"] input[type="radio"]`);
     await expect(radio, id).toBeEnabled({ timeout: 30_000 });
+    await beat(t);
     await radio.check();
+    t += id === COMBINATION.issuer ? 1.2 : 0.4;
   }
   await page.getByRole('radio', { name: 'SD-JWT VC', exact: true }).check();
   await page.getByRole('radio', { name: 'Cross-device (QR)', exact: true }).check();
   const run = page.getByRole('region', { name: 'Start' }).getByRole('button', { name: 'Run' });
   await expect(run).toBeEnabled({ timeout: 30_000 });
+  await beat(3.6);
   await run.click();
   await page.waitForURL(RUN_URL);
   const parentId = RUN_URL.exec(new URL(page.url()).pathname)?.[1] ?? '';
@@ -84,7 +95,8 @@ test('fix-it: walt.id parent fails (FP-01) → one click → child Pass → fixe
   const result = page.getByRole('region', { name: 'Result' });
   await expect(result).toBeVisible({ timeout: 120_000 });
   await expect(result.locator('.result-word')).toHaveText('Fail');
-  await page.waitForTimeout(HOLD);
+  await expect(result.getByTestId('stamp')).toHaveAttribute('data-status', 'fail');
+  await smooth(result);
 
   // the diagnosis card: FP-01 exact, verifier side, with the KNOB-01 fix-it panel
   const card = page.getByTestId('diagnosis-card');
@@ -97,15 +109,16 @@ test('fix-it: walt.id parent fails (FP-01) → one click → child Pass → fixe
   await expect(card).toContainText('G-55');
   const panel = page.getByRole('region', { name: 'Fix it and re-run' });
   await expect(panel).toContainText('waltid.sdjwt.x5c');
-  await card.scrollIntoViewIfNeeded();
-  await page.waitForTimeout(800 + HOLD); // let the take show the diagnosis
-  await panel.scrollIntoViewIfNeeded();
-  await page.waitForTimeout(HOLD);
+  await beat(9.3);
+  await smooth(card);
+  await beat(17.8);
+  await smooth(panel);
 
   // one click derives the child (API-24), no confirm dialog
   const derive = page.waitForResponse(
     (r) => r.request().method() === 'POST' && r.url().endsWith(`/runs/${parentId}/derive`),
   );
+  await beat(20.2);
   await panel.getByRole('button', { name: 'Fix it and re-run' }).click();
   const res = await derive;
   expect(res.status()).toBe(201);
@@ -120,9 +133,12 @@ test('fix-it: walt.id parent fails (FP-01) → one click → child Pass → fixe
     `Re-run of ${parentId.slice(-8)}: waltid.sdjwt.x5c absent → present`,
   );
 
-  // the child passes and is classified `fixed` with the claim sentence (09 A5.4, API-31)
+  // the child passes (verdict stamp Valid) and is classified `fixed` with the claim sentence
+  // (09 A5.4, API-31)
   await expect(result).toBeVisible({ timeout: 120_000 });
   await expect(result.locator('.result-word')).toHaveText('Pass');
+  await expect(result.getByTestId('stamp')).toHaveAttribute('data-stamp', 'valid');
+  await smooth(result);
   const child = page.getByTestId('child-result');
   await expect(child).toHaveAttribute('data-classification', 'fixed', { timeout: 30_000 });
   await expect(child.getByRole('heading')).toHaveText('The change fixed it.');
@@ -135,18 +151,17 @@ test('fix-it: walt.id parent fails (FP-01) → one click → child Pass → fixe
     'Changing only waltid.sdjwt.x5c from absent to present makes it pass.',
   );
   await expect(claim).toContainText(`run ${parentId} vs run ${childId}`);
-  await child.scrollIntoViewIfNeeded();
-  await page.waitForTimeout(HOLD);
+  // the take holds on the Valid stamp to the end of the shot
+  await beat(27.15);
+  await mark('end');
 
   // the compact strip: the knob's direct effect (credential header x5c) first
   const strip = page.getByTestId('compare-strip');
   await strip.getByRole('button', { name: `Compare with run ${parentId.slice(-8)}` }).click();
   const rows = strip.locator('tbody tr');
   await expect(rows.first()).toHaveAttribute('data-step-row', 'vci.credential');
-  await expect(rows.first()).toContainText('Changed by KNOB-01');
-  await strip.scrollIntoViewIfNeeded();
-  await page.waitForTimeout(1500 + HOLD); // let the take show the result
+  await expect(rows.first()).toContainText('Changed by the fix');
+  await expect(rows.first().locator('[title="KNOB-01"]')).toBeVisible();
 
-  await mark('end');
   await saveTake(page, testInfo, marks);
 });

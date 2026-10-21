@@ -352,7 +352,7 @@ h1[tabindex='-1']:focus-visible {
 }
 /* the small stamp for table rows (History, Matrix, Report steps): no turn, no second line */
 .stamp-sm {
-  padding: 2px 8px 1px;
+  padding: 2px 12px 1px;
   border-width: 1px;
   outline-offset: -4px;
   transform: none;
@@ -1480,7 +1480,7 @@ a.run-row:hover {
     flex: 1 1 auto;
   }
   .start-text {
-    font-size: var(--text-14);
+    font-size: 16px;
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;

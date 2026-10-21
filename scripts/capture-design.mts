@@ -91,6 +91,7 @@ await page.route(`**/api/v1/runs/${RUN_ID}/diagnosis`, (r) =>
 // settle: let the entrance animation finish (the mid-run shot settles less, because its
 // finite fixture stream would trigger the reconnect banner after about 2 s)
 const shot = async (name: string, settleMs = 900) => {
+  await page.evaluate(() => document.fonts.ready);
   await page.waitForTimeout(settleMs);
   await page.screenshot({ path: path.join(outDir, `design-${name}.png`) });
 };

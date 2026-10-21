@@ -67,10 +67,13 @@ export async function maskPrivate(page: Page): Promise<void> {
  */
 export function marker(page: Page): {
   mark: (shot: string) => Promise<void>;
+  /** waits until `sec` seconds into the current shot (counted from the end of its mark strip) */
+  at: (sec: number) => Promise<void>;
   marks: [string, number][];
 } {
   const t0 = Date.now();
   const marks: [string, number][] = [];
+  let shotStart = t0;
   const mark = async (shot: string): Promise<void> => {
     marks.push([shot, (Date.now() - t0) / 1000]);
     await page.evaluate(() => {
@@ -82,9 +85,14 @@ export function marker(page: Page): {
     });
     await page.waitForTimeout(300);
     await page.evaluate(() => document.querySelector('[data-take-mark]')?.remove());
+    shotStart = Date.now();
     await page.waitForTimeout(150);
   };
-  return { mark, marks };
+  const at = async (sec: number): Promise<void> => {
+    const left = shotStart + sec * 1000 - Date.now();
+    if (left > 0) await page.waitForTimeout(left);
+  };
+  return { mark, at, marks };
 }
 
 /** closes the page and copies its video to `LIVE_TAKE` (+ `<take>.marks.json` when marks exist) */
