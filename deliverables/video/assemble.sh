@@ -2,7 +2,8 @@
 # Assemble deliverables/video/demo-v1.mp4 from deliverables/takes/*.webm.
 # ffmpeg/ffprobe only, no network. Re-runnable: uses whatever takes exist now.
 # Silent video, captions burned in from demo-v1.srt (the .srt also ships as a side-car).
-# Each shot = take slowed by at most 2x, then last frame held, to the narration length (SHOTS table).
+# Each shot = take slowed by at most 2x, then last frame held, to the shot length (SHOTS table): the
+# spoken line plus about 2 s, measured on the voice-over recording.
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -13,19 +14,19 @@ FONT="${FONT:-/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf}"
 FONTB="${FONTB:-/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf}"
 W=1440; H=900; FPS=25
 
-# id|take file (or "card")|narration length in seconds|card title|card line 2|card line 3
+# id|take file (or "card")|shot length in seconds|card title|card line 2|card line 3
 SHOTS=(
-"S1|card|12|Interop Playground|Run real Inji issuers, wallets and verifiers against each other.|"
-"S2|s02-environment.webm|18"
-"S3|s03-select.webm|22"
-"S4|s04-issuance.webm|36"
-"S5|s05-decoded.webm|17"
-"S6|s06-present.webm|35"
-"S7|s07-report.webm|15"
-"S9|s09-labels.webm|15"
-"S10|s10-fixit.webm|50"
-"S11|card|25|Interop report and gaps|docs/interop-report.md: every combination we ran and its outcome|docs/gaps.md: Inji defects with reproduction steps"
-"S12|card|15|Interop Playground|Repository: https://github.com/abhijay-jindal-604/interop-playground|Credits: Abhijay Jindal"
+"S1|card|13|Interop Playground|Run real Inji issuers, wallets and verifiers against each other.|"
+"S2|s02-environment.webm|12"
+"S3|s03-select.webm|12.5"
+"S4|s04-issuance.webm|19"
+"S5|s05-decoded.webm|13"
+"S6|s06-present.webm|15"
+"S7|s07-report.webm|10.5"
+"S9|s09-labels.webm|12.5"
+"S10|s10-fixit.webm|33"
+"S11|card|13|Interop report and gaps|docs/interop-report.md: every combination we ran and its outcome|docs/gaps.md: Inji defects with reproduction steps"
+"S12|card|10|Interop Playground|Repository: https://github.com/abhijay-jindal-604/interop-playground|Team Bhrinjal (Abhijay Jindal)"
 )
 
 for t in ffmpeg ffprobe; do command -v "$t" >/dev/null || { echo "missing $t" >&2; exit 1; }; done

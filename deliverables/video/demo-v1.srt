@@ -1,118 +1,140 @@
 1
-00:00:00,500 --> 00:00:06,000
-Interop Playground runs real Inji issuers,
-wallets and verifiers against each other,
+00:00:00,350 --> 00:00:05,680
+Issuers, wallets and verifiers from different vendors
+are supposed to work together.
 
 2
-00:00:06,000 --> 00:00:11,500
-shows every protocol message, and proves fixes
-for the failures it finds.
+00:00:05,730 --> 00:00:10,760
+Interop Playground checks whether they actually do,
+and when they don't, it shows you why.
 
 3
-00:00:12,500 --> 00:00:29,000
-One script brings up Inji Certify, Verify, Mimoto, eSignet
-and our backend locally, digest-pinned.
+00:00:13,350 --> 00:00:14,680
+It starts with one command.
 
 4
-00:00:30,500 --> 00:00:38,000
-Pick who plays issuer, wallet and verifier.
+00:00:14,730 --> 00:00:21,260
+That brings up the full Inji stack, Certify, Verify,
+Mimoto and eSignet, on your own machine,
 
 5
-00:00:38,000 --> 00:00:51,000
-Combinations that cannot work are greyed out
-with the reason and the gap behind it.
+00:00:21,310 --> 00:00:23,720
+with every version pinned.
 
 6
-00:00:52,500 --> 00:01:02,000
-Issuance runs over OpenID4VCI 1.0
-with a pre-authorized code.
+00:00:25,350 --> 00:00:30,300
+First, you pick who plays each role:
+an issuer, a wallet and a verifier.
 
 7
-00:01:02,000 --> 00:01:12,000
-Each arrow is a captured HTTP exchange:
+00:00:30,350 --> 00:00:35,980
+If a combination can't work, the playground tells you why
+before you even run it.
 
 8
-00:01:12,000 --> 00:01:27,000
-here is the credential offer, the token response
-and the issued credential.
+00:00:37,850 --> 00:00:43,880
+Press Run, and the credential is issued
+over OpenID for Verifiable Credential Issuance.
 
 9
-00:01:28,500 --> 00:01:34,000
-The wallet now holds the credential.
+00:00:43,930 --> 00:00:48,400
+Every arrow in the diagram
+is a real HTTP message we captured.
 
 10
-00:01:34,000 --> 00:01:44,500
-The inspector decodes it: issuer key,
-selective disclosures and the holder binding.
+00:00:48,450 --> 00:00:53,140
+Here's the credential offer, the access token,
+and the credential itself.
 
 11
-00:01:45,500 --> 00:01:56,000
-Inji Verify creates an OpenID4VP request
-with a DCQL query.
+00:00:56,850 --> 00:00:59,840
+Now the wallet holds the credential.
 
 12
-00:01:56,000 --> 00:02:08,000
-The wallet presents with a key-binding JWT,
+00:00:59,890 --> 00:01:05,260
+The inspector shows exactly what's inside: who signed it,
+which fields can be selectively disclosed,
 
 13
-00:02:08,000 --> 00:02:19,000
-and Verify returns the result JSON: valid.
+00:01:05,310 --> 00:01:08,520
+and the key that binds it to the holder.
 
 14
-00:02:20,500 --> 00:02:27,000
-Every run produces a pass/fail report:
+00:01:09,850 --> 00:01:13,260
+Next, Inji Verify asks the wallet for proof.
 
 15
-00:02:27,000 --> 00:02:34,500
-issuer, wallet, verifier, format, proof type, outcome,
-and the failing check when there is one.
+00:01:13,310 --> 00:01:17,960
+The wallet presents the credential, signed with its own key,
+and Verify checks it.
 
 16
-00:02:35,500 --> 00:02:42,000
-Verification distinguishes valid, invalid,
-and valid-but-expired:
+00:01:18,010 --> 00:01:21,180
+The answer comes back: valid.
 
 17
-00:02:42,000 --> 00:02:49,500
-the signature checks out
-but the credential has expired.
+00:01:24,850 --> 00:01:30,200
+Every run ends with a report: who took part,
+which format was used, and the result.
 
 18
-00:02:50,500 --> 00:02:58,000
-A non-Inji issuer, walt.id, fails at Inji Verify.
+00:01:30,250 --> 00:01:33,740
+If something failed, it points to the exact check.
 
 19
-00:02:58,000 --> 00:03:10,000
-The playground matches the failure to a known cause:
-Verify requires an x5c certificate chain in the SD-JWT header.
+00:01:35,350 --> 00:01:39,480
+The playground can tell valid, invalid and expired apart.
 
 20
-00:03:10,000 --> 00:03:18,000
-It offers exactly one change.
+00:01:39,530 --> 00:01:43,600
+Here the signature is fine,
+but the credential has expired.
 
 21
-00:03:18,000 --> 00:03:30,000
-One click re-runs with that change only,
-and the run passes.
+00:01:47,850 --> 00:01:49,300
+Now the interesting part.
 
 22
-00:03:30,000 --> 00:03:39,500
-That is proof of the fix, not a guess.
+00:01:49,350 --> 00:01:56,180
+We swap in an issuer from outside the Inji ecosystem,
+walt.id, and verification fails.
 
 23
-00:03:40,500 --> 00:03:52,000
-The interop report lists every combination we ran
-and its outcome.
+00:01:56,230 --> 00:01:57,880
+The playground recognises this failure:
 
 24
-00:03:52,000 --> 00:04:04,500
-The gaps write-up documents the Inji defects we found,
-with reproduction steps, ready to file.
+00:01:57,930 --> 00:02:05,340
+Inji Verify expects the issuer's certificate chain
+in the credential, and walt.id doesn't send it.
 
 25
-00:04:05,500 --> 00:04:12,000
-Interop Playground.
+00:02:05,390 --> 00:02:07,300
+It suggests one change.
 
 26
-00:04:12,000 --> 00:04:19,500
-Source, setup and every flow are in the README.
+00:02:07,350 --> 00:02:11,220
+One click re-runs with only that change,
+and now it passes.
+
+27
+00:02:11,270 --> 00:02:14,800
+So this isn't a guess. It's a proven fix.
+
+28
+00:02:20,850 --> 00:02:26,980
+All of this adds up to an interop report:
+every combination we tested and how it went,
+
+29
+00:02:27,030 --> 00:02:31,920
+plus a write-up of the Inji issues we found,
+each with steps to reproduce.
+
+30
+00:02:33,850 --> 00:02:36,200
+Interop Playground, by Team Bhrinjal.
+
+31
+00:02:36,250 --> 00:02:40,140
+The code, the setup and every flow are on GitHub.

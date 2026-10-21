@@ -2,13 +2,14 @@
  * README screenshot (plan/13 §1): the selector with the slice triple
  * issuer.certify-preauth × wallet.playground-ts × verifier.inji-verify-local, SD-JWT VC,
  * cross-device: the Start bar summarises it with Run enabled, and the run preview resolves the same
- * selection to FLOW-04 → FLOW-30. 1440 px wide, host masked (take.ts).
+ * selection to FLOW-04 → FLOW-30. 1440 px wide, host masked (take.ts). The shot waits
+ * for settled content: pages enter with a short fade and rise, and a cold headless load can paint late.
  * LIVE_SCREENSHOT=<path> saves it (docs/screenshots/selector.png). Live bundle only.
  */
 import { mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { expect, test } from '@playwright/test';
-import { maskPrivate } from './take.ts';
+import { maskPrivate, settled } from './take.ts';
 
 const SLICE = {
   issuer: 'issuer.certify-preauth',
@@ -45,7 +46,7 @@ test('selector: slice triple resolves to FLOW-30', async ({ page, request }) => 
   expect(preview.spec.presentationFlowId).toBe('FLOW-30');
   await expect(start.getByRole('button', { name: 'Run' })).toBeEnabled();
   await page.mouse.move(0, 0);
-  await page.waitForTimeout(800);
+  await settled(page, 800);
   const out = process.env.LIVE_SCREENSHOT;
   if (out) {
     mkdirSync(path.dirname(path.resolve(out)), { recursive: true });

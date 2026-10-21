@@ -45,6 +45,18 @@ const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, b
 const page = await ctx.newPage();
 await setTheme(page as never, 'light');
 await serveApi(page as never);
+// the selector asks the backend to check every card; the shared fixture API has no such route
+await page.route('**/api/v1/runs/preview', (r) =>
+  r.fulfill({
+    json: {
+      ok: true,
+      spec: { delivery: 'cross-device' },
+      warnings: [],
+      tamperApplicable: [],
+      controlRequired: false,
+    },
+  }),
+);
 const run = (id: string, state: string, spec: unknown) => ({
   runId: id,
   spec,
@@ -76,8 +88,10 @@ await page.route(`**/api/v1/runs/${RUN_ID}/diagnosis`, (r) =>
   r.fulfill({ json: UNCLASSIFIED_DIAGNOSIS }),
 );
 
-const shot = async (name: string) => {
-  await page.waitForTimeout(500);
+// settle: let the entrance animation finish (the mid-run shot settles less, because its
+// finite fixture stream would trigger the reconnect banner after about 2 s)
+const shot = async (name: string, settleMs = 900) => {
+  await page.waitForTimeout(settleMs);
   await page.screenshot({ path: path.join(outDir, `design-${name}.png`) });
 };
 const resultCard = async (id: string) => {
@@ -87,15 +101,19 @@ const resultCard = async (id: string) => {
   await card.scrollIntoViewIfNeeded();
 };
 
+// Cold-load guard: the first page after a fresh load paints late in headless Chromium, so wait for
+// visible content and let the entrance animation settle before the first shot.
 await page.goto('/');
 await page.getByRole('radiogroup').first().waitFor();
+await page.getByRole('heading', { level: 1 }).first().waitFor({ state: 'visible' });
+await page.getByRole('radio').last().waitFor({ state: 'attached' });
+await page.waitForTimeout(3500);
 await shot('selector');
 
 await page.clock.setFixedTime(new Date(Date.parse(cut[1].ts) + 41_000));
 await page.goto(`/runs/${MID}`);
 await page.locator('[data-renderer]').first().waitFor();
-await page.waitForTimeout(800);
-await shot('run-midrun');
+await shot('run-midrun', 700);
 
 await page.goto(`/runs/${RUN_ID}#step=vci.credential`);
 await page.getByRole('region', { name: 'Result' }).waitFor();

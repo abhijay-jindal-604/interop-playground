@@ -1030,7 +1030,7 @@ a.run-row:hover {
   display: grid;
   gap: var(--space-6);
   /* the sticky run bar never covers the last row */
-  padding-bottom: var(--space-4);
+  padding-bottom: var(--space-8);
 }
 .recipe-strip {
   display: flex;
@@ -1325,7 +1325,7 @@ a.run-row:hover {
   margin: var(--space-1) 0 0;
   padding-left: var(--space-4);
 }
-/* the run bar: frosted, sticky at the bottom, never wider than the content */
+/* the run bar: opaque, sticky at the bottom, never wider than the content */
 .start-bar {
   position: sticky;
   bottom: var(--space-4);
@@ -1336,12 +1336,21 @@ a.run-row:hover {
   justify-content: space-between;
   gap: var(--space-3) var(--space-5);
   padding: var(--space-3) var(--space-3) var(--space-3) var(--space-5);
-  background: var(--glass);
-  -webkit-backdrop-filter: saturate(180%) blur(20px);
-  backdrop-filter: saturate(180%) blur(20px);
+  background: var(--bg);
   border: 1px solid var(--border);
   border-radius: var(--radius-pill);
   box-shadow: var(--shadow-2);
+}
+/* hides content scrolling through the gap below the floating bar */
+.start-bar::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: var(--space-4);
+  background: var(--bg);
+  pointer-events: none;
 }
 @media (max-width: 639px) {
   .start-bar {
@@ -1851,20 +1860,6 @@ kbd {
 }
 
 /* ---------- run screen (06 UI-09..UI-14, T-27; UI-75 tokens only) ---------- */
-.title-chips {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  margin-left: var(--space-2);
-  vertical-align: middle;
-  font-size: var(--text-14);
-  font-weight: var(--weight-regular);
-}
-.state-word {
-  padding: 0 var(--space-2);
-  border-left: 3px solid var(--tone);
-  color: var(--text);
-}
 .run-label {
   margin: 0 0 var(--space-2);
   color: var(--text-muted);
@@ -2023,24 +2018,6 @@ kbd {
   font-size: var(--text-12);
   color: var(--text-muted);
 }
-.dg-legend li::before {
-  content: '';
-  display: inline-block;
-  width: 1.25rem;
-  height: 0;
-  margin-right: var(--space-1);
-  vertical-align: middle;
-  border-top: 2px solid var(--status-skipped);
-}
-.dg-legend li[data-state='pass']::before {
-  border-top-color: var(--status-pass);
-}
-.dg-legend li[data-state='skipped']::before {
-  border-top-style: dashed;
-}
-.dg-legend li[data-state='pending']::before {
-  opacity: 0.4;
-}
 .dg-notice {
   margin: 0;
 }
@@ -2112,10 +2089,6 @@ kbd {
 .dg-msg[data-state='drawn'] {
   color: var(--accent);
 }
-.dg-msg[data-state='active'] .dg-line {
-  stroke-dasharray: 6 4;
-  animation: dg-flow 0.8s linear infinite;
-}
 .dg-msg[data-state='drawn']:not([data-dashed]) .dg-line {
   stroke-dasharray: 1000;
   animation: dg-draw 250ms var(--ease) both;
@@ -2166,11 +2139,6 @@ kbd {
 .diagram[data-motion='off'] *::before {
   animation: none !important;
   transition: none !important;
-}
-@keyframes dg-flow {
-  to {
-    stroke-dashoffset: -20;
-  }
 }
 @keyframes dg-draw {
   from {
@@ -2230,10 +2198,6 @@ kbd {
 }
 .step-row.is-skipped .step-label {
   color: var(--text-muted);
-}
-.step-order {
-  color: var(--text-muted);
-  text-align: right;
 }
 .step-main {
   display: flex;
@@ -3007,4 +2971,20 @@ kbd {
 .table-wrap {
   max-width: 100%;
   overflow-x: auto;
+}
+
+.advanced-panel > .btn {
+  min-height: 24px;
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  color: var(--accent);
+  font-size: var(--text-14);
+}
+.advanced-panel > .btn:hover {
+  background: none;
+  color: var(--accent-strong);
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
 }

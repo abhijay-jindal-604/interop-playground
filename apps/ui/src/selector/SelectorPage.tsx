@@ -61,7 +61,6 @@ type Hits = Record<string, IncompatibilityHit | null>;
 /** adapters cut from this release (ADR-95) fold into one quiet disclosure per column (ADR-126) */
 const isLater = (e: AdapterEntry) =>
   !e.availability.available && (e.availability.reason ?? '').startsWith('not in this release');
-const laterLabel = (n: number) => `${n} more coming later`;
 
 const nameOf = (e: AdapterEntry) =>
   e.descriptor.displayName || (c.names[e.descriptor.id]?.[0] ?? e.descriptor.id);
@@ -324,7 +323,7 @@ function Column({
           {now.map(card)}
           {later.length > 0 ? (
             <details className="column-later">
-              <summary>{laterLabel(later.length)}</summary>
+              <summary>{c.laterLabel(later.length)}</summary>
               <div className="adapter-list">{later.map(card)}</div>
             </details>
           ) : null}

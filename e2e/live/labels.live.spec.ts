@@ -4,10 +4,11 @@
  * verifier.inji-verify-local, mode "Credential only (no OID4VP)", and run the three fixture cases:
  * the result cards say exactly Valid, Invalid and Valid but expired. The three cards are then shown
  * side by side (plan/13 S9). Runs only through e2e/playwright.live.config.ts (PLAYGROUND_LIVE=1).
- * LIVE_TAKE=<path> saves the video (deliverables/takes/s09-labels.webm).
+ * LIVE_TAKE=<path> saves the video + `.marks.json` (deliverables/takes/s09-take.webm,
+ * cut to `s09-labels.webm` by `scripts/cut-takes.sh`).
  */
 import { expect, test, type Page } from '@playwright/test';
-import { maskPrivate, saveTake } from './take.ts';
+import { marker, maskPrivate, saveTake, settled, warmUp } from './take.ts';
 
 const COMBINATION = {
   issuer: 'issuer.fixture',
@@ -32,8 +33,14 @@ const CASES = [
 
 test.skip(process.env.PLAYGROUND_LIVE !== '1', 'live bundle only (e2e/playwright.live.config.ts)');
 
-async function runCase(page: Page, name: string): Promise<string> {
+async function runCase(
+  page: Page,
+  name: string,
+  start: ((shot: string) => Promise<void>) | null,
+): Promise<string> {
   await page.goto('/');
+  await settled(page, 0);
+  if (start) await start('s09-labels'); // the take starts on the painted selector
   for (const id of Object.values(COMBINATION)) {
     const radio = page.locator(`[data-adapter="${id}"] input[type="radio"]`);
     await expect(radio).toBeEnabled({ timeout: 30_000 });
@@ -50,17 +57,21 @@ async function runCase(page: Page, name: string): Promise<string> {
 }
 
 test('labels: fixture Valid / Invalid / Valid but expired at the real Verify (FLOW-40)', async ({
+  browser,
   page,
 }, testInfo) => {
   await maskPrivate(page);
+  const { mark, marks } = marker(page);
+  // the take starts on a painted page (a fresh headless browser can paint its first page late)
+  await warmUp(browser, testInfo.project.use.baseURL ?? 'http://127.0.0.1:3100');
   const runs: string[] = [];
   for (const c of CASES) {
-    runs.push(await runCase(page, c.name));
+    runs.push(await runCase(page, c.name, runs.length === 0 ? mark : null));
     const result = page.getByRole('region', { name: 'Result' });
     await expect(result).toBeVisible({ timeout: 60_000 });
     await expect(result.locator('.result-word')).toHaveText(c.word);
     await expect(result).toContainText(c.sentence);
-    await page.waitForTimeout(1500); // the take shows each card
+    await page.waitForTimeout(500); // the take shows each card
   }
   // S9: the three result cards side by side (the run screens in one strip of frames)
   await page.setContent(
@@ -74,6 +85,7 @@ test('labels: fixture Valid / Invalid / Valid but expired at the real Verify (FL
     await expect(card.locator('.result-word')).toHaveText(c.word, { timeout: 30_000 });
     await card.scrollIntoViewIfNeeded();
   }
-  await page.waitForTimeout(4000);
-  await saveTake(page, testInfo);
+  await page.waitForTimeout(6000); // the narration lands on the three cards side by side
+  await mark('end');
+  await saveTake(page, testInfo, marks);
 });

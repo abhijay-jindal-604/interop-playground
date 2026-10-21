@@ -6,13 +6,14 @@
  * The LAN host is masked and QR codes blurred (`take.ts`); no OTP, key or `.env` value is shown.
  * Runs only through e2e/playwright.live.config.ts (PLAYGROUND_LIVE=1), on the slice bundle:
  *   LIVE_TAKES=deliverables/takes LIVE_UPLOG=<up.sh output> npx playwright test -c e2e/playwright.live.config.ts takes
- * S3–S7 is saved as `s03-s07-slice.webm` + `.marks.json` (shot cut points, seconds);
- * `scripts/cut-takes.sh` splits it into `s03-*.webm` … `s07-*.webm`.
+ * S2 is saved as `s02-take.webm` and S3–S7 as `s03-s07-slice.webm`, each with `.marks.json` (shot
+ * marks, take.ts); `scripts/cut-takes.sh` cuts them into `s02-environment.webm`, `s03-*.webm` …
+ * `s07-*.webm`.
  */
 import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { expect, test, type Page, type TestInfo } from '@playwright/test';
-import { marker, maskPrivate, publicHost } from './take.ts';
+import { marker, maskPrivate, publicHost, settled, warmUp } from './take.ts';
 
 const SLICE = {
   issuer: 'issuer.certify-preauth',
@@ -56,32 +57,45 @@ function upTail(): string {
     .join('<PUBLIC_HOST>');
 }
 
-test('S2: up.sh ready, then the environment strip is all green', async ({ page }, testInfo) => {
+test('S2: up.sh ready, then the environment strip is all green', async ({
+  browser,
+  page,
+}, testInfo) => {
   await maskPrivate(page);
+  const { mark, marks } = marker(page);
+  // the UI part starts on a painted page (a fresh headless browser can paint its first page late)
+  await warmUp(browser, testInfo.project.use.baseURL ?? 'http://127.0.0.1:3100');
   await page.setContent(
     `<!doctype html><meta charset="utf-8"><title>scripts/up.sh</title>
      <style>body{margin:0;background:#0d1117;color:#c9d1d9;font:15px/1.5 ui-monospace,monospace;padding:32px}
      .p{color:#7ee787}</style>
      <pre><span class="p">$ scripts/up.sh</span>\n…\n${escapeHtml(upTail())}</pre>`,
   );
+  await mark('s02-environment');
   await page.waitForTimeout(3000);
   await page.goto('/');
+  await settled(page);
   await expect(page.getByText('Ready', { exact: true }).first()).toBeVisible({ timeout: 30_000 });
   // the header strip (UI-02): mode and readiness of the required services
   await page.getByText('Ready', { exact: true }).first().hover();
   await page.waitForTimeout(4000);
-  await save(page, testInfo, 's02-environment.webm');
+  await mark('end');
+  await save(page, testInfo, 's02-take.webm', marks);
 });
 
 test('S3–S7: selection → issuance → decoded SD-JWT → QR + vp.* → result → report', async ({
+  browser,
   page,
 }, testInfo) => {
   await maskPrivate(page);
-  const { mark, marks } = marker();
+  const { mark, marks } = marker(page);
+  await warmUp(browser, testInfo.project.use.baseURL ?? 'http://127.0.0.1:3100');
 
-  // S3: pick the slice; the greyed mDoc × Inji Verify card shows its reason and G-09
-  mark('s03-select');
+  // S3: pick the slice; the greyed mDoc × Inji Verify card shows its reason and G-09. The shot
+  // starts once the selector has painted and settled (no blank first frames).
   await page.goto('/');
+  await settled(page);
+  await mark('s03-select');
   for (const id of Object.values(SLICE)) {
     const radio = page.locator(`[data-adapter="${id}"] input[type="radio"]`);
     await expect(radio).toBeEnabled({ timeout: 30_000 });
@@ -101,7 +115,7 @@ test('S3–S7: selection → issuance → decoded SD-JWT → QR + vp.* → resul
   // S4: Start; the diagram animates the vci.* steps; offer, token and credential payloads
   const run = page.getByRole('region', { name: 'Start' }).getByRole('button', { name: 'Run' });
   await expect(run).toBeEnabled({ timeout: 30_000 });
-  mark('s04-issuance');
+  await mark('s04-issuance');
   await run.click();
   await page.waitForURL(/\/runs\/[0-9A-HJKMNP-TV-Z]{26}$/);
   const runId = new URL(page.url()).pathname.split('/').pop()!;
@@ -129,7 +143,7 @@ test('S3–S7: selection → issuance → decoded SD-JWT → QR + vp.* → resul
   await chip('credential');
 
   // S5: the decoded SD-JWT (header, disclosures, cnf) and the evidence label
-  mark('s05-decoded');
+  await mark('s05-decoded');
   await inspector.getByRole('tab', { name: 'Decoded' }).click();
   await page.waitForTimeout(1500);
   await inspector.evaluate((el) => el.scrollBy({ top: 400, behavior: 'smooth' }));
@@ -140,7 +154,7 @@ test('S3–S7: selection → issuance → decoded SD-JWT → QR + vp.* → resul
 
   // S6: the QR of the Inji Verify request (blurred: it carries the LAN host), the vp.* payloads,
   // the result card "Valid"
-  mark('s06-present');
+  await mark('s06-present');
   await inspector.getByRole('tab', { name: 'Messages' }).click();
   const delivery = page.locator('[data-action="delivery"]').first();
   if ((await delivery.count()) > 0) {
@@ -156,14 +170,14 @@ test('S3–S7: selection → issuance → decoded SD-JWT → QR + vp.* → resul
   await page.waitForTimeout(2500);
 
   // S7: the run report (REQ-26 table)
-  mark('s07-report');
+  await mark('s07-report');
   await page.goto(`/runs/${runId}/report`);
   await expect(page.locator('h1')).toContainText(': PASS');
-  await page.waitForTimeout(1200);
+  await settled(page, 1200);
   await page.mouse.wheel(0, 500);
   await page.waitForTimeout(1500);
   await page.mouse.wheel(0, 700);
   await page.waitForTimeout(2000);
-  mark('end');
+  await mark('end');
   await save(page, testInfo, 's03-s07-slice.webm', marks);
 });

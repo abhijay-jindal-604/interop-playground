@@ -669,6 +669,9 @@
   background: none;
 }
 .dg-legend li::before {
+  content: '';
+  display: inline-block;
+  flex: none;
   width: 8px;
   height: 8px;
   margin: 0;

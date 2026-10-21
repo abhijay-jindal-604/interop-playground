@@ -7,12 +7,11 @@
  * child (KNOB-01 `present`, x5c) → the child passes → the child result card says `fixed` with the
  * API-31 claim sentence, and the compact strip shows the knob's direct effect first.
  * Runs only through e2e/playwright.live.config.ts (PLAYGROUND_LIVE=1); the fixture suite skips it.
- * LIVE_TAKE=<path> saves the video (deliverables/takes/s10-fixit.webm; m2-fixit.webm is the earlier take).
+ * LIVE_TAKE=<path> saves the video + `.marks.json` (deliverables/takes/s10-take.webm,
+ * cut to `s10-fixit.webm` by `scripts/cut-takes.sh`; m2-fixit.webm is the earlier take).
  */
-import { copyFileSync, mkdirSync } from 'node:fs';
-import path from 'node:path';
 import { expect, test } from '@playwright/test';
-import { maskPrivate } from './take.ts';
+import { marker, maskPrivate, saveTake, settled, warmUp } from './take.ts';
 
 // a take (LIVE_TAKE, plan/13 S10) holds each beat long enough to read; the plain e2e does not wait
 const HOLD = process.env.LIVE_TAKE ? 3500 : 0;
@@ -27,9 +26,11 @@ const RUN_URL = /\/runs\/([0-9A-HJKMNP-TV-Z]{26})$/;
 test.skip(process.env.PLAYGROUND_LIVE !== '1', 'live bundle only (e2e/playwright.live.config.ts)');
 
 test('fix-it: walt.id parent fails (FP-01) → one click → child Pass → fixed + claim', async ({
+  browser,
   page,
 }, testInfo) => {
   await maskPrivate(page);
+  const { mark, marks } = marker(page);
   let dialogs = 0;
   page.on('dialog', (d) => {
     dialogs += 1;
@@ -61,8 +62,11 @@ test('fix-it: walt.id parent fails (FP-01) → one click → child Pass → fixe
     )
     .toBe(true);
 
-  // the selector (UI-03..UI-08), knobs left at their defaults
+  // the selector (UI-03..UI-08), knobs left at their defaults; the take starts on a painted page
+  await warmUp(browser, base);
   await page.goto('/');
+  await settled(page);
+  await mark('s10-fixit');
   for (const id of Object.values(COMBINATION)) {
     const radio = page.locator(`[data-adapter="${id}"] input[type="radio"]`);
     await expect(radio, id).toBeEnabled({ timeout: 30_000 });
@@ -143,13 +147,6 @@ test('fix-it: walt.id parent fails (FP-01) → one click → child Pass → fixe
   await strip.scrollIntoViewIfNeeded();
   await page.waitForTimeout(1500 + HOLD); // let the take show the result
 
-  const take = process.env.LIVE_TAKE;
-  const video = page.video();
-  if (take && video) {
-    await page.close();
-    const out = path.resolve(take);
-    mkdirSync(path.dirname(out), { recursive: true });
-    copyFileSync(await video.path(), out);
-    testInfo.annotations.push({ type: 'take', description: out });
-  }
+  await mark('end');
+  await saveTake(page, testInfo, marks);
 });

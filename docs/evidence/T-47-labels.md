@@ -26,4 +26,4 @@ expired: {"allChecksSuccessful":false,"schemaAndSignatureCheck":{"valid":true,"e
 
 The real shape matches the recorded one: `packages/adapters/src/verifiers/inji-verify-result.ts` needed no change. One fixture defect was found and fixed live: the minted SD-JWTs carried `_sd_alg: "sha256"`, which Verify rejects with `ERR_INVALID_SD_ALG`; the IANA name is `sha-256` (`issuers/fixture-mint.ts`, committed `fixtures/credentials/sdjwt-*.txt` re-minted; asserted in `issuers/fixture.test.ts`).
 
-UI e2e: `e2e/live/labels.live.spec.ts` (selector "Credential only (no OID4VP)" + "Fixture case", three runs, three cards), take `deliverables/takes/s09-labels.webm`. Command: `LIVE_TAKE=deliverables/takes/s09-labels.webm npx playwright test -c e2e/playwright.live.config.ts labels`.
+UI e2e: `e2e/live/labels.live.spec.ts` (selector "Credential only (no OID4VP)" + "Fixture case", three runs, three cards), take `deliverables/takes/s09-labels.webm`. Command: `LIVE_TAKE=deliverables/takes/s09-take.webm npx playwright test -c e2e/playwright.live.config.ts labels`, then `scripts/cut-takes.sh deliverables/takes/s09-take.webm`.

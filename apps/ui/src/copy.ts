@@ -44,7 +44,6 @@ export const copy = {
     guardBody: `Open the playground at ${BFF_ORIGIN_TEXT}. The backend refuses other hosts and origins.`,
   },
   env: {
-    eyebrow: 'Bundle health',
     modeLocal: 'Full local',
     modeCollab: 'Collab',
     ready: 'Ready',
@@ -658,7 +657,7 @@ export const deliveryCopy = {
 
 /** UI-03..UI-08 selector copy, verbatim. */
 export const selectorCopy = {
-  eyebrow: 'New interop run',
+  laterLabel: (n: number) => `${n} more coming later`,
   title: 'Pick who plays each role',
   lead: 'Choose an issuer, a wallet and a verifier. The playground runs the whole credential journey and records every message.',
   groupLabel: 'Issuer, wallet and verifier',
