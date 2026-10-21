@@ -1,6 +1,6 @@
 /**
  * Angle A fixtures (T-45) for unit tests and e2e, shaped like the API-30 / API-31 / API-33 / API-04
- * answers session B serves this wave (04 §3): an S-077-shaped parent (FP-01 exact + KNOB-01 offer),
+ * answers the fixture API serves (04 §3): an S-077-shaped parent (FP-01 exact + KNOB-01 offer),
  * the S-120 unclassified case, a two-cause "possible" case, an observed-only case, and the derived
  * child of the T-44 flow (KNOB-01 absent → present, `fixed`, with its compare and lineage).
  */

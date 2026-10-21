@@ -8,7 +8,7 @@ import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-do
 import { APP_NAME, BFF_ORIGIN_TEXT, copy } from '../copy.js';
 import { boot, openEnvStream } from '../state/boot.js';
 import { store, useStore } from '../state/store.js';
-import { BrandMark, Icon, IconSprite, type IconName } from '../components/Icon.js';
+import { Icon, IconSprite, type IconName } from '../components/Icon.js';
 import { Skeleton } from '../components/Skeleton.js';
 import { ToastRegion } from '../components/Toast.js';
 import { ShellBanners } from './Banners.js';
@@ -48,12 +48,11 @@ function LiveRegions() {
   );
 }
 
-/** The product name and mark in the header. */
+/** The product name in the header: plain text, no logo tile (ADR-126). */
 function Brand() {
   return (
     <Link to="/" className="brand">
-      <BrandMark />
-      <span>{APP_NAME}</span>
+      {APP_NAME}
     </Link>
   );
 }
@@ -173,7 +172,7 @@ export function AppShell() {
             {NAV.map((item) => (
               <li key={item.to}>
                 <NavLink to={item.to} end={item.end ?? false} className="rail-link">
-                  <Icon name={item.icon} size={20} />
+                  <Icon name={item.icon} size={18} />
                   <span>{item.label}</span>
                 </NavLink>
               </li>
@@ -182,7 +181,7 @@ export function AppShell() {
           <ul className="rail-secondary">
             <li>
               <NavLink to="/environment" className="rail-link">
-                <Icon name="environment" size={20} />
+                <Icon name="environment" size={18} />
                 <span>{copy.nav.environment}</span>
               </NavLink>
             </li>
@@ -201,7 +200,7 @@ export function AppShell() {
           <footer className="footer">
             <span>{copy.footer.local}</span>
             <button type="button" className="btn-link" onClick={() => setHelpOpen(true)}>
-              <Icon name="keyboard" size={16} />
+              <Icon name="keyboard" size={14} />
               <span>{copy.footer.shortcuts}</span>
             </button>
           </footer>

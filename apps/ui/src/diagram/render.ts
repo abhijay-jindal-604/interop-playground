@@ -36,18 +36,20 @@ function mermaid(): Promise<MermaidApi | null> {
       startOnLoad: false,
       securityLevel: 'strict',
       theme: 'neutral',
-      // ADR-119: tighter rows and bolder lifeline heads; colours come from run-screen.css
+      // ADR-129 ("Quiet"): system type, smaller heads and labels; colours come from run-screen.css
+      fontFamily:
+        "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
       sequence: {
         showSequenceNumbers: true,
         mirrorActors: false,
-        actorFontSize: 15,
+        actorFontSize: 14,
         actorFontWeight: 600,
-        messageFontSize: 15,
-        messageMargin: 16,
+        messageFontSize: 14,
+        messageMargin: 18,
         boxMargin: 4,
-        actorMargin: 40,
+        actorMargin: 48,
         width: 150,
-        height: 52,
+        height: 40,
         diagramMarginX: 12,
         diagramMarginY: 8,
       },
@@ -119,7 +121,8 @@ const nums = (v: string | null): number[] =>
  * ADR-119: paints a lane band behind each lifeline and a row band behind each message of the
  * indexed Mermaid SVG (inserted first, so they sit under the drawing). Rows carry `data-msg` and
  * `data-row-step` (not `data-step`, which stays on the message line and label) so `applyStates`
- * can tint the running, selected and failed rows. Purely decorative; the SVG stays aria-hidden.
+ * can tint the running, selected and failed rows, and a `dg-mark` circle under each sequence
+ * number that carries the step's status (ADR-129). Purely decorative; the SVG stays aria-hidden.
  */
 export function decorateLanes(root: ParentNode): void {
   const svg = root.querySelector('svg');
@@ -166,6 +169,22 @@ export function decorateLanes(root: ParentNode): void {
     decor.appendChild(row);
   });
   svg.insertBefore(decor, svg.firstChild);
+  // ADR-129: a status marker per message, drawn over Mermaid's sequence-number circle and under
+  // its number, so a step's outcome shows on the small marker while the arrow stays neutral
+  const numbers = [...svg.querySelectorAll('text.sequenceNumber')];
+  if (numbers.length !== lines.length) return;
+  numbers.forEach((num, i) => {
+    const x = Number(num.getAttribute('x'));
+    const y = Number(num.getAttribute('y'));
+    if (!Number.isFinite(x) || !Number.isFinite(y)) return;
+    const mark = document.createElementNS(SVG_NS, 'circle');
+    mark.setAttribute('class', 'dg-mark');
+    mark.setAttribute('cx', String(x));
+    mark.setAttribute('cy', String(y - 4));
+    mark.setAttribute('r', '8');
+    mark.setAttribute('data-msg', lines[i]?.getAttribute('data-msg') ?? String(i));
+    num.parentNode?.insertBefore(mark, num);
+  });
 }
 
 let seq = 0;

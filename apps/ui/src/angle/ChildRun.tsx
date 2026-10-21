@@ -174,9 +174,7 @@ export function ChildResultCard({
         <span className="child-glyph" aria-hidden="true">
           <Icon name={CLASS_GLYPH[classification]} size={28} />
         </span>
-        <span className={`badge tone-${CLASS_TONE[classification]}`}>
-          {c.child.chip[classification]}
-        </span>
+        <span className="child-kind">{c.child.chip[classification]}</span>
         <h2 id={hid}>{c.child.heading[classification]}</h2>
       </div>
       {sentence}
@@ -228,7 +226,7 @@ function OutcomeCell({ step }: { step: CompareRow['parent'] }) {
     <>
       <StatusBadge state={o === 'skipped' ? 'n/a' : o === 'pass' || o === 'fail' ? o : 'not-run'} />
       {step?.capture && step.capture !== 'full' && o !== 'skipped' ? (
-        <span className="chip chip-outline">{`capture ${step.capture}`}</span>
+        <span className="capture-note">{`capture ${step.capture}`}</span>
       ) : null}
     </>
   );
@@ -313,9 +311,7 @@ export function CompareStrip({
                         <th scope="row">
                           {stepLabel(r.stepKey)}
                           {r.directEffect ? (
-                            <span className="chip chip-outline compare-direct">
-                              {c.strip.direct(delta.knobId)}
-                            </span>
+                            <span className="compare-direct">{c.strip.direct(delta.knobId)}</span>
                           ) : null}
                         </th>
                         <td>
@@ -424,7 +420,7 @@ export function LineageStrip({
               <Link to={`/runs/${link.runId}`} className="mono" title={link.runId}>
                 {c.lineage.run(shortId(link.runId))}
               </Link>
-              {current ? <span className="chip chip-outline">{c.lineage.current}</span> : null}
+              {current ? <span className="lineage-current">{c.lineage.current}</span> : null}
             </li>
           );
         })}

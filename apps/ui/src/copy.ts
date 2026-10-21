@@ -261,7 +261,11 @@ export const runCopy = {
     inconclusive: 'Inconclusive',
     'no-submission': 'No submission',
   },
+  /** the run header's status line, while the stream is live */
+  live: 'Live',
   facts: {
+    region: 'Run facts',
+    envLine: (env: string) => `${env} environment`,
     issuer: 'Issuer',
     wallet: 'Wallet',
     verifier: 'Verifier',
@@ -398,8 +402,8 @@ export const runCopy = {
   },
   diagram: {
     region: 'Sequence diagram',
-    issue: '1. Issue',
-    present: '2. Present and verify',
+    issue: 'Issue',
+    present: 'Present and verify',
     legend: 'Diagram legend',
     pass: 'Pass',
     fail: 'Fail',
@@ -927,6 +931,15 @@ export const angleCopy = {
       `The failing step has ${capture}${reason ? ` (${reason})` : ''}. The playground does not diagnose from partial captures.`,
     side: (side: string, component: string, versions: string) =>
       `Deviating side: ${side}: ${component} ${versions}`,
+    /** the cause facts as a definition list (ADR-129) */
+    factLabel: {
+      side: 'Deviating side',
+      spec: 'Spec',
+      gaps: 'Known gaps',
+      evidence: 'Evidence',
+    },
+    sideValue: (side: string, component: string, versions: string) =>
+      `${side}: ${component} ${versions}`,
     spec: (clause: string) => `Spec: ${clause}`,
     gaps: (ids: string) => `Known gaps: ${ids}`,
     evidence: 'Evidence: ',

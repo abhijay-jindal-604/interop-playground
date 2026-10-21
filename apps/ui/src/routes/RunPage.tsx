@@ -7,13 +7,12 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import type { EventEnvelope, EventPage, Run } from '@interop-playground/api';
 import { ApiError, apiGet, apiSend } from '../api/client.js';
-import { LiveDot } from '../components/ConnectionBanner.js';
 import { EmptyState } from '../components/EmptyState.js';
 import { shortId } from '../components/RunLink.js';
 import { Skeleton } from '../components/Skeleton.js';
 import { runCopy } from '../copy.js';
 import { useRunFlows } from '../run/flows.js';
-import { RunActions, RunHeaderFacts, RunTitleChips } from '../run/parts.js';
+import { RunActions, RunHeaderFacts, RunStatusLine } from '../run/parts.js';
 import { reduceAll, viewStateOf, type RunView } from '../run/reduce.js';
 import { CancelDialog, DeleteDialog, NoteDialog } from '../run/RunDialogs.js';
 import { RunScreen } from '../run/RunScreen.js';
@@ -99,8 +98,7 @@ export function RunPage() {
       title={
         <>
           {runCopy.title('')}
-          <span className="mono">{sid}</span> <LiveDot status={slice?.stream ?? null} />
-          <RunTitleChips vs={vs} view={view} />
+          <span className="run-id mono">{sid}</span>
         </>
       }
       docTitle={runCopy.title(sid)}
@@ -126,12 +124,13 @@ export function RunPage() {
         vs === 'loading' && !spec ? (
           <Skeleton width="60%" height="1.25rem" />
         ) : (
-          <>
+          <div className="run-head">
+            <RunStatusLine vs={vs} view={view} live={slice?.stream?.state === 'live'} />
             {(view.label ?? run?.label) ? (
               <p className="run-label">{view.label ?? run?.label}</p>
             ) : null}
             <RunHeaderFacts view={view} run={run} />
-          </>
+          </div>
         )
       }
     >

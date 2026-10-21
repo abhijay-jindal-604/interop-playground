@@ -1,5 +1,5 @@
 /**
- * DiagramPane (06 UI-12): one SequenceBlock per flow of the run ("1. Issue", "2. Present and
+ * DiagramPane (06 UI-12): one SequenceBlock per flow of the run ("Issue", "Present and
  * verify"), rendered once with pinned Mermaid when it is available and passes the integrity check,
  * else by the built-in SVG renderer with the muted toolbar line "Using the built-in diagram
  * renderer.". The run's events only change `data-state` attributes; the SVG is never re-rendered.
@@ -50,10 +50,16 @@ function applyStates(
       r,
     ]),
   );
+  const marks = new Map(
+    [...root.querySelectorAll<SVGElement>('.dg-mark[data-msg]')].map((r) => [
+      r.getAttribute('data-msg'),
+      r,
+    ]),
+  );
   flow.messages.forEach((m, i) => {
     const st = states.get(m.stepKey);
     const state = st?.messageStates[m.part] ?? 'pending';
-    for (const el of [lines[i], texts[i], rows.get(String(i))]) {
+    for (const el of [lines[i], texts[i], rows.get(String(i)), marks.get(String(i))]) {
       if (!el) continue;
       el.setAttribute('data-state', state);
       el.setAttribute('data-step-state', st?.state ?? 'pending');

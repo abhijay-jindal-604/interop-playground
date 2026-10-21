@@ -6,7 +6,9 @@ _v1, 2026-10-21. Screenshots of the main screens, low-fidelity wireframes of the
 
 Every screenshot below was captured with Playwright at 1440 × 900 px in the light theme. It shows the production UI build (`apps/ui`, served by `vite preview`) answering from the same fixture API that `npm run e2e` uses ([`e2e/support.ts`](../e2e/support.ts)): the recorded event logs in [`fixtures/events/`](../fixtures/events/) and the UI test fixtures in `apps/ui/src/test/`. No Docker bundle runs behind them. The public host is the documentation address `192.0.2.10`, and no secrets are shown.
 
-The look is called "Ink and Signal": a dark ink top bar and side rail frame a light work area, the accent is violet, and the outcome colours (pass green, fail red, running blue, skipped and pending grey) are separate from the accent, so a violet control is never mistaken for a result. Every colour pair is checked by `npm run contrast`, in light and dark themes.
+The look is called "Quiet": a white page (black in the dark theme) with a light, frosted top bar and a plain side rail, one link blue for links, selection and focus, and ink (near-black) pill buttons for the main action. Type does the work: system sans-serif, large page titles, sentence-case labels, and monospace only for real data such as payloads, digests and run IDs. Cards are flat, either a light grey fill or a hairline border. The outcome colours (pass green, fail red, warning amber, running slate blue, skipped grey) appear only on small icons and their words, never as large fills, and every outcome also has an icon and a word. Every colour pair is checked by `npm run contrast`, in light and dark themes.
+
+Motion is quiet and physical: pages and lists fade in with a short rise (staggered by 40 ms), buttons respond with a slight press, selections cross-fade, and nothing bounces, glows or loops except a real progress indicator. With "reduce motion" set in the operating system, all of it is off.
 
 The ten `design-*.png` files are recaptured with [`scripts/capture-design.mts`](../scripts/capture-design.mts). Build the UI, start the preview on port 4391, then run the script:
 

@@ -4,7 +4,15 @@
  * the run (API-20) and opens `/runs/:runId`. The deep link `/?issuer&wallet&verifier&format&grant&mode`
  * preselects; otherwise the last selection (`pg.selection.v1`) or the defaults apply.
  */
-import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+} from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import type {
   CreateRunRequest,
@@ -49,6 +57,11 @@ import {
 const ROLES: Role[] = ['issuer', 'wallet', 'verifier'];
 const SKELETON: Record<Role, number> = { issuer: 6, wallet: 5, verifier: 7 };
 type Hits = Record<string, IncompatibilityHit | null>;
+
+/** adapters cut from this release (ADR-95) fold into one quiet disclosure per column (ADR-126) */
+const isLater = (e: AdapterEntry) =>
+  !e.availability.available && (e.availability.reason ?? '').startsWith('not in this release');
+const laterLabel = (n: number) => `${n} more coming later`;
 
 const nameOf = (e: AdapterEntry) =>
   e.descriptor.displayName || (c.names[e.descriptor.id]?.[0] ?? e.descriptor.id);
@@ -162,6 +175,7 @@ function AdapterCard({
   checked,
   evidence,
   onPick,
+  index = 0,
 }: {
   entry: AdapterEntry;
   role: Role;
@@ -171,6 +185,8 @@ function AdapterCard({
   checked: boolean;
   evidence: string[];
   onPick: () => void;
+  /** position for the entrance stagger (ADR-127) */
+  index?: number;
 }) {
   const d = entry.descriptor;
   const down = !entry.availability.available;
@@ -180,17 +196,32 @@ function AdapterCard({
   const [tier, tierTip] = c.tier[d.tier] ?? [d.tier, ''];
   const blurb = c.names[d.id]?.[1] ?? null;
   const hops = d.coverage.partialHops;
+  const fingerprint =
+    entry.availability.available && entry.availability.versionFingerprint
+      ? entry.availability.versionFingerprint
+      : null;
+  // one muted meta line instead of a row of tags: "Local · Automated · SD-JWT VC, JSON-LD"
+  const meta = [
+    c.env[d.envClass] ?? d.envClass,
+    tier,
+    d.formats.map((f) => c.recipe.formats[f] ?? f).join(', '),
+  ].join(' · ');
   let status: { text: string; tone: string } | null = null;
   if (down) status = { text: c.unavailable(entry.availability.reason ?? ''), tone: 'skipped' };
   else if (conflict) status = { text: c.conflicts(hit.reason, hit.gapId), tone: 'fail' };
   else if (hit) status = { text: c.notAvailable(hit.reason, hit.gapId), tone: 'skipped' };
   else if (tunnel && !tunnelUp) status = { text: c.tunnel[tunnel], tone: 'warn' };
+  else if (c.tierHint[d.tier]) status = { text: c.tierHint[d.tier] ?? '', tone: '' };
   return (
     <div
-      className={`adapter-card${greyed ? ' is-unavailable' : ''}${checked ? ' is-checked' : ''}${conflict ? ' is-conflict' : ''}`}
+      className={`adapter-card enter${greyed ? ' is-unavailable' : ''}${checked ? ' is-checked' : ''}${conflict ? ' is-conflict' : ''}`}
+      style={{ '--i': index } as CSSProperties}
       data-adapter={d.id}
     >
-      <label className="adapter-radio" title={`${d.vendor} · ${d.formats.join(', ')}`}>
+      <label
+        className="adapter-radio"
+        title={fingerprint ? `${d.vendor} · ${c.version(fingerprint)}` : d.vendor}
+      >
         <input
           type="radio"
           className="radio-input"
@@ -205,27 +236,15 @@ function AdapterCard({
             <span className="adapter-name">{nameOf(entry)}</span>
           </span>
           {blurb ? <span className="adapter-blurb">{blurb}</span> : null}
-          <span className="adapter-card-meta">
-            <span className="chip">{c.env[d.envClass]}</span>
-            <span className="chip chip-outline" title={tierTip}>
-              {tier}
-            </span>
-            {d.formats.map((f) => (
-              <span key={f} className="chip chip-outline">
-                {c.recipe.formats[f] ?? f}
-              </span>
-            ))}
+          <span className="adapter-card-meta" title={tierTip}>
+            {meta}
           </span>
           {status ? (
-            <span className={`adapter-status tone-${status.tone}`} data-status>
+            <span
+              className={`adapter-status ${status.tone ? `tone-${status.tone}` : 'muted'}`}
+              {...(status.tone ? { 'data-status': true } : {})}
+            >
               {status.text}
-            </span>
-          ) : (
-            <span className="adapter-status muted">{c.tierHint[d.tier] ?? c.available}</span>
-          )}
-          {entry.availability.available && entry.availability.versionFingerprint ? (
-            <span className="adapter-version mono">
-              {c.version(entry.availability.versionFingerprint)}
             </span>
           ) : null}
         </span>
@@ -268,6 +287,28 @@ function Column({
   const hitOf = (id: AdapterId) =>
     role === 'verifier' && sel.scope === 'issuance' ? null : (hits[`${role}:${id}`] ?? null);
   const titleId = `col-${role}`;
+  const offset = ROLES.indexOf(role) * 2;
+  const card = (e: AdapterEntry, i: number) => {
+    const id = e.descriptor.id;
+    const hit = hitOf(id);
+    return (
+      <AdapterCard
+        key={id}
+        entry={e}
+        role={role}
+        sel={sel}
+        hit={hit}
+        tunnelUp={tunnelUp}
+        checked={sel[role] === id}
+        evidence={hit ? evidenceOf(hit.ruleId) : []}
+        onPick={() => onPick(role, id)}
+        index={offset + Math.min(i, 8)}
+      />
+    );
+  };
+  // a selected adapter always stays in view, even when it is outside the release
+  const later = entries?.filter((e) => isLater(e) && sel[role] !== e.descriptor.id) ?? [];
+  const now = entries?.filter((e) => !later.includes(e)) ?? [];
   return (
     <section className="card column" aria-labelledby={titleId}>
       <h2 id={titleId} className="column-title">
@@ -280,23 +321,13 @@ function Column({
       <div className={`column-progress${checking ? ' is-active' : ''}`} aria-hidden="true" />
       {entries ? (
         <div className="adapter-list" role="radiogroup" aria-label={c.columns[role]}>
-          {entries.map((e) => {
-            const id = e.descriptor.id;
-            const hit = hitOf(id);
-            return (
-              <AdapterCard
-                key={id}
-                entry={e}
-                role={role}
-                sel={sel}
-                hit={hit}
-                tunnelUp={tunnelUp}
-                checked={sel[role] === id}
-                evidence={hit ? evidenceOf(hit.ruleId) : []}
-                onPick={() => onPick(role, id)}
-              />
-            );
-          })}
+          {now.map(card)}
+          {later.length > 0 ? (
+            <details className="column-later">
+              <summary>{laterLabel(later.length)}</summary>
+              <div className="adapter-list">{later.map(card)}</div>
+            </details>
+          ) : null}
         </div>
       ) : (
         <div className="adapter-list" aria-hidden="true">
@@ -471,7 +502,7 @@ export function SelectorPage() {
   ].join(' · ');
 
   return (
-    <PageFrame title={c.title} eyebrow={c.eyebrow} lead={<p>{c.lead}</p>}>
+    <PageFrame title={c.title} lead={<p>{c.lead}</p>}>
       {adapters.status === 'error' ? (
         <EmptyState
           title="No components"
@@ -529,11 +560,9 @@ export function SelectorPage() {
               onChange={(scope) => update({ scope })}
               help={sel.scope === 'issuance' ? c.recipe.issueOnlyHelp : null}
             />
-            <ul className="chip-row recipe-chips">
-              <li className="chip chip-outline">{c.recipe.grant(grant)}</li>
-              {delivery ? (
-                <li className="chip chip-outline">{c.recipe.delivery(delivery)}</li>
-              ) : null}
+            <ul className="recipe-facts">
+              <li>{c.recipe.grant(grant)}</li>
+              {delivery ? <li>{c.recipe.delivery(delivery)}</li> : null}
             </ul>
           </div>
           <div

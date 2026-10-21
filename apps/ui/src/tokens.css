@@ -2,53 +2,61 @@
  * Design tokens (06 UI-75, ADR-42). Source of truth for colour, type, spacing, shape and motion.
  * scripts/contrast.mjs parses the two colour blocks below (`:root` = light, `:root[data-theme='dark']`
  * = dark) and checks every pair; the prefers-color-scheme block must repeat the dark block exactly.
- * Plain CSS only: no Tailwind, no web fonts, no CDN. Direction "Ink and Signal" (ADR-117): an ink
- * chrome band (top bar and rail) in both themes, one violet signal accent that no status colour
- * shares, and status colours that keep their meaning everywhere.
+ * Plain CSS only: no Tailwind, no web fonts, no CDN. Direction "Quiet" (ADR-126, supersedes ADR-117):
+ * white and near-black, one link blue for links, selection and focus, ink primary buttons, status
+ * colour only on small icons and text. The `--chrome-*` names stay so older rules keep working; their
+ * values equal the page values, so the top bar and the rail are light in light mode and dark in dark.
  */
-
 :root {
   color-scheme: light;
-  /* colour: light ("Ink and Signal", ADR-117) */
+  /* colour: light ("Quiet", ADR-126) */
   --bg: #ffffff;
-  --surface: #f6f7fb;
-  --sunken: #eceef5;
-  --border: #d5d9e5;
-  --border-ui: #7f889e;
-  --text: #0b1020;
-  --text-muted: #4a5268;
-  --accent: #5b2bd6;
+  --surface: #f5f5f7;
+  --sunken: #ebebf0;
+  --border: #e5e5ea;
+  --border-ui: #86868b;
+  --text: #1d1d1f;
+  --text-muted: #5e5e63;
+  --accent: #0066cc;
   --on-accent: #ffffff;
-  --focus: #5b2bd6;
-  --status-pass: #146c3a;
-  --status-fail: #b42318;
-  --status-warn: #8f3d0b;
-  --status-info: #1f4fc9;
-  --status-neutral: #344d74;
-  --status-skipped: #566078; /* UI-75 listed #5B6B82; its 12 % badge pair was 4.45 (ADR-62) */
-  --shadow-1: 0 1px 2px rgba(11, 16, 32, 0.1), 0 1px 1px rgba(11, 16, 32, 0.06);
-  /* additive (ADR-117) */
-  --accent-strong: #4a1fb8;
-  --accent-soft: rgba(91, 43, 214, 0.08);
+  --focus: #0066cc;
+  --status-pass: #1a7431;
+  --status-fail: #b8261b;
+  --status-warn: #8a5300;
+  --status-info: #3d5a80;
+  --status-neutral: #48484d;
+  --status-skipped: #636366;
+  --accent-strong: #004f9e;
+  --accent-soft: rgba(0, 102, 204, 0.08);
   --surface-raised: #ffffff;
-  --shadow-2: 0 2px 4px rgba(11, 16, 32, 0.06), 0 8px 24px -6px rgba(11, 16, 32, 0.14);
-  --shadow-3: 0 4px 8px rgba(11, 16, 32, 0.08), 0 24px 48px -12px rgba(11, 16, 32, 0.28);
-  /* ink chrome: top bar and rail, dark in both themes */
-  --chrome-bg: #0b1020;
-  --chrome-raised: #161c33;
-  --chrome-border: #262e48;
-  --chrome-border-ui: #6a7591;
-  --chrome-text: #f2f4fa;
-  --chrome-muted: #a3abc2;
-  --chrome-accent: #c6b0ff;
-  --chrome-focus: #c6b0ff;
-  --chrome-pass: #4ade80;
-  --chrome-warn: #fbbf24;
-  --chrome-fail: #ff8a80;
-  --chrome-off: #8a93ab;
+  /* primary buttons are ink, not blue (ADR-126) */
+  --button-primary-bg: #1d1d1f;
+  --button-primary-text: #ffffff;
+  --button-primary-hover: #424245;
+  /* one soft shadow level, for floating things only (menus, popovers, the sticky run bar) */
+  --shadow-1: 0 0 #0000;
+  --shadow-2: 0 1px 2px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.06);
+  --shadow-3: 0 1px 2px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.06);
+  /* frosted bars: the page colour at 80 % behind a blur */
+  --glass: rgba(255, 255, 255, 0.8);
+  /* chrome (top bar and rail) now equals the page in each theme (ADR-126) */
+  --chrome-bg: #ffffff;
+  --chrome-raised: #f5f5f7;
+  --chrome-border: #e5e5ea;
+  --chrome-border-ui: #86868b;
+  --chrome-text: #1d1d1f;
+  --chrome-muted: #5e5e63;
+  --chrome-accent: #0066cc;
+  --chrome-focus: #0066cc;
+  --chrome-pass: #1a7431;
+  --chrome-warn: #8a5300;
+  --chrome-fail: #b8261b;
+  --chrome-off: #636366;
 
   /* typography */
-  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue',
+    Arial, sans-serif;
   --font-mono:
     ui-monospace, 'SF Mono', 'Cascadia Mono', 'JetBrains Mono', Menlo, Consolas, 'Liberation Mono',
     monospace;
@@ -61,16 +69,20 @@
   --text-20: 1.25rem;
   --text-24: 1.5rem;
   --text-32: 2rem;
+  --text-15: 0.9375rem;
+  --text-17: 1.0625rem;
+  --text-21: 1.3125rem;
   --text-40: 2.5rem;
-  --leading-body: 1.5;
-  --leading-heading: 1.25;
+  --text-48: 3rem;
+  --leading-body: 1.47;
+  --leading-heading: 1.2;
   --leading-mono: 1.4;
   --weight-regular: 400;
   --weight-strong: 600;
   --weight-bold: 700;
-  --tracking-tight: -0.025em;
-  --tracking-display: -0.035em;
-  --tracking-eyebrow: 0.08em;
+  --tracking-tight: -0.012em;
+  --tracking-display: -0.022em;
+  --tracking-eyebrow: 0;
 
   /* spacing (4 px base) */
   --space-0: 0;
@@ -84,23 +96,30 @@
   --space-8: 4rem;
 
   /* shape */
-  --radius-sm: 4px;
+  --radius-sm: 6px;
   --radius-md: 8px;
-  --radius-lg: 14px;
-  --radius-pill: 999px;
+  --radius-lg: 12px;
+  --radius-pill: 980px;
 
-  /* motion */
-  --duration-fast: 120ms;
-  --duration-panel: 200ms;
-  --duration-slow: 320ms;
-  --ease: cubic-bezier(0.2, 0, 0, 1);
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  /* motion ("Quiet", ADR-127): quiet and physical, no bounce, no infinite loops but spinners */
+  --ease-standard: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-1: 150ms; /* hover, press */
+  --dur-2: 250ms; /* state change, selection */
+  --dur-3: 450ms; /* entrance */
+  --stagger: 40ms;
+  --rise: 10px;
+  /* older names, kept as aliases */
+  --ease: var(--ease-standard);
+  --duration-fast: var(--dur-1);
+  --duration-panel: var(--dur-2);
+  --duration-slow: var(--dur-3);
 
   /* layout (UI-72) */
   --gutter: 16px;
   --rail-width: 220px;
-  --content-max: 1280px;
-  --topbar-height: 56px;
+  --content-max: 1200px;
+  --topbar-height: 52px;
 
   /* QR code (UI-16): dark modules on a white square in both themes */
   --qr-size: 280px;
@@ -110,81 +129,89 @@
 
 :root[data-theme='dark'] {
   color-scheme: dark;
-  /* colour: dark */
-  --bg: #090d18;
-  --surface: #10152a;
-  --sunken: #05070f;
-  --border: #252d45;
-  --border-ui: #68728c;
-  --text: #e6e9f2;
-  --text-muted: #a7afc6;
-  --accent: #b9a2ff;
-  --on-accent: #0b0820;
-  --focus: #b9a2ff;
-  --status-pass: #4ade80;
-  --status-fail: #ff7a72;
-  --status-warn: #fbbf24;
-  --status-info: #8fbcff;
-  --status-neutral: #a0b4d8;
-  --status-skipped: #95a0b8;
-  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.5);
-  --accent-strong: #cbb9ff;
-  --accent-soft: rgba(185, 162, 255, 0.1);
-  --surface-raised: #151b33;
-  --shadow-2: 0 2px 4px rgba(0, 0, 0, 0.4), 0 8px 24px -6px rgba(0, 0, 0, 0.6);
-  --shadow-3: 0 4px 8px rgba(0, 0, 0, 0.45), 0 24px 48px -12px rgba(0, 0, 0, 0.75);
-  --chrome-bg: #05070f;
-  --chrome-raised: #11162a;
-  --chrome-border: #20273d;
-  --chrome-border-ui: #6a7591;
-  --chrome-text: #f2f4fa;
-  --chrome-muted: #a3abc2;
-  --chrome-accent: #c6b0ff;
-  --chrome-focus: #c6b0ff;
-  --chrome-pass: #4ade80;
-  --chrome-warn: #fbbf24;
-  --chrome-fail: #ff8a80;
-  --chrome-off: #8a93ab;
+  /* colour: dark ("Quiet", ADR-126) */
+  --bg: #000000;
+  --surface: #1c1c1e;
+  --sunken: #111113;
+  --border: #38383a;
+  --border-ui: #8e8e93;
+  --text: #f5f5f7;
+  --text-muted: #a1a1a6;
+  --accent: #2997ff;
+  --on-accent: #000000;
+  --focus: #2997ff;
+  --status-pass: #30d158;
+  --status-fail: #ff6961;
+  --status-warn: #ffb340;
+  --status-info: #8fb4e3;
+  --status-neutral: #b4b4ba;
+  --status-skipped: #98989d;
+  --accent-strong: #66b5ff;
+  --accent-soft: rgba(41, 151, 255, 0.12);
+  --surface-raised: #2c2c2e;
+  --button-primary-bg: #f5f5f7;
+  --button-primary-text: #000000;
+  --button-primary-hover: #d2d2d7;
+  --shadow-1: 0 0 #0000;
+  --shadow-2: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.4);
+  --shadow-3: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.4);
+  --glass: rgba(0, 0, 0, 0.72);
+  --chrome-bg: #000000;
+  --chrome-raised: #1c1c1e;
+  --chrome-border: #38383a;
+  --chrome-border-ui: #8e8e93;
+  --chrome-text: #f5f5f7;
+  --chrome-muted: #a1a1a6;
+  --chrome-accent: #2997ff;
+  --chrome-focus: #2997ff;
+  --chrome-pass: #30d158;
+  --chrome-warn: #ffb340;
+  --chrome-fail: #ff6961;
+  --chrome-off: #98989d;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
     color-scheme: dark;
     /* colour: dark (system) */
-    --bg: #090d18;
-    --surface: #10152a;
-    --sunken: #05070f;
-    --border: #252d45;
-    --border-ui: #68728c;
-    --text: #e6e9f2;
-    --text-muted: #a7afc6;
-    --accent: #b9a2ff;
-    --on-accent: #0b0820;
-    --focus: #b9a2ff;
-    --status-pass: #4ade80;
-    --status-fail: #ff7a72;
-    --status-warn: #fbbf24;
-    --status-info: #8fbcff;
-    --status-neutral: #a0b4d8;
-    --status-skipped: #95a0b8;
-    --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.5);
-    --accent-strong: #cbb9ff;
-    --accent-soft: rgba(185, 162, 255, 0.1);
-    --surface-raised: #151b33;
-    --shadow-2: 0 2px 4px rgba(0, 0, 0, 0.4), 0 8px 24px -6px rgba(0, 0, 0, 0.6);
-    --shadow-3: 0 4px 8px rgba(0, 0, 0, 0.45), 0 24px 48px -12px rgba(0, 0, 0, 0.75);
-    --chrome-bg: #05070f;
-    --chrome-raised: #11162a;
-    --chrome-border: #20273d;
-    --chrome-border-ui: #6a7591;
-    --chrome-text: #f2f4fa;
-    --chrome-muted: #a3abc2;
-    --chrome-accent: #c6b0ff;
-    --chrome-focus: #c6b0ff;
-    --chrome-pass: #4ade80;
-    --chrome-warn: #fbbf24;
-    --chrome-fail: #ff8a80;
-    --chrome-off: #8a93ab;
+    --bg: #000000;
+    --surface: #1c1c1e;
+    --sunken: #111113;
+    --border: #38383a;
+    --border-ui: #8e8e93;
+    --text: #f5f5f7;
+    --text-muted: #a1a1a6;
+    --accent: #2997ff;
+    --on-accent: #000000;
+    --focus: #2997ff;
+    --status-pass: #30d158;
+    --status-fail: #ff6961;
+    --status-warn: #ffb340;
+    --status-info: #8fb4e3;
+    --status-neutral: #b4b4ba;
+    --status-skipped: #98989d;
+    --accent-strong: #66b5ff;
+    --accent-soft: rgba(41, 151, 255, 0.12);
+    --surface-raised: #2c2c2e;
+    --button-primary-bg: #f5f5f7;
+    --button-primary-text: #000000;
+    --button-primary-hover: #d2d2d7;
+    --shadow-1: 0 0 #0000;
+    --shadow-2: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.4);
+    --shadow-3: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.4);
+    --glass: rgba(0, 0, 0, 0.72);
+    --chrome-bg: #000000;
+    --chrome-raised: #1c1c1e;
+    --chrome-border: #38383a;
+    --chrome-border-ui: #8e8e93;
+    --chrome-text: #f5f5f7;
+    --chrome-muted: #a1a1a6;
+    --chrome-accent: #2997ff;
+    --chrome-focus: #2997ff;
+    --chrome-pass: #30d158;
+    --chrome-warn: #ffb340;
+    --chrome-fail: #ff6961;
+    --chrome-off: #98989d;
   }
 }
 

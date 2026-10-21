@@ -15,7 +15,6 @@ import type {
 import { ApiError, apiSend } from '../api/client.js';
 import { InlineError } from '../components/InlineError.js';
 import { angleCopy as c, runCopy, screenCopy } from '../copy.js';
-import { Icon } from '../components/Icon.js';
 import {
   diagnosisCase,
   fixItDecision,
@@ -55,18 +54,46 @@ function CauseBlock({
         aria-controls={id}
         onClick={onToggle}
       >
-        <code>{m.fingerprintId}</code> <span>{m.title}</span>
+        <span>{m.title}</span> <code className="cause-id">{m.fingerprintId}</code>
       </button>
       <div id={id} className="cause-body" hidden={!open}>
-        <p data-testid="deviating-side">
-          {c.card.side(sideWord(m.deviatingSide), m.component.name, m.component.versions)}
-        </p>
-        {m.specClause ? <p>{c.card.spec(m.specClause)}</p> : null}
-        <p>{c.card.gaps(m.gapIds.join(', ') || c.card.none)}</p>
-        <p>
-          {c.card.evidence}
-          <code title={c.card.evidenceTip}>{c.card.evidencePath(m.fingerprintId)}</code>
-        </p>
+        {/* ADR-129: the facts as a definition list; the hidden ": " keeps each row one sentence */}
+        <dl className="cause-facts">
+          <div data-testid="deviating-side">
+            <dt>
+              {c.card.factLabel.side}
+              <span className="visually-hidden">: </span>
+            </dt>
+            <dd>
+              {c.card.sideValue(sideWord(m.deviatingSide), m.component.name, m.component.versions)}
+            </dd>
+          </div>
+          {m.specClause ? (
+            <div>
+              <dt>
+                {c.card.factLabel.spec}
+                <span className="visually-hidden">: </span>
+              </dt>
+              <dd>{m.specClause}</dd>
+            </div>
+          ) : null}
+          <div>
+            <dt>
+              {c.card.factLabel.gaps}
+              <span className="visually-hidden">: </span>
+            </dt>
+            <dd>{m.gapIds.join(', ') || c.card.none}</dd>
+          </div>
+          <div>
+            <dt>
+              {c.card.factLabel.evidence}
+              <span className="visually-hidden">: </span>
+            </dt>
+            <dd>
+              <code title={c.card.evidenceTip}>{c.card.evidencePath(m.fingerprintId)}</code>
+            </dd>
+          </div>
+        </dl>
         {onShowMessages || onShowCheck ? (
           <p className="cause-actions">
             {onShowMessages && m.matchedExchangeIds.length > 0 ? (
@@ -156,12 +183,7 @@ export function FixItPanel({
     <section className="fixit-panel" aria-label={c.fix.region} data-testid="fixit-panel">
       <div className="fixit-head">
         <h3 className="fixit-title">{c.fix.title}</h3>
-        <span className="fixit-count">
-          <span className="fixit-count-n" aria-hidden="true">
-            1
-          </span>
-          {screenCopy.fix.oneChange}
-        </span>
+        <span className="fixit-count">{screenCopy.fix.oneChange}</span>
       </div>
       <p className="fixit-change">
         <code className="fixit-knob" title={knob?.label ?? undefined}>
@@ -178,7 +200,7 @@ export function FixItPanel({
           {offer.to}
         </q>
       </p>
-      {knob?.label ? <p className="chip chip-outline fixit-label">{knob.label}</p> : null}
+      {knob?.label ? <p className="fixit-label">{knob.label}</p> : null}
       <p className="small">{c.fix.explainer}</p>
       {applies === 'wallet-runtime' ? <p className="small">{c.fix.walletRuntime}</p> : null}
       {applies === 'peer-runtime-option' && peerName ? (
@@ -188,13 +210,12 @@ export function FixItPanel({
       {error ? <InlineError error={error} /> : null}
       <button
         type="button"
-        className="btn btn-primary"
+        className="btn btn-primary fixit-button"
         data-knob-target
         disabled={sending}
         onClick={() => void start()}
       >
-        <Icon name="st-running" size={16} />
-        <span>{sending ? c.fix.sending : c.fix.button}</span>
+        {sending ? c.fix.sending : c.fix.button}
       </button>
     </section>
   );
@@ -252,7 +273,10 @@ export function DiagnosisCard({
         <h2 id={hid} ref={headingRef} tabIndex={-1}>
           {heading}
         </h2>
-        <span className={`badge tone-${CASE_TONE[view.kind]}`} title={c.card.chipTip[view.kind]}>
+        <span
+          className={`diagnosis-kind tone-${CASE_TONE[view.kind]}`}
+          title={c.card.chipTip[view.kind]}
+        >
           {c.card.chip[view.kind]}
         </span>
       </div>

@@ -84,11 +84,27 @@ for (const [name, body] of Object.entries(themes)) {
   };
   for (const fg of TEXT) for (const bg of SURFACES) check(fg, need(fg), bg, need(bg), 4.5);
   check('--on-accent', need('--on-accent'), '--accent', need('--accent'), 4.5);
+  // ink primary button (ADR-126): its label, and the button against the page as a UI component
+  check(
+    '--button-primary-text',
+    need('--button-primary-text'),
+    '--button-primary-bg',
+    need('--button-primary-bg'),
+    4.5,
+  );
+  check(
+    '--button-primary-text',
+    need('--button-primary-text'),
+    '--button-primary-hover',
+    need('--button-primary-hover'),
+    4.5,
+  );
+  check('--button-primary-bg', need('--button-primary-bg'), '--bg', need('--bg'), 3);
   for (const bg of ['--bg', '--surface']) {
     check('--border-ui', need('--border-ui'), bg, need(bg), 3);
     check('--focus', need('--focus'), bg, need(bg), 3);
   }
-  // ink chrome (ADR-117): the top bar and rail keep their own dark band in both themes
+  // chrome (top bar and rail): equal to the page values since ADR-126, still checked by name
   for (const bg of ['--chrome-bg', '--chrome-raised']) {
     for (const fg of ['--chrome-text', '--chrome-muted', '--chrome-accent'])
       check(fg, need(fg), bg, need(bg), 4.5);

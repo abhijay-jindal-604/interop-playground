@@ -52,7 +52,7 @@ export function CaptureBadge({
         ? runCopy.capture.partialTip(note ?? '')
         : runCopy.capture.noneTip;
   return (
-    <span className={`chip chip-outline capture-${capture}`} title={tip}>
+    <span className={`capture-note capture-${capture}`} title={tip}>
       {text}
     </span>
   );
@@ -95,8 +95,8 @@ function Row({
         onClick={onSelect}
         onKeyDown={onKey}
       >
-        <span className="step-order mono" aria-hidden="true">
-          {row.order}
+        <span className={`step-icon tone-${TONE[word]}`} aria-hidden="true">
+          <Icon name={`st-${BADGE[word]}`} size={16} />
         </span>
         <span className="step-main">
           <span className="step-label">{row.label}</span>
@@ -109,20 +109,15 @@ function Row({
           ) : null}
         </span>
         <span className="step-meta">
-          <span className={`badge badge-sm tone-${TONE[word]}`}>
-            <Icon name={`st-${BADGE[word]}`} size={16} />
-            <span>{runCopy.rail.outcome[word]}</span>
-          </span>
+          <span className={`step-outcome tone-${TONE[word]}`}>{runCopy.rail.outcome[word]}</span>
           {done && !skipped ? (
             <CaptureBadge capture={step?.capture ?? null} note={step?.coverageNote ?? null} />
           ) : null}
           {done && !skipped && step?.durationMs !== null && step?.durationMs !== undefined ? (
-            <span className="muted small mono">{step.durationMs} ms</span>
+            <span className="step-duration">{step.durationMs} ms</span>
           ) : null}
-          {messages > 0 ? (
-            <span className="muted small">{runCopy.rail.messages(messages)}</span>
-          ) : null}
-          {checks > 0 ? <span className="muted small">{runCopy.rail.checks(checks)}</span> : null}
+          {messages > 0 ? <span>{runCopy.rail.messages(messages)}</span> : null}
+          {checks > 0 ? <span>{runCopy.rail.checks(checks)}</span> : null}
         </span>
       </button>
       {onDelivery ? (

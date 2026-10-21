@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 import type { AdapterId, Run } from '@interop-playground/api';
 import { Icon } from '../components/Icon.js';
 import { shortId } from '../components/RunLink.js';
-import { StatusBadge, type BadgeState } from '../components/StatusBadge.js';
+import type { BadgeState } from '../components/StatusBadge.js';
 import { runCopy } from '../copy.js';
 import { FORMAT_LABEL } from '../lib/labels.js';
 import { useStore } from '../state/store.js';
@@ -33,6 +33,8 @@ export function useAdapterName(): (id: AdapterId) => string {
   };
 }
 
+const VERDICT_WORD = runCopy.verdictChip;
+
 function stateBadge(vs: ViewState): { state: BadgeState; word: string } {
   switch (vs) {
     case 'queued':
@@ -50,16 +52,6 @@ function stateBadge(vs: ViewState): { state: BadgeState; word: string } {
   }
 }
 
-/** StateChip / VerdictChip (UI-10): the shared badge silhouette with the UI-10 words */
-export function Chip({ state, word }: { state: BadgeState; word: string }) {
-  return (
-    <span className="run-chip" data-state={state}>
-      <StatusBadge state={state} size="md" />
-      <span className="visually-hidden">{word}</span>
-    </span>
-  );
-}
-
 export interface HeaderActions {
   onCancel: () => void;
   onPin: () => void;
@@ -67,15 +59,41 @@ export interface HeaderActions {
   onDelete: () => void;
 }
 
-/** The facts line under the run title: adapters, format, grant and environment. */
+/**
+ * The facts under the run title (ADR-128): the three roles as one inline definition list, then
+ * format, grant, mode, environment and proof as one muted line; versions stay in a disclosure.
+ */
 export function RunHeaderFacts({ view, run }: { view: RunView; run: Run | null }) {
   const name = useAdapterName();
   const spec = view.spec;
   if (!spec) return null;
   const changed = Object.entries(spec.knobs);
+  const meta: { key: string; node: React.ReactNode; title?: string }[] = [
+    { key: 'format', node: FORMAT_LABEL[spec.format] },
+  ];
+  if (spec.grant) meta.push({ key: 'grant', node: spec.grant });
+  if (spec.presentationMode) meta.push({ key: 'mode', node: spec.presentationMode });
+  meta.push({
+    key: 'env',
+    node: runCopy.facts.envLine([...new Set(Object.values(spec.env))].join(' + ')),
+  });
+  if (view.proofAlg) meta.push({ key: 'proof', node: runCopy.facts.proof(view.proofAlg) });
+  for (const [k, v] of changed)
+    meta.push({ key: `knob-${k}`, node: runCopy.facts.changed(k, String(v)) });
+  if (spec.parentRunId)
+    meta.push({
+      key: 'parent',
+      node: (
+        <Link to={`/runs/${spec.parentRunId}`}>
+          {runCopy.facts.rerunOf(shortId(spec.parentRunId))}
+        </Link>
+      ),
+    });
+  if (run?.origin === 'imported')
+    meta.push({ key: 'imported', node: runCopy.facts.imported, title: runCopy.facts.importedTip });
   return (
     <div className="run-facts">
-      <dl className="facts facts-inline">
+      <dl className="run-roles">
         <div>
           <dt>{runCopy.facts.issuer}</dt>
           <dd>{name(spec.issuer)}</dd>
@@ -89,37 +107,14 @@ export function RunHeaderFacts({ view, run }: { view: RunView; run: Run | null }
           <dd>{name(spec.verifier)}</dd>
         </div>
       </dl>
-      <ul className="chip-row" aria-label="Run facts">
-        <li className="chip">{FORMAT_LABEL[spec.format]}</li>
-        {spec.grant ? <li className="chip chip-outline">{spec.grant}</li> : null}
-        {spec.presentationMode ? (
-          <li className="chip chip-outline">{spec.presentationMode}</li>
-        ) : null}
-        <li className="chip chip-outline">
-          {runCopy.facts.env}: {[...new Set(Object.values(spec.env))].join(' + ')}
-        </li>
-        {view.proofAlg ? (
-          <li className="chip chip-outline">{runCopy.facts.proof(view.proofAlg)}</li>
-        ) : null}
-        {changed.map(([k, v]) => (
-          <li key={k} className="chip tone-info">
-            {runCopy.facts.changed(k, String(v))}
+      <ul className="run-meta" aria-label={runCopy.facts.region}>
+        {meta.map((m) => (
+          <li key={m.key} title={m.title}>
+            {m.node}
           </li>
         ))}
-        {spec.parentRunId ? (
-          <li className="chip chip-outline">
-            <Link to={`/runs/${spec.parentRunId}`}>
-              {runCopy.facts.rerunOf(shortId(spec.parentRunId))}
-            </Link>
-          </li>
-        ) : null}
-        {run?.origin === 'imported' ? (
-          <li className="chip chip-outline" title={runCopy.facts.importedTip}>
-            {runCopy.facts.imported}
-          </li>
-        ) : null}
       </ul>
-      <details className="disclosure">
+      <details className="disclosure run-versions">
         <summary>{runCopy.facts.versions}</summary>
         <ul className="disclosure-body mono small">
           {(['issuer', 'wallet', 'verifier'] as const).map((role) => (
@@ -133,18 +128,47 @@ export function RunHeaderFacts({ view, run }: { view: RunView; run: Run | null }
   );
 }
 
-/** State badge shown beside the run title. */
-export function RunTitleChips({ vs, view }: { vs: ViewState; view: RunView }) {
+/** The one status line under the run title: a small dot, the state word, the verdict once done. */
+export function RunStatusLine({ vs, view, live }: { vs: ViewState; view: RunView; live: boolean }) {
   if (vs === 'loading') return null;
   const s = stateBadge(vs);
+  const verdict = view.verdict && vs.startsWith('done-') ? view.verdict.outcome : null;
+  const tone = verdict ? outcomeTone(verdict) : STATE_TONE[s.state];
   return (
-    <span className="title-chips">
-      <span className={`state-word tone-${s.state === 'failed' ? 'warn' : 'info'}`}>{s.word}</span>
-      {view.verdict && vs.startsWith('done-') ? (
-        <StatusBadge state={view.verdict.outcome} size="md" />
-      ) : null}
-    </span>
+    <p className={`run-status tone-${tone}`}>
+      <span className="run-status-dot" aria-hidden="true" />
+      <span>{s.word}</span>
+      {verdict ? <span className="run-status-verdict">{VERDICT_WORD[verdict]}</span> : null}
+      {live ? <span className="run-status-live">{runCopy.live}</span> : null}
+    </p>
   );
+}
+
+const STATE_TONE: Record<BadgeState, string> = {
+  pass: 'pass',
+  fail: 'fail',
+  blocked: 'fail',
+  lenient: 'neutral',
+  inconclusive: 'warn',
+  'no-submission': 'neutral',
+  'n/a': 'skipped',
+  'not-run': 'skipped',
+  queued: 'info',
+  running: 'info',
+  cancelled: 'skipped',
+  failed: 'warn',
+};
+
+type Outcome = NonNullable<RunView['verdict']>['outcome'];
+/** status tone of a verdict outcome (status colour on the glyph and word only) */
+function outcomeTone(o: Outcome): string {
+  return o === 'pass'
+    ? 'pass'
+    : o === 'fail' || o === 'blocked'
+      ? 'fail'
+      : o === 'inconclusive'
+        ? 'warn'
+        : 'neutral';
 }
 
 /** The run's action buttons (cancel while running; pin, note and export), shown according to the run state. */
@@ -168,7 +192,7 @@ export function RunActions({
           {runCopy.actions.cancel}
         </button>
       ) : null}
-      <Link className="btn btn-secondary btn-sm" to={`/?clone=${runId}`}>
+      <Link className="btn btn-primary btn-sm" to={`/?clone=${runId}`}>
         {runCopy.actions.runAgain}
       </Link>
       <button
@@ -289,18 +313,22 @@ export function StatusBanner({
     <div role="status" className="status-banner">
       {text ? (
         <div className={`banner tone-${tone}`}>
-          <Icon
-            name={
-              vs === 'error'
-                ? 'st-failed'
-                : vs === 'cancelled'
-                  ? 'st-cancelled'
-                  : vs === 'queued'
-                    ? 'st-queued'
-                    : 'st-running'
-            }
-            size={20}
-          />
+          {vs === 'running' ? (
+            <span className="run-spinner" aria-hidden="true" />
+          ) : (
+            <Icon
+              name={
+                vs === 'error'
+                  ? 'st-failed'
+                  : vs === 'cancelled'
+                    ? 'st-cancelled'
+                    : vs === 'queued'
+                      ? 'st-queued'
+                      : 'st-running'
+              }
+              size={20}
+            />
+          )}
           <p>{text}</p>
           {extra}
           {vs === 'error' && view.failed?.errorCode === 'env_not_ready' ? (
@@ -312,7 +340,34 @@ export function StatusBanner({
   );
 }
 
-const VERDICT_WORD = runCopy.verdictChip;
+/**
+ * The verdict glyph (ADR-128): drawn once with a stroke when the result appears. The silhouettes
+ * stay distinct without colour (UI-74): circle and tick for pass, square and cross for fail or
+ * blocked, triangle for inconclusive, circle and bar for the neutral outcomes.
+ */
+export function VerdictGlyph({ outcome }: { outcome: Outcome }) {
+  const fail = outcome === 'fail' || outcome === 'blocked';
+  return (
+    <svg className="verdict-glyph" viewBox="0 0 40 40" width="40" height="40" aria-hidden="true">
+      {fail ? (
+        <rect className="vg-shape" x="3" y="3" width="34" height="34" rx="9" pathLength={1} />
+      ) : outcome === 'inconclusive' ? (
+        <path className="vg-shape" d="M20 3.5 37 34.5H3z" pathLength={1} />
+      ) : (
+        <circle className="vg-shape" cx="20" cy="20" r="17" pathLength={1} />
+      )}
+      {outcome === 'pass' ? (
+        <path className="vg-mark" d="M12.5 20.5l5 5 10-10.5" pathLength={1} />
+      ) : fail ? (
+        <path className="vg-mark" d="M14 14l12 12M26 14L14 26" pathLength={1} />
+      ) : outcome === 'inconclusive' ? (
+        <path className="vg-mark" d="M20 14v9M20 28.5v.5" pathLength={1} />
+      ) : (
+        <path className="vg-mark" d="M13 20h14" pathLength={1} />
+      )}
+    </svg>
+  );
+}
 
 /** UI-11 ResultCard for terminal `completed` runs */
 export function ResultCard({
@@ -347,23 +402,17 @@ export function ResultCard({
     [runCopy.result.outcome, VERDICT_WORD[v.outcome]],
   ];
   if (failing) rows.push([runCopy.result.failingStep, failing]);
-  const tone =
-    v.outcome === 'pass'
-      ? 'pass'
-      : v.outcome === 'fail' || v.outcome === 'blocked'
-        ? 'fail'
-        : v.outcome === 'inconclusive'
-          ? 'warn'
-          : 'neutral';
+  const tone = outcomeTone(v.outcome);
   return (
     <section
       role="region"
       aria-label={runCopy.result.region}
       className={`result-card tone-${tone}`}
+      data-outcome={v.outcome}
     >
       <div className="result-verdict">
         <p className="result-word">
-          <Icon name={`st-${v.outcome}`} size={28} />
+          <VerdictGlyph outcome={v.outcome} />
           <span>{VERDICT_WORD[v.outcome]}</span>
         </p>
         <p className="result-sentence">{resultSentence(view, steps, target)}</p>

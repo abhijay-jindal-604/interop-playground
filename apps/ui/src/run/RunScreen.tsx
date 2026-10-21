@@ -1,5 +1,6 @@
 /**
- * The run screen body (06 UI-09 layout): banners, result, and the workspace with the diagram pane
+ * The run screen body (06 UI-09 layout, order per ADR-128): banners, result, diagnosis, and the
+ * workspace with the diagram pane
  * (diagram slot for T-29 + StepRail) and the inspector pane (slot for T-28). The awaiting panel slot
  * (T-31) sits in the banners region. Pure over the reduced view; data wiring is in RunPage.
  */
@@ -114,6 +115,12 @@ export function RunScreen({
         </div>
         {ready ? <CoverageBanner view={view} steps={steps} onSelect={select} /> : null}
       </div>
+      {/* ADR-128: the verdict comes first, then the diagnosis and the fix that explain it */}
+      {vs.startsWith('done-') ? (
+        <div className="run-region" data-region="result">
+          <ResultCard view={view} steps={steps} target={target} note={run?.note ?? null} />
+        </div>
+      ) : null}
       <div className="run-region" data-region="diagnosis" data-slot="diagnosis">
         {runId && ready ? (
           <RunAngle
@@ -127,11 +134,6 @@ export function RunScreen({
           />
         ) : null}
       </div>
-      {vs.startsWith('done-') ? (
-        <div className="run-region" data-region="result">
-          <ResultCard view={view} steps={steps} target={target} note={run?.note ?? null} />
-        </div>
-      ) : null}
       {flows.status === 'error' ? <InlineError error={flows.error} alert={false} /> : null}
       <div className="run-workspace" data-region="workspace">
         <div className="run-pane run-pane-diagram">

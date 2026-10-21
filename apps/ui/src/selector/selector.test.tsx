@@ -188,6 +188,28 @@ describe('ui.selector cards (UI-04, UI-05)', () => {
   });
 });
 
+describe('ui.selector release cut (ADR-95, ADR-126)', () => {
+  it('folds adapters outside the release into one "coming later" disclosure per column', () => {
+    store.set((st) => {
+      const later = entry('verifier.credo', 'verifier', 'Credo verifier', false);
+      (later.availability as { reason: string }).reason =
+        'not in this release (docs/decisions.md 2026-10-20)';
+      st.catalog.adapters = {
+        status: 'ready',
+        data: { ...adapters, verifiers: [...adapters.verifiers, later] },
+      };
+      return st;
+    });
+    renderAt('/');
+    const more = card('verifier.credo').closest('details');
+    expect(more?.querySelector('summary')?.textContent).toBe('1 more coming later');
+    expect(card('verifier.credo').textContent).toContain('Not in this release');
+    expect(radio('verifier.credo').disabled).toBe(true);
+    // a stopped adapter is not a release cut: it stays in the column
+    expect(card('verifier.eudi').closest('details')).toBeNull();
+  });
+});
+
 describe('ui.selector deep link and Start (UI-08)', () => {
   it('the deep link preselects issuer, wallet, verifier, format, grant and mode', async () => {
     renderAt(

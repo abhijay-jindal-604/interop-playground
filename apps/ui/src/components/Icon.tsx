@@ -245,38 +245,3 @@ export function Icon({
     </svg>
   );
 }
-
-/** The brand mark: a signal tile with three joined parties, drawn on the ink chrome (ADR-117). */
-export function BrandMark() {
-  // three parties joined by one path (issuer, wallet, verifier) on the signal tile (ADR-117)
-  return (
-    <svg
-      className="brand-mark"
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <rect x="0.5" y="0.5" width="23" height="23" rx="6.5" fill="var(--chrome-accent)" />
-      <path
-        d="M6 16.5 L12 7.5 L18 16.5"
-        fill="none"
-        stroke="var(--chrome-bg)"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <circle cx="6" cy="16.5" r="2.4" fill="var(--chrome-bg)" />
-      <circle cx="12" cy="7.5" r="2.4" fill="var(--chrome-bg)" />
-      <circle
-        cx="18"
-        cy="16.5"
-        r="2.4"
-        fill="var(--chrome-accent)"
-        stroke="var(--chrome-bg)"
-        strokeWidth="1.8"
-      />
-    </svg>
-  );
-}

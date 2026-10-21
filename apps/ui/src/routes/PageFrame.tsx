@@ -16,7 +16,6 @@ export function PageFrame({
   crumbs,
   actions,
   lead,
-  eyebrow,
   children,
 }: {
   title: ReactNode;
@@ -25,7 +24,7 @@ export function PageFrame({
   crumbs?: { label: string; to?: string }[];
   actions?: ReactNode;
   lead?: ReactNode;
-  /** a short mono label shown above the `<h1>` (ADR-118); not part of the heading's name */
+  /** kept for callers; "Quiet" (ADR-126) no longer shows a label above the `<h1>` */
   eyebrow?: string;
   children?: ReactNode;
 }) {
@@ -58,7 +57,6 @@ export function PageFrame({
           </ol>
         </nav>
       ) : null}
-      {eyebrow ? <p className="page-eyebrow">{eyebrow}</p> : null}
       <div className="page-head">
         <h1 ref={h1} tabIndex={-1}>
           {title}
