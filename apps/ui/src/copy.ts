@@ -235,9 +235,85 @@ export const STATE_MEANINGS: Partial<Record<keyof typeof STATE_WORDS, string>> =
   'not-run': 'No run exists for this combination yet.',
 };
 
+/**
+ * ADR-136: every flow step as a plain action a non-developer can read. The step rail, the
+ * inspector, the diagram tooltips, the result sentence and the report title a step with this; the
+ * flow file's own label (the HTTP line, such as `GET /.well-known/openid-credential-issuer`) stays
+ * as the muted secondary line, and the step ID moves into the step's Details.
+ */
+export const STEP_TITLES: Record<string, string> = {
+  'vci.fixture.load': 'Load the saved credential',
+  'vci.setup.config-read': "Read the issuer's credential setup",
+  'vci.setup.variant': "Prepare the issuer's credential setup",
+  'vci.offer.mint': 'Create the credential offer',
+  'vci.offer.fetch': 'Wallet fetches the credential offer',
+  'vci.metadata.issuer': "Read the issuer's metadata",
+  'vci.metadata.as': "Read the sign-in server's metadata",
+  'vci.issuer.did': "Look up the issuer's public key",
+  'vci.token': 'Get an access token',
+  'vci.nonce': 'Get a fresh challenge from the issuer',
+  'vci.proof.sign': 'Sign the proof of possession',
+  'vci.credential': 'Request the credential',
+  'vci.credential.inspect': 'Wallet reads the credential',
+  'vp.request.create': 'Verifier creates the request',
+  'vp.request.deliver': 'Send the request to the wallet',
+  'vp.request.fetch': 'Wallet fetches the request',
+  'vp.request.validate': 'Wallet checks the request',
+  'vp.credential.match': 'Wallet picks the matching credential',
+  'vp.token.build': 'Wallet signs the presentation',
+  'vp.response.post': 'Wallet sends the presentation',
+  'vp.response.redirect': 'Verifier sends the wallet back',
+  'vp.error.dispatch': 'Wallet reports an error',
+  'vp.wallet.observe': 'Note what the phone showed',
+  'vp.result.poll': "Read the verifier's answer",
+  'vp.result.fetch': "Read the verifier's answer",
+  'vp.vc.verify': 'Verifier checks the credential',
+  'vp.verdict.evaluate': "Record the verifier's verdict",
+  'vp.dcapi.probe': 'Check that the browser can ask a wallet',
+  'vp.dcapi.request.create': 'Verifier creates the browser request',
+  'vp.dcapi.request.fetch': 'Wallet fetches the request',
+  'vp.dcapi.invoke': 'Browser asks for a credential',
+  'vp.dcapi.holder': 'Note which wallet answered',
+  'vp.dcapi.response.post': 'Wallet sends the presentation',
+};
+
+/** The plain title of a step, or the flow file's label when the step has none (ADR-136). */
+export const stepTitle = (stepKey: string, fallback: string): string =>
+  STEP_TITLES[stepKey] ?? fallback;
+
+/**
+ * ADR-137: the one-sentence "What failed" of a known cause, in words a non-developer can read.
+ * `issuer` is the display name of the run's issuer. Causes without an entry use their title.
+ */
+export const CAUSE_PLAIN: Record<string, (issuer: string) => string> = {
+  'FP-01': (issuer) =>
+    `Inji Verify can't check this credential because ${issuer} doesn't send its certificate chain.`,
+};
+
 /** Run screen copy, verbatim from 06 UI-09, UI-10, UI-11, UI-13, UI-14, UI-15 (headings). */
 export const runCopy = {
   title: (shortId: string) => `Run ${shortId}`,
+  /** the h1 reads like a document number: "Run No." in the sans, the number in mono */
+  runNo: 'Run No.',
+  /** the three roles as one plain sentence under the title */
+  roles: (issuer: string, wallet: string, verifier: string) =>
+    `${issuer} issues the credential, ${wallet} holds it and ${verifier} checks it.`,
+  rolesIssueOnly: (issuer: string, wallet: string) =>
+    `${issuer} issues the credential to ${wallet}.`,
+  /** the verdict stamp (one per result): the word, in capitals inside the stamp only */
+  stamp: {
+    valid: 'Valid',
+    invalid: 'Invalid',
+    expired: 'Expired',
+    pass: 'Pass',
+    fail: 'Fail',
+    blocked: 'Blocked',
+    lenient: 'Lenient',
+    inconclusive: 'Inconclusive',
+    'no-submission': 'No answer',
+    issued: 'Issued',
+  },
+  details: 'Details',
   notFound: {
     heading: 'This run does not exist.',
     body: (shortId: string) => `It may have been deleted. Run ${shortId} was not found.`,
@@ -276,6 +352,9 @@ export const runCopy = {
     proof: (alg: string) => `Proof: ${alg}`,
     changed: (knob: string, value: string) => `Changed: ${knob} = ${value}`,
     rerunOf: (parent: string) => `Re-run of ${parent}`,
+    proofAlg: 'Proof algorithm',
+    changedSetting: 'Changed setting',
+    origin: 'Origin',
     imported: 'Imported',
     importedTip: 'Imported runs cannot be re-run with a fix: their holder key is not included.',
   },
@@ -330,33 +409,32 @@ export const runCopy = {
   } as Record<string, string>,
   result: {
     region: 'Result',
-    passValid: 'The verifier accepted the credential: Valid.',
-    passExpired:
-      'Valid but expired. The signature checks out and the credential is past its expiry date.',
+    passValid: 'The verifier accepted the credential.',
+    passExpired: 'The signature checks out, but the credential is past its expiry date.',
     passIssued: 'The credential was issued. No verification was run.',
-    failInvalid: (step: string, code: string, message: string) =>
-      `Invalid. The verifier rejected the credential at ${step}: ${code} ${message}.`,
+    /** ADR-136: the sentence names the step in plain words; the verbatim error is its own field */
+    failInvalid: (step: string) => `The verifier rejected the credential at “${step}”.`,
     /** every step passed and the verifier answered "invalid" (FLOW-40 credential-level) */
-    failInvalidChecks: (code: string, message: string) =>
-      `Invalid. The verifier rejected the credential: ${code} ${message}.`,
-    failAt: (step: string, code: string, message: string) =>
-      `Failed at ${step}: ${code} ${message}.`,
+    failInvalidChecks: 'The verifier rejected the credential.',
+    failAt: (step: string) => `The run failed at “${step}”.`,
     blocked: (target: string, failing: string) =>
-      `Blocked. ${target} did not run because ${failing} failed first. Counted as not working in pass rates.`,
+      `“${target}” did not run because “${failing}” failed first. Counted as not working in pass rates.`,
     lenient:
-      'Lenient. The component accepted something the specification leaves to policy. Counted as conformant.',
-    inconclusive: (reason: string) => `Inconclusive. ${reason}. Not counted in pass rates.`,
+      'The component accepted something the specification leaves to policy. Counted as conformant.',
+    inconclusive: (reason: string) =>
+      `The playground could not tell: ${reason}. Not counted in pass rates.`,
     inconclusiveManual: 'a manual observation never arrived',
     inconclusiveControl: 'the control run failed',
     noSubmission:
-      'No submission. The wallet never sent a response to the verifier before the request expired. Not counted in pass rates.',
+      'The wallet never answered the verifier before the request expired. Not counted in pass rates.',
     probe:
-      'Probe result: no holder answered. Inji Wallet cannot answer the DC API (G-37). Not counted in pass rates.',
+      'Probe result: no wallet answered. Inji Wallet cannot answer the Digital Credentials API yet. Not counted in pass rates.',
     outcome: 'Outcome',
     failingStep: 'Failing step',
     errorDetail: 'Error detail',
-    proofAlg: 'Proof alg',
+    proofAlg: 'Proof algorithm',
     note: 'Note',
+    finished: 'Finished',
   },
   rail: {
     heading: 'Steps',
@@ -377,7 +455,7 @@ export const runCopy = {
   capture: {
     full: 'Full capture',
     partial: 'Partial capture',
-    none: 'No capture (engine)',
+    none: 'Not recorded (library step)',
     fullTip: 'Every HTTP message of this step was recorded by the playground.',
     partialTip: (note: string) =>
       `Part of this step ran outside the playground's capture: ${note}. Diagnosis does not use this step as evidence.`,
@@ -386,11 +464,10 @@ export const runCopy = {
   },
   coverage: {
     heading: (k: number) => `Partial evidence: ${k} step(s) ran outside full capture.`,
-    partialItem: (label: string, key: string, note: string) =>
-      `${label} (${key}): Partial capture: ${note}`,
-    noneItem: (label: string, key: string, engine: string) =>
-      `${label} (${key}): No capture: runs inside ${engine} or by hand`,
-    engineSteps: 'Engine steps (always uncaptured)',
+    partialItem: (label: string, note: string) => `${label}: partly recorded: ${note}`,
+    noneItem: (label: string, engine: string) =>
+      `${label}: not recorded, it runs inside ${engine} or by hand`,
+    engineSteps: 'Library steps (never recorded)',
     footer:
       'A diagnosis never rests on these steps. Anything seen only here is reported as an observation.',
   },
@@ -1024,7 +1101,8 @@ export const angleCopy = {
     rerun: (child: string, knob: string, to: string) => `Run ${child} (with ${knob} = ${to})`,
     step: 'Step',
     change: 'Change',
-    direct: (knobId: string) => `Changed by ${knobId}`,
+    /** ADR-136: the knob ID is jargon; it stays reachable as the hover title */
+    direct: 'Changed by the fix',
     showUnchanged: (n: number) => `Show ${n} unchanged steps`,
     full: 'Open full comparison',
     volatile:
@@ -1080,12 +1158,56 @@ export const screenCopy = {
     copyPayload: 'Copy payload',
     disclosures: (n: number) => `${n} disclosed claim${n === 1 ? '' : 's'}`,
   },
+  /** ADR-137: the fix-it card in three parts */
   fix: {
-    oneChange: 'One setting changes',
+    whatFailed: 'What failed',
+    oneChange: 'The one change',
+    result: 'Result',
+    resultLine: 'Passes with this change. Everything else stays the same.',
     from: 'Now',
     to: 'Re-run with',
+    details: 'Details',
+    fingerprint: 'Known cause',
   },
   strip: {
     flipped: 'Outcome flipped',
+    original: 'Original run',
+    rerun: 'Re-run',
+  },
+  /** the inspector head: the step's technical facts behind one disclosure (ADR-136) */
+  step: {
+    details: 'Details',
+    stepId: 'Step ID',
+    recording: 'Recording',
+    library: 'Library',
+    messages: 'Messages',
+    checks: 'Checks',
+    duration: (ms: number) => `${ms} ms`,
+  },
+  /** the decoded credential shown as a document (ADR-137) */
+  document: {
+    holder: 'Holder',
+    issuer: 'Issuer',
+    signingKey: 'Signing key',
+    issued: 'Issued',
+    expires: 'Expires',
+    type: 'Type',
+    raw: 'Raw JSON',
+    claims: {
+      fullName: 'Full name',
+      name: 'Name',
+      given_name: 'Given name',
+      family_name: 'Family name',
+      dateOfBirth: 'Date of birth',
+      birthdate: 'Date of birth',
+      birth_date: 'Date of birth',
+      gender: 'Gender',
+      email: 'Email',
+      phone: 'Phone',
+      mobile: 'Phone',
+      address: 'Address',
+      nationality: 'Nationality',
+      UIN: 'ID number',
+    } as Record<string, string>,
   },
 } as const;

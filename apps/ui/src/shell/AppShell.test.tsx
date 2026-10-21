@@ -69,7 +69,9 @@ describe('ui.app-shell', () => {
     expect(screen.getByRole('contentinfo').textContent).toContain(copy.footer.local);
     expect(document.title).toBe('Interop Playground');
     expect(await screen.findByText('Inji Certify (pre-authorized code)')).toBeTruthy();
-    expect(screen.getByText('Not running: inji-verify is not ready')).toBeTruthy();
+    expect(
+      screen.getByText('Inji Verify (local) is not running (inji-verify is not ready).'),
+    ).toBeTruthy();
     expect(document.getElementById('live-polite')?.getAttribute('aria-live')).toBe('polite');
     expect(document.getElementById('live-assertive')?.getAttribute('aria-live')).toBe('assertive');
   });

@@ -183,6 +183,7 @@ export function RunAngle({
           failingCheck={failing?.check ?? null}
           knobs={knobs}
           peerName={(id) => adapterName(id as Parameters<typeof adapterName>[0])}
+          issuerName={spec ? adapterName(spec.issuer) : null}
           onShowMessages={showMessages}
           onShowCheck={failingKey ? () => onShowCheck(failingKey) : undefined}
         />

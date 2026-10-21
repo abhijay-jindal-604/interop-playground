@@ -21,6 +21,7 @@ const TEXT = [
   '--status-fail',
   '--status-warn',
   '--status-info',
+  '--status-expired',
   '--status-neutral',
   '--status-skipped',
 ];

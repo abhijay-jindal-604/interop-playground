@@ -11,13 +11,14 @@ import { EmptyState } from '../components/EmptyState.js';
 import { InlineError } from '../components/InlineError.js';
 import { shortId } from '../components/RunLink.js';
 import { Skeleton } from '../components/Skeleton.js';
+import { Stamp, stampDate, stampFor } from '../components/Stamp.js';
 import { StatusBadge } from '../components/StatusBadge.js';
 import { FixItPanel } from '../angle/DiagnosisCard.js';
 import { CLASS_TONE, diagnosisCase, fixItDecision, knobEntry, sideWord } from '../angle/model.js';
 import { useKnobs } from '../angle/RunAngle.js';
-import { angleCopy, reportCopy as c, selectorCopy } from '../copy.js';
+import { angleCopy, reportCopy as c, selectorCopy, stepTitle as plainStepTitle } from '../copy.js';
 import { announce } from '../lib/announce.js';
-import { FORMAT_LABEL } from '../lib/labels.js';
+import { FORMAT_LABEL, FORMAT_SHORT } from '../lib/labels.js';
 import { PageFrame } from '../routes/PageFrame.js';
 import { useAdapterName } from '../run/parts.js';
 
@@ -31,7 +32,67 @@ type Load =
 const TABS = ['report', 'markdown', 'json'] as const;
 type Tab = (typeof TABS)[number];
 
-const verdictWord = (r: RunReport) => r.fields.verdict.outcome.toUpperCase();
+/** plain sentence beside the stamp (ADR-134); local to the report */
+function verdictSentence(r: RunReport): string {
+  const v = r.fields.verdict;
+  if (v.verification === 'valid') return 'The verifier accepted the credential.';
+  if (v.verification === 'invalid') return 'The verifier rejected the credential.';
+  if (v.verification === 'valid-but-expired')
+    return 'The credential is genuine, but it has expired.';
+  if (v.verification === 'no-submission') return 'The wallet never sent a presentation.';
+  switch (v.outcome) {
+    case 'pass':
+      return 'Every step of the run passed.';
+    case 'fail':
+      return 'The run failed. The failing checks below show where.';
+    case 'blocked':
+      return 'The run was blocked before it could finish.';
+    case 'inconclusive':
+      return 'The run could not reach a clear result.';
+    default:
+      return 'The run ended without a verdict.';
+  }
+}
+
+/** The report's opening: the verdict stamp, its sentence, and the combination as form fields. */
+function VerdictBlock({ r }: { r: RunReport }) {
+  const name = useAdapterName();
+  const f = r.fields;
+  const { status, word } = stampFor(f.verdict.outcome, f.verdict.verification);
+  const line = [stampDate(r.generatedAt), f.verdict.verification ? name(f.verifier) : null]
+    .filter(Boolean)
+    .join(' · ');
+  const fields: [string, string][] = [
+    [c.fields.issuer, name(f.issuer)],
+    [c.fields.wallet, name(f.wallet)],
+    [c.fields.verifier, name(f.verifier)],
+    [c.fields.format, FORMAT_SHORT[f.format] ?? f.format],
+    [c.fields.mode, f.mode ? (selectorCopy.recipe.modes[f.mode] ?? f.mode) : c.fields.none],
+  ];
+  return (
+    <div className="report-verdict-block">
+      <div className="verdict">
+        <Stamp status={status} word={word} line={line} />
+        <p className="verdict-sentence">{verdictSentence(r)}</p>
+      </div>
+      <dl className="fields">
+        {fields.map(([label, value]) => (
+          <div className="field" key={label}>
+            <dt>{label}</dt>
+            <dd>{value}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  );
+}
+
+/** plain notes for steps the playground could not see (local: the "capture" words stay in Details) */
+const STEP_NOT_RECORDED = 'Happens inside the component, not recorded';
+const STEP_PARTLY_RECORDED = 'Partly recorded';
+
+/** step titles in plain words (ADR-136); the step key stays as the secondary mono line */
+const stepTitle = (key: string): string => plainStepTitle(key, key);
 
 /** Saves text as a file through a temporary link. */
 function download(name: string, text: string, type: string): void {
@@ -111,7 +172,19 @@ function Combination({ r, run }: { r: RunReport; run: Run | null }) {
         ) : null}
       </span>,
     ],
-    [c.fields.failedStep, f.failedStepKey ? <code>{f.failedStepKey}</code> : c.fields.none],
+    [
+      c.fields.failedStep,
+      f.failedStepKey ? (
+        <span className="report-step-name">
+          {stepTitle(f.failedStepKey)}
+          {stepTitle(f.failedStepKey) !== f.failedStepKey ? (
+            <code className="mono">{f.failedStepKey}</code>
+          ) : null}
+        </span>
+      ) : (
+        c.fields.none
+      ),
+    ],
     [c.fields.errorDetail, f.errorDetail ?? (run?.errorCode ? run.errorCode : c.fields.none)],
   ];
   return (
@@ -189,46 +262,55 @@ function Diagnosis({ r }: { r: RunReport }) {
         {matches.map((m) => (
           <li key={m.fingerprintId} className="report-card">
             <p className="report-card-head">
-              <span className="chip chip-outline mono">
-                {m.confidence === 'possible' ? 'possible ' : ''}
-                {m.fingerprintId}
-              </span>{' '}
               <strong>{m.title}</strong>
+              {m.confidence === 'possible' ? (
+                <span className="muted"> ({c.confidence.possible})</span>
+              ) : null}
             </p>
-            <dl className="facts">
-              <div>
-                <dt>{c.match.gaps}</dt>
-                <dd>{m.gapIds.join(', ') || c.fields.none}</dd>
-              </div>
-              <div>
-                <dt>{c.match.side}</dt>
-                <dd>
-                  {sideWord(m.deviatingSide)}: {m.component.name} {m.component.versions}
-                </dd>
-              </div>
-              <div>
-                <dt>{c.match.clause}</dt>
-                <dd>{m.specClause}</dd>
-              </div>
-              <div>
-                <dt>{c.match.confidence}</dt>
-                <dd>{c.confidence[m.confidence] ?? m.confidence}</dd>
-              </div>
-              <div>
-                <dt>{c.match.evidence}</dt>
-                <dd className="mono small">{angleCopy.card.evidencePath(m.fingerprintId)}</dd>
-              </div>
-              <div>
-                <dt>{c.match.exchanges}</dt>
-                <dd className="mono small">
-                  {m.matchedExchangeIds.map((x) => (
-                    <Link key={x} to={`/runs/${r.runId}#exchange=${x}`}>
-                      {x.slice(-8)}
-                    </Link>
-                  ))}
-                </dd>
-              </div>
-            </dl>
+            <p className="muted">
+              {sideWord(m.deviatingSide)}: {m.component.name}
+            </p>
+            <details className="details">
+              <summary>{selectorCopy.details}</summary>
+              <dl className="facts">
+                <div>
+                  <dt>Fingerprint</dt>
+                  <dd className="mono">{m.fingerprintId}</dd>
+                </div>
+                <div>
+                  <dt>{c.match.gaps}</dt>
+                  <dd>{m.gapIds.join(', ') || c.fields.none}</dd>
+                </div>
+                <div>
+                  <dt>{c.match.side}</dt>
+                  <dd>
+                    {sideWord(m.deviatingSide)}: {m.component.name} {m.component.versions}
+                  </dd>
+                </div>
+                <div>
+                  <dt>{c.match.clause}</dt>
+                  <dd>{m.specClause}</dd>
+                </div>
+                <div>
+                  <dt>{c.match.confidence}</dt>
+                  <dd>{c.confidence[m.confidence] ?? m.confidence}</dd>
+                </div>
+                <div>
+                  <dt>{c.match.evidence}</dt>
+                  <dd className="mono small">{angleCopy.card.evidencePath(m.fingerprintId)}</dd>
+                </div>
+                <div>
+                  <dt>{c.match.exchanges}</dt>
+                  <dd className="mono small">
+                    {m.matchedExchangeIds.map((x) => (
+                      <Link key={x} to={`/runs/${r.runId}#exchange=${x}`}>
+                        {x.slice(-8)}
+                      </Link>
+                    ))}
+                  </dd>
+                </div>
+              </dl>
+            </details>
           </li>
         ))}
       </ul>
@@ -317,24 +399,45 @@ function ReportBody({ r, run }: { r: RunReport; run: Run | null }) {
         {cov.length === 0 ? (
           <p className="muted">{c.coverageAll}</p>
         ) : (
-          <ul className="report-list">
-            {cov.map((h) => (
-              <li key={h.stepKey}>
-                <code>{h.stepKey}</code>: {c.captureWord[h.capture]}
-                {h.reason ? `: ${h.reason}` : ''}
-              </li>
-            ))}
-          </ul>
+          <>
+            <p>
+              {cov.length === 1
+                ? 'One step happens inside a component, so the playground could not record all of it.'
+                : `${cov.length} steps happen inside a component, so the playground could not record all of them.`}
+            </p>
+            <details className="details">
+              <summary>{selectorCopy.details}</summary>
+              <ul className="report-list">
+                {cov.map((h) => (
+                  <li key={h.stepKey}>
+                    <code>{h.stepKey}</code>: {c.captureWord[h.capture]}
+                    {h.reason ? `: ${h.reason}` : ''}
+                  </li>
+                ))}
+              </ul>
+            </details>
+          </>
         )}
       </Section>
       <Section id="steps" title={c.sections.steps}>
         <ol className="report-steps">
           {r.steps.map((s) => (
             <li key={s.stepKey}>
-              <code>{s.stepKey}</code>{' '}
+              <span className="report-step-name">
+                {stepTitle(s.stepKey) !== s.stepKey ? (
+                  <>
+                    {stepTitle(s.stepKey)}
+                    <code className="mono">{s.stepKey}</code>
+                  </>
+                ) : (
+                  <code>{s.stepKey}</code>
+                )}
+              </span>
               <StatusBadge state={s.outcome === 'skipped' ? 'n/a' : (s.outcome ?? 'not-run')} />
-              {s.capture && s.capture !== 'full' && s.outcome !== 'skipped' ? (
-                <span className="chip chip-outline">{`capture ${s.capture}`}</span>
+              {s.capture === 'none' && s.outcome !== 'skipped' ? (
+                <span className="muted small">{STEP_NOT_RECORDED}</span>
+              ) : s.capture === 'partial' && s.outcome !== 'skipped' ? (
+                <span className="muted small">{STEP_PARTLY_RECORDED}</span>
               ) : null}
               {s.skipReason ? <span className="muted small"> {s.skipReason}</span> : null}
             </li>
@@ -457,9 +560,9 @@ export function ReportPage() {
   return (
     <PageFrame
       title={
-        <>
-          {c.title(sid, verdictWord(r))} <StatusBadge state={r.fields.verdict.outcome} size="md" />
-        </>
+        <span className="doc-no">
+          Run No. <span className="mono">{sid}</span>
+        </span>
       }
       docTitle={c.docTitle(sid)}
       crumbs={crumbs}
@@ -503,12 +606,13 @@ export function ReportPage() {
       }
       lead={
         <ul className="chip-row" aria-label="Report facts">
-          <li className="chip chip-outline">{r.fields.verdict.kind}</li>
+          <li className="chip chip-outline">{c.crumb}</li>
           {run?.label ? <li className="chip chip-outline">{run.label}</li> : null}
           {run?.origin === 'imported' ? <li className="chip chip-outline">Imported</li> : null}
         </ul>
       }
     >
+      <VerdictBlock r={r} />
       {run?.state === 'failed' ? (
         <p className="banner tone-warn report-banner" role="status">
           {c.failedRun(run.errorCode ?? 'internal_error')}

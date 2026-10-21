@@ -6,11 +6,15 @@
 import { useEffect, useState } from 'react';
 import type { FlowDefinition, FlowStep, RunSpec } from '@interop-playground/api';
 import { apiGet } from '../api/client.js';
+import { stepTitle } from '../copy.js';
 
 export interface RailStep {
   stepKey: string;
   order: number;
+  /** the plain action title (ADR-136), e.g. "Get an access token" */
   label: string;
+  /** the flow file's label without placeholders: the HTTP line or library call, shown muted */
+  detail: string;
   kind: FlowStep['kind'];
   flowId: string;
   block: 'issuance' | 'presentation';
@@ -67,10 +71,12 @@ export function railSteps(
     const base = def.extends ? (bases[def.extends] ?? null) : null;
     for (const s of mergeSteps(def, base)) {
       if (s.deprecated) continue;
+      const detail = plainLabel(s.label, spec);
       rows.push({
         stepKey: s.stepKey,
         order: s.order,
-        label: plainLabel(s.label, spec),
+        label: stepTitle(s.stepKey, detail),
+        detail,
         kind: s.kind,
         flowId: def.flowId,
         block,

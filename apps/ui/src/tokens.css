@@ -2,87 +2,151 @@
  * Design tokens (06 UI-75, ADR-42). Source of truth for colour, type, spacing, shape and motion.
  * scripts/contrast.mjs parses the two colour blocks below (`:root` = light, `:root[data-theme='dark']`
  * = dark) and checks every pair; the prefers-color-scheme block must repeat the dark block exactly.
- * Plain CSS only: no Tailwind, no web fonts, no CDN. Direction "Quiet" (ADR-126, supersedes ADR-117):
- * white and near-black, one link blue for links, selection and focus, ink primary buttons, status
- * colour only on small icons and text. The `--chrome-*` names stay so older rules keep working; their
- * values equal the page values, so the top bar and the rail are light in light mode and dark in dark.
+ * Plain CSS only: no Tailwind, no CDN. Direction "Document" (ADR-134, supersedes "Quiet" ADR-126):
+ * the visual language of official papers. Warm paper and ink, one deep passport green for links,
+ * selection and focus, ink primary buttons, status colour only on small marks, words and the verdict
+ * stamp. Three self-hosted OFL faces (public/fonts, ADR-135): Source Serif 4 for headings and
+ * credential values, IBM Plex Sans for the interface, IBM Plex Mono for real data only. The
+ * `--chrome-*` names stay so older rules keep working; their values equal the page values.
  */
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/source-serif-4-latin-400-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/source-serif-4-latin-600-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/source-serif-4-latin-400-italic.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/ibm-plex-sans-latin-400-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/ibm-plex-sans-latin-500-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/ibm-plex-sans-latin-600-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/ibm-plex-mono-latin-400-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/ibm-plex-mono-latin-500-normal.woff2') format('woff2');
+}
+
 :root {
   color-scheme: light;
-  /* colour: light ("Quiet", ADR-126) */
-  --bg: #ffffff;
-  --surface: #f5f5f7;
-  --sunken: #ebebf0;
-  --border: #e5e5ea;
-  --border-ui: #86868b;
-  --text: #1d1d1f;
-  --text-muted: #5e5e63;
-  --accent: #0066cc;
-  --on-accent: #ffffff;
-  --focus: #0066cc;
-  --status-pass: #1a7431;
-  --status-fail: #b8261b;
+  /* colour: light, "paper" ("Document", ADR-134) */
+  --bg: #f7f5f0;
+  --surface: #efebe3;
+  --sunken: #e7e2d7;
+  --border: #dcd6c9;
+  --border-ui: #7a7467;
+  --text: #1a1c1b;
+  --text-muted: #5a5852;
+  --accent: #1f5c4a;
+  --on-accent: #fcfbf8;
+  --focus: #1f5c4a;
+  --status-pass: #1e6b40;
+  --status-fail: #b02a1f;
   --status-warn: #8a5300;
   --status-info: #3d5a80;
+  --status-expired: #3d5a80;
   --status-neutral: #48484d;
-  --status-skipped: #636366;
-  --accent-strong: #004f9e;
-  --accent-soft: rgba(0, 102, 204, 0.08);
-  --surface-raised: #ffffff;
-  /* primary buttons are ink, not blue (ADR-126) */
-  --button-primary-bg: #1d1d1f;
-  --button-primary-text: #ffffff;
-  --button-primary-hover: #424245;
-  /* one soft shadow level, for floating things only (menus, popovers, the sticky run bar) */
+  --status-skipped: #5e5c56;
+  --accent-strong: #16463a;
+  --accent-soft: rgba(31, 92, 74, 0.08);
+  --surface-raised: #fcfbf8;
+  /* primary buttons are ink (ADR-134) */
+  --button-primary-bg: #1a1c1b;
+  --button-primary-text: #f7f5f0;
+  --button-primary-hover: #3a3c3a;
+  /* one soft shadow level, for floating things only (menus, popovers, dialogs) */
   --shadow-1: 0 0 #0000;
-  --shadow-2: 0 1px 2px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.06);
-  --shadow-3: 0 1px 2px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.06);
-  /* frosted bars: the page colour at 80 % behind a blur */
-  --glass: rgba(255, 255, 255, 0.8);
-  /* chrome (top bar and rail) now equals the page in each theme (ADR-126) */
-  --chrome-bg: #ffffff;
-  --chrome-raised: #f5f5f7;
-  --chrome-border: #e5e5ea;
-  --chrome-border-ui: #86868b;
-  --chrome-text: #1d1d1f;
-  --chrome-muted: #5e5e63;
-  --chrome-accent: #0066cc;
-  --chrome-focus: #0066cc;
-  --chrome-pass: #1a7431;
+  --shadow-2: 0 1px 2px rgba(26, 28, 27, 0.05), 0 6px 20px rgba(26, 28, 27, 0.08);
+  --shadow-3: 0 1px 2px rgba(26, 28, 27, 0.05), 0 6px 20px rgba(26, 28, 27, 0.08);
+  /* bars are opaque now (ADR-134); the name stays for older rules */
+  --glass: #f7f5f0;
+  /* chrome (top bar and rail) equals the page in each theme */
+  --chrome-bg: #f7f5f0;
+  --chrome-raised: #efebe3;
+  --chrome-border: #dcd6c9;
+  --chrome-border-ui: #7a7467;
+  --chrome-text: #1a1c1b;
+  --chrome-muted: #5a5852;
+  --chrome-accent: #1f5c4a;
+  --chrome-focus: #1f5c4a;
+  --chrome-pass: #1e6b40;
   --chrome-warn: #8a5300;
-  --chrome-fail: #b8261b;
-  --chrome-off: #636366;
+  --chrome-fail: #b02a1f;
+  --chrome-off: #5e5c56;
 
-  /* typography */
+  /* typography ("Document", ADR-134): serif for titles and values, sans for the interface */
+  --font-serif: 'Source Serif 4', 'Iowan Old Style', Charter, 'Bitstream Charter', Georgia, serif;
   --font-sans:
-    -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue',
-    Arial, sans-serif;
+    'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    sans-serif;
   --font-mono:
-    ui-monospace, 'SF Mono', 'Cascadia Mono', 'JetBrains Mono', Menlo, Consolas, 'Liberation Mono',
+    'IBM Plex Mono', ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, Consolas, 'Liberation Mono',
     monospace;
-  --font-display: var(--font-sans);
-  --text-11: 0.6875rem;
-  --text-12: 0.75rem;
+  --font-display: var(--font-serif);
+  --text-11: 0.8125rem; /* fine print never goes below 13 px (ADR-134) */
+  --text-12: 0.8125rem;
   --text-13: 0.8125rem;
   --text-14: 0.875rem;
+  --text-15: 1rem;
   --text-16: 1rem;
+  --text-17: 1.0625rem;
   --text-20: 1.25rem;
+  --text-21: 1.375rem;
   --text-24: 1.5rem;
   --text-32: 2rem;
-  --text-15: 0.9375rem;
-  --text-17: 1.0625rem;
-  --text-21: 1.3125rem;
   --text-40: 2.5rem;
-  --text-48: 3rem;
-  --leading-body: 1.47;
+  --text-46: 2.875rem;
+  --text-48: 2.875rem;
+  --leading-body: 1.5;
   --leading-heading: 1.2;
-  --leading-mono: 1.4;
+  --leading-mono: 1.45;
   --weight-regular: 400;
+  --weight-medium: 500;
   --weight-strong: 600;
-  --weight-bold: 700;
-  --tracking-tight: -0.012em;
-  --tracking-display: -0.022em;
+  --weight-bold: 600;
+  --tracking-tight: -0.01em;
+  --tracking-display: -0.01em;
   --tracking-eyebrow: 0;
+  --tracking-stamp: 0.08em;
 
   /* spacing (4 px base) */
   --space-0: 0;
@@ -94,21 +158,24 @@
   --space-6: 2rem;
   --space-7: 3rem;
   --space-8: 4rem;
+  --section-gap: 3rem; /* 48 px between sections; 64 px on wide screens */
 
   /* shape */
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-pill: 980px;
+  --radius-sm: 4px; /* controls */
+  --radius-md: 4px;
+  --radius-lg: 6px; /* cards */
+  --radius-pill: 980px; /* segmented controls only */
 
-  /* motion ("Quiet", ADR-127): quiet and physical, no bounce, no infinite loops but spinners */
+  /* motion ("Document", ADR-134): calm, no bounce, no infinite loops but a real spinner */
   --ease-standard: cubic-bezier(0.25, 0.1, 0.25, 1);
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-press: cubic-bezier(0.2, 0.8, 0.2, 1); /* the verdict stamp, once */
+  --dur-press: 220ms;
   --dur-1: 150ms; /* hover, press */
   --dur-2: 250ms; /* state change, selection */
   --dur-3: 450ms; /* entrance */
   --stagger: 40ms;
-  --rise: 10px;
+  --rise: 8px;
   /* older names, kept as aliases */
   --ease: var(--ease-standard);
   --duration-fast: var(--dur-1);
@@ -119,7 +186,7 @@
   --gutter: 16px;
   --rail-width: 220px;
   --content-max: 1200px;
-  --topbar-height: 52px;
+  --topbar-height: 56px;
 
   /* QR code (UI-16): dark modules on a white square in both themes */
   --qr-size: 280px;
@@ -129,89 +196,91 @@
 
 :root[data-theme='dark'] {
   color-scheme: dark;
-  /* colour: dark ("Quiet", ADR-126) */
-  --bg: #000000;
-  --surface: #1c1c1e;
-  --sunken: #111113;
-  --border: #38383a;
-  --border-ui: #8e8e93;
-  --text: #f5f5f7;
-  --text-muted: #a1a1a6;
-  --accent: #2997ff;
-  --on-accent: #000000;
-  --focus: #2997ff;
-  --status-pass: #30d158;
-  --status-fail: #ff6961;
-  --status-warn: #ffb340;
-  --status-info: #8fb4e3;
-  --status-neutral: #b4b4ba;
-  --status-skipped: #98989d;
-  --accent-strong: #66b5ff;
-  --accent-soft: rgba(41, 151, 255, 0.12);
-  --surface-raised: #2c2c2e;
-  --button-primary-bg: #f5f5f7;
-  --button-primary-text: #000000;
-  --button-primary-hover: #d2d2d7;
+  /* colour: dark, "night document" (ADR-134) */
+  --bg: #121413;
+  --surface: #1a1d1b;
+  --sunken: #0d0f0e;
+  --border: #2f3431;
+  --border-ui: #8b877d;
+  --text: #ece8df;
+  --text-muted: #a7a296;
+  --accent: #7cc4a4;
+  --on-accent: #121413;
+  --focus: #7cc4a4;
+  --status-pass: #6fcf97;
+  --status-fail: #f08a7e;
+  --status-warn: #e0b060;
+  --status-info: #9db8dc;
+  --status-expired: #9db8dc;
+  --status-neutral: #b8b5ad;
+  --status-skipped: #9a968c;
+  --accent-strong: #a3d9c0;
+  --accent-soft: rgba(124, 196, 164, 0.1);
+  --surface-raised: #222624;
+  --button-primary-bg: #ece8df;
+  --button-primary-text: #121413;
+  --button-primary-hover: #cfcac0;
   --shadow-1: 0 0 #0000;
-  --shadow-2: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.4);
-  --shadow-3: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.4);
-  --glass: rgba(0, 0, 0, 0.72);
-  --chrome-bg: #000000;
-  --chrome-raised: #1c1c1e;
-  --chrome-border: #38383a;
-  --chrome-border-ui: #8e8e93;
-  --chrome-text: #f5f5f7;
-  --chrome-muted: #a1a1a6;
-  --chrome-accent: #2997ff;
-  --chrome-focus: #2997ff;
-  --chrome-pass: #30d158;
-  --chrome-warn: #ffb340;
-  --chrome-fail: #ff6961;
-  --chrome-off: #98989d;
+  --shadow-2: 0 1px 2px rgba(0, 0, 0, 0.3), 0 6px 20px rgba(0, 0, 0, 0.4);
+  --shadow-3: 0 1px 2px rgba(0, 0, 0, 0.3), 0 6px 20px rgba(0, 0, 0, 0.4);
+  --glass: #121413;
+  --chrome-bg: #121413;
+  --chrome-raised: #1a1d1b;
+  --chrome-border: #2f3431;
+  --chrome-border-ui: #8b877d;
+  --chrome-text: #ece8df;
+  --chrome-muted: #a7a296;
+  --chrome-accent: #7cc4a4;
+  --chrome-focus: #7cc4a4;
+  --chrome-pass: #6fcf97;
+  --chrome-warn: #e0b060;
+  --chrome-fail: #f08a7e;
+  --chrome-off: #9a968c;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
     color-scheme: dark;
     /* colour: dark (system) */
-    --bg: #000000;
-    --surface: #1c1c1e;
-    --sunken: #111113;
-    --border: #38383a;
-    --border-ui: #8e8e93;
-    --text: #f5f5f7;
-    --text-muted: #a1a1a6;
-    --accent: #2997ff;
-    --on-accent: #000000;
-    --focus: #2997ff;
-    --status-pass: #30d158;
-    --status-fail: #ff6961;
-    --status-warn: #ffb340;
-    --status-info: #8fb4e3;
-    --status-neutral: #b4b4ba;
-    --status-skipped: #98989d;
-    --accent-strong: #66b5ff;
-    --accent-soft: rgba(41, 151, 255, 0.12);
-    --surface-raised: #2c2c2e;
-    --button-primary-bg: #f5f5f7;
-    --button-primary-text: #000000;
-    --button-primary-hover: #d2d2d7;
+    --bg: #121413;
+    --surface: #1a1d1b;
+    --sunken: #0d0f0e;
+    --border: #2f3431;
+    --border-ui: #8b877d;
+    --text: #ece8df;
+    --text-muted: #a7a296;
+    --accent: #7cc4a4;
+    --on-accent: #121413;
+    --focus: #7cc4a4;
+    --status-pass: #6fcf97;
+    --status-fail: #f08a7e;
+    --status-warn: #e0b060;
+    --status-info: #9db8dc;
+    --status-expired: #9db8dc;
+    --status-neutral: #b8b5ad;
+    --status-skipped: #9a968c;
+    --accent-strong: #a3d9c0;
+    --accent-soft: rgba(124, 196, 164, 0.1);
+    --surface-raised: #222624;
+    --button-primary-bg: #ece8df;
+    --button-primary-text: #121413;
+    --button-primary-hover: #cfcac0;
     --shadow-1: 0 0 #0000;
-    --shadow-2: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.4);
-    --shadow-3: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.4);
-    --glass: rgba(0, 0, 0, 0.72);
-    --chrome-bg: #000000;
-    --chrome-raised: #1c1c1e;
-    --chrome-border: #38383a;
-    --chrome-border-ui: #8e8e93;
-    --chrome-text: #f5f5f7;
-    --chrome-muted: #a1a1a6;
-    --chrome-accent: #2997ff;
-    --chrome-focus: #2997ff;
-    --chrome-pass: #30d158;
-    --chrome-warn: #ffb340;
-    --chrome-fail: #ff6961;
-    --chrome-off: #98989d;
+    --shadow-2: 0 1px 2px rgba(0, 0, 0, 0.3), 0 6px 20px rgba(0, 0, 0, 0.4);
+    --shadow-3: 0 1px 2px rgba(0, 0, 0, 0.3), 0 6px 20px rgba(0, 0, 0, 0.4);
+    --glass: #121413;
+    --chrome-bg: #121413;
+    --chrome-raised: #1a1d1b;
+    --chrome-border: #2f3431;
+    --chrome-border-ui: #8b877d;
+    --chrome-text: #ece8df;
+    --chrome-muted: #a7a296;
+    --chrome-accent: #7cc4a4;
+    --chrome-focus: #7cc4a4;
+    --chrome-pass: #6fcf97;
+    --chrome-warn: #e0b060;
+    --chrome-fail: #f08a7e;
+    --chrome-off: #9a968c;
   }
 }
 
@@ -223,5 +292,6 @@
 @media (min-width: 1024px) {
   :root {
     --gutter: 32px;
+    --section-gap: 4rem;
   }
 }

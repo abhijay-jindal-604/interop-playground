@@ -97,8 +97,8 @@ export function RunPage() {
     <PageFrame
       title={
         <>
-          {runCopy.title('')}
-          <span className="run-id mono">{sid}</span>
+          {/* ADR-136: the run reads like a document number, "Run No." then the number */}
+          <span className="run-no">{runCopy.runNo}</span> <span className="run-id mono">{sid}</span>
         </>
       }
       docTitle={runCopy.title(sid)}

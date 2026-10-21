@@ -131,8 +131,13 @@ test.describe('run screen (T-27, recorded FLOW-30 fail log)', () => {
   }) => {
     await page.goto(`/runs/${RUN_ID}#step=vci.token`);
     const result = page.getByRole('region', { name: 'Result' });
+    // ADR-136/137: the stamp, a plain sentence with the step's plain title, the error as a field
+    await expect(result.locator('.stamp')).toHaveAttribute('data-stamp', 'invalid');
     await expect(result).toContainText(
-      'Invalid. The verifier rejected the credential at POST response_uri vp_token: invalid_request Client id validation failed due to invalid client_id/domain.',
+      'The verifier rejected the credential at “Wallet sends the presentation”.',
+    );
+    await expect(result).toContainText(
+      'invalid_request Client id validation failed due to invalid client_id/domain',
     );
     const rail = page.getByRole('navigation', { name: 'Steps' });
     await expect(rail.locator('[aria-current="true"]')).toHaveAttribute('data-step', 'vci.token');

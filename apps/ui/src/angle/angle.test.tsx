@@ -339,7 +339,8 @@ describe('ui.angle child run (UI-26..UI-28)', () => {
     fireEvent.click(toggle);
     const rows = screen.getAllByRole('row').slice(1);
     expect(rows[0]?.getAttribute('data-step-row')).toBe('vci.credential');
-    expect(rows[0]?.textContent).toContain('Changed by KNOB-01');
+    expect(rows[0]?.textContent).toContain('Changed by the fix');
+    expect(rows[0]?.querySelector('.compare-direct')?.getAttribute('title')).toBe('KNOB-01');
     expect(rows).toHaveLength(2);
     fireEvent.click(screen.getByRole('button', { name: 'Show 1 unchanged steps' }));
     expect(screen.getAllByRole('row')).toHaveLength(4);

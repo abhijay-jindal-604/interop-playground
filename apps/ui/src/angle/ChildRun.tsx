@@ -20,6 +20,7 @@ import { Icon } from '../components/Icon.js';
 import { StatusBadge } from '../components/StatusBadge.js';
 import { angleCopy as c, screenCopy } from '../copy.js';
 import { announce } from '../lib/announce.js';
+import { Stamp, stampDate, stampOf } from '../components/Stamp.js';
 import {
   CLASS_TONE,
   changeOf,
@@ -76,6 +77,28 @@ export function ChildBanner({
   );
 }
 
+/**
+ * The two stamps of a re-run (ADR-137): from the compare answer's runs when they carry verdicts,
+ * else from the classification (a fixed child flipped a failed parent to a pass). Nothing is
+ * drawn while the compare loads or when the parent is gone.
+ */
+function flipOf(compare: Load<CompareResponse>, classification: Classification) {
+  if (compare.status !== 'ready') return null;
+  const p =
+    stampOf(compare.data.parent?.verdict) ??
+    (classification === 'fixed' ? stampOf({ outcome: 'fail', verification: 'invalid' }) : null);
+  const ch =
+    stampOf(compare.data.child?.verdict) ??
+    (classification === 'fixed' ? stampOf({ outcome: 'pass', verification: 'valid' }) : null);
+  if (!p || !ch) return null;
+  return {
+    parent: p,
+    child: ch,
+    parentLine: stampDate(compare.data.parent?.finishedAt ?? null),
+    childLine: stampDate(compare.data.child?.finishedAt ?? null),
+  };
+}
+
 /** UI-26 ChildResultCard (terminal derived runs only) */
 export function ChildResultCard({
   childRunId,
@@ -110,12 +133,12 @@ export function ChildResultCard({
     announced.current = true;
     announce(c.child.announce(c.child.chip[classification]));
   }, [classification]);
-  const label = knobEntry(knobs, delta.knobId)?.label ?? null;
   const gone =
     compare.status === 'error' &&
     compare.error instanceof ApiError &&
     (compare.error.code === 'not_found' || compare.error.code === 'compare_not_comparable');
   const claim = compare.status === 'ready' ? compare.data.claimSentence : null;
+  const flip = flipOf(compare, classification);
 
   const runAgain = async () => {
     setAgain({ sending: true, error: null });
@@ -150,11 +173,14 @@ export function ChildResultCard({
       ) : (
         <>
           {claim ? (
-            <blockquote className="claim-block" data-testid="claim">
+            <blockquote
+              className="claim-block"
+              data-testid="claim"
+              title={knobEntry(knobs, delta.knobId)?.label ?? undefined}
+            >
               {claim}
             </blockquote>
           ) : null}
-          {label ? <p className="small muted">({label})</p> : null}
         </>
       );
   else if (classification === 'moved')
@@ -177,6 +203,22 @@ export function ChildResultCard({
         <span className="child-kind">{c.child.chip[classification]}</span>
         <h2 id={hid}>{c.child.heading[classification]}</h2>
       </div>
+      {flip ? (
+        // ADR-137: the flipped verdict, original and re-run stamps side by side
+        <div className="child-stamps">
+          <figure className="child-stamp">
+            <Stamp word={flip.parent.word} status={flip.parent.status} line={flip.parentLine} />
+            <figcaption>{screenCopy.strip.original}</figcaption>
+          </figure>
+          <span className="child-stamps-arrow" aria-hidden="true">
+            →
+          </span>
+          <figure className="child-stamp">
+            <Stamp word={flip.child.word} status={flip.child.status} line={flip.childLine} />
+            <figcaption>{screenCopy.strip.rerun}</figcaption>
+          </figure>
+        </div>
+      ) : null}
       {sentence}
       {again.error ? <InlineError error={again.error} /> : null}
       {gone ? null : (
@@ -311,7 +353,9 @@ export function CompareStrip({
                         <th scope="row">
                           {stepLabel(r.stepKey)}
                           {r.directEffect ? (
-                            <span className="compare-direct">{c.strip.direct(delta.knobId)}</span>
+                            <span className="compare-direct" title={delta.knobId}>
+                              {c.strip.direct}
+                            </span>
                           ) : null}
                         </th>
                         <td>

@@ -48,7 +48,8 @@ test.describe('angle A (T-45)', () => {
     await strip.getByRole('button', { name: 'Compare with run PPPPPPPP' }).click();
     const rows = strip.locator('tbody tr');
     await expect(rows.first()).toHaveAttribute('data-step-row', 'vci.credential');
-    await expect(rows.first()).toContainText('Changed by KNOB-01');
+    await expect(rows.first()).toContainText('Changed by the fix');
+    await expect(rows.first().locator('.compare-direct')).toHaveAttribute('title', 'KNOB-01');
 
     const lineage = page.getByRole('navigation', { name: 'Re-run chain' });
     await expect(lineage).toContainText('waltid.sdjwt.x5c absent → present · Fixed');

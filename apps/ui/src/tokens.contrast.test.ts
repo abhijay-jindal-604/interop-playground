@@ -22,19 +22,19 @@ describe('contrast', () => {
     const file = path.join(dir, 'tokens.css');
     writeFileSync(
       file,
-      readFileSync(tokens, 'utf8').replace('--text-muted: #5e5e63;', '--text-muted: #94a3b8;'),
+      readFileSync(tokens, 'utf8').replace('--text-muted: #5a5852;', '--text-muted: #94a3b8;'),
     );
     const r = run(file);
     expect(r.status).toBe(1);
     expect(r.stderr).toContain('light: --text-muted on --bg');
   });
 
-  it('checks the chrome pairs (ADR-126)', () => {
+  it('checks the chrome pairs (ADR-126, ADR-134)', () => {
     const dir = mkdtempSync(path.join(tmpdir(), 'contrast-'));
     const file = path.join(dir, 'tokens.css');
     writeFileSync(
       file,
-      readFileSync(tokens, 'utf8').replace('--chrome-muted: #5e5e63;', '--chrome-muted: #c7c7cc;'),
+      readFileSync(tokens, 'utf8').replace('--chrome-muted: #5a5852;', '--chrome-muted: #c7c7cc;'),
     );
     const r = run(file);
     expect(r.status).toBe(1);

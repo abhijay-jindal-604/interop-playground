@@ -36,16 +36,17 @@ function mermaid(): Promise<MermaidApi | null> {
       startOnLoad: false,
       securityLevel: 'strict',
       theme: 'neutral',
-      // ADR-129 ("Quiet"): system type, smaller heads and labels; colours come from run-screen.css
+      // ADR-136 ("Document"): the interface sans for labels (lane heads are set in the serif by
+      // run-screen.css); the same stack as --font-sans, since Mermaid measures text with it
       fontFamily:
-        "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+        "'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif",
       sequence: {
         showSequenceNumbers: true,
         mirrorActors: false,
-        actorFontSize: 14,
+        actorFontSize: 17,
         actorFontWeight: 600,
-        messageFontSize: 14,
-        messageMargin: 18,
+        messageFontSize: 17,
+        messageMargin: 22,
         boxMargin: 4,
         actorMargin: 48,
         width: 150,
@@ -143,7 +144,7 @@ export function decorateLanes(root: ParentNode): void {
     lane.setAttribute('y', String(y));
     lane.setAttribute('width', String(w));
     lane.setAttribute('height', String(Math.max(0, vy + vh - y)));
-    lane.setAttribute('rx', '8');
+    lane.setAttribute('rx', '0');
     decor.appendChild(lane);
   });
   const { lines, texts } = messageElements(svg);
@@ -163,7 +164,7 @@ export function decorateLanes(root: ParentNode): void {
     row.setAttribute('y', String(top));
     row.setAttribute('width', String(vw));
     row.setAttribute('height', String(bottom - top));
-    row.setAttribute('rx', '6');
+    row.setAttribute('rx', '4');
     row.setAttribute('data-msg', line.getAttribute('data-msg') ?? String(i));
     row.setAttribute('data-row-step', line.getAttribute('data-step') ?? '');
     decor.appendChild(row);

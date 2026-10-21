@@ -11,6 +11,7 @@ import type {
   Lifeline,
   RunSpec,
 } from '@interop-playground/api';
+import { STEP_TITLES } from '../copy.js';
 import { mergeSteps } from '../run/flows.js';
 import type { RunView } from '../run/reduce.js';
 
@@ -286,6 +287,11 @@ export function notReachedReason(view: RunView): string | null {
   return null;
 }
 
+const titled = (stepKey: string, line: string): string => {
+  const title = STEP_TITLES[stepKey];
+  return title ? `${title}: ${line}` : line;
+};
+
 /** Works out the state of every diagram message (pending, done, failed) from the run view and events. */
 export function diagramStates(
   flow: DiagramFlow,
@@ -329,7 +335,8 @@ export function diagramStates(
       checks: checks.length,
       pollTotal: f?.n ?? null,
       labels: [cut(full[0]), cut(full[1])],
-      titles: full,
+      // ADR-136: the tooltip leads with the step's plain title, then the HTTP line
+      titles: [titled(step.stepKey, full[0]), titled(step.stepKey, full[1])],
       messageStates: ms,
       engineOp: f?.engineOp ?? null,
     });

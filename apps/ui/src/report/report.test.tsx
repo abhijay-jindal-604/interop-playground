@@ -68,7 +68,8 @@ afterEach(() => cleanup());
 describe('ui.report REQ-26 fields', () => {
   it('a pass report lists issuer, wallet, verifier, format, proof type, outcome and error detail', async () => {
     renderAt(`/runs/${PASS_REPORT.runId}/report`);
-    expect(await screen.findByRole('heading', { level: 1, name: /: PASS/ })).toBeTruthy();
+    expect(await screen.findByRole('heading', { level: 1, name: /^Run No\. / })).toBeTruthy();
+    expect(screen.getByTestId('stamp').getAttribute('data-status')).toBe('pass');
     expect(row('Issuer')).toContain('issuer.certify-preauth');
     expect(row('Wallet')).toContain('wallet.playground-ts');
     expect(row('Verifier')).toContain('verifier.inji-verify-local');
@@ -87,7 +88,8 @@ describe('ui.report REQ-26 fields', () => {
 
   it('a forced-fail report adds the failed step, error detail, failing checks and the diagnosis', async () => {
     renderAt(`/runs/${FAIL_REPORT.runId}/report`);
-    expect(await screen.findByRole('heading', { level: 1, name: /: FAIL/ })).toBeTruthy();
+    expect(await screen.findByRole('heading', { level: 1, name: /^Run No\. / })).toBeTruthy();
+    expect(screen.getByTestId('stamp').getAttribute('data-status')).toBe('fail');
     expect(row('Issuer')).toContain('issuer.certify-preauth');
     expect(row('Wallet')).toContain('wallet.playground-ts');
     expect(row('Verifier')).toContain('verifier.inji-verify-local');
@@ -114,7 +116,7 @@ describe('ui.report REQ-26 fields', () => {
       [FAIL_REPORT.runId]: { ...FAIL_REPORT, diagnosis: { ...FAIL_REPORT.diagnosis, matches: [] } },
     });
     renderAt(`/runs/${FAIL_REPORT.runId}/report`);
-    await screen.findByRole('heading', { level: 1, name: /: FAIL/ });
+    await screen.findByRole('heading', { level: 1, name: /^Run No\. / });
     expect(screen.getByRole('region', { name: 'Diagnosis' }).textContent).toContain(
       'Unclassified. No known fingerprint matched; the raw checks above are the evidence.',
     );
@@ -128,7 +130,7 @@ describe('ui.report REQ-26 fields', () => {
       },
     });
     renderAt(`/runs/${FAIL_REPORT.runId}/report`);
-    await screen.findByRole('heading', { level: 1, name: /: FAIL/ });
+    await screen.findByRole('heading', { level: 1, name: /^Run No\. / });
     expect(screen.getByRole('region', { name: 'Diagnosis' }).textContent).toContain(
       'Issuer and verifier: inji-verify (vc-verifier) 1.0-alpha.1',
     );

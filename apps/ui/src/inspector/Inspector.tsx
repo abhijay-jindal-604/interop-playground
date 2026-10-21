@@ -14,6 +14,7 @@ import type { RunView } from '../run/reduce.js';
 import { CaptureBadge, outcomeWord } from '../run/StepRail.js';
 import { runCopy, screenCopy } from '../copy.js';
 import { BodyViewer, Redacted } from './BodyViewer.js';
+import { credentialDocument, DocumentCard } from './DocumentCard.js';
 import { findDecodable, pretty, type DecodedItem } from './decode.js';
 import { JsonCode } from './JsonCode.js';
 import {
@@ -410,10 +411,14 @@ function Payload({ value }: { value: unknown }) {
 
 /** One decoded credential, token or document with its parts. */
 function ArtifactCard({ item, from }: { item: DecodedItem; from: string }) {
-  return (
-    <article className="artifact-card" data-artifact={item.kind}>
-      <h3 className="artifact-title">{titleOf(item)}</h3>
-      <p className="muted small">{c.decoded.from(from)}</p>
+  // ADR-137: a credential reads as a document first; tokens and proofs keep the raw view
+  const credential =
+    item.kind === 'sd-jwt' || item.field === 'credential' || item.field === 'verifiableCredential';
+  const doc = credential
+    ? credentialDocument(item.jwt.payload, item.sdJwt?.disclosures ?? [], item.jwt.header)
+    : null;
+  const raw = (
+    <>
       <JoseChips h={item.jwt.header} />
       {item.sdJwt ? (
         <DisclosureList
@@ -432,6 +437,13 @@ function ArtifactCard({ item, from }: { item: DecodedItem; from: string }) {
           <Payload value={item.sdJwt.kbJwt.payload} />
         </>
       ) : null}
+    </>
+  );
+  return (
+    <article className="artifact-card" data-artifact={item.kind}>
+      <h3 className="artifact-title">{titleOf(item)}</h3>
+      <p className="muted small">{c.decoded.from(from)}</p>
+      {doc ? <DocumentCard doc={doc}>{raw}</DocumentCard> : raw}
       <p className="muted small">{c.decoded.disclaimer}</p>
     </article>
   );
@@ -471,13 +483,14 @@ function EngineArtifactCard({ row }: { row: EngineRowView }) {
   const format = typeof out.format === 'string' ? out.format : '';
   const header = isRec(out.header) ? out.header : null;
   const disclosures = Array.isArray(out.disclosures) ? out.disclosures.filter(isRec) : [];
-  return (
-    <article className="artifact-card" data-artifact="credential" data-engine-op={call.op}>
-      <h3 className="artifact-title">{c.decoded.inspected(format)}</h3>
-      <p className="muted small">{from}</p>
-      {typeof out.error === 'string' ? (
-        <p className="tone-fail small">{c.decoded.inspectError(out.error)}</p>
-      ) : null}
+  const body = 'payload' in out ? out.payload : 'credential' in out ? out.credential : null;
+  const doc = credentialDocument(
+    body,
+    disclosures.map((d) => ({ name: typeof d.name === 'string' ? d.name : null, value: d.value })),
+    header,
+  );
+  const raw = (
+    <>
       {header ? <JoseChips h={header} /> : null}
       <DisclosureList
         items={disclosures.map((d, i) => ({
@@ -493,6 +506,16 @@ function EngineArtifactCard({ row }: { row: EngineRowView }) {
       ) : typeof out.bytes === 'number' ? (
         <p className="small">{c.decoded.bytesOnly(out.bytes)}</p>
       ) : null}
+    </>
+  );
+  return (
+    <article className="artifact-card" data-artifact="credential" data-engine-op={call.op}>
+      <h3 className="artifact-title">{c.decoded.inspected(format)}</h3>
+      <p className="muted small">{from}</p>
+      {typeof out.error === 'string' ? (
+        <p className="tone-fail small">{c.decoded.inspectError(out.error)}</p>
+      ) : null}
+      {doc ? <DocumentCard doc={doc}>{raw}</DocumentCard> : raw}
       {isRec(out.artifacts) ? (
         <details className="disclosure">
           <summary>{c.decoded.artifacts}</summary>
@@ -526,7 +549,13 @@ function DecodedTab({ list, engines }: { list: ExchangeView[]; engines: EngineRo
         );
       }
     }
-    return out;
+    // ADR-137: the credential itself reads first, as a document; tokens and proofs follow
+    const isCredential = (i: DecodedItem) =>
+      i.kind === 'sd-jwt' || i.field === 'credential' || i.field === 'verifiableCredential';
+    return [
+      ...out.filter((o) => isCredential(o.item)),
+      ...out.filter((o) => !isCredential(o.item)),
+    ];
   }, [list]);
   if (items.length === 0 && fromEngines.length === 0)
     return <p className="tab-empty">{c.decoded.empty}</p>;
@@ -943,7 +972,8 @@ export function Inspector({
   }, [focus]);
 
   const step = selected ? view.steps[selected] : undefined;
-  const label = selected ? (steps.find((s) => s.stepKey === selected)?.label ?? selected) : null;
+  const row = selected ? steps.find((s) => s.stepKey === selected) : undefined;
+  const label = selected ? (row?.label ?? selected) : null;
   const keys = scope === 'run' ? null : new Set(selected ? [selected] : []);
   const exchanges = model.exchanges.filter((x) => !keys || keys.has(x.stepKey ?? ''));
   const engines = model.engines.filter((r) => !keys || keys.has(r.stepKey ?? ''));
@@ -1019,14 +1049,52 @@ export function Inspector({
     >
       <div className="inspector-head">
         <h2 className="inspector-title">{label ?? c.scope.run}</h2>
-        {selected ? <p className="mono muted small">{selected}</p> : null}
+        {row && row.detail !== row.label ? (
+          <p className="inspector-detail mono">{row.detail}</p>
+        ) : null}
         <p className="inspector-chips">
-          {step ? <span className="chip chip-outline">{runCopy.rail.outcome[word]}</span> : null}
-          {step?.state === 'done' && !skipped ? (
-            <CaptureBadge capture={step.capture} note={step.coverageNote} />
+          {step ? <span className="inspector-state">{runCopy.rail.outcome[word]}</span> : null}
+          {step?.durationMs !== null && step?.durationMs !== undefined && !skipped ? (
+            <span>{screenCopy.step.duration(step.durationMs)}</span>
           ) : null}
-          {following && label ? <span className="chip tone-info">{c.following(label)}</span> : null}
+          {following && label ? (
+            <span className="inspector-following">{c.following(label)}</span>
+          ) : null}
         </p>
+        {selected ? (
+          // ADR-136: the step's technical facts, one disclosure (developers still reach all of it)
+          <details className="disclosure inspector-details">
+            <summary>{screenCopy.step.details}</summary>
+            <dl className="doc-fields disclosure-body">
+              <div className="doc-field is-mono">
+                <dt>{screenCopy.step.stepId}</dt>
+                <dd>{selected}</dd>
+              </div>
+              {step?.state === 'done' && !skipped && step.capture ? (
+                <div className="doc-field">
+                  <dt>{screenCopy.step.recording}</dt>
+                  <dd>
+                    <CaptureBadge capture={step.capture} note={step.coverageNote} />
+                  </dd>
+                </div>
+              ) : null}
+              {step && step.engines.length > 0 ? (
+                <div className="doc-field is-mono">
+                  <dt>{screenCopy.step.library}</dt>
+                  <dd>{step.engines.join(', ')}</dd>
+                </div>
+              ) : null}
+              <div className="doc-field">
+                <dt>{screenCopy.step.messages}</dt>
+                <dd>{step?.exchangeIds.length ?? 0}</dd>
+              </div>
+              <div className="doc-field">
+                <dt>{screenCopy.step.checks}</dt>
+                <dd>{step?.checks.filter((k) => k.outcome !== 'info').length ?? 0}</dd>
+              </div>
+            </dl>
+          </details>
+        ) : null}
         <div role="radiogroup" aria-label={c.scope.label} className="seg">
           {(['step', 'run'] as const).map((s) => (
             <label key={s} className="seg-option">

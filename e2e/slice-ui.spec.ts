@@ -40,7 +40,8 @@ test.describe('slice UI (T-29 diagram, T-30 selector, UI-51 report)', () => {
 
   test('the report view lists the REQ-26 fields', async ({ page }) => {
     await page.goto(`/runs/${RUN_ID}/report`);
-    await expect(page.locator('h1')).toContainText(': FAIL');
+    await expect(page.locator('h1')).toContainText('Run No.');
+    await expect(page.getByTestId('stamp')).toHaveAttribute('data-status', 'fail');
     const table = page.getByRole('region', { name: 'Combination' });
     await expect(table).toContainText('issuer.certify-preauth');
     await expect(table).toContainText('jwt (ES256, P1363)');

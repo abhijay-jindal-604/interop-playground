@@ -70,7 +70,19 @@ export function targetStepKey(flows: RunFlows | null): string | null {
   return (flows?.presentation ?? flows?.issuance)?.targetStepKey ?? null;
 }
 
-/** The ResultCard sentence for a terminal `completed` run (UI-11 table). */
+/** the step whose failure the verdict names: the failed step, else the step carrying the failing check */
+function failingKeyOf(view: RunView, steps: readonly RailStep[]): string | null {
+  return (
+    view.verdict?.failedStepKey ??
+    steps.find((s) => view.steps[s.stepKey]?.checks.some((c) => c.outcome === 'fail'))?.stepKey ??
+    null
+  );
+}
+
+/**
+ * The ResultCard sentence for a terminal `completed` run (UI-11 table). ADR-136: plain words with
+ * the step's plain title; the verbatim code and message are `resultError`'s field, not the sentence.
+ */
 export function resultSentence(
   view: RunView,
   steps: readonly RailStep[],
@@ -88,17 +100,11 @@ export function resultSentence(
     case 'fail': {
       // a verifier that answers "invalid" with every step passed (FLOW-40) names its failing
       // check at the step that carries it
-      const key =
-        failingKey ??
-        steps.find((s) => view.steps[s.stepKey]?.checks.some((c) => c.outcome === 'fail'))
-          ?.stepKey ??
-        null;
-      const f = failureOf(key ? view.steps[key] : undefined);
       if (v.verification === 'invalid' && failingKey === null)
-        return runCopy.result.failInvalidChecks(f.code, f.message);
+        return runCopy.result.failInvalidChecks;
       return v.verification === 'invalid'
-        ? runCopy.result.failInvalid(labelOf(key, steps), f.code, f.message)
-        : runCopy.result.failAt(failing, f.code, f.message);
+        ? runCopy.result.failInvalid(labelOf(failingKeyOf(view, steps), steps))
+        : runCopy.result.failAt(failing);
     }
     case 'blocked':
       return runCopy.result.blocked(labelOf(target, steps), failing);
@@ -113,6 +119,15 @@ export function resultSentence(
     case 'no-submission':
       return v.kind === 'probe' ? runCopy.result.probe : runCopy.result.noSubmission;
   }
+}
+
+/** The verbatim error of a failed run ("invalid_request Client id …"), or null (ADR-136). */
+export function resultError(view: RunView, steps: readonly RailStep[]): string | null {
+  if (view.verdict?.outcome !== 'fail') return null;
+  const key = failingKeyOf(view, steps);
+  const f = failureOf(key ? view.steps[key] : undefined);
+  const text = `${f.code} ${f.message}`.trim();
+  return text || null;
 }
 
 export interface CoverageItem {
@@ -133,13 +148,13 @@ export function coverageItems(view: RunView, steps: readonly RailStep[]): Covera
       items.push({
         stepKey: row.stepKey,
         expected: false,
-        text: runCopy.coverage.partialItem(row.label, row.stepKey, s.coverageNote ?? ''),
+        text: runCopy.coverage.partialItem(row.label, s.coverageNote ?? ''),
       });
     } else {
       items.push({
         stepKey: row.stepKey,
         expected: row.captureDefault === 'none',
-        text: runCopy.coverage.noneItem(row.label, row.stepKey, s.engines[0] ?? 'a library'),
+        text: runCopy.coverage.noneItem(row.label, s.engines[0] ?? 'a library'),
       });
     }
   }

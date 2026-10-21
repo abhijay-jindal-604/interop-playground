@@ -4,15 +4,7 @@
  * the run (API-20) and opens `/runs/:runId`. The deep link `/?issuer&wallet&verifier&format&grant&mode`
  * preselects; otherwise the last selection (`pg.selection.v1`) or the defaults apply.
  */
-import {
-  useCallback,
-  useEffect,
-  useId,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-} from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import type {
   CreateRunRequest,
@@ -124,47 +116,88 @@ function useCompatibility(sel: Selection, entries: Record<Role, AdapterEntry[]> 
 /** research-log S-IDs are internal; the UI shows only public evidence (ADR-98, ADR-100) */
 const isResearchId = (e: string): boolean => /^S-\d+$/.test(e);
 
-/** Expandable explanation of why a card is unavailable: the reason and its public evidence references. */
-function WhyNot({ hit, evidence: all }: { hit: IncompatibilityHit; evidence: string[] }) {
-  const evidence = all.filter((e) => !isResearchId(e));
-  const [open, setOpen] = useState(false);
-  const btn = useRef<HTMLButtonElement>(null);
-  const id = useId();
+/** plain words for the one note under a column (ADR-134); codes stay in its Details */
+const NOTE = {
+  cannot: (names: string, reason: string) =>
+    `${names} can't be used with this selection. ${reason}`,
+  conflict: (name: string, reason: string) =>
+    `${name} doesn't work with this selection. ${reason} Choose another option or change the format.`,
+  down: (names: string, many: boolean, reason: string) =>
+    reason.startsWith('not in this release')
+      ? `${names} ${many ? 'are' : 'is'} not in this release.`
+      : `${names} ${many ? 'are' : 'is'} not running (${reason}).`,
+  rule: (id: string) => `Rule ${id}`,
+};
+const andList = (xs: string[]) =>
+  xs.length <= 1 ? (xs[0] ?? '') : `${xs.slice(0, -1).join(', ')} and ${xs[xs.length - 1]}`;
+const sentence = (t: string) => (/[.!?]$/.test(t.trim()) ? t.trim() : `${t.trim()}.`);
+
+/** the run bar's sentence (ADR-134) */
+const START = {
+  full: (issuer: string, wallet: string, verifier: string) =>
+    `${issuer} issues to ${wallet}, and ${verifier} checks it.`,
+  issueOnly: (issuer: string, wallet: string) => `${issuer} issues to ${wallet}.`,
+};
+
+type Blocked = { entry: AdapterEntry; hit: IncompatibilityHit | null; checked: boolean };
+
+/** The one quiet note under a column: why its greyed options can't be picked, in plain words, with
+ * the rule IDs, gap IDs and evidence behind a "Details" disclosure (ADR-134). */
+function ColumnNote({
+  id,
+  blocked,
+  evidenceOf,
+}: {
+  id: string;
+  blocked: Blocked[];
+  evidenceOf: (ruleId: string) => string[];
+}) {
+  if (blocked.length === 0) return null;
+  const lines: string[] = [];
+  const byReason = new Map<string, string[]>();
+  const downBy = new Map<string, string[]>();
+  for (const b of blocked) {
+    const n = nameOf(b.entry);
+    if (b.hit && b.checked) lines.push(NOTE.conflict(n, sentence(b.hit.reason)));
+    else if (b.hit) byReason.set(b.hit.reason, [...(byReason.get(b.hit.reason) ?? []), n]);
+    else {
+      const r = b.entry.availability.reason ?? '';
+      downBy.set(r, [...(downBy.get(r) ?? []), n]);
+    }
+  }
+  for (const [reason, names] of byReason) lines.push(NOTE.cannot(andList(names), sentence(reason)));
+  for (const [reason, names] of downBy)
+    lines.push(NOTE.down(andList(names), names.length > 1, reason));
+  const coded = blocked.filter((b) => b.hit);
   return (
-    <span className="why-not">
-      <button
-        ref={btn}
-        type="button"
-        className="btn btn-ghost btn-sm"
-        aria-expanded={open}
-        aria-controls={id}
-        onClick={() => setOpen((o) => !o)}
-      >
-        {c.whyNot}
-      </button>
-      {open ? (
-        <span
-          id={id}
-          className="why-not-pop"
-          role="note"
-          onKeyDown={(e) => {
-            if (e.key === 'Escape') {
-              setOpen(false);
-              btn.current?.focus();
-            }
-          }}
-        >
-          <code>{hit.ruleId}</code>
-          <span>{hit.reason}</span>
-          {hit.gapId ? <span>{c.gap(hit.gapId)}</span> : null}
-          {evidence.length ? <span>{c.evidence(evidence.join(', '))}</span> : null}
-        </span>
+    <div className="column-note" id={id} data-testid="column-note">
+      {lines.map((l) => (
+        <p key={l}>{l}</p>
+      ))}
+      {coded.length > 0 ? (
+        <details className="details">
+          <summary>{c.details}</summary>
+          <ul>
+            {coded.map(({ entry, hit }) => {
+              const evidence = evidenceOf(hit!.ruleId).filter((e) => !isResearchId(e));
+              return (
+                <li key={entry.descriptor.id}>
+                  <span>{nameOf(entry)}: </span>
+                  <code>{NOTE.rule(hit!.ruleId)}</code>
+                  {hit!.gapId ? <span> · {c.gap(hit!.gapId)}</span> : null}
+                  {evidence.length ? <span> · {c.evidence(evidence.join(', '))}</span> : null}
+                </li>
+              );
+            })}
+          </ul>
+        </details>
       ) : null}
-    </span>
+    </div>
   );
 }
 
-/** One selectable adapter card with its tier, availability and, when blocked, the reason. */
+/** One option row: a radio mark, the name and one muted line. An option that can't be used with
+ * the current selection is greyed, stays focusable (`aria-disabled`) and points at the column note. */
 function AdapterCard({
   entry,
   role,
@@ -172,7 +205,7 @@ function AdapterCard({
   hit,
   tunnelUp,
   checked,
-  evidence,
+  noteId,
   onPick,
   index = 0,
 }: {
@@ -182,9 +215,10 @@ function AdapterCard({
   hit: IncompatibilityHit | null;
   tunnelUp: boolean;
   checked: boolean;
-  evidence: string[];
+  /** the column note that explains why this option is greyed */
+  noteId: string;
   onPick: () => void;
-  /** position for the entrance stagger (ADR-127) */
+  /** position for the entrance stagger (ADR-134) */
   index?: number;
 }) {
   const d = entry.descriptor;
@@ -192,23 +226,21 @@ function AdapterCard({
   const greyed = down || (hit !== null && !checked);
   const conflict = checked && hit !== null && !down;
   const tunnel = cardTunnel(sel, role, d.id);
-  const [tier, tierTip] = c.tier[d.tier] ?? [d.tier, ''];
+  const [tier] = c.tier[d.tier] ?? [d.tier, ''];
   const blurb = c.names[d.id]?.[1] ?? null;
   const hops = d.coverage.partialHops;
   const fingerprint =
     entry.availability.available && entry.availability.versionFingerprint
       ? entry.availability.versionFingerprint
       : null;
-  // one muted meta line instead of a row of tags: "Local · Automated · SD-JWT VC, JSON-LD"
+  // where it runs, how it runs and its formats: for the tooltip, not a row of tags
   const meta = [
     c.env[d.envClass] ?? d.envClass,
     tier,
     d.formats.map((f) => c.recipe.formats[f] ?? f).join(', '),
   ].join(' · ');
   let status: { text: string; tone: string } | null = null;
-  if (down) status = { text: c.unavailable(entry.availability.reason ?? ''), tone: 'skipped' };
-  else if (conflict) status = { text: c.conflicts(hit.reason, hit.gapId), tone: 'fail' };
-  else if (hit) status = { text: c.notAvailable(hit.reason, hit.gapId), tone: 'skipped' };
+  if (greyed || conflict) status = null;
   else if (tunnel && !tunnelUp) status = { text: c.tunnel[tunnel], tone: 'warn' };
   else if (c.tierHint[d.tier]) status = { text: c.tierHint[d.tier] ?? '', tone: '' };
   return (
@@ -219,7 +251,7 @@ function AdapterCard({
     >
       <label
         className="adapter-radio"
-        title={fingerprint ? `${d.vendor} · ${c.version(fingerprint)}` : d.vendor}
+        title={`${meta}${fingerprint ? ` · ${c.version(fingerprint)}` : ''}`}
       >
         <input
           type="radio"
@@ -227,17 +259,17 @@ function AdapterCard({
           name={`select-${role}`}
           value={d.id}
           checked={checked}
-          disabled={greyed}
-          onChange={onPick}
+          aria-disabled={greyed || undefined}
+          aria-describedby={greyed || conflict ? noteId : undefined}
+          onChange={() => {
+            if (!greyed) onPick();
+          }}
         />
         <span className="adapter-card-body">
           <span className="adapter-card-head">
             <span className="adapter-name">{nameOf(entry)}</span>
           </span>
           {blurb ? <span className="adapter-blurb">{blurb}</span> : null}
-          <span className="adapter-card-meta" title={tierTip}>
-            {meta}
-          </span>
           {status ? (
             <span
               className={`adapter-status ${status.tone ? `tone-${status.tone}` : 'muted'}`}
@@ -248,9 +280,8 @@ function AdapterCard({
           ) : null}
         </span>
       </label>
-      {hit && !down && !checked ? <WhyNot hit={hit} evidence={evidence} /> : null}
       {hops.length > 0 ? (
-        <details className="disclosure adapter-details">
+        <details className="details adapter-details">
           <summary>{c.details}</summary>
           <ul className="small">
             {hops.map((h) => (
@@ -263,7 +294,7 @@ function AdapterCard({
   );
 }
 
-/** One role's column of adapter cards, behaving as a radio group. */
+/** One role's column of options, behaving as a radio group, with one note for the greyed ones. */
 function Column({
   role,
   entries,
@@ -286,20 +317,20 @@ function Column({
   const hitOf = (id: AdapterId) =>
     role === 'verifier' && sel.scope === 'issuance' ? null : (hits[`${role}:${id}`] ?? null);
   const titleId = `col-${role}`;
+  const noteId = `col-${role}-note`;
   const offset = ROLES.indexOf(role) * 2;
   const card = (e: AdapterEntry, i: number) => {
     const id = e.descriptor.id;
-    const hit = hitOf(id);
     return (
       <AdapterCard
         key={id}
         entry={e}
         role={role}
         sel={sel}
-        hit={hit}
+        hit={hitOf(id)}
         tunnelUp={tunnelUp}
         checked={sel[role] === id}
-        evidence={hit ? evidenceOf(hit.ruleId) : []}
+        noteId={noteId}
         onPick={() => onPick(role, id)}
         index={offset + Math.min(i, 8)}
       />
@@ -308,6 +339,10 @@ function Column({
   // a selected adapter always stays in view, even when it is outside the release
   const later = entries?.filter((e) => isLater(e) && sel[role] !== e.descriptor.id) ?? [];
   const now = entries?.filter((e) => !later.includes(e)) ?? [];
+  const blocked: Blocked[] = now
+    .map((e) => ({ entry: e, hit: hitOf(e.descriptor.id), checked: sel[role] === e.descriptor.id }))
+    .filter((b) => !b.entry.availability.available || b.hit !== null)
+    .map((b) => (b.entry.availability.available ? b : { ...b, hit: null }));
   return (
     <section className="card column" aria-labelledby={titleId}>
       <h2 id={titleId} className="column-title">
@@ -315,23 +350,26 @@ function Column({
         {entries ? <span className="counter muted">{c.options(entries.length)}</span> : null}
       </h2>
       {role === 'verifier' && sel.scope === 'issuance' ? (
-        <p className="muted small column-note">{c.verifierUnused}</p>
+        <p className="muted small">{c.verifierUnused}</p>
       ) : null}
       <div className={`column-progress${checking ? ' is-active' : ''}`} aria-hidden="true" />
       {entries ? (
-        <div className="adapter-list" role="radiogroup" aria-label={c.columns[role]}>
-          {now.map(card)}
-          {later.length > 0 ? (
-            <details className="column-later">
-              <summary>{c.laterLabel(later.length)}</summary>
-              <div className="adapter-list">{later.map(card)}</div>
-            </details>
-          ) : null}
-        </div>
+        <>
+          <div className="adapter-list" role="radiogroup" aria-label={c.columns[role]}>
+            {now.map(card)}
+            {later.length > 0 ? (
+              <details className="column-later">
+                <summary>{c.laterLabel(later.length)}</summary>
+                <div className="adapter-list">{later.map(card)}</div>
+              </details>
+            ) : null}
+          </div>
+          <ColumnNote id={noteId} blocked={blocked} evidenceOf={evidenceOf} />
+        </>
       ) : (
         <div className="adapter-list" aria-hidden="true">
           {Array.from({ length: SKELETON[role] }, (_, i) => (
-            <Skeleton key={i} height="3.5rem" radius="var(--radius-md)" />
+            <Skeleton key={i} height="3.5rem" radius="var(--radius-sm)" />
           ))}
         </div>
       )}
@@ -447,7 +485,7 @@ export function SelectorPage() {
     .map((r) => entries?.[r].find((e) => e.descriptor.id === sel[r]))
     .find((e) => e && !e.availability.available);
   const blockReason = selfHit
-    ? `${selfHit.reason}${selfHit.gapId ? ` (${selfHit.gapId})` : ''}`
+    ? selfHit.reason
     : down
       ? `${nameOf(down)}: ${c.unavailable(down.availability.reason ?? '')}`
       : tunnelBlock
@@ -491,10 +529,12 @@ export function SelectorPage() {
 
   const grant = grantOf(sel);
   const delivery = preview?.ok ? preview.spec.delivery : null;
-  const summary = [
+  // the run bar says it as a sentence; the recipe follows as one muted line (ADR-134)
+  const summary =
     sel.scope === 'issuance'
-      ? `${name('issuer')} → ${name('wallet')}`
-      : `${name('issuer')} → ${name('wallet')} → ${name('verifier')}`,
+      ? START.issueOnly(name('issuer'), name('wallet'))
+      : START.full(name('issuer'), name('wallet'), name('verifier'));
+  const recipe = [
     c.recipe.formats[sel.format] ?? sel.format,
     c.grantWord[grant] ?? grant,
     sel.scope === 'issuance' ? c.issueOnly : (c.recipe.modes[sel.mode] ?? sel.mode),
@@ -596,6 +636,7 @@ export function SelectorPage() {
           <div className="start-bar" role="region" aria-label={c.startBar}>
             <div className="start-summary">
               <p className="start-text">{summary}</p>
+              <p className="start-meta">{recipe}</p>
               {preview?.ok
                 ? preview.warnings.map((w) => (
                     <p key={w} className="small muted">

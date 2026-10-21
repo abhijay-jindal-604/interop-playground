@@ -57,6 +57,12 @@ const statusText = () =>
     .map((s) => s.textContent ?? '')
     .join(' ');
 const resultText = () => screen.getByRole('region', { name: 'Result' }).textContent ?? '';
+/** the verdict stamp's word key (ADR-137) */
+const stampOfResult = () =>
+  screen
+    .getByRole('region', { name: 'Result' })
+    .querySelector('.stamp')
+    ?.getAttribute('data-stamp');
 
 beforeEach(() => {
   window.history.replaceState(null, '', '/runs/x');
@@ -95,7 +101,7 @@ describe('ui.run-screen UI-11 states', () => {
     );
     const { view } = show('FLOW-30-pass', events);
     expect(viewStateOf(view, true)).toBe('running');
-    expect(statusText()).toContain('Running. Step 18 of 31: POST response_uri vp_token.');
+    expect(statusText()).toContain('Running. Step 18 of 31: Wallet sends the presentation.');
   });
 
   it('awaiting: "Waiting for you. {UI-15 heading}"', () => {
@@ -179,44 +185,54 @@ describe('ui.run-screen UI-11 states', () => {
   it('done-pass: issuance only, valid, valid-but-expired', () => {
     show('FLOW-01-pass');
     expect(resultText()).toContain('The credential was issued. No verification was run.');
+    expect(stampOfResult()).toBe('issued');
     cleanup();
     show('FLOW-30-pass');
-    expect(resultText()).toContain('The verifier accepted the credential: Valid.');
+    expect(resultText()).toContain('The verifier accepted the credential.');
+    expect(stampOfResult()).toBe('valid');
     cleanup();
     show('FLOW-30-pass', withVerdict('FLOW-30-pass', { verification: 'valid-but-expired' }));
     expect(resultText()).toContain(
-      'Valid but expired. The signature checks out and the credential is past its expiry date.',
+      'The signature checks out, but the credential is past its expiry date.',
     );
+    expect(stampOfResult()).toBe('expired');
   });
 
   it('done-fail: invalid at the failing step with the recorded code and message', () => {
     const { view } = show('FLOW-30-fail');
     expect(viewStateOf(view, true)).toBe('done-fail');
     expect(resultText()).toContain(
-      'Invalid. The verifier rejected the credential at POST response_uri vp_token: invalid_request Client id validation failed due to invalid client_id/domain.',
+      'The verifier rejected the credential at “Wallet sends the presentation”.',
     );
+    expect(stampOfResult()).toBe('invalid');
     expect(resultText()).toContain('Failing step');
+    // the verbatim error is its own field (ADR-136), not part of the sentence
+    expect(resultText()).toContain(
+      'Error detailinvalid_request Client id validation failed due to invalid client_id/domain',
+    );
     cleanup();
     show('FLOW-30-fail', withVerdict('FLOW-30-fail', { verification: null, issuanceOk: false }));
+    expect(resultText()).toContain('The run failed at “Wallet sends the presentation”.');
+    expect(stampOfResult()).toBe('fail');
     expect(resultText()).toContain(
-      'Failed at POST response_uri vp_token: invalid_request Client id validation failed due to invalid client_id/domain.',
+      'invalid_request Client id validation failed due to invalid client_id/domain',
     );
   });
 
   it('done-blocked, done-lenient, done-inconclusive, done-no-submission and the probe', () => {
     show('FLOW-30-fail', withVerdict('FLOW-30-fail', { outcome: 'blocked' }));
     expect(resultText()).toContain(
-      'Blocked. normalise to checks did not run because POST response_uri vp_token failed first. Counted as not working in pass rates.',
+      "“Record the verifier's verdict” did not run because “Wallet sends the presentation” failed first. Counted as not working in pass rates.",
     );
     cleanup();
     show('FLOW-30-pass', withVerdict('FLOW-30-pass', { outcome: 'lenient' }));
     expect(resultText()).toContain(
-      'Lenient. The component accepted something the specification leaves to policy. Counted as conformant.',
+      'The component accepted something the specification leaves to policy. Counted as conformant.',
     );
     cleanup();
     show('FLOW-30-pass', withVerdict('FLOW-30-pass', { outcome: 'inconclusive' }));
     expect(resultText()).toContain(
-      'Inconclusive. a manual observation never arrived. Not counted in pass rates.',
+      'The playground could not tell: a manual observation never arrived. Not counted in pass rates.',
     );
     cleanup();
     show(
@@ -224,12 +240,12 @@ describe('ui.run-screen UI-11 states', () => {
       withVerdict('FLOW-30-pass', { outcome: 'no-submission', verification: 'no-submission' }),
     );
     expect(resultText()).toContain(
-      'No submission. The wallet never sent a response to the verifier before the request expired. Not counted in pass rates.',
+      'The wallet never answered the verifier before the request expired. Not counted in pass rates.',
     );
     cleanup();
     show('FLOW-30-pass', withVerdict('FLOW-30-pass', { outcome: 'no-submission', kind: 'probe' }));
     expect(resultText()).toContain(
-      'Probe result: no holder answered. Inji Wallet cannot answer the DC API (G-37). Not counted in pass rates.',
+      'Probe result: no wallet answered. Inji Wallet cannot answer the Digital Credentials API yet. Not counted in pass rates.',
     );
   });
 });
@@ -314,7 +330,7 @@ describe('ui.run-screen step rail and deep links', () => {
     expect(document.activeElement).toBe(screen.getByRole('region', { name: 'Inspector' }));
   });
 
-  it('rows show outcome, capture label, skip reason and counts (UI-13, UI-14)', () => {
+  it('rows show a plain title, the HTTP line, outcome and skip reason; capture and counts sit in the inspector Details (UI-13, UI-14, ADR-136)', () => {
     show('FLOW-30-pass');
     const rail = screen.getByRole('navigation', { name: 'Steps' });
     expect(within(rail).getByRole('heading', { name: 'Issuance' })).toBeTruthy();
@@ -329,12 +345,27 @@ describe('ui.run-screen step rail and deep links', () => {
       .getAllByRole('button')
       .find((b) => b.dataset.step === 'vp.response.post');
     expect(post?.textContent).toContain('Pass');
-    expect(post?.textContent).toContain('Full capture');
-    expect(post?.textContent).toContain('1 message');
+    expect(post?.querySelector('.step-label')?.textContent).toBe('Wallet sends the presentation');
+    expect(post?.querySelector('.step-detail')?.textContent).toBe('POST response_uri vp_token');
+    expect(post?.textContent).not.toContain('vp.response.post');
+    expect(post?.textContent).not.toContain('capture');
+    if (!post) throw new Error('no row');
+    fireEvent.click(post);
+    const details = () => {
+      const inspector = screen.getByRole('region', { name: 'Inspector' });
+      const d = inspector.querySelector('details.inspector-details');
+      if (!d) throw new Error('no step Details');
+      return d.textContent ?? '';
+    };
+    expect(details()).toContain('Step IDvp.response.post');
+    expect(details()).toContain('Full capture');
+    expect(details()).toContain('Messages1');
     const sign = within(rail)
       .getAllByRole('button')
       .find((b) => b.dataset.step === 'vci.proof.sign');
-    expect(sign?.textContent).toContain('No capture (engine)');
+    if (!sign) throw new Error('no row');
+    fireEvent.click(sign);
+    expect(details()).toContain('Not recorded (library step)');
   });
 
   it('a partial step raises the CoverageBanner; engine steps are listed but not counted', () => {
@@ -354,11 +385,9 @@ describe('ui.run-screen step rail and deep links', () => {
     show('FLOW-30-pass', events);
     expect(screen.getByText('Partial evidence: 1 step(s) ran outside full capture.')).toBeTruthy();
     expect(
-      screen.getByText(
-        'POST vp-results (vp.result.poll): Partial capture: the phone posted directly',
-      ),
+      screen.getByText("Read the verifier's answer: partly recorded: the phone posted directly"),
     ).toBeTruthy();
-    expect(screen.getByText('Engine steps (always uncaptured)')).toBeTruthy();
+    expect(screen.getByText('Library steps (never recorded)')).toBeTruthy();
     expect(
       screen.getByText(
         'A diagnosis never rests on these steps. Anything seen only here is reported as an observation.',

@@ -81,8 +81,8 @@ function Row({
   const word = outcomeWord(step);
   const done = step?.state === 'done';
   const skipped = done && step?.outcome === 'skipped';
-  const messages = step?.exchangeIds.length ?? 0;
-  const checks = step?.checks.filter((c) => c.outcome !== 'info').length ?? 0;
+  // ADR-136: a plain title, the HTTP line muted under it, one meta line (status word + duration);
+  // the step ID, capture and counts live in the inspector's Details
   return (
     <li className={`step-row${selected ? ' is-selected' : ''}${skipped ? ' is-skipped' : ''}`}>
       <button
@@ -100,7 +100,9 @@ function Row({
         </span>
         <span className="step-main">
           <span className="step-label">{row.label}</span>
-          <span className="step-key mono">{row.stepKey}</span>
+          {row.detail && row.detail !== row.label ? (
+            <span className="step-detail mono">{row.detail}</span>
+          ) : null}
           {skipped && step?.skipReason ? (
             <span className="step-note">{step.skipReason}</span>
           ) : null}
@@ -110,14 +112,9 @@ function Row({
         </span>
         <span className="step-meta">
           <span className={`step-outcome tone-${TONE[word]}`}>{runCopy.rail.outcome[word]}</span>
-          {done && !skipped ? (
-            <CaptureBadge capture={step?.capture ?? null} note={step?.coverageNote ?? null} />
-          ) : null}
           {done && !skipped && step?.durationMs !== null && step?.durationMs !== undefined ? (
             <span className="step-duration">{step.durationMs} ms</span>
           ) : null}
-          {messages > 0 ? <span>{runCopy.rail.messages(messages)}</span> : null}
-          {checks > 0 ? <span>{runCopy.rail.checks(checks)}</span> : null}
         </span>
       </button>
       {onDelivery ? (

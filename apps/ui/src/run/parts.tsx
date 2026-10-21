@@ -8,8 +8,8 @@ import type { AdapterId, Run } from '@interop-playground/api';
 import { Icon } from '../components/Icon.js';
 import { shortId } from '../components/RunLink.js';
 import type { BadgeState } from '../components/StatusBadge.js';
-import { runCopy } from '../copy.js';
-import { FORMAT_LABEL } from '../lib/labels.js';
+import { runCopy, screenCopy, selectorCopy } from '../copy.js';
+import { FORMAT_SHORT } from '../lib/labels.js';
 import { useStore } from '../state/store.js';
 import {
   awaitingText,
@@ -17,11 +17,13 @@ import {
   errorDetail,
   labelOf,
   queuedReason,
+  resultError,
   resultSentence,
   runningText,
 } from './derive.js';
 import type { RailStep } from './flows.js';
 import type { RunView, ViewState } from './reduce.js';
+import { Stamp, stampDate, stampOf } from '../components/Stamp.js';
 
 /** Returns a function that turns an adapter id into its display name, falling back to the id while the catalogue loads. */
 export function useAdapterName(): (id: AdapterId) => string {
@@ -59,70 +61,96 @@ export interface HeaderActions {
   onDelete: () => void;
 }
 
+/** "Cross-device (QR)" for a presentation mode, "Issue only" or "Credential only" without one */
+export function modeWord(spec: NonNullable<RunView['spec']>): string {
+  if (spec.presentationMode)
+    return selectorCopy.recipe.modes[spec.presentationMode] ?? spec.presentationMode;
+  return spec.scope === 'issuance'
+    ? selectorCopy.issueOnly
+    : (selectorCopy.recipe.modes['credential-level'] ?? 'credential-level');
+}
+
+/** One form field (ADR-134 form language): a small muted label above, the value on a hairline. */
+export function Field({
+  label,
+  children,
+  mono = false,
+  className,
+}: {
+  label: string;
+  children: React.ReactNode;
+  mono?: boolean;
+  className?: string;
+}) {
+  return (
+    <div className={`doc-field${mono ? ' is-mono' : ''}${className ? ` ${className}` : ''}`}>
+      <dt>{label}</dt>
+      <dd>{children}</dd>
+    </div>
+  );
+}
+
 /**
- * The facts under the run title (ADR-128): the three roles as one inline definition list, then
- * format, grant, mode, environment and proof as one muted line; versions stay in a disclosure.
+ * The facts under the run title (ADR-136): the three roles as one plain sentence, the re-run link,
+ * and everything technical (format, grant, mode, environment, proof, changed setting, versions)
+ * behind one "Details" disclosure as form fields.
  */
 export function RunHeaderFacts({ view, run }: { view: RunView; run: Run | null }) {
   const name = useAdapterName();
   const spec = view.spec;
   if (!spec) return null;
-  const changed = Object.entries(spec.knobs);
-  const meta: { key: string; node: React.ReactNode; title?: string }[] = [
-    { key: 'format', node: FORMAT_LABEL[spec.format] },
-  ];
-  if (spec.grant) meta.push({ key: 'grant', node: spec.grant });
-  if (spec.presentationMode) meta.push({ key: 'mode', node: spec.presentationMode });
-  meta.push({
-    key: 'env',
-    node: runCopy.facts.envLine([...new Set(Object.values(spec.env))].join(' + ')),
-  });
-  if (view.proofAlg) meta.push({ key: 'proof', node: runCopy.facts.proof(view.proofAlg) });
-  for (const [k, v] of changed)
-    meta.push({ key: `knob-${k}`, node: runCopy.facts.changed(k, String(v)) });
-  if (spec.parentRunId)
-    meta.push({
-      key: 'parent',
-      node: (
-        <Link to={`/runs/${spec.parentRunId}`}>
-          {runCopy.facts.rerunOf(shortId(spec.parentRunId))}
-        </Link>
-      ),
-    });
-  if (run?.origin === 'imported')
-    meta.push({ key: 'imported', node: runCopy.facts.imported, title: runCopy.facts.importedTip });
+  const sentence =
+    spec.scope === 'issuance'
+      ? runCopy.rolesIssueOnly(name(spec.issuer), name(spec.wallet))
+      : runCopy.roles(name(spec.issuer), name(spec.wallet), name(spec.verifier));
   return (
     <div className="run-facts">
-      <dl className="run-roles">
-        <div>
-          <dt>{runCopy.facts.issuer}</dt>
-          <dd>{name(spec.issuer)}</dd>
-        </div>
-        <div>
-          <dt>{runCopy.facts.wallet}</dt>
-          <dd>{name(spec.wallet)}</dd>
-        </div>
-        <div>
-          <dt>{runCopy.facts.verifier}</dt>
-          <dd>{name(spec.verifier)}</dd>
-        </div>
-      </dl>
-      <ul className="run-meta" aria-label={runCopy.facts.region}>
-        {meta.map((m) => (
-          <li key={m.key} title={m.title}>
-            {m.node}
-          </li>
-        ))}
-      </ul>
-      <details className="disclosure run-versions">
-        <summary>{runCopy.facts.versions}</summary>
-        <ul className="disclosure-body mono small">
-          {(['issuer', 'wallet', 'verifier'] as const).map((role) => (
-            <li key={role}>
-              {spec[role]}: {spec.versions[role]}
-            </li>
+      <p className="run-roles">{sentence}</p>
+      {spec.parentRunId ? (
+        <p className="run-parent">
+          <Link to={`/runs/${spec.parentRunId}`}>
+            {runCopy.facts.rerunOf(shortId(spec.parentRunId))}
+          </Link>
+        </p>
+      ) : null}
+      <details className="disclosure run-details">
+        <summary>{runCopy.details}</summary>
+        <dl className="doc-fields disclosure-body" aria-label={runCopy.facts.region}>
+          <Field label={runCopy.facts.format}>{FORMAT_SHORT[spec.format]}</Field>
+          <Field label={runCopy.facts.mode}>{modeWord(spec)}</Field>
+          {spec.grant ? (
+            <Field label={runCopy.facts.grant}>
+              {selectorCopy.grantWord[spec.grant] ?? spec.grant}
+            </Field>
+          ) : null}
+          <Field label={runCopy.facts.env}>
+            {[...new Set(Object.values(spec.env))].join(' + ')}
+          </Field>
+          {view.proofAlg ? (
+            <Field label={runCopy.facts.proofAlg} mono>
+              {view.proofAlg}
+            </Field>
+          ) : null}
+          {Object.entries(spec.knobs).map(([k, v]) => (
+            <Field key={k} label={runCopy.facts.changedSetting} mono>
+              {k} = {String(v)}
+            </Field>
           ))}
-        </ul>
+          {run?.origin === 'imported' ? (
+            <Field label={runCopy.facts.origin}>
+              <span title={runCopy.facts.importedTip}>{runCopy.facts.imported}</span>
+            </Field>
+          ) : null}
+          {(['issuer', 'wallet', 'verifier'] as const).map((role) => (
+            <Field
+              key={role}
+              label={`${runCopy.facts[role]} ${runCopy.facts.versions.toLowerCase()}`}
+              mono
+            >
+              {spec[role]} {spec.versions[role]}
+            </Field>
+          ))}
+        </dl>
       </details>
     </div>
   );
@@ -340,36 +368,7 @@ export function StatusBanner({
   );
 }
 
-/**
- * The verdict glyph (ADR-128): drawn once with a stroke when the result appears. The silhouettes
- * stay distinct without colour (UI-74): circle and tick for pass, square and cross for fail or
- * blocked, triangle for inconclusive, circle and bar for the neutral outcomes.
- */
-export function VerdictGlyph({ outcome }: { outcome: Outcome }) {
-  const fail = outcome === 'fail' || outcome === 'blocked';
-  return (
-    <svg className="verdict-glyph" viewBox="0 0 40 40" width="40" height="40" aria-hidden="true">
-      {fail ? (
-        <rect className="vg-shape" x="3" y="3" width="34" height="34" rx="9" pathLength={1} />
-      ) : outcome === 'inconclusive' ? (
-        <path className="vg-shape" d="M20 3.5 37 34.5H3z" pathLength={1} />
-      ) : (
-        <circle className="vg-shape" cx="20" cy="20" r="17" pathLength={1} />
-      )}
-      {outcome === 'pass' ? (
-        <path className="vg-mark" d="M12.5 20.5l5 5 10-10.5" pathLength={1} />
-      ) : fail ? (
-        <path className="vg-mark" d="M14 14l12 12M26 14L14 26" pathLength={1} />
-      ) : outcome === 'inconclusive' ? (
-        <path className="vg-mark" d="M20 14v9M20 28.5v.5" pathLength={1} />
-      ) : (
-        <path className="vg-mark" d="M13 20h14" pathLength={1} />
-      )}
-    </svg>
-  );
-}
-
-/** UI-11 ResultCard for terminal `completed` runs */
+/** UI-11 ResultCard for terminal `completed` runs: the stamp, the plain sentence, form fields (ADR-137) */
 export function ResultCard({
   view,
   steps,
@@ -384,24 +383,12 @@ export function ResultCard({
   const name = useAdapterName();
   const v = view.verdict;
   const spec = view.spec;
-  if (!v || !spec) return null;
+  const stamp = stampOf(v);
+  if (!v || !spec || !stamp) return null;
   const failing = v.failedStepKey ? labelOf(v.failedStepKey, steps) : null;
-  const rows: [string, string][] = [
-    [runCopy.facts.issuer, name(spec.issuer)],
-    [runCopy.facts.wallet, name(spec.wallet)],
-    [runCopy.facts.verifier, name(spec.verifier)],
-    [runCopy.facts.format, FORMAT_LABEL[spec.format]],
-    [runCopy.result.proofAlg, view.proofAlg ?? 'not recorded'],
-    [runCopy.facts.grant, spec.grant ?? 'none'],
-    [
-      runCopy.facts.mode,
-      spec.presentationMode ??
-        (spec.scope === 'issuance' ? 'issuance only' : 'credential only (no OID4VP)'),
-    ],
-    [runCopy.facts.env, [...new Set(Object.values(spec.env))].join(' + ')],
-    [runCopy.result.outcome, VERDICT_WORD[v.outcome]],
-  ];
-  if (failing) rows.push([runCopy.result.failingStep, failing]);
+  const error = resultError(view, steps);
+  const decidedBy = spec.scope === 'issuance' ? name(spec.issuer) : name(spec.verifier);
+  const date = stampDate(view.finishedAt);
   const tone = outcomeTone(v.outcome);
   return (
     <section
@@ -410,27 +397,64 @@ export function ResultCard({
       className={`result-card tone-${tone}`}
       data-outcome={v.outcome}
     >
-      <div className="result-verdict">
-        <p className="result-word">
-          <VerdictGlyph outcome={v.outcome} />
-          <span>{VERDICT_WORD[v.outcome]}</span>
-        </p>
-        <p className="result-sentence">{resultSentence(view, steps, target)}</p>
-        {note ? (
-          <p className="result-note">
-            <span className="muted">{runCopy.result.note}: </span>
-            {note}
-          </p>
-        ) : null}
+      <div className="result-verdict verdict">
+        <Stamp
+          word={stamp.word}
+          status={stamp.status}
+          line={[date, decidedBy].filter(Boolean).join(' · ')}
+          className="result-stamp"
+        />
+        <div className="result-text verdict-sentence">
+          <p className="result-sentence">{resultSentence(view, steps, target)}</p>
+          {note ? (
+            <p className="result-note">
+              <span className="muted">{runCopy.result.note}: </span>
+              {note}
+            </p>
+          ) : null}
+        </div>
       </div>
-      <dl className="facts result-facts">
-        {rows.map(([k, val]) => (
-          <div key={k}>
-            <dt>{k}</dt>
-            <dd>{val}</dd>
-          </div>
-        ))}
+      <dl className="doc-fields result-facts">
+        <Field label={runCopy.facts.issuer}>{name(spec.issuer)}</Field>
+        <Field label={runCopy.facts.wallet}>{name(spec.wallet)}</Field>
+        <Field label={runCopy.facts.verifier}>
+          {spec.scope === 'issuance' ? selectorCopy.verifierUnused : name(spec.verifier)}
+        </Field>
+        <Field label={runCopy.facts.format}>{FORMAT_SHORT[spec.format]}</Field>
+        <Field label={runCopy.facts.mode}>{modeWord(spec)}</Field>
+        <Field label={runCopy.result.outcome}>
+          <span className="result-word">{VERDICT_WORD[v.outcome]}</span>
+        </Field>
+        {failing ? (
+          <Field label={runCopy.result.failingStep} className="is-wide">
+            {failing}
+          </Field>
+        ) : null}
+        {error ? (
+          <Field label={runCopy.result.errorDetail} mono className="is-wide">
+            {error}
+          </Field>
+        ) : null}
       </dl>
+      <details className="disclosure result-details">
+        <summary>{runCopy.details}</summary>
+        <dl className="doc-fields disclosure-body">
+          <Field label={runCopy.result.proofAlg} mono>
+            {view.proofAlg ?? 'not recorded'}
+          </Field>
+          <Field label={runCopy.facts.grant}>
+            {spec.grant ? (selectorCopy.grantWord[spec.grant] ?? spec.grant) : 'none'}
+          </Field>
+          <Field label={runCopy.facts.env}>
+            {[...new Set(Object.values(spec.env))].join(' + ')}
+          </Field>
+          {v.failedStepKey ? (
+            <Field label={screenCopy.step.stepId} mono>
+              {v.failedStepKey}
+            </Field>
+          ) : null}
+        </dl>
+      </details>
     </section>
   );
 }

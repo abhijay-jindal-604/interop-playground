@@ -155,36 +155,46 @@ describe('ui.selector cards (UI-04, UI-05)', () => {
     );
   });
 
-  it('greyed cards show the reason text and the gap ID; Why not? names the rule', async () => {
+  it('greyed cards stay focusable; one column note says why, the rule and gap sit in Details', async () => {
     renderAt('/');
+    const note = (role: string) => document.getElementById(`col-${role}-note`)?.textContent ?? '';
     await waitFor(() =>
-      expect(card('wallet.inji-jvm').textContent).toContain(
-        'Not available with this selection: VCIClient refuses http issuers. (G-103)',
+      expect(note('wallet')).toContain(
+        "Inji libraries (Kotlin) can't be used with this selection. VCIClient refuses http issuers.",
       ),
     );
-    expect(radio('wallet.inji-jvm').disabled).toBe(true);
-    expect(card('verifier.eudi').textContent).toContain('Not running: container not reachable');
-    expect(radio('verifier.eudi').disabled).toBe(true);
-    const why = within(card('wallet.inji-jvm')).getByRole('button', { name: 'Why not?' });
-    fireEvent.click(why);
-    expect(card('wallet.inji-jvm').textContent).toContain('jvm-http-issuer');
-    expect(card('wallet.inji-jvm').textContent).toContain('Gap G-103');
+    // no reason text repeated on the card itself (ADR-134)
+    expect(card('wallet.inji-jvm').textContent).not.toContain('VCIClient');
+    expect(radio('wallet.inji-jvm').getAttribute('aria-disabled')).toBe('true');
+    expect(radio('wallet.inji-jvm').disabled).toBe(false);
+    expect(radio('wallet.inji-jvm').getAttribute('aria-describedby')).toBe('col-wallet-note');
+    // picking a greyed option does nothing
+    fireEvent.click(radio('wallet.inji-jvm'));
+    expect(radio('wallet.playground-ts').checked).toBe(true);
+    expect(note('verifier')).toContain('EUDI verifier is not running (container not reachable).');
+    expect(radio('verifier.eudi').getAttribute('aria-disabled')).toBe('true');
+    // the developer facts are behind the column's Details
+    const details = document.getElementById('col-wallet-note')!.querySelector('details')!;
+    expect(details.querySelector('summary')?.textContent).toBe('Details');
+    expect(details.textContent).toContain('jvm-http-issuer');
+    expect(details.textContent).toContain('Gap G-103');
     // switching the format makes the card selectable again
     fireEvent.click(screen.getByRole('radio', { name: 'JSON-LD' }));
-    await waitFor(() => expect(radio('wallet.inji-jvm').disabled).toBe(false));
-    expect(card('wallet.inji-jvm').textContent).not.toContain('Not available');
+    await waitFor(() => expect(radio('wallet.inji-jvm').getAttribute('aria-disabled')).toBeNull());
+    expect(note('wallet')).not.toContain('Inji libraries');
   });
 
   it('a conflicting selected card disables Run with the reason', async () => {
     renderAt('/?wallet=wallet.inji-jvm');
     await waitFor(() =>
-      expect(card('wallet.inji-jvm').textContent).toContain(
-        'Conflicts with the selection: VCIClient refuses http issuers.',
+      expect(document.getElementById('col-wallet-note')?.textContent).toContain(
+        "Inji libraries (Kotlin) doesn't work with this selection. VCIClient refuses http issuers.",
       ),
     );
     const bar = screen.getByRole('region', { name: 'Start' });
     expect(within(bar).getByRole('button', { name: 'Run' })).toHaveProperty('disabled', true);
-    expect(bar.textContent).toContain('VCIClient refuses http issuers. (G-103)');
+    expect(bar.textContent).toContain('VCIClient refuses http issuers.');
+    expect(bar.textContent).not.toContain('G-103');
   });
 });
 
@@ -203,8 +213,7 @@ describe('ui.selector release cut (ADR-95, ADR-126)', () => {
     renderAt('/');
     const more = card('verifier.credo').closest('details');
     expect(more?.querySelector('summary')?.textContent).toBe('1 more coming later');
-    expect(card('verifier.credo').textContent).toContain('Not in this release');
-    expect(radio('verifier.credo').disabled).toBe(true);
+    expect(radio('verifier.credo').getAttribute('aria-disabled')).toBe('true');
     // a stopped adapter is not a release cut: it stays in the column
     expect(card('verifier.eudi').closest('details')).toBeNull();
   });
@@ -226,8 +235,9 @@ describe('ui.selector deep link and Start (UI-08)', () => {
     expect(screen.getByText('Grant: authorization code')).toBeTruthy();
     const bar = screen.getByRole('region', { name: 'Start' });
     expect(bar.textContent).toContain(
-      'Inji Certify (authorization code) → Inji libraries (Kotlin) → walt.id verifier · JSON-LD · authorization code · Same-device (deep link)',
+      'Inji Certify (authorization code) issues to Inji libraries (Kotlin), and walt.id verifier checks it.',
     );
+    expect(bar.textContent).toContain('JSON-LD · authorization code · Same-device (deep link)');
     // the preselection is what Start sends
     await waitFor(() =>
       expect(within(bar).getByRole('button', { name: 'Run' })).toHaveProperty('disabled', false),
