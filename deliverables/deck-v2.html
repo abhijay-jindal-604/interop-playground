@@ -3,13 +3,15 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Interop Playground deck</title>
+    <title>Interop Playground brief</title>
     <!--
-      Deck v2 (2026-10-21). Nine slides: problem, solution, how it works, the original angle,
-      results, technology stack, target audience, potential impact, run it yourself.
-      Self-contained except repository images (../docs/screenshots/, ../docs/diagrams/) and the
-      app's own fonts (../apps/ui/public/fonts/): no external fonts or scripts. Keys: arrow keys or space to move, "n" toggles the speaker notes.
-      Print gives one slide per page. Deck v1 (deck-v1.html) is kept unchanged.
+      Deck v3 (2026-10-23), kept at this path as the deck source. Twelve 1280 x 720 sheets, laid
+      out as a printed brief: cover, problem, what we built, how it works, two demo sheets, fix-it
+      re-runs, findings in Inji, results, audience and impact, roadmap, team.
+      Self-contained except repository images (../docs/screenshots/) and the app's own fonts
+      (../apps/ui/public/fonts/). Screenshots are cropped in CSS, the files are unchanged.
+      Print (or Playwright page.pdf at 1280 x 720) gives one sheet per page. Keys: arrows or space
+      move, "n" toggles the source notes. Deck v1 (deck-v1.html) is kept unchanged.
     -->
     <style>
       @font-face {
@@ -23,9 +25,20 @@
         src: url('../apps/ui/public/fonts/source-serif-4-latin-400-normal.woff2') format('woff2');
       }
       @font-face {
+        font-family: 'Source Serif 4';
+        font-weight: 400;
+        font-style: italic;
+        src: url('../apps/ui/public/fonts/source-serif-4-latin-400-italic.woff2') format('woff2');
+      }
+      @font-face {
         font-family: 'IBM Plex Sans';
         font-weight: 400;
         src: url('../apps/ui/public/fonts/ibm-plex-sans-latin-400-normal.woff2') format('woff2');
+      }
+      @font-face {
+        font-family: 'IBM Plex Sans';
+        font-weight: 500;
+        src: url('../apps/ui/public/fonts/ibm-plex-sans-latin-500-normal.woff2') format('woff2');
       }
       @font-face {
         font-family: 'IBM Plex Sans';
@@ -37,543 +50,1398 @@
         font-weight: 400;
         src: url('../apps/ui/public/fonts/ibm-plex-mono-latin-400-normal.woff2') format('woff2');
       }
+      @font-face {
+        font-family: 'IBM Plex Mono';
+        font-weight: 500;
+        src: url('../apps/ui/public/fonts/ibm-plex-mono-latin-500-normal.woff2') format('woff2');
+      }
       :root {
-        --bg: #ebe8e0;
-        --fg: #1a1c1b;
-        --muted: #5a5852;
-        --slide: #f7f5f0;
-        --line: #cfcbc0;
-        --accent: #1f5c4a;
-        --fail: #a3341f;
-        --pass: #1f5c4a;
-        --code: #ece9e1;
-        --future: #7a5a12;
+        --desk: #e4e0d6;
+        --paper: #f7f5f0;
+        --paper-2: #efece4;
+        --ink: #1a1c1b;
+        --ink-2: #3b3d3a;
+        --muted: #66635b;
+        --rule: #cfcbc0;
+        --rule-ink: #1a1c1b;
+        --green: #1f5c4a;
+        --red: #a3341f;
+        --blue: #46607f;
+        --ochre: #7a5a12;
+        --serif: 'Source Serif 4', Georgia, serif;
+        --sans: 'IBM Plex Sans', system-ui, sans-serif;
+        --mono: 'IBM Plex Mono', ui-monospace, monospace;
       }
       * {
         box-sizing: border-box;
       }
+      html,
       body {
         margin: 0;
-        background: var(--bg);
-        color: var(--fg);
-        font:
-          18px/1.45 'IBM Plex Sans',
-          system-ui,
-          sans-serif;
+        background: var(--desk);
+        color: var(--ink);
+        font: 16px/1.45 var(--sans);
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
       }
       main {
-        max-width: 1100px;
-        margin: 0 auto;
-        padding: 24px 16px 64px;
+        padding: 32px 0 64px;
       }
-      section.slide {
-        background: var(--slide);
-        border: 1px solid var(--line);
-        border-radius: 2px;
-        aspect-ratio: 16 / 9;
-        padding: 40px 56px;
-        margin: 0 0 24px;
+      .sheet {
+        position: relative;
+        width: 1280px;
+        height: 720px;
+        margin: 0 auto 32px;
+        background: var(--paper);
+        overflow: hidden;
+        box-shadow: 0 1px 0 var(--rule);
+        padding: 76px 64px 64px 64px;
         display: flex;
         flex-direction: column;
-        overflow: hidden;
       }
-      .num {
+      /* Running head and foot, like a numbered form */
+      .head,
+      .foot {
+        position: absolute;
+        left: 64px;
+        right: 64px;
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        font-size: 12px;
         color: var(--muted);
-        font-size: 14px;
-        letter-spacing: 0.04em;
+        letter-spacing: 0.02em;
+      }
+      .head {
+        top: 26px;
+        padding-bottom: 9px;
+        border-bottom: 1px solid var(--rule);
+      }
+      .head b {
+        font-weight: 600;
+        color: var(--ink);
+      }
+      .foot {
+        bottom: 22px;
+      }
+      .folio {
+        font-family: var(--serif);
+        font-size: 13px;
+        color: var(--ink-2);
+      }
+      .folio em {
+        font-style: italic;
+      }
+      .sec {
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: 16px;
+        color: var(--green);
+        margin: 0 0 4px;
       }
       h1,
-      h2 {
-        margin: 8px 0 12px;
-        line-height: 1.15;
-        font-family: 'Source Serif 4', Georgia, serif;
+      h2,
+      h3 {
+        font-family: var(--serif);
         font-weight: 600;
+        margin: 0;
+        line-height: 1.12;
+        letter-spacing: -0.005em;
       }
       h2 {
-        padding-bottom: 10px;
-        border-bottom: 1px solid var(--ink-rule, var(--fg));
+        font-size: 36px;
+        max-width: 1040px;
       }
-      h1 {
-        font-size: 52px;
+      h3 {
+        font-size: 20px;
       }
-      h2 {
-        font-size: 34px;
+      .lede {
+        font-family: var(--serif);
+        font-size: 19px;
+        line-height: 1.4;
+        color: var(--ink-2);
+        margin: 10px 0 0;
+        max-width: 920px;
       }
-      .message {
-        font-family: 'Source Serif 4', Georgia, serif;
-        font-size: 22px;
-        color: var(--accent);
-        margin: 0 0 20px;
-      }
-      .visual {
+      .body {
         flex: 1;
         min-height: 0;
+        margin-top: 26px;
         display: flex;
-        gap: 16px;
-        align-items: stretch;
+        gap: 40px;
       }
-      .box {
-        flex: 1;
-        border: 1px solid var(--line);
-        border-radius: 2px;
-        padding: 14px 16px;
-        font-size: 16px;
-      }
-      .box b {
-        display: block;
-        margin-bottom: 6px;
-      }
-      .box ul {
+      p {
         margin: 0;
-        padding-left: 18px;
       }
-      .box li {
-        margin-bottom: 4px;
+      .mono {
+        font-family: var(--mono);
+        font-size: 0.92em;
+        letter-spacing: -0.01em;
       }
-      .arrow {
-        align-self: center;
+      .label {
+        font-size: 12px;
+        font-weight: 500;
         color: var(--muted);
-        font-size: 28px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
       }
       .fail {
-        color: var(--fail);
-        font-weight: 600;
+        color: var(--red);
       }
       .pass {
-        color: var(--pass);
-        font-weight: 600;
+        color: var(--green);
       }
-      .future {
+      .rule {
+        border-top: 1px solid var(--rule);
+      }
+      /* Rubber stamp */
+      .stamp {
         display: inline-block;
-        border: 1px solid var(--future);
-        color: var(--future);
-        border-radius: 2px;
-        padding: 0 8px;
-        font-size: 12px;
+        font-family: var(--serif);
         font-weight: 600;
-        letter-spacing: 0.03em;
-        vertical-align: 2px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        border: 3px solid currentColor;
+        outline: 1px solid currentColor;
+        outline-offset: 3px;
+        padding: 4px 14px 3px;
+        transform: rotate(-3deg);
+        line-height: 1.1;
+        text-align: center;
+        opacity: 0.92;
       }
-      code {
-        font-family: 'IBM Plex Mono', ui-monospace, monospace;
-        background: var(--code);
-        padding: 1px 5px;
-        border-radius: 2px;
-        font-size: 0.9em;
-      }
-      .big {
-        font-family: 'Source Serif 4', Georgia, serif;
-        font-size: 42px;
-        font-weight: 600;
-        line-height: 1;
-      }
-      .shot {
+      .stamp small {
         display: block;
-        max-width: 100%;
-        max-height: 100%;
-        margin: 0 auto;
-        border: 1px solid var(--line);
-        border-radius: 2px;
-        object-fit: contain;
+        font-family: var(--sans);
+        font-weight: 500;
+        font-size: 11px;
+        letter-spacing: 0.06em;
+        text-transform: none;
       }
-      table.stack {
-        border-collapse: collapse;
-        width: 100%;
-        font-size: 16px;
+      /* Exhibits: cropped screenshots in a hairline frame with a caption */
+      figure {
+        margin: 0;
       }
-      table.stack th,
-      table.stack td {
-        text-align: left;
-        border-bottom: 1px solid var(--line);
-        padding: 6px 10px 6px 0;
-        vertical-align: top;
+      .crop {
+        position: relative;
+        overflow: hidden;
+        aspect-ratio: var(--w) / var(--h);
+        border: 1px solid var(--rule);
+        background: var(--paper);
       }
-      table.stack th {
+      .crop img {
+        display: block;
+        width: calc(1440 / var(--w) * 100%);
+        margin-left: calc(var(--x) / var(--w) * -100%);
+        margin-top: calc(var(--y) / var(--w) * -100%);
+      }
+      figcaption {
+        margin-top: 8px;
+        font-size: 13px;
         color: var(--muted);
+        line-height: 1.35;
+      }
+      figcaption b {
+        font-family: var(--serif);
+        font-style: italic;
+        font-weight: 400;
+        color: var(--ink);
+        margin-right: 4px;
+      }
+      .pin {
+        position: absolute;
+        width: 26px;
+        height: 26px;
+        margin: -13px 0 0 -13px;
+        border-radius: 50%;
+        background: var(--ink);
+        color: var(--paper);
+        font: 600 13px/26px var(--sans);
+        text-align: center;
+      }
+      ol.notes-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      ol.notes-list li {
+        display: grid;
+        grid-template-columns: 34px 1fr;
+        padding: 12px 0;
+        border-top: 1px solid var(--rule);
+        font-size: 15px;
+      }
+      ol.notes-list li:last-child {
+        border-bottom: 1px solid var(--rule);
+      }
+      ol.notes-list .n {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: var(--ink);
+        color: var(--paper);
+        font: 600 12px/24px var(--sans);
+        text-align: center;
+        margin-top: 1px;
+      }
+      ol.notes-list b {
+        display: block;
         font-weight: 600;
-        width: 18%;
-      }
-      .credits {
-        color: var(--muted);
-        margin-top: auto;
+        margin-bottom: 2px;
       }
       aside.notes {
         display: none;
-        margin-top: 16px;
-        padding-top: 12px;
-        border-top: 1px solid var(--line);
-        font-size: 14px;
-        color: var(--muted);
       }
       body.show-notes aside.notes {
         display: block;
+        width: 1280px;
+        margin: -24px auto 32px;
+        padding: 12px 64px;
+        font-size: 13px;
+        color: var(--muted);
+        background: var(--paper-2);
       }
-      body.show-notes section.slide {
-        aspect-ratio: auto;
+
+      /* 1 Cover */
+      #s1 {
+        padding: 0;
       }
-      @media (max-width: 760px) {
-        section.slide {
-          aspect-ratio: auto;
-          padding: 24px 20px;
-        }
-        h1 {
-          font-size: 34px;
-        }
-        h2 {
-          font-size: 26px;
-        }
-        .visual {
-          flex-direction: column;
-        }
-        .arrow {
-          transform: rotate(90deg);
-        }
+      #s1 .left {
+        position: absolute;
+        left: 64px;
+        top: 64px;
+        bottom: 56px;
+        width: 640px;
+        display: flex;
+        flex-direction: column;
+      }
+      #s1 .kicker {
+        font-size: 13px;
+        color: var(--muted);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        font-weight: 500;
+        padding-bottom: 10px;
+        border-bottom: 2px solid var(--ink);
+      }
+      #s1 h1 {
+        font-size: 78px;
+        line-height: 1;
+        margin-top: 40px;
+        letter-spacing: -0.015em;
+      }
+      #s1 .sub {
+        font-family: var(--serif);
+        font-size: 23px;
+        line-height: 1.38;
+        margin-top: 20px;
+        color: var(--ink-2);
+      }
+      #s1 .fields {
+        margin-top: auto;
+        display: grid;
+        grid-template-columns: 1.7fr 1fr;
+        column-gap: 28px;
+      }
+      .field {
+        padding: 9px 0 8px;
+        border-bottom: 1px solid var(--rule);
+      }
+      .field .label {
+        display: block;
+        margin-bottom: 2px;
+        font-size: 11px;
+      }
+      .field .v {
+        font-size: 15.5px;
+      }
+      .field.wide {
+        grid-column: 1 / -1;
+      }
+      .field .names {
+        font-family: var(--serif);
+        font-size: 21px;
+      }
+      #s1 .right {
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 492px;
+        background: var(--paper-2);
+        border-left: 1px solid var(--rule);
+      }
+      #s1 .cx {
+        position: absolute;
+        left: 40px;
+        width: 412px;
+      }
+      #s1 .cx .crop {
+        box-shadow: 0 2px 0 var(--rule);
+      }
+
+      /* 2 Problem */
+      .journey {
+        position: relative;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        margin-top: 8px;
+      }
+      .journey .role {
+        position: relative;
+        padding: 0 24px 0 0;
+      }
+      .journey .role .label {
+        display: block;
+      }
+      .journey .role h3 {
+        font-size: 24px;
+        margin-top: 4px;
+      }
+      .journey .line {
+        position: relative;
+        height: 34px;
+        margin: 14px 0 16px;
+      }
+      .journey .line::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 16px;
+        border-top: 2px solid var(--ink);
+      }
+      .journey .dot {
+        position: absolute;
+        left: 0;
+        top: 8px;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: var(--paper);
+        border: 2px solid var(--ink);
+      }
+      .journey .dot.cause {
+        border-color: var(--red);
+        background: var(--red);
+      }
+      .journey .msg {
+        position: absolute;
+        left: 34px;
+        top: 0;
+        font-size: 13px;
+        color: var(--muted);
+        background: var(--paper);
+        padding: 0 8px;
+        line-height: 32px;
+      }
+      .journey .role:last-child .line::before {
+        right: 70%;
+      }
+      .journey p.what {
+        font-size: 15.5px;
+        color: var(--ink-2);
+        max-width: 330px;
+      }
+      .cause-note {
+        border-left: 3px solid var(--red);
+        padding: 2px 0 2px 14px;
+      }
+      .cause-note .label {
+        color: var(--red);
+      }
+      .err {
+        margin-top: 12px;
+      }
+      .err .stamp {
+        color: var(--red);
+        font-size: 22px;
+      }
+      .err .code {
+        font-family: var(--mono);
+        font-size: 13px;
+        margin-top: 16px;
+        color: var(--ink);
+      }
+      .trace {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 56px;
+        color: var(--red);
+      }
+      .trace .ah {
+        font-size: 22px;
+        line-height: 1;
+      }
+      .trace .dash {
+        flex: 1;
+        border-top: 2px dashed var(--red);
+      }
+      .trace .t {
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: 17px;
+        color: var(--ink-2);
+        max-width: 640px;
+      }
+      .why {
+        margin-top: auto;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        column-gap: 40px;
+        padding-top: 18px;
+        border-top: 2px solid var(--ink);
+      }
+      .why h3 {
+        font-size: 18px;
+        margin-bottom: 4px;
+      }
+      .why p {
+        font-size: 15px;
+        color: var(--ink-2);
+      }
+
+      /* 3 What we built */
+      .clauses {
+        width: 380px;
+        flex: none;
+      }
+      .clause {
+        display: grid;
+        grid-template-columns: 44px 1fr;
+        padding: 10px 0;
+        border-top: 1px solid var(--rule);
+      }
+      .clause:last-child {
+        border-bottom: 1px solid var(--rule);
+      }
+      .clause .k {
+        font-family: var(--serif);
+        font-size: 26px;
+        line-height: 1;
+        color: var(--green);
+      }
+      .clause b {
+        display: block;
+        font-family: var(--serif);
+        font-size: 19px;
+        font-weight: 600;
+        margin-bottom: 2px;
+      }
+      .clause span {
+        font-size: 14.5px;
+        color: var(--ink-2);
+      }
+
+      /* 4 How it works */
+      .arch {
+        display: grid;
+        grid-template-columns: 210px 70px 1fr 70px 270px;
+        align-items: stretch;
+        flex: 1;
+        min-height: 0;
+      }
+      .zone {
+        border: 1px solid var(--ink);
+        padding: 14px 16px;
+        background: var(--paper);
+      }
+      .zone .label {
+        display: block;
+        margin-bottom: 6px;
+      }
+      .zone h3 {
+        font-size: 19px;
+        margin-bottom: 8px;
+      }
+      .zone.dock {
+        border-style: dashed;
+      }
+      .zone ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        font-size: 15px;
+      }
+      .zone ul li {
+        padding: 5px 0;
+        border-top: 1px solid var(--rule);
+      }
+      .mods {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      .mod {
+        border: 1px solid var(--rule);
+        padding: 10px 12px;
+        font-size: 14.5px;
+        line-height: 1.3;
+        background: var(--paper);
+      }
+      .mod b {
+        display: block;
+        font-size: 15.5px;
+      }
+      .mod.store {
+        grid-column: 1 / -1;
+        border-color: var(--green);
+        border-width: 1.5px;
+      }
+      .wire {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-size: 12px;
+        color: var(--muted);
+        text-align: center;
+        line-height: 1.3;
+      }
+      .wire .ar {
+        font-size: 22px;
+        color: var(--ink);
+        line-height: 1;
+        margin: 4px 0;
+      }
+      .principles {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        column-gap: 28px;
+        margin-top: 22px;
+        padding-top: 14px;
+        border-top: 2px solid var(--ink);
+      }
+      .principles b {
+        display: block;
+        font-family: var(--serif);
+        font-size: 17px;
+        margin-bottom: 3px;
+      }
+      .principles p {
+        font-size: 14.5px;
+        color: var(--ink-2);
+        line-height: 1.4;
+      }
+
+      /* 6 Verdicts register */
+      .register {
+        width: 100%;
+        border-top: 2px solid var(--ink);
+      }
+      .reg-row {
+        display: grid;
+        grid-template-columns: 640px 1fr;
+        column-gap: 36px;
+        align-items: center;
+        padding: 16px 0;
+        border-bottom: 1px solid var(--rule);
+      }
+      .reg-row h3 {
+        font-size: 22px;
+      }
+      .reg-row p {
+        font-size: 15px;
+        color: var(--ink-2);
+        margin-top: 4px;
+      }
+      .reg-row .run {
+        font-family: var(--mono);
+        font-size: 12.5px;
+        color: var(--muted);
+        margin-top: 6px;
+      }
+
+      /* 7 Fix-it */
+      .ledger {
+        display: grid;
+        grid-template-columns: 1fr 40px 1fr 40px 1fr;
+        align-items: stretch;
+      }
+      .ledger .cell {
+        border-top: 2px solid var(--ink);
+        padding-top: 10px;
+      }
+      .ledger .cell .label {
+        display: block;
+      }
+      .ledger .cell h3 {
+        font-size: 21px;
+        margin: 3px 0 5px;
+      }
+      .ledger .cell p {
+        font-size: 14.5px;
+        color: var(--ink-2);
+      }
+      .ledger .run {
+        font-family: var(--mono);
+        font-size: 12.5px;
+        color: var(--muted);
+        margin-top: 6px;
+      }
+      .ledger .to {
+        align-self: center;
+        text-align: center;
+        font-size: 24px;
+      }
+      .claim {
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: 21px;
+        line-height: 1.35;
+        border-left: 3px solid var(--green);
+        padding: 2px 0 2px 18px;
+      }
+      .rules {
+        font-size: 14.5px;
+      }
+      .rules div {
+        display: grid;
+        grid-template-columns: 170px 1fr;
+        padding: 8px 0;
+        border-top: 1px solid var(--rule);
+      }
+      .rules div:last-child {
+        border-bottom: 1px solid var(--rule);
+      }
+      .rules b {
+        font-weight: 600;
+      }
+
+      /* 8 Findings table */
+      table.find {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14.5px;
+      }
+      table.find th {
+        text-align: left;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--muted);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: 0 16px 8px 0;
+        border-bottom: 2px solid var(--ink);
+      }
+      table.find td {
+        padding: 9px 16px 9px 0;
+        border-bottom: 1px solid var(--rule);
+        vertical-align: top;
+        line-height: 1.38;
+      }
+      table.find td.id {
+        font-family: var(--serif);
+        font-weight: 600;
+        font-size: 17px;
+        white-space: nowrap;
+      }
+      table.find td.id small {
+        display: block;
+        font-family: var(--sans);
+        font-weight: 400;
+        font-size: 12px;
+        color: var(--muted);
+      }
+      table.find td.st {
+        white-space: nowrap;
+        font-size: 13.5px;
+      }
+      .mark {
+        font-weight: 600;
+      }
+      .mark.live {
+        color: var(--green);
+      }
+      .mark.used {
+        color: var(--ochre);
+      }
+      .mark.res {
+        color: var(--muted);
+      }
+
+      /* 9 Results */
+      .tally {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        column-gap: 48px;
+        width: 100%;
+        align-content: start;
+      }
+      .tally .row {
+        display: grid;
+        grid-template-columns: 172px 1fr;
+        column-gap: 18px;
+        align-items: baseline;
+        padding: 22px 0 21px;
+        border-top: 1px solid var(--rule);
+      }
+      .tally .row:nth-child(-n + 2) {
+        border-top: 2px solid var(--ink);
+      }
+      .tally .fig {
+        font-family: var(--serif);
+        font-weight: 600;
+        font-size: 52px;
+        line-height: 1;
+        letter-spacing: -0.01em;
+      }
+      .tally .fig small {
+        font-size: 22px;
+      }
+      .tally b {
+        display: block;
+        font-size: 17.5px;
+        font-weight: 600;
+        margin-bottom: 2px;
+      }
+      .tally p {
+        font-size: 15px;
+        color: var(--ink-2);
+      }
+      .tally .src {
+        display: block;
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 3px;
+      }
+
+      /* 10 Audience */
+      .cols2 {
+        display: grid;
+        grid-template-columns: 1.15fr 1fr;
+        column-gap: 56px;
+        width: 100%;
+      }
+      .who {
+        border-top: 2px solid var(--ink);
+      }
+      .who div {
+        padding: 17px 0;
+        border-bottom: 1px solid var(--rule);
+      }
+      .who b {
+        display: block;
+        font-family: var(--serif);
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 3px;
+      }
+      .who p {
+        font-size: 15.5px;
+        color: var(--ink-2);
+      }
+      .col-h {
+        display: block;
+        margin-bottom: 8px;
+      }
+
+      /* 11 Roadmap */
+      .road {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        column-gap: 0;
+        width: 100%;
+      }
+      .stage {
+        position: relative;
+        padding: 0 32px 0 0;
+      }
+      .stage .bar {
+        position: relative;
+        height: 30px;
+        margin-bottom: 14px;
+      }
+      .stage .bar::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 13px;
+        border-top: 2px solid var(--ink);
+      }
+      .stage.later .bar::before {
+        border-top-style: dashed;
+      }
+      .stage .bar i {
+        position: absolute;
+        left: 0;
+        top: 4px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 2px solid var(--ink);
+        background: var(--paper);
+      }
+      .stage.now .bar i {
+        background: var(--green);
+        border-color: var(--green);
+      }
+      .stage h3 {
+        font-size: 28px;
+      }
+      .stage .label {
+        display: block;
+        margin: 2px 0 10px;
+      }
+      .stage ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      .stage li {
+        font-size: 16px;
+        padding: 12px 0;
+        border-top: 1px solid var(--rule);
+        color: var(--ink-2);
+      }
+      .stage li b {
+        color: var(--ink);
+        font-weight: 600;
+      }
+
+      /* 12 Team */
+      .team {
+        border-top: 2px solid var(--ink);
+      }
+      .person {
+        display: grid;
+        grid-template-columns: 54px 1fr;
+        align-items: baseline;
+        padding: 22px 0;
+        border-bottom: 1px solid var(--rule);
+      }
+      .person .k {
+        font-family: var(--serif);
+        font-style: italic;
+        color: var(--muted);
+        font-size: 18px;
+      }
+      .person .nm {
+        font-family: var(--serif);
+        font-size: 38px;
+        font-weight: 600;
+        line-height: 1.1;
+      }
+      .steps {
+        font-size: 15px;
+      }
+      .steps div {
+        display: grid;
+        grid-template-columns: 30px 1fr;
+        padding: 12px 0;
+        border-top: 1px solid var(--rule);
+      }
+      .steps div:last-child {
+        border-bottom: 1px solid var(--rule);
+      }
+      .steps .n {
+        font-family: var(--serif);
+        color: var(--green);
+        font-size: 18px;
+        line-height: 1.2;
+      }
+      .steps .mono {
+        display: block;
+        white-space: nowrap;
+        font-size: 12.5px;
+        margin-top: 2px;
+      }
+
+      @page {
+        size: 1280px 720px;
+        margin: 0;
       }
       @media print {
+        html,
         body {
-          background: #f7f5f0;
+          background: var(--paper);
         }
         main {
           padding: 0;
-          max-width: none;
         }
-        section.slide {
-          page-break-after: always;
-          border: 0;
+        .sheet {
           margin: 0;
+          box-shadow: none;
+          break-after: page;
+          page-break-after: always;
+        }
+        aside.notes {
+          display: none !important;
         }
       }
     </style>
   </head>
   <body>
     <main>
-      <section class="slide" id="s1">
-        <div class="num">1 / 9</div>
-        <h1>Interop Playground</h1>
-        <p class="message">
-          Run Inji issuer → wallet → verifier combinations, see every message, and prove the fix for
-          a failure with one changed setting.
-        </p>
-        <div class="visual">
-          <img
-            class="shot"
-            src="../docs/screenshots/selector.png"
-            alt="The combination selector: issuer, wallet and verifier columns, with unavailable combinations greyed out"
-          />
-        </div>
-        <p class="credits">
-          Team Bhrinjal (Abhijay Jindal) · MOSIP Decode 2026, PS02 ·
-          https://github.com/abhijay-jindal-604/interop-playground
-        </p>
-        <aside class="notes">
-          Speaker: "We are Team Bhrinjal. Interop Playground runs Inji issuers, wallets and
-          verifiers against each other, shows every message on the wire, and proves fixes with a
-          re-run." Sources: README "What it does"; image
-          <code>docs/screenshots/selector.png</code> (the live selector).
-        </aside>
-      </section>
-
-      <section class="slide" id="s2">
-        <div class="num">2 / 9</div>
-        <h2>The problem</h2>
-        <p class="message">
-          A failed presentation is one opaque error; the cause sits in a message two hops earlier.
-        </p>
-        <div class="visual">
-          <div class="box">
-            <b>What the verifier says</b>
-            Inji Verify: <span class="fail">invalid</span><br />
-            <code>ERR_SIGNATURE_VERIFICATION_FAILED</code><br />
-            "getX509CertChain(...) must not be null"
-          </div>
-          <div class="arrow">→</div>
-          <div class="box">
-            <b>Where the cause is</b>
-            The walt.id credential, issued two hops earlier, carries no <code>x5c</code> chain in
-            its SD-JWT header, and Inji Verify requires one (gap G-55).
-          </div>
-          <div class="arrow">→</div>
-          <div class="box">
-            <b>Why it is slow today</b>
-            Issuer, wallet and verifier come from different teams. Nobody sees all the messages of
-            one journey in one place, so each failure is debugged by hand.
+      <!-- 1 Cover -->
+      <section class="sheet" id="s1">
+        <div class="left">
+          <div class="kicker">MOSIP Decode 2026 &nbsp;·&nbsp; Problem statement PS02</div>
+          <h1>Interop<br />Playground</h1>
+          <p class="sub">
+            Run Inji issuer → wallet → verifier combinations, see every protocol message, and prove
+            the fix for a failure with a re-run that changes one setting.
+          </p>
+          <div class="fields">
+            <div class="field wide">
+              <span class="label">Submitted by Team Bhrinjal</span>
+              <span class="names">Abhijay Jindal &nbsp;·&nbsp; Shrey Bhardwaj &nbsp;·&nbsp; Aryan Bedwal</span>
+            </div>
+            <div class="field">
+              <span class="label">Repository</span>
+              <span class="v">github.com/abhijay-jindal-604/interop-playground</span>
+            </div>
+            <div class="field">
+              <span class="label">Release</span>
+              <span class="v">v1, 2026-10-20 &nbsp;·&nbsp; MPL-2.0</span>
+            </div>
           </div>
         </div>
-        <aside class="notes">
-          Speaker: "When a credential fails at a verifier, you get one code. The cause is in an
-          earlier message that no single component shows." Source: run
-          <code>01M5B6KNNY7DC3YK3CR0ETNBN9</code>, report
-          <code>docs/reports/01M5B6KNNY7DC3YK3CR0ETNBN9.md</code> (live, 2026-10-20);
-          docs/overview.md "The problem".
-        </aside>
+        <div class="right">
+          <figure class="cx" style="top: 150px">
+            <div class="crop" style="--w: 560; --h: 132; --x: 262; --y: 96">
+              <img src="../docs/screenshots/selector.png" alt="The selector headline: Pick who plays each role" />
+            </div>
+            <figcaption><b>Choose the roles.</b> Issuer, wallet and verifier, run for real against Inji.</figcaption>
+          </figure>
+          <figure class="cx" style="top: 346px">
+            <div class="crop" style="--w: 440; --h: 186; --x: 262; --y: 118">
+              <img src="../docs/screenshots/design-child-compare.png" alt="The fix-it re-run: the original run stamped Invalid, the re-run stamped Valid" />
+            </div>
+            <figcaption><b>Prove the fix.</b> A failed run, re-run with one setting changed, now passes.</figcaption>
+          </figure>
+        </div>
       </section>
+      <aside class="notes">
+        Sources: README "What it does"; image docs/screenshots/selector.png. Team names as given by
+        the team. The two stamps preview the fix-it story on sheet 7.
+      </aside>
 
-      <section class="slide" id="s3">
-        <div class="num">3 / 9</div>
-        <h2>The solution</h2>
-        <p class="message">
-          Pick three roles, run the real protocols, inspect every payload, get a report with a clear
-          verdict.
-        </p>
-        <div class="visual">
-          <div class="box">
-            <b>Select</b>Issuer, wallet, verifier, format, mode. Impossible combinations are greyed
-            out with a one-line reason.
+      <!-- 2 Problem -->
+      <section class="sheet" id="s2">
+        <div class="head"><span><b>Interop Playground</b> &nbsp;·&nbsp; Brief for MOSIP Decode 2026</span><span class="folio">Sheet 2 <em>of</em> 12</span></div>
+        <p class="sec">The problem</p>
+        <h2>A failed presentation is one opaque error at the last hop. The cause sits two hops earlier.</h2>
+        <div class="body" style="flex-direction: column; gap: 0">
+          <div class="journey">
+            <div class="role">
+              <span class="label">Issuer</span>
+              <h3>walt.id issuer-api2</h3>
+              <div class="line"><span class="dot cause"></span><span class="msg">issues SD-JWT VC</span></div>
+              <div class="cause-note">
+                <span class="label">Where the cause is</span>
+                <p class="what">
+                  The credential header carries the issuer key without an
+                  <span class="mono">x5c</span> certificate chain, which Inji Verify requires (gap
+                  G-55).
+                </p>
+              </div>
+            </div>
+            <div class="role">
+              <span class="label">Wallet</span>
+              <h3>Playground reference wallet</h3>
+              <div class="line"><span class="dot"></span><span class="msg">presents over OpenID4VP</span></div>
+              <p class="what">
+                Holds the credential and presents it. Nothing here fails, so nothing here looks
+                wrong.
+              </p>
+            </div>
+            <div class="role">
+              <span class="label">Verifier</span>
+              <h3>Inji Verify</h3>
+              <div class="line"><span class="dot"></span></div>
+              <div class="err">
+                <span class="stamp">Invalid</span>
+                <div class="code">ERR_SIGNATURE_VERIFICATION_FAILED<br />"getX509CertChain(...) must not be null"</div>
+              </div>
+            </div>
           </div>
-          <div class="arrow">→</div>
-          <div class="box">
-            <b>Run</b>OpenID4VCI 1.0 pre-authorized issuance and OpenID4VP 1.0 cross-device
-            presentation, live against Inji in Docker.
-          </div>
-          <div class="arrow">→</div>
-          <div class="box">
-            <b>Inspect</b>Every HTTP exchange, decoded SD-JWT disclosures and JOSE headers; each hop
-            labelled full / partial / none capture.
-          </div>
-          <div class="arrow">→</div>
-          <div class="box">
-            <b>Report and fix</b>Per-run JSON and Markdown report; a diagnosis in plain words, and a
-            one-click fix-it re-run when the fix is proven.
+          <div class="trace"><span class="ah">←</span><span class="dash"></span><span class="t">Nothing at the verifier points back to the issuer. Today the trace is done by hand.</span></div>
+          <div class="why">
+            <div>
+              <h3>Different teams</h3>
+              <p>Issuer, wallet and verifier are built and run by different teams and vendors.</p>
+            </div>
+            <div>
+              <h3>No single view</h3>
+              <p>No component shows all the messages of one credential journey in one place.</p>
+            </div>
+            <div>
+              <h3>Debugged by hand</h3>
+              <p>Each failure is traced by hand, and the fix is guessed rather than shown to work.</p>
+            </div>
           </div>
         </div>
-        <p>
-          Two formats live: SD-JWT VC (<code>dc+sd-jwt</code>) and W3C VC JSON-LD
-          (<code>ldp_vc</code>). Verifier labels <b>Valid</b>, <b>Invalid</b> and
-          <b>Valid-but-Expired</b>.
-        </p>
-        <aside class="notes">
-          Speaker: "Pick an issuer, a wallet and a verifier; we run OpenID4VCI and OpenID4VP for
-          real and hand you a report." Say "two formats live"; mDoc was cut (docs/decisions.md
-          2026-10-20). Sources: README "What it does", "Formats and labels"; screens in
-          docs/design.md.
-        </aside>
+        <div class="foot"><span>Team Bhrinjal &nbsp;·&nbsp; PS02</span><span>Run 01M5B6KNNY7DC3YK3CR0ETNBN9, docs/overview.md</span></div>
       </section>
+      <aside class="notes">
+        Source: run 01M5B6KNNY7DC3YK3CR0ETNBN9 and its report in docs/reports/; docs/overview.md
+        "The problem"; docs/gaps.md D-04 / G-55.
+      </aside>
 
-      <section class="slide" id="s4">
-        <div class="num">4 / 9</div>
-        <h2>How it works</h2>
-        <p class="message">
-          One backend drives every role and records each exchange in an event log the UI replays.
-        </p>
-        <div class="visual">
-          <img
-            class="shot"
-            src="../docs/diagrams/architecture-components.svg"
-            alt="Component diagram: the browser talks to one BFF process (routes, orchestrator, adapters, capture, edge gateway, event sink with the SQLite event log, diagnosis and derive, report generator); Inji Certify, Inji Verify, Mimoto, eSignet, Inji Web, the walt.id peers and the JVM sidecar run in Docker behind the gateway"
-          />
+      <!-- 3 What we built -->
+      <section class="sheet" id="s3">
+        <div class="head"><span><b>Interop Playground</b> &nbsp;·&nbsp; Brief for MOSIP Decode 2026</span><span class="folio">Sheet 3 <em>of</em> 12</span></div>
+        <p class="sec">What we built</p>
+        <h2>Pick three roles, run the real protocols, read every message.</h2>
+        <div class="body">
+          <div class="clauses">
+            <div class="clause"><span class="k">1</span><div><b>Select</b><span>Issuer, wallet, verifier, format and mode. Combinations that cannot work are greyed out with the reason and a gap ID.</span></div></div>
+            <div class="clause"><span class="k">2</span><div><b>Run</b><span>OpenID4VCI 1.0 pre-authorized issuance and OpenID4VP 1.0 cross-device presentation, live against Inji in Docker.</span></div></div>
+            <div class="clause"><span class="k">3</span><div><b>Inspect</b><span>Every HTTP exchange, decoded SD-JWT disclosures and JOSE headers. Each hop says if its capture is full, partial or none.</span></div></div>
+            <div class="clause"><span class="k">4</span><div><b>Report and fix</b><span>A JSON and Markdown report per run, a diagnosis in plain words, and a one-click fix-it re-run when the fix is proven.</span></div></div>
+          </div>
+          <figure style="flex: 1">
+            <div class="crop" style="--w: 1172; --h: 690; --x: 268; --y: 90">
+              <img src="../docs/screenshots/selector.png" alt="The combination selector with issuer, wallet and verifier columns" />
+            </div>
+            <figcaption><b>Exhibit A.</b> The selector. SD-JWT VC and W3C VC (JSON-LD) run live; mDoc is shown and greyed out (not in v1).</figcaption>
+          </figure>
         </div>
-        <aside class="notes">
-          Speaker: "The backend makes every outbound call itself; the wallet's inbound legs pass
-          through an allowlisting gateway. Every event is redacted, persisted, then streamed to the
-          UI over Server-Sent Events, so a finished run replays exactly." Sources: README
-          "Architecture"; docs/architecture.md (four diagrams: components, data flow of one run,
-          issuance and presentation sequence, fix-it derive flow).
-        </aside>
+        <div class="foot"><span>Team Bhrinjal &nbsp;·&nbsp; PS02</span><span>README, "What it does"</span></div>
       </section>
+      <aside class="notes">
+        Sources: README "What it does", "Formats and labels"; docs/screenshots/selector.png.
+      </aside>
 
-      <section class="slide" id="s5">
-        <div class="num">5 / 9</div>
-        <h2>The original angle: fix-it re-runs</h2>
-        <p class="message">
-          We do not only diagnose: we prove the fix by re-running with exactly one change.
-        </p>
-        <div class="visual">
-          <div class="box">
-            <b>Parent</b>walt.id → reference wallet → Inji Verify: <span class="fail">FAIL</span
-            ><br />
-            run <code>01M5B6KNNY7DC3YK3CR0ETNBN9</code>
+      <!-- 4 How it works -->
+      <section class="sheet" id="s4">
+        <div class="head"><span><b>Interop Playground</b> &nbsp;·&nbsp; Brief for MOSIP Decode 2026</span><span class="folio">Sheet 4 <em>of</em> 12</span></div>
+        <p class="sec">How it works</p>
+        <h2>One backend drives every role and writes each exchange to a log the UI replays.</h2>
+        <div class="body" style="flex-direction: column; gap: 0">
+          <div class="arch">
+            <div class="zone">
+              <span class="label">Browser</span>
+              <h3>React 18 UI</h3>
+              <ul>
+                <li>Selector</li>
+                <li>Run screen and sequence diagram</li>
+                <li>Inspector</li>
+                <li>Report</li>
+              </ul>
+            </div>
+            <div class="wire"><span>REST<br />commands</span><span class="ar">⇄</span><span>SSE<br />events</span></div>
+            <div class="zone">
+              <span class="label">BFF: one Node 22 process (Fastify)</span>
+              <div class="mods">
+                <div class="mod"><b>Orchestrator</b>immutable RunSpecs, scheduler</div>
+                <div class="mod"><b>Adapters</b>issuers, wallets, verifiers</div>
+                <div class="mod"><b>Capture + edge gateway</b>outbound calls; allowlisted inbound legs</div>
+                <div class="mod"><b>Diagnosis + derive</b>fingerprints; one-knob re-runs</div>
+                <div class="mod store"><b>Event sink → SQLite event log → SSE stream</b>secrets redacted before any write; reports generated from stored events</div>
+              </div>
+            </div>
+            <div class="wire"><span>HTTPS,<br />captured</span><span class="ar">⇄</span><span>wallet and<br />verifier legs</span></div>
+            <div class="zone dock">
+              <span class="label">Docker network, digest-pinned</span>
+              <ul>
+                <li>Inji Certify <span class="mono">1.0.0-alpha.1</span></li>
+                <li>Inji Verify <span class="mono">1.0.0-alpha.1</span></li>
+                <li>Mimoto, Inji Web</li>
+                <li>eSignet <span class="mono">1.8.0</span></li>
+                <li>walt.id issuer <span class="mono">1.1.0</span> (peer)</li>
+              </ul>
+            </div>
           </div>
-          <div class="arrow">→</div>
-          <div class="box">
-            <b>Diagnosis</b>FP-01, exact match, gap G-55. One offer: KNOB-01 <code>absent</code> →
-            <code>present</code>. No button when the cause is uncertain.
-          </div>
-          <div class="arrow">→</div>
-          <div class="box">
-            <b>Child</b>Same run, one knob changed: <span class="pass">PASS</span>, classified
-            <b>fixed</b>.<br />
-            run <code>01M5B6M723AQ7T818D36816PRV</code>
-          </div>
-        </div>
-        <p>"Changing only waltid.sdjwt.x5c from absent to present makes it pass."</p>
-        <aside class="notes">
-          Speaker: "A diagnosis with a proven fix gets one button. One knob changes, the run
-          repeats, and the result proves the fix." Proven live on 2026-10-20. Sources: reports
-          <code>docs/reports/01M5B6KNNY7DC3YK3CR0ETNBN9.md</code> and
-          <code>docs/reports/01M5B6M723AQ7T818D36816PRV.md</code>; live e2e
-          <code>e2e/live/fixit.live.spec.ts</code> (green 3× on
-          <code>scripts/up.sh --with peers</code>); golden replay
-          <code>apps/bff/src/diagnosis/fixit.golden.test.ts</code>; take
-          <code>deliverables/takes/s10-fixit.webm</code>.
-        </aside>
-      </section>
-
-      <section class="slide" id="s6">
-        <div class="num">6 / 9</div>
-        <h2>Results (v1, 2026-10-20)</h2>
-        <p class="message">Every number below has a run ID or a test in the repository.</p>
-        <div class="visual">
-          <div class="box">
-            <span class="big">75 %</span><b>pass rate (3 of 4)</b>Presentation cells: SD-JWT 2 of 3,
-            JSON-LD 1 of 1. The one failure is the walt.id cell, fixed by one knob.
-          </div>
-          <div class="box">
-            <span class="big">3 / 3</span><b>verifier labels</b>Valid, Invalid and
-            Valid-but-Expired, exactly as expected at the real Inji Verify.
-          </div>
-          <div class="box">
-            <span class="big">16</span><b>defect write-ups (D-01..D-16)</b>Drafted for the Inji
-            repositories, to be filed by hand. D-04 is reproduced live by the fix-it pair.
-          </div>
-          <div class="box">
-            <span class="big">682</span><b>automated tests passing</b>Plus 54 fixture Playwright
-            tests (axe, 320–1440 px, light and dark) and 6 CI jobs.
+          <div class="principles">
+            <div><b>Capture is orchestration</b><p>The backend makes every outbound call itself; each hop is labelled full, partial or none.</p></div>
+            <div><b>Persist, then publish</b><p>Each event is stored before it is streamed, so a finished run replays exactly.</p></div>
+            <div><b>Immutable runs</b><p>A fix-it re-run is a derived RunSpec with one knob changed and a link to its parent.</p></div>
+            <div><b>Closed by default</b><p>Inji services publish no ports; the gateway is the only listener and denies admin paths.</p></div>
           </div>
         </div>
-        <aside class="notes">
-          Sources: docs/interop-report.md "Summary" (75 %, 3/4); docs/evidence/T-47-labels.md (runs
-          <code>01M5CBEB3M9ANDEDPFBQD5D0NX</code>, <code>01M5CBEB4BW718XJ7VW09CB7EF</code>,
-          <code>01M5CBEB5F7W1Z8G14VNN0PK3Q</code>); docs/gaps.md group (a), D-01..D-16; README
-          "Development and tests" (682 passing, 8 skipped, 60 files, and 54 fixture Playwright tests
-          at commit <code>2f162cd</code>); <code>.github/workflows/ci.yml</code> (jobs static, unit,
-          integration, sidecar, ui, ci-fast). The write-ups are drafts; most are research
-          reproductions, and only D-04 was re-run in the build. Current counts: docs/testing.md.
-        </aside>
+        <div class="foot"><span>Team Bhrinjal &nbsp;·&nbsp; PS02</span><span>README "Architecture"; docs/architecture.md (ADR-19 to ADR-22)</span></div>
       </section>
+      <aside class="notes">
+        Sources: README "Architecture", "Security notes", "Spec targets and versions";
+        docs/architecture.md; versions.lock.
+      </aside>
 
-      <section class="slide" id="s7">
-        <div class="num">7 / 9</div>
-        <h2>Technology stack</h2>
-        <p class="message">TypeScript backend and UI, real Inji services, every image pinned.</p>
-        <div class="visual">
-          <table class="stack">
+      <!-- 5 Demo: inspector -->
+      <section class="sheet" id="s5">
+        <div class="head"><span><b>Interop Playground</b> &nbsp;·&nbsp; Brief for MOSIP Decode 2026</span><span class="folio">Sheet 5 <em>of</em> 12</span></div>
+        <p class="sec">In the demo, 1 of 2</p>
+        <h2>Follow the journey step by step, and open any message.</h2>
+        <div class="body">
+          <figure style="width: 800px; flex: none">
+            <div class="crop" style="--w: 1150; --h: 650; --x: 254; --y: 86">
+              <img src="../docs/screenshots/design-inspector-decoded.png" alt="The run screen: issuance step rail on the left, inspector on the right showing the decoded SD-JWT credential" />
+              <span class="pin" style="left: 2%; top: 31.5%">1</span>
+              <span class="pin" style="left: 43.4%; top: 7.7%">2</span>
+              <span class="pin" style="left: 43.4%; top: 39.5%">3</span>
+              <span class="pin" style="left: 43.4%; top: 62%">4</span>
+            </div>
+            <figcaption><b>Exhibit B.</b> The run screen of an SD-JWT VC issuance: step rail and inspector.</figcaption>
+          </figure>
+          <ol class="notes-list" style="flex: 1">
+            <li><span class="n">1</span><div><b>Plain step titles</b>Every step of OpenID4VCI and OpenID4VP, with its HTTP call, outcome and time.</div></li>
+            <li><span class="n">2</span><div><b>The exact exchange</b>Method, path and result of the selected step, here the credential request.</div></li>
+            <li><span class="n">3</span><div><b>Key payloads, one click away</b>Offer, token, credential, request, vp_token, verification result.</div></li>
+            <li><span class="n">4</span><div><b>Decoded, not raw</b>SD-JWT disclosures, JOSE headers, issuer and signing key, read as a document.</div></li>
+          </ol>
+        </div>
+        <div class="foot"><span>Team Bhrinjal &nbsp;·&nbsp; PS02</span><span>Screens from the UI fixture routes (docs/design.md)</span></div>
+      </section>
+      <aside class="notes">
+        Source: docs/screenshots/design-inspector-decoded.png; docs/design.md. The same path runs
+        live in e2e/live/slice.live.spec.ts.
+      </aside>
+
+      <!-- 6 Demo: verdicts -->
+      <section class="sheet" id="s6">
+        <div class="head"><span><b>Interop Playground</b> &nbsp;·&nbsp; Brief for MOSIP Decode 2026</span><span class="folio">Sheet 6 <em>of</em> 12</span></div>
+        <p class="sec">In the demo, 2 of 2</p>
+        <h2>Every run ends in a verdict you can read at a glance.</h2>
+        <p class="lede">The three labels of the problem statement, shown live at the real Inji Verify on 2026-10-20.</p>
+        <div class="body" style="margin-top: 20px">
+          <div class="register">
+            <div class="reg-row">
+              <div class="crop" style="--w: 830; --h: 112; --x: 266; --y: 474">
+                <img src="../docs/screenshots/design-result-valid.png" alt="Result card with a green Valid stamp: the verifier accepted the credential" />
+              </div>
+              <div><h3 class="pass">Valid</h3><p>Signature, holder proof and expiry all check out.</p><div class="run">run 01M5CBEB3M9ANDEDPFBQD5D0NX</div></div>
+            </div>
+            <div class="reg-row">
+              <div class="crop" style="--w: 830; --h: 112; --x: 266; --y: 414">
+                <img src="../docs/screenshots/design-result-invalid.png" alt="Result card with a red Invalid stamp: the verifier rejected the credential" />
+              </div>
+              <div><h3 class="fail">Invalid</h3><p>A bad signature is rejected with ERR_SIGNATURE_VERIFICATION_FAILED.</p><div class="run">run 01M5CBEB4BW718XJ7VW09CB7EF</div></div>
+            </div>
+            <div class="reg-row">
+              <div class="crop" style="--w: 830; --h: 112; --x: 266; --y: 474">
+                <img src="../docs/screenshots/design-result-expired.png" alt="Result card with a blue Expired stamp: the signature checks out but the credential is past its expiry date" />
+              </div>
+              <div><h3 style="color: var(--blue)">Valid-but-Expired</h3><p>Signature valid, past its expiry date. Inji Verify does not fold it into Invalid.</p><div class="run">run 01M5CBEB5F7W1Z8G14VNN0PK3Q</div></div>
+            </div>
+            <p style="font-size: 14px; color: var(--ink-2); margin-top: 12px">Presented over OpenID4VP, the expired credential is also reported as Valid-but-Expired (run 01M5CBC7EQY4ZKHPE50C1PC9CJ).</p>
+          </div>
+        </div>
+        <div class="foot"><span>Team Bhrinjal &nbsp;·&nbsp; PS02</span><span>docs/evidence/T-47-labels.md; screens from the UI fixture routes</span></div>
+      </section>
+      <aside class="notes">
+        Sources: README "Formats and labels"; docs/evidence/T-47-labels.md (FLOW-40 runs); over
+        OpenID4VP the expired credential is also Valid-but-Expired (run 01M5CBC7EQY4ZKHPE50C1PC9CJ).
+      </aside>
+
+      <!-- 7 Fix-it -->
+      <section class="sheet" id="s7">
+        <div class="head"><span><b>Interop Playground</b> &nbsp;·&nbsp; Brief for MOSIP Decode 2026</span><span class="folio">Sheet 7 <em>of</em> 12</span></div>
+        <p class="sec">The original angle: fix-it re-runs</p>
+        <h2>We do not stop at a diagnosis. We prove the fix by re-running with one change.</h2>
+        <div class="body" style="flex-direction: column; gap: 22px; margin-top: 22px">
+          <div class="ledger">
+            <div class="cell"><span class="label">Parent run</span><h3>walt.id → wallet → Inji Verify: <span class="fail">Fail</span></h3><p>At the verdict, ERR_SIGNATURE_VERIFICATION_FAILED.</p><div class="run">01M5B6KNNY7DC3YK3CR0ETNBN9</div></div>
+            <div class="to">→</div>
+            <div class="cell"><span class="label">Diagnosis</span><h3>FP-01, exact match (G-55)</h3><p>One proven knob is offered: KNOB-01, <span class="mono">waltid.sdjwt.x5c</span> absent → present.</p></div>
+            <div class="to">→</div>
+            <div class="cell"><span class="label">Child run, one click</span><h3>Same run, one knob: <span class="pass">Pass</span></h3><p>Classified <b>fixed</b>. Proven live on 2026-10-20.</p><div class="run">01M5B6M723AQ7T818D36816PRV</div></div>
+          </div>
+          <div style="display: flex; gap: 40px; flex: 1; min-height: 0">
+            <figure style="width: 560px; flex: none">
+              <div class="crop" style="--w: 620; --h: 262; --x: 262; --y: 118">
+                <img src="../docs/screenshots/design-child-compare.png" alt="The child run: The change fixed it. Invalid stamp on the original run, Valid stamp on the re-run" />
+              </div>
+              <figcaption><b>Exhibit C.</b> The child run: the original verdict, the re-run verdict, and the one change.</figcaption>
+            </figure>
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 16px">
+              <p class="claim">“Changing only waltid.sdjwt.x5c from absent to present makes it pass.”</p>
+              <div class="rules">
+                <div><b>Exact match + proven knob</b><span>One button, no dialog; the child changes that knob only.</span></div>
+                <div><b>Several causes, or partial capture</b><span>The causes are listed. No button.</span></div>
+                <div><b>No match</b><span>“Unclassified”. No button.</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="foot"><span>Team Bhrinjal &nbsp;·&nbsp; PS02</span><span>docs/reports/; e2e/live/fixit.live.spec.ts; fixit.golden.test.ts</span></div>
+      </section>
+      <aside class="notes">
+        Sources: README "Fix-it re-runs"; reports docs/reports/01M5B6KNNY7DC3YK3CR0ETNBN9.md and
+        01M5B6M723AQ7T818D36816PRV.md; live e2e e2e/live/fixit.live.spec.ts (green 3x on
+        scripts/up.sh --with peers); golden replay apps/bff/src/diagnosis/fixit.golden.test.ts.
+        Child runs are classified fixed, moved, not-fixed or inconclusive.
+      </aside>
+
+      <!-- 8 Findings -->
+      <section class="sheet" id="s8">
+        <div class="head"><span><b>Interop Playground</b> &nbsp;·&nbsp; Brief for MOSIP Decode 2026</span><span class="folio">Sheet 8 <em>of</em> 12</span></div>
+        <p class="sec">What we found in Inji</p>
+        <h2>Sixteen defect write-ups, drafted for the Inji repositories with their evidence.</h2>
+        <div class="body" style="margin-top: 22px">
+          <table class="find">
+            <thead><tr><th style="width: 110px">Draft</th><th style="width: 170px">Component</th><th>Finding</th><th style="width: 210px">Status</th></tr></thead>
             <tbody>
-              <tr>
-                <th>Backend</th>
-                <td>Node 22, TypeScript, Fastify 5, <code>better-sqlite3</code> event log</td>
-              </tr>
-              <tr>
-                <th>UI</th>
-                <td>
-                  React 18, Vite 7, React Router, a generated sequence diagram, plain CSS tokens
-                  (light and dark)
-                </td>
-              </tr>
-              <tr>
-                <th>Live data</th>
-                <td>REST commands, Server-Sent Events (no WebSocket); OpenAPI 3.1 contract</td>
-              </tr>
-              <tr>
-                <th>Protocols</th>
-                <td>OpenID4VCI 1.0, OpenID4VP 1.0 with DCQL, SD-JWT VC, W3C VC (JSON-LD)</td>
-              </tr>
-              <tr>
-                <th>Inji stack</th>
-                <td>
-                  Inji Certify, Inji Verify, Mimoto, Inji Web <code>1.0.0-alpha.1</code>; eSignet
-                  <code>1.8.0</code>; walt.id <code>1.1.0</code> as an external peer
-                </td>
-              </tr>
-              <tr>
-                <th>Libraries</th>
-                <td>
-                  JVM sidecar (Gradle) with the Inji Kotlin libraries (built; not used by v1 flows)
-                </td>
-              </tr>
-              <tr>
-                <th>Ops and tests</th>
-                <td>
-                  Docker Compose, one <code>scripts/up.sh</code>, digests in
-                  <code>versions.lock</code>; Vitest, Playwright, axe-core, GitHub Actions CI
-                </td>
-              </tr>
+              <tr><td class="id">D-04<small>G-55</small></td><td>Inji Verify</td><td>SD-JWT verification requires an <span class="mono">x5c</span> header and cannot resolve a <span class="mono">did:jwk</span> or JWK issuer key.</td><td class="st"><span class="mark live">Reproduced live</span><br />by the fix-it pair</td></tr>
+              <tr><td class="id">D-01<small>G-109</small></td><td>Inji Certify</td><td>Returns 500 instead of 400 for a token request without a pre-authorized code, and for an EdDSA proof on an EC key.</td><td class="st"><span class="mark used">Recorded answers</span><br />in fixtures</td></tr>
+              <tr><td class="id">D-16<small>G-115</small></td><td>Inji Certify</td><td>A wrong <span class="mono">tx_code</span> answers invalid_request instead of invalid_grant, and any failed attempt burns the code.</td><td class="st"><span class="mark used">Relied on</span><br />known-fails list</td></tr>
+              <tr><td class="id">D-08<small>G-112</small></td><td>inji-openid4vp</td><td>Accepts only EdDSA request-object signatures, so it fails against EUDI (ES512) and signed walt.id (ES256) requests.</td><td class="st"><span class="mark used">Relied on</span><br />the selector greys the cell</td></tr>
+              <tr><td class="id">D-02<small>G-19</small></td><td>Inji Verify</td><td>A tampered SD-JWT disclosure is reported as a missing claim, and the credential is labelled ldp_vc.</td><td class="st"><span class="mark res">Research</span><br />with recorded traces</td></tr>
             </tbody>
           </table>
         </div>
-        <aside class="notes">
-          Sources: README "Tech stack", "Spec targets and versions";
-          <code>apps/bff/package.json</code>, <code>apps/ui/package.json</code>, root
-          <code>package.json</code>; <code>versions.lock</code>;
-          <code>packages/api/openapi.yaml</code>.
-        </aside>
+        <p style="font-size: 14px; color: var(--ink-2); margin-top: 14px">Five of sixteen shown. The full list, with groups for documentation gaps and our own bundle defects, is in docs/gaps.md. Issues are filed upstream by hand only.</p>
+        <div class="foot"><span>Team Bhrinjal &nbsp;·&nbsp; PS02</span><span>docs/gaps.md, group (a)</span></div>
       </section>
+      <aside class="notes">
+        Source: docs/gaps.md group (a) D-01..D-16 with evidence and status; "Filed issues" section.
+        Only D-04 was re-run in the build; most others are research reproductions.
+      </aside>
 
-      <section class="slide" id="s8">
-        <div class="num">8 / 9</div>
-        <h2>Target audience</h2>
-        <p class="message">Anyone who has to make Inji work with something it did not ship with.</p>
-        <div class="visual">
-          <div class="box">
-            <b>Inji / MOSIP developers and integrators</b>See where a change breaks interop, with
-            the exact exchange and spec clause.
-          </div>
-          <div class="box">
-            <b>Wallet, issuer and verifier vendors</b>Test an implementation against real Inji
-            services before integrating; the walt.id issuer is the worked example.
-          </div>
-          <div class="box">
-            <b>Country ID programmes and system integrators</b>Check which issuer, wallet and
-            verifier combinations work, with evidence, before a rollout.
-          </div>
-          <div class="box">
-            <b>Conformance and QA teams</b>Repeatable runs from digest-pinned images, per-run
-            reports, and fixture credentials for Valid, Invalid and Expired.
+      <!-- 9 Results -->
+      <section class="sheet" id="s9">
+        <div class="head"><span><b>Interop Playground</b> &nbsp;·&nbsp; Brief for MOSIP Decode 2026</span><span class="folio">Sheet 9 <em>of</em> 12</span></div>
+        <p class="sec">Results, v1 (2026-10-20)</p>
+        <h2>Every figure has a run ID, an evidence file or a test behind it.</h2>
+        <div class="body">
+          <div class="tally">
+            <div class="row"><span class="fig">75<small> %</small></span><div><b>Presentation pass rate, 3 of 4</b><p>SD-JWT 2 of 3, JSON-LD 1 of 1. The one failure is the walt.id cell, fixed by one knob.</p><span class="src">docs/interop-report.md</span></div></div>
+            <div class="row"><span class="fig">3<small> of </small>3</span><div><b>Verifier labels at the real Inji Verify</b><p>Valid, Invalid and Valid-but-Expired, exactly as expected.</p><span class="src">docs/evidence/T-47-labels.md</span></div></div>
+            <div class="row"><span class="fig">2</span><div><b>Credential formats live</b><p>SD-JWT VC (dc+sd-jwt) and W3C VC JSON-LD (ldp_vc), issued and presented.</p><span class="src">README, "Formats and labels"</span></div></div>
+            <div class="row"><span class="fig">1</span><div><b>Fix proven by a re-run</b><p>FP-01 + KNOB-01: Fail to Pass with one setting changed, classified fixed.</p><span class="src">docs/reports/01M5B6M723AQ7T818D36816PRV.md</span></div></div>
+            <div class="row"><span class="fig">3<small> min </small>1<small> s</small></span><div><b>Fresh clone to the first Pass</b><p>git clone, scripts/up.sh, first run; on a host with the images cached.</p><span class="src">docs/evidence/T-55-fresh-clone.md</span></div></div>
+            <div class="row"><span class="fig">682</span><div><b>Automated tests passing</b><p>Plus 54 fixture Playwright tests: axe, 320 to 1440 px, light and dark.</p><span class="src">README, "Development and tests" (2026-10-21)</span></div></div>
           </div>
         </div>
-        <aside class="notes">
-          Speaker: "The playground is for people who integrate, not only for people who build Inji."
-          Each box maps to a shipped feature: selector and inspector (README "What it does"), the
-          walt.id flows (FLOW-08), versions.lock, the fixture issuer (FLOW-14, FLOW-40).
-        </aside>
+        <div class="foot"><span>Team Bhrinjal &nbsp;·&nbsp; PS02</span><span>Pass rate = (pass + lenient) / (pass + lenient + fail + blocked), per cell</span></div>
       </section>
+      <aside class="notes">
+        Sources as printed under each figure. 682 passing and 8 skipped in a fresh clone of commit
+        aaffa79. Current counts: docs/testing.md.
+      </aside>
 
-      <section class="slide" id="s9">
-        <div class="num">9 / 9</div>
-        <h2>Potential impact, and run it yourself</h2>
-        <p class="message">Faster interop debugging today; a shared compatibility record next.</p>
-        <div class="visual">
-          <div class="box">
-            <b>Faster interop debugging</b>The failing exchange, its decoded payload and a matched
-            cause in one screen; a proven fix in one click (FP-01 / KNOB-01).
-          </div>
-          <div class="box">
-            <b>Evidence-backed bug reports</b>16 drafted Inji defects in <code>docs/gaps.md</code>,
-            each with its evidence; filed upstream by hand.
-          </div>
-          <div class="box">
-            <b>Compatibility matrix</b> <span class="future">FUTURE</span><br />A nightly
-            cross-vendor matrix from the same runs. Not in v1.
-          </div>
-          <div class="box">
-            <b>Back to MOSIP</b> <span class="future">FUTURE</span><br />More fingerprints and
-            knobs, and fixes contributed upstream. Open source under MPL-2.0.
+      <!-- 10 Audience and impact -->
+      <section class="sheet" id="s10">
+        <div class="head"><span><b>Interop Playground</b> &nbsp;·&nbsp; Brief for MOSIP Decode 2026</span><span class="folio">Sheet 10 <em>of</em> 12</span></div>
+        <p class="sec">Who it is for, and what it changes</p>
+        <h2>For anyone who must make Inji work with something it did not ship with.</h2>
+        <div class="body">
+          <div class="cols2">
+            <div>
+              <span class="label col-h">Who it is for</span>
+              <div class="who">
+                <div><b>Inji and MOSIP developers</b><p>See where a change breaks interop, with the exact exchange and the spec clause.</p></div>
+                <div><b>Wallet, issuer and verifier vendors</b><p>Test against real Inji services before integrating; the walt.id issuer is the worked example.</p></div>
+                <div><b>Country ID programmes and integrators</b><p>Check which combinations work, with evidence, before a rollout.</p></div>
+                <div><b>Conformance and QA teams</b><p>Repeatable runs from digest-pinned images and fixture credentials for each label.</p></div>
+              </div>
+            </div>
+            <div>
+              <span class="label col-h">What it changes</span>
+              <div class="who">
+                <div><b>From one error code to the cause</b><p>The failing exchange, its decoded payload and a matched cause on one screen.</p></div>
+                <div><b>From a guessed fix to a proven one</b><p>A fix is shown to work by a re-run that changes only that setting.</p></div>
+                <div><b>From anecdotes to evidence</b><p>Bug reports that carry the run, the messages and the spec clause.</p></div>
+              </div>
+            </div>
           </div>
         </div>
-        <p>
-          <code>git clone https://github.com/abhijay-jindal-604/interop-playground</code> →
-          <code>scripts/up.sh</code> → open <code>http://127.0.0.1:3100</code>. First Pass 3 min 1 s
-          after the clone (images cached). Docs: <code>README.md</code>,
-          <code>docs/architecture.md</code>, <code>docs/design.md</code>.
-        </p>
-        <p class="credits">Team Bhrinjal (Abhijay Jindal).</p>
-        <aside class="notes">
-          Speaker: "Clone, run one script, and your first combination passes in minutes." Sources:
-          docs/gaps.md group (a) D-01..D-16 and its "Filed issues" section (none filed yet); README
-          "Known limitations" (the interop matrix and nightly CI are not in v1);
-          <code>LICENSE</code> (MPL-2.0); docs/evidence/T-55-fresh-clone.md (git clone →
-          <code>scripts/up.sh</code> 2 min 40 s → first run Pass,
-          <code>01M5CCC4FZRMCCWMVQF5038EYS</code>, 3 min 1 s on a host with every image cached; a
-          new host adds the image pulls). Demo video: deliverables/video/demo-v1.mp4.
-        </aside>
+        <div class="foot"><span>Team Bhrinjal &nbsp;·&nbsp; PS02</span><span>docs/overview.md</span></div>
       </section>
+      <aside class="notes">
+        Each audience maps to a shipped feature: selector and inspector (README "What it does"),
+        the walt.id flows (FLOW-08), versions.lock, the fixture issuer (FLOW-14, FLOW-40).
+      </aside>
+
+      <!-- 11 Roadmap -->
+      <section class="sheet" id="s11">
+        <div class="head"><span><b>Interop Playground</b> &nbsp;·&nbsp; Brief for MOSIP Decode 2026</span><span class="folio">Sheet 11 <em>of</em> 12</span></div>
+        <p class="sec">Roadmap</p>
+        <h2>From one proven fix to a shared compatibility record.</h2>
+        <p class="lede">The first column is shipped. The other two are planned work, listed in the README as not in v1.</p>
+        <div class="body">
+          <div class="road">
+            <div class="stage now">
+              <div class="bar"><i></i></div>
+              <h3>Shipped in v1</h3>
+              <span class="label">Live on the bundle</span>
+              <ul>
+                <li><b>Two formats</b>, SD-JWT VC and JSON-LD, issued and presented</li>
+                <li><b>Three issuers</b>: Inji Certify, walt.id, a fixture issuer</li>
+                <li><b>Inspector and reports</b> for every run</li>
+                <li><b>Fix-it</b>: one fingerprint, one knob, proven</li>
+              </ul>
+            </div>
+            <div class="stage">
+              <div class="bar"><i></i></div>
+              <h3>Next</h3>
+              <span class="label">Wider coverage</span>
+              <ul>
+                <li><b>More adapters</b>: the Inji JVM wallet, Inji Web, the phone wallet, walt.id and EUDI verifiers</li>
+                <li><b>mDoc</b> (mso_mdoc), cut from v1</li>
+                <li><b>More fingerprints and knobs</b> for fix-it</li>
+                <li><b>Tamper mode</b> and suites</li>
+              </ul>
+            </div>
+            <div class="stage later">
+              <div class="bar"><i></i></div>
+              <h3>Later</h3>
+              <span class="label">Back to the ecosystem</span>
+              <ul>
+                <li><b>Interop matrix</b> across vendors, from the same runs</li>
+                <li><b>Nightly CI</b> against the Collab sandbox</li>
+                <li><b>Issue drafts</b> filed upstream with their evidence</li>
+                <li><b>Fixes contributed</b> to the Inji repositories</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <p class="claim" style="font-size: 19px; margin-top: 18px">The same runs that prove one fix today can feed a cross-vendor compatibility record: every cell a run, every run a report.</p>
+        <div class="foot"><span>Team Bhrinjal &nbsp;·&nbsp; PS02</span><span>README "Known limitations"; docs/decisions.md</span></div>
+      </section>
+      <aside class="notes">
+        Source: README "Known limitations" (built adapters; not in v1: tamper mode, suites, the
+        interop matrix, nightly CI against Collab, issue drafts, tx_code, auth-code issuance,
+        same-device presentation). The grouping into Next and Later is our plan, not a commitment.
+      </aside>
+
+      <!-- 12 Team and links -->
+      <section class="sheet" id="s12">
+        <div class="head"><span><b>Interop Playground</b> &nbsp;·&nbsp; Brief for MOSIP Decode 2026</span><span class="folio">Sheet 12 <em>of</em> 12</span></div>
+        <p class="sec">Team and links</p>
+        <h2>Team Bhrinjal</h2>
+        <div class="body" style="gap: 64px">
+          <div style="flex: 1">
+            <div class="team">
+              <div class="person"><span class="k">i.</span><span class="nm">Abhijay Jindal</span></div>
+              <div class="person"><span class="k">ii.</span><span class="nm">Shrey Bhardwaj</span></div>
+              <div class="person"><span class="k">iii.</span><span class="nm">Aryan Bedwal</span></div>
+            </div>
+            <div style="margin-top: 28px; display: flex; align-items: center; gap: 26px">
+              <span class="stamp" style="color: var(--green); font-size: 20px">PS02<small>MOSIP Decode 2026</small></span>
+              <p style="font-size: 15px; color: var(--ink-2); max-width: 340px">Open source under MPL-2.0. Thank you for reading.</p>
+            </div>
+          </div>
+          <div style="width: 560px; flex: none">
+            <span class="label col-h">Run it yourself</span>
+            <div class="steps">
+              <div><span class="n">1</span><span>Clone the repository<span class="mono">git clone https://github.com/abhijay-jindal-604/interop-playground</span></span></div>
+              <div><span class="n">2</span><span>Start the digest-pinned bundle<span class="mono">scripts/up.sh</span></span></div>
+              <div><span class="n">3</span><span>Open the playground and press Run<span class="mono">http://127.0.0.1:3100</span></span></div>
+            </div>
+            <span class="label col-h" style="margin-top: 22px">Read more in the repository</span>
+            <div class="steps">
+              <div><span class="n">·</span><span>README.md: quickstart, flows, limitations</span></div>
+              <div><span class="n">·</span><span>docs/architecture.md, docs/design.md, docs/gaps.md</span></div>
+              <div><span class="n">·</span><span>docs/interop-report.md and the per-run reports</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot"><span>Team Bhrinjal &nbsp;·&nbsp; PS02</span><span>github.com/abhijay-jindal-604/interop-playground</span></div>
+      </section>
+      <aside class="notes">
+        Sources: README "Quickstart"; LICENSE (MPL-2.0); docs/evidence/T-55-fresh-clone.md.
+      </aside>
     </main>
     <script>
       (() => {
-        const slides = [...document.querySelectorAll('section.slide')];
+        const slides = [...document.querySelectorAll('section.sheet')];
         let i = 0;
         const go = (n) => {
           i = Math.max(0, Math.min(slides.length - 1, n));
-          slides[i].scrollIntoView({ behavior: 'smooth', block: 'start' });
+          slides[i].scrollIntoView({ behavior: 'smooth', block: 'center' });
         };
         document.addEventListener('keydown', (e) => {
           if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') {
