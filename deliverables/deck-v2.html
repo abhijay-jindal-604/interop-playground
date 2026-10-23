@@ -987,7 +987,9 @@
           <div class="fields">
             <div class="field wide">
               <span class="label">Submitted by Team Bhrinjal</span>
-              <span class="names">Abhijay Jindal &nbsp;·&nbsp; Shrey Bhardwaj &nbsp;·&nbsp; Aryan Bedwal</span>
+              <span class="names"
+                >Abhijay Jindal &nbsp;·&nbsp; Shrey Bhardwaj &nbsp;·&nbsp; Aryan Bedwal</span
+              >
             </div>
             <div class="field">
               <span class="label">Repository</span>
@@ -1002,15 +1004,25 @@
         <div class="right">
           <figure class="cx" style="top: 150px">
             <div class="crop" style="--w: 560; --h: 132; --x: 262; --y: 96">
-              <img src="../docs/screenshots/selector.png" alt="The selector headline: Pick who plays each role" />
+              <img
+                src="../docs/screenshots/selector.png"
+                alt="The selector headline: Pick who plays each role"
+              />
             </div>
-            <figcaption><b>Choose the roles.</b> Issuer, wallet and verifier, run for real against Inji.</figcaption>
+            <figcaption>
+              <b>Choose the roles.</b> Issuer, wallet and verifier, run for real against Inji.
+            </figcaption>
           </figure>
           <figure class="cx" style="top: 346px">
             <div class="crop" style="--w: 440; --h: 186; --x: 262; --y: 118">
-              <img src="../docs/screenshots/design-child-compare.png" alt="The fix-it re-run: the original run stamped Invalid, the re-run stamped Valid" />
+              <img
+                src="../docs/screenshots/design-child-compare.png"
+                alt="The fix-it re-run: the original run stamped Invalid, the re-run stamped Valid"
+              />
             </div>
-            <figcaption><b>Prove the fix.</b> A failed run, re-run with one setting changed, now passes.</figcaption>
+            <figcaption>
+              <b>Prove the fix.</b> A failed run, re-run with one setting changed, now passes.
+            </figcaption>
           </figure>
         </div>
       </section>
@@ -1021,15 +1033,23 @@
 
       <!-- 2 Problem -->
       <section class="sheet" id="s2">
-        <div class="head"><span><b>Interop Playground</b> &nbsp;·&nbsp; Brief for MOSIP Decode 2026</span><span class="folio">Sheet 2 <em>of</em> 12</span></div>
+        <div class="head">
+          <span><b>Interop Playground</b> &nbsp;·&nbsp; Brief for MOSIP Decode 2026</span
+          ><span class="folio">Sheet 2 <em>of</em> 12</span>
+        </div>
         <p class="sec">The problem</p>
-        <h2>A failed presentation is one opaque error at the last hop. The cause sits two hops earlier.</h2>
+        <h2>
+          A failed presentation is one opaque error at the last hop. The cause sits two hops
+          earlier.
+        </h2>
         <div class="body" style="flex-direction: column; gap: 0">
           <div class="journey">
             <div class="role">
               <span class="label">Issuer</span>
               <h3>walt.id issuer-api2</h3>
-              <div class="line"><span class="dot cause"></span><span class="msg">issues SD-JWT VC</span></div>
+              <div class="line">
+                <span class="dot cause"></span><span class="msg">issues SD-JWT VC</span>
+              </div>
               <div class="cause-note">
                 <span class="label">Where the cause is</span>
                 <p class="what">
@@ -1042,7 +1062,9 @@
             <div class="role">
               <span class="label">Wallet</span>
               <h3>Playground reference wallet</h3>
-              <div class="line"><span class="dot"></span><span class="msg">presents over OpenID4VP</span></div>
+              <div class="line">
+                <span class="dot"></span><span class="msg">presents over OpenID4VP</span>
+              </div>
               <p class="what">
                 Holds the credential and presents it. Nothing here fails, so nothing here looks
                 wrong.
@@ -1054,11 +1076,19 @@
               <div class="line"><span class="dot"></span></div>
               <div class="err">
                 <span class="stamp">Invalid</span>
-                <div class="code">ERR_SIGNATURE_VERIFICATION_FAILED<br />"getX509CertChain(...) must not be null"</div>
+                <div class="code">
+                  ERR_SIGNATURE_VERIFICATION_FAILED<br />"getX509CertChain(...) must not be null"
+                </div>
               </div>
             </div>
           </div>
-          <div class="trace"><span class="ah">←</span><span class="dash"></span><span class="t">Nothing at the verifier points back to the issuer. Today the trace is done by hand.</span></div>
+          <div class="trace">
+            <span class="ah">←</span><span class="dash"></span
+            ><span class="t"
+              >Nothing at the verifier points back to the issuer. Today the trace is done by
+              hand.</span
+            >
+          </div>
           <div class="why">
             <div>
               <h3>Different teams</h3>
@@ -1070,11 +1100,16 @@
             </div>
             <div>
               <h3>Debugged by hand</h3>
-              <p>Each failure is traced by hand, and the fix is guessed rather than shown to work.</p>
+              <p>
+                Each failure is traced by hand, and the fix is guessed rather than shown to work.
+              </p>
             </div>
           </div>
         </div>
-        <div class="foot"><span>Team Bhrinjal &nbsp;·&nbsp; PS02</span><span>Run 01M5B6KNNY7DC3YK3CR0ETNBN9, docs/overview.md</span></div>
+        <div class="foot">
+          <span>Team Bhrinjal &nbsp;·&nbsp; PS02</span
+          ><span>Run 01M5B6KNNY7DC3YK3CR0ETNBN9, docs/overview.md</span>
+        </div>
       </section>
       <aside class="notes">
         Source: run 01M5B6KNNY7DC3YK3CR0ETNBN9 and its report in docs/reports/; docs/overview.md
@@ -1083,24 +1118,71 @@
 
       <!-- 3 What we built -->
       <section class="sheet" id="s3">
-        <div class="head"><span><b>Interop Playground</b> &nbsp;·&nbsp; Brief for MOSIP Decode 2026</span><span class="folio">Sheet 3 <em>of</em> 12</span></div>
+        <div class="head">
+          <span><b>Interop Playground</b> &nbsp;·&nbsp; Brief for MOSIP Decode 2026</span
+          ><span class="folio">Sheet 3 <em>of</em> 12</span>
+        </div>
         <p class="sec">What we built</p>
         <h2>Pick three roles, run the real protocols, read every message.</h2>
         <div class="body">
           <div class="clauses">
-            <div class="clause"><span class="k">1</span><div><b>Select</b><span>Issuer, wallet, verifier, format and mode. Combinations that cannot work are greyed out with the reason and a gap ID.</span></div></div>
-            <div class="clause"><span class="k">2</span><div><b>Run</b><span>OpenID4VCI 1.0 pre-authorized issuance and OpenID4VP 1.0 cross-device presentation, live against Inji in Docker.</span></div></div>
-            <div class="clause"><span class="k">3</span><div><b>Inspect</b><span>Every HTTP exchange, decoded SD-JWT disclosures and JOSE headers. Each hop says if its capture is full, partial or none.</span></div></div>
-            <div class="clause"><span class="k">4</span><div><b>Report and fix</b><span>A JSON and Markdown report per run, a diagnosis in plain words, and a one-click fix-it re-run when the fix is proven.</span></div></div>
+            <div class="clause">
+              <span class="k">1</span>
+              <div>
+                <b>Select</b
+                ><span
+                  >Issuer, wallet, verifier, format and mode. Combinations that cannot work are
+                  greyed out with the reason and a gap ID.</span
+                >
+              </div>
+            </div>
+            <div class="clause">
+              <span class="k">2</span>
+              <div>
+                <b>Run</b
+                ><span
+                  >OpenID4VCI 1.0 pre-authorized issuance and OpenID4VP 1.0 cross-device
+                  presentation, live against Inji in Docker.</span
+                >
+              </div>
+            </div>
+            <div class="clause">
+              <span class="k">3</span>
+              <div>
+                <b>Inspect</b
+                ><span
+                  >Every HTTP exchange, decoded SD-JWT disclosures and JOSE headers. Each hop says
+                  if its capture is full, partial or none.</span
+                >
+              </div>
+            </div>
+            <div class="clause">
+              <span class="k">4</span>
+              <div>
+                <b>Report and fix</b
+                ><span
+                  >A JSON and Markdown report per run, a diagnosis in plain words, and a one-click
+                  fix-it re-run when the fix is proven.</span
+                >
+              </div>
+            </div>
           </div>
           <figure style="flex: 1">
             <div class="crop" style="--w: 1172; --h: 690; --x: 268; --y: 90">
-              <img src="../docs/screenshots/selector.png" alt="The combination selector with issuer, wallet and verifier columns" />
+              <img
+                src="../docs/screenshots/selector.png"
+                alt="The combination selector with issuer, wallet and verifier columns"
+              />
             </div>
-            <figcaption><b>Exhibit A.</b> The selector. SD-JWT VC and W3C VC (JSON-LD) run live; mDoc is shown and greyed out (not in v1).</figcaption>
+            <figcaption>
+              <b>Exhibit A.</b> The selector. SD-JWT VC and W3C VC (JSON-LD) run live; mDoc is shown
+              and greyed out (not in v1).
+            </figcaption>
           </figure>
         </div>
-        <div class="foot"><span>Team Bhrinjal &nbsp;·&nbsp; PS02</span><span>README, "What it does"</span></div>
+        <div class="foot">
+          <span>Team Bhrinjal &nbsp;·&nbsp; PS02</span><span>README, "What it does"</span>
+        </div>
       </section>
       <aside class="notes">
         Sources: README "What it does", "Formats and labels"; docs/screenshots/selector.png.
@@ -1108,7 +1190,10 @@
 
       <!-- 4 How it works -->
       <section class="sheet" id="s4">
-        <div class="head"><span><b>Interop Playground</b> &nbsp;·&nbsp; Brief for MOSIP Decode 2026</span><span class="folio">Sheet 4 <em>of</em> 12</span></div>
+        <div class="head">
+          <span><b>Interop Playground</b> &nbsp;·&nbsp; Brief for MOSIP Decode 2026</span
+          ><span class="folio">Sheet 4 <em>of</em> 12</span>
+        </div>
         <p class="sec">How it works</p>
         <h2>One backend drives every role and writes each exchange to a log the UI replays.</h2>
         <div class="body" style="flex-direction: column; gap: 0">
@@ -1123,18 +1208,28 @@
                 <li>Report</li>
               </ul>
             </div>
-            <div class="wire"><span>REST<br />commands</span><span class="ar">⇄</span><span>SSE<br />events</span></div>
+            <div class="wire">
+              <span>REST<br />commands</span><span class="ar">⇄</span><span>SSE<br />events</span>
+            </div>
             <div class="zone">
               <span class="label">BFF: one Node 22 process (Fastify)</span>
               <div class="mods">
                 <div class="mod"><b>Orchestrator</b>immutable RunSpecs, scheduler</div>
                 <div class="mod"><b>Adapters</b>issuers, wallets, verifiers</div>
-                <div class="mod"><b>Capture + edge gateway</b>outbound calls; allowlisted inbound legs</div>
+                <div class="mod">
+                  <b>Capture + edge gateway</b>outbound calls; allowlisted inbound legs
+                </div>
                 <div class="mod"><b>Diagnosis + derive</b>fingerprints; one-knob re-runs</div>
-                <div class="mod store"><b>Event sink → SQLite event log → SSE stream</b>secrets redacted before any write; reports generated from stored events</div>
+                <div class="mod store">
+                  <b>Event sink → SQLite event log → SSE stream</b>secrets redacted before any
+                  write; reports generated from stored events
+                </div>
               </div>
             </div>
-            <div class="wire"><span>HTTPS,<br />captured</span><span class="ar">⇄</span><span>wallet and<br />verifier legs</span></div>
+            <div class="wire">
+              <span>HTTPS,<br />captured</span><span class="ar">⇄</span
+              ><span>wallet and<br />verifier legs</span>
+            </div>
             <div class="zone dock">
               <span class="label">Docker network, digest-pinned</span>
               <ul>
@@ -1147,13 +1242,36 @@
             </div>
           </div>
           <div class="principles">
-            <div><b>Capture is orchestration</b><p>The backend makes every outbound call itself; each hop is labelled full, partial or none.</p></div>
-            <div><b>Persist, then publish</b><p>Each event is stored before it is streamed, so a finished run replays exactly.</p></div>
-            <div><b>Immutable runs</b><p>A fix-it re-run is a derived RunSpec with one knob changed and a link to its parent.</p></div>
-            <div><b>Closed by default</b><p>Inji services publish no ports; the gateway is the only listener and denies admin paths.</p></div>
+            <div>
+              <b>Capture is orchestration</b>
+              <p>
+                The backend makes every outbound call itself; each hop is labelled full, partial or
+                none.
+              </p>
+            </div>
+            <div>
+              <b>Persist, then publish</b>
+              <p>Each event is stored before it is streamed, so a finished run replays exactly.</p>
+            </div>
+            <div>
+              <b>Immutable runs</b>
+              <p>
+                A fix-it re-run is a derived RunSpec with one knob changed and a link to its parent.
+              </p>
+            </div>
+            <div>
+              <b>Closed by default</b>
+              <p>
+                Inji services publish no ports; the gateway is the only listener and denies admin
+                paths.
+              </p>
+            </div>
           </div>
         </div>
-        <div class="foot"><span>Team Bhrinjal &nbsp;·&nbsp; PS02</span><span>README "Architecture"; docs/architecture.md (ADR-19 to ADR-22)</span></div>
+        <div class="foot">
+          <span>Team Bhrinjal &nbsp;·&nbsp; PS02</span
+          ><span>README "Architecture"; docs/architecture.md (ADR-19 to ADR-22)</span>
+        </div>
       </section>
       <aside class="notes">
         Sources: README "Architecture", "Security notes", "Spec targets and versions";
@@ -1162,28 +1280,63 @@
 
       <!-- 5 Demo: inspector -->
       <section class="sheet" id="s5">
-        <div class="head"><span><b>Interop Playground</b> &nbsp;·&nbsp; Brief for MOSIP Decode 2026</span><span class="folio">Sheet 5 <em>of</em> 12</span></div>
+        <div class="head">
+          <span><b>Interop Playground</b> &nbsp;·&nbsp; Brief for MOSIP Decode 2026</span
+          ><span class="folio">Sheet 5 <em>of</em> 12</span>
+        </div>
         <p class="sec">In the demo, 1 of 2</p>
         <h2>Follow the journey step by step, and open any message.</h2>
         <div class="body">
           <figure style="width: 800px; flex: none">
             <div class="crop" style="--w: 1150; --h: 650; --x: 254; --y: 86">
-              <img src="../docs/screenshots/design-inspector-decoded.png" alt="The run screen: issuance step rail on the left, inspector on the right showing the decoded SD-JWT credential" />
+              <img
+                src="../docs/screenshots/design-inspector-decoded.png"
+                alt="The run screen: issuance step rail on the left, inspector on the right showing the decoded SD-JWT credential"
+              />
               <span class="pin" style="left: 2%; top: 31.5%">1</span>
               <span class="pin" style="left: 43.4%; top: 7.7%">2</span>
               <span class="pin" style="left: 43.4%; top: 39.5%">3</span>
               <span class="pin" style="left: 43.4%; top: 62%">4</span>
             </div>
-            <figcaption><b>Exhibit B.</b> The run screen of an SD-JWT VC issuance: step rail and inspector.</figcaption>
+            <figcaption>
+              <b>Exhibit B.</b> The run screen of an SD-JWT VC issuance: step rail and inspector.
+            </figcaption>
           </figure>
           <ol class="notes-list" style="flex: 1">
-            <li><span class="n">1</span><div><b>Plain step titles</b>Every step of OpenID4VCI and OpenID4VP, with its HTTP call, outcome and time.</div></li>
-            <li><span class="n">2</span><div><b>The exact exchange</b>Method, path and result of the selected step, here the credential request.</div></li>
-            <li><span class="n">3</span><div><b>Key payloads, one click away</b>Offer, token, credential, request, vp_token, verification result.</div></li>
-            <li><span class="n">4</span><div><b>Decoded, not raw</b>SD-JWT disclosures, JOSE headers, issuer and signing key, read as a document.</div></li>
+            <li>
+              <span class="n">1</span>
+              <div>
+                <b>Plain step titles</b>Every step of OpenID4VCI and OpenID4VP, with its HTTP call,
+                outcome and time.
+              </div>
+            </li>
+            <li>
+              <span class="n">2</span>
+              <div>
+                <b>The exact exchange</b>Method, path and result of the selected step, here the
+                credential request.
+              </div>
+            </li>
+            <li>
+              <span class="n">3</span>
+              <div>
+                <b>Key payloads, one click away</b>Offer, token, credential, request, vp_token,
+                verification result.
+              </div>
+            </li>
+            <li>
+              <span class="n">4</span>
+              <div>
+                <b>Decoded, not raw</b>SD-JWT disclosures, JOSE headers, issuer and signing key,
+                read as a document.
+              </div>
+            </li>
           </ol>
         </div>
-        <div class="foot"><span>Team Bhrinjal &nbsp;·&nbsp; PS02</span><span>Screens from the UI fixture routes (docs/design.md)</span></div>
+        <div class="foot">
+          <span>Team Bhrinjal &nbsp;·&nbsp; PS02</span
+          ><span>Screens from the UI fixture routes (docs/design.md)</span>
+        </div>
       </section>
       <aside class="notes">
         Source: docs/screenshots/design-inspector-decoded.png; docs/design.md. The same path runs
@@ -1192,34 +1345,69 @@
 
       <!-- 6 Demo: verdicts -->
       <section class="sheet" id="s6">
-        <div class="head"><span><b>Interop Playground</b> &nbsp;·&nbsp; Brief for MOSIP Decode 2026</span><span class="folio">Sheet 6 <em>of</em> 12</span></div>
+        <div class="head">
+          <span><b>Interop Playground</b> &nbsp;·&nbsp; Brief for MOSIP Decode 2026</span
+          ><span class="folio">Sheet 6 <em>of</em> 12</span>
+        </div>
         <p class="sec">In the demo, 2 of 2</p>
         <h2>Every run ends in a verdict you can read at a glance.</h2>
-        <p class="lede">The three labels of the problem statement, shown live at the real Inji Verify on 2026-10-20.</p>
+        <p class="lede">
+          The three labels of the problem statement, shown live at the real Inji Verify on
+          2026-10-20.
+        </p>
         <div class="body" style="margin-top: 20px">
           <div class="register">
             <div class="reg-row">
               <div class="crop" style="--w: 830; --h: 112; --x: 266; --y: 474">
-                <img src="../docs/screenshots/design-result-valid.png" alt="Result card with a green Valid stamp: the verifier accepted the credential" />
+                <img
+                  src="../docs/screenshots/design-result-valid.png"
+                  alt="Result card with a green Valid stamp: the verifier accepted the credential"
+                />
               </div>
-              <div><h3 class="pass">Valid</h3><p>Signature, holder proof and expiry all check out.</p><div class="run">run 01M5CBEB3M9ANDEDPFBQD5D0NX</div></div>
+              <div>
+                <h3 class="pass">Valid</h3>
+                <p>Signature, holder proof and expiry all check out.</p>
+                <div class="run">run 01M5CBEB3M9ANDEDPFBQD5D0NX</div>
+              </div>
             </div>
             <div class="reg-row">
               <div class="crop" style="--w: 830; --h: 112; --x: 266; --y: 414">
-                <img src="../docs/screenshots/design-result-invalid.png" alt="Result card with a red Invalid stamp: the verifier rejected the credential" />
+                <img
+                  src="../docs/screenshots/design-result-invalid.png"
+                  alt="Result card with a red Invalid stamp: the verifier rejected the credential"
+                />
               </div>
-              <div><h3 class="fail">Invalid</h3><p>A bad signature is rejected with ERR_SIGNATURE_VERIFICATION_FAILED.</p><div class="run">run 01M5CBEB4BW718XJ7VW09CB7EF</div></div>
+              <div>
+                <h3 class="fail">Invalid</h3>
+                <p>A bad signature is rejected with ERR_SIGNATURE_VERIFICATION_FAILED.</p>
+                <div class="run">run 01M5CBEB4BW718XJ7VW09CB7EF</div>
+              </div>
             </div>
             <div class="reg-row">
               <div class="crop" style="--w: 830; --h: 112; --x: 266; --y: 474">
-                <img src="../docs/screenshots/design-result-expired.png" alt="Result card with a blue Expired stamp: the signature checks out but the credential is past its expiry date" />
+                <img
+                  src="../docs/screenshots/design-result-expired.png"
+                  alt="Result card with a blue Expired stamp: the signature checks out but the credential is past its expiry date"
+                />
               </div>
-              <div><h3 style="color: var(--blue)">Valid-but-Expired</h3><p>Signature valid, past its expiry date. Inji Verify does not fold it into Invalid.</p><div class="run">run 01M5CBEB5F7W1Z8G14VNN0PK3Q</div></div>
+              <div>
+                <h3 style="color: var(--blue)">Valid-but-Expired</h3>
+                <p>
+                  Signature valid, past its expiry date. Inji Verify does not fold it into Invalid.
+                </p>
+                <div class="run">run 01M5CBEB5F7W1Z8G14VNN0PK3Q</div>
+              </div>
             </div>
-            <p style="font-size: 14px; color: var(--ink-2); margin-top: 12px">Presented over OpenID4VP, the expired credential is also reported as Valid-but-Expired (run 01M5CBC7EQY4ZKHPE50C1PC9CJ).</p>
+            <p style="font-size: 14px; color: var(--ink-2); margin-top: 12px">
+              Presented over OpenID4VP, the expired credential is also reported as Valid-but-Expired
+              (run 01M5CBC7EQY4ZKHPE50C1PC9CJ).
+            </p>
           </div>
         </div>
-        <div class="foot"><span>Team Bhrinjal &nbsp;·&nbsp; PS02</span><span>docs/evidence/T-47-labels.md; screens from the UI fixture routes</span></div>
+        <div class="foot">
+          <span>Team Bhrinjal &nbsp;·&nbsp; PS02</span
+          ><span>docs/evidence/T-47-labels.md; screens from the UI fixture routes</span>
+        </div>
       </section>
       <aside class="notes">
         Sources: README "Formats and labels"; docs/evidence/T-47-labels.md (FLOW-40 runs); over
@@ -1228,35 +1416,72 @@
 
       <!-- 7 Fix-it -->
       <section class="sheet" id="s7">
-        <div class="head"><span><b>Interop Playground</b> &nbsp;·&nbsp; Brief for MOSIP Decode 2026</span><span class="folio">Sheet 7 <em>of</em> 12</span></div>
+        <div class="head">
+          <span><b>Interop Playground</b> &nbsp;·&nbsp; Brief for MOSIP Decode 2026</span
+          ><span class="folio">Sheet 7 <em>of</em> 12</span>
+        </div>
         <p class="sec">The original angle: fix-it re-runs</p>
         <h2>We do not stop at a diagnosis. We prove the fix by re-running with one change.</h2>
         <div class="body" style="flex-direction: column; gap: 22px; margin-top: 22px">
           <div class="ledger">
-            <div class="cell"><span class="label">Parent run</span><h3>walt.id → wallet → Inji Verify: <span class="fail">Fail</span></h3><p>At the verdict, ERR_SIGNATURE_VERIFICATION_FAILED.</p><div class="run">01M5B6KNNY7DC3YK3CR0ETNBN9</div></div>
+            <div class="cell">
+              <span class="label">Parent run</span>
+              <h3>walt.id → wallet → Inji Verify: <span class="fail">Fail</span></h3>
+              <p>At the verdict, ERR_SIGNATURE_VERIFICATION_FAILED.</p>
+              <div class="run">01M5B6KNNY7DC3YK3CR0ETNBN9</div>
+            </div>
             <div class="to">→</div>
-            <div class="cell"><span class="label">Diagnosis</span><h3>FP-01, exact match (G-55)</h3><p>One proven knob is offered: KNOB-01, <span class="mono">waltid.sdjwt.x5c</span> absent → present.</p></div>
+            <div class="cell">
+              <span class="label">Diagnosis</span>
+              <h3>FP-01, exact match (G-55)</h3>
+              <p>
+                One proven knob is offered: KNOB-01,
+                <span class="mono">waltid.sdjwt.x5c</span> absent → present.
+              </p>
+            </div>
             <div class="to">→</div>
-            <div class="cell"><span class="label">Child run, one click</span><h3>Same run, one knob: <span class="pass">Pass</span></h3><p>Classified <b>fixed</b>. Proven live on 2026-10-20.</p><div class="run">01M5B6M723AQ7T818D36816PRV</div></div>
+            <div class="cell">
+              <span class="label">Child run, one click</span>
+              <h3>Same run, one knob: <span class="pass">Pass</span></h3>
+              <p>Classified <b>fixed</b>. Proven live on 2026-10-20.</p>
+              <div class="run">01M5B6M723AQ7T818D36816PRV</div>
+            </div>
           </div>
           <div style="display: flex; gap: 40px; flex: 1; min-height: 0">
             <figure style="width: 560px; flex: none">
               <div class="crop" style="--w: 620; --h: 262; --x: 262; --y: 118">
-                <img src="../docs/screenshots/design-child-compare.png" alt="The child run: The change fixed it. Invalid stamp on the original run, Valid stamp on the re-run" />
+                <img
+                  src="../docs/screenshots/design-child-compare.png"
+                  alt="The child run: The change fixed it. Invalid stamp on the original run, Valid stamp on the re-run"
+                />
               </div>
-              <figcaption><b>Exhibit C.</b> The child run: the original verdict, the re-run verdict, and the one change.</figcaption>
+              <figcaption>
+                <b>Exhibit C.</b> The child run: the original verdict, the re-run verdict, and the
+                one change.
+              </figcaption>
             </figure>
             <div style="flex: 1; display: flex; flex-direction: column; gap: 16px">
-              <p class="claim">“Changing only waltid.sdjwt.x5c from absent to present makes it pass.”</p>
+              <p class="claim">
+                “Changing only waltid.sdjwt.x5c from absent to present makes it pass.”
+              </p>
               <div class="rules">
-                <div><b>Exact match + proven knob</b><span>One button, no dialog; the child changes that knob only.</span></div>
-                <div><b>Several causes, or partial capture</b><span>The causes are listed. No button.</span></div>
+                <div>
+                  <b>Exact match + proven knob</b
+                  ><span>One button, no dialog; the child changes that knob only.</span>
+                </div>
+                <div>
+                  <b>Several causes, or partial capture</b
+                  ><span>The causes are listed. No button.</span>
+                </div>
                 <div><b>No match</b><span>“Unclassified”. No button.</span></div>
               </div>
             </div>
           </div>
         </div>
-        <div class="foot"><span>Team Bhrinjal &nbsp;·&nbsp; PS02</span><span>docs/reports/; e2e/live/fixit.live.spec.ts; fixit.golden.test.ts</span></div>
+        <div class="foot">
+          <span>Team Bhrinjal &nbsp;·&nbsp; PS02</span
+          ><span>docs/reports/; e2e/live/fixit.live.spec.ts; fixit.golden.test.ts</span>
+        </div>
       </section>
       <aside class="notes">
         Sources: README "Fix-it re-runs"; reports docs/reports/01M5B6KNNY7DC3YK3CR0ETNBN9.md and
@@ -1267,23 +1492,82 @@
 
       <!-- 8 Findings -->
       <section class="sheet" id="s8">
-        <div class="head"><span><b>Interop Playground</b> &nbsp;·&nbsp; Brief for MOSIP Decode 2026</span><span class="folio">Sheet 8 <em>of</em> 12</span></div>
+        <div class="head">
+          <span><b>Interop Playground</b> &nbsp;·&nbsp; Brief for MOSIP Decode 2026</span
+          ><span class="folio">Sheet 8 <em>of</em> 12</span>
+        </div>
         <p class="sec">What we found in Inji</p>
         <h2>Sixteen defect write-ups, drafted for the Inji repositories with their evidence.</h2>
         <div class="body" style="margin-top: 22px">
           <table class="find">
-            <thead><tr><th style="width: 110px">Draft</th><th style="width: 170px">Component</th><th>Finding</th><th style="width: 210px">Status</th></tr></thead>
+            <thead>
+              <tr>
+                <th style="width: 110px">Draft</th>
+                <th style="width: 170px">Component</th>
+                <th>Finding</th>
+                <th style="width: 210px">Status</th>
+              </tr>
+            </thead>
             <tbody>
-              <tr><td class="id">D-04<small>G-55</small></td><td>Inji Verify</td><td>SD-JWT verification requires an <span class="mono">x5c</span> header and cannot resolve a <span class="mono">did:jwk</span> or JWK issuer key.</td><td class="st"><span class="mark live">Reproduced live</span><br />by the fix-it pair</td></tr>
-              <tr><td class="id">D-01<small>G-109</small></td><td>Inji Certify</td><td>Returns 500 instead of 400 for a token request without a pre-authorized code, and for an EdDSA proof on an EC key.</td><td class="st"><span class="mark used">Recorded answers</span><br />in fixtures</td></tr>
-              <tr><td class="id">D-16<small>G-115</small></td><td>Inji Certify</td><td>A wrong <span class="mono">tx_code</span> answers invalid_request instead of invalid_grant, and any failed attempt burns the code.</td><td class="st"><span class="mark used">Relied on</span><br />known-fails list</td></tr>
-              <tr><td class="id">D-08<small>G-112</small></td><td>inji-openid4vp</td><td>Accepts only EdDSA request-object signatures, so it fails against EUDI (ES512) and signed walt.id (ES256) requests.</td><td class="st"><span class="mark used">Relied on</span><br />the selector greys the cell</td></tr>
-              <tr><td class="id">D-02<small>G-19</small></td><td>Inji Verify</td><td>A tampered SD-JWT disclosure is reported as a missing claim, and the credential is labelled ldp_vc.</td><td class="st"><span class="mark res">Research</span><br />with recorded traces</td></tr>
+              <tr>
+                <td class="id">D-04<small>G-55</small></td>
+                <td>Inji Verify</td>
+                <td>
+                  SD-JWT verification requires an <span class="mono">x5c</span> header and cannot
+                  resolve a <span class="mono">did:jwk</span> or JWK issuer key.
+                </td>
+                <td class="st">
+                  <span class="mark live">Reproduced live</span><br />by the fix-it pair
+                </td>
+              </tr>
+              <tr>
+                <td class="id">D-01<small>G-109</small></td>
+                <td>Inji Certify</td>
+                <td>
+                  Returns 500 instead of 400 for a token request without a pre-authorized code, and
+                  for an EdDSA proof on an EC key.
+                </td>
+                <td class="st"><span class="mark used">Recorded answers</span><br />in fixtures</td>
+              </tr>
+              <tr>
+                <td class="id">D-16<small>G-115</small></td>
+                <td>Inji Certify</td>
+                <td>
+                  A wrong <span class="mono">tx_code</span> answers invalid_request instead of
+                  invalid_grant, and any failed attempt burns the code.
+                </td>
+                <td class="st"><span class="mark used">Relied on</span><br />known-fails list</td>
+              </tr>
+              <tr>
+                <td class="id">D-08<small>G-112</small></td>
+                <td>inji-openid4vp</td>
+                <td>
+                  Accepts only EdDSA request-object signatures, so it fails against EUDI (ES512) and
+                  signed walt.id (ES256) requests.
+                </td>
+                <td class="st">
+                  <span class="mark used">Relied on</span><br />the selector greys the cell
+                </td>
+              </tr>
+              <tr>
+                <td class="id">D-02<small>G-19</small></td>
+                <td>Inji Verify</td>
+                <td>
+                  A tampered SD-JWT disclosure is reported as a missing claim, and the credential is
+                  labelled ldp_vc.
+                </td>
+                <td class="st"><span class="mark res">Research</span><br />with recorded traces</td>
+              </tr>
             </tbody>
           </table>
         </div>
-        <p style="font-size: 14px; color: var(--ink-2); margin-top: 14px">Five of sixteen shown. The full list, with groups for documentation gaps and our own bundle defects, is in docs/gaps.md. Issues are filed upstream by hand only.</p>
-        <div class="foot"><span>Team Bhrinjal &nbsp;·&nbsp; PS02</span><span>docs/gaps.md, group (a)</span></div>
+        <p style="font-size: 14px; color: var(--ink-2); margin-top: 14px">
+          Five of sixteen shown. The full list, with groups for documentation gaps and our own
+          bundle defects, is in docs/gaps.md. Issues are filed upstream by hand only.
+        </p>
+        <div class="foot">
+          <span>Team Bhrinjal &nbsp;·&nbsp; PS02</span><span>docs/gaps.md, group (a)</span>
+        </div>
       </section>
       <aside class="notes">
         Source: docs/gaps.md group (a) D-01..D-16 with evidence and status; "Filed issues" section.
@@ -1292,20 +1576,71 @@
 
       <!-- 9 Results -->
       <section class="sheet" id="s9">
-        <div class="head"><span><b>Interop Playground</b> &nbsp;·&nbsp; Brief for MOSIP Decode 2026</span><span class="folio">Sheet 9 <em>of</em> 12</span></div>
+        <div class="head">
+          <span><b>Interop Playground</b> &nbsp;·&nbsp; Brief for MOSIP Decode 2026</span
+          ><span class="folio">Sheet 9 <em>of</em> 12</span>
+        </div>
         <p class="sec">Results, v1 (2026-10-20)</p>
         <h2>Every figure has a run ID, an evidence file or a test behind it.</h2>
         <div class="body">
           <div class="tally">
-            <div class="row"><span class="fig">75<small> %</small></span><div><b>Presentation pass rate, 3 of 4</b><p>SD-JWT 2 of 3, JSON-LD 1 of 1. The one failure is the walt.id cell, fixed by one knob.</p><span class="src">docs/interop-report.md</span></div></div>
-            <div class="row"><span class="fig">3<small> of </small>3</span><div><b>Verifier labels at the real Inji Verify</b><p>Valid, Invalid and Valid-but-Expired, exactly as expected.</p><span class="src">docs/evidence/T-47-labels.md</span></div></div>
-            <div class="row"><span class="fig">2</span><div><b>Credential formats live</b><p>SD-JWT VC (dc+sd-jwt) and W3C VC JSON-LD (ldp_vc), issued and presented.</p><span class="src">README, "Formats and labels"</span></div></div>
-            <div class="row"><span class="fig">1</span><div><b>Fix proven by a re-run</b><p>FP-01 + KNOB-01: Fail to Pass with one setting changed, classified fixed.</p><span class="src">docs/reports/01M5B6M723AQ7T818D36816PRV.md</span></div></div>
-            <div class="row"><span class="fig">3<small> min </small>1<small> s</small></span><div><b>Fresh clone to the first Pass</b><p>git clone, scripts/up.sh, first run; on a host with the images cached.</p><span class="src">docs/evidence/T-55-fresh-clone.md</span></div></div>
-            <div class="row"><span class="fig">682</span><div><b>Automated tests passing</b><p>Plus 54 fixture Playwright tests: axe, 320 to 1440 px, light and dark.</p><span class="src">README, "Development and tests" (2026-10-21)</span></div></div>
+            <div class="row">
+              <span class="fig">75<small> %</small></span>
+              <div>
+                <b>Presentation pass rate, 3 of 4</b>
+                <p>
+                  SD-JWT 2 of 3, JSON-LD 1 of 1. The one failure is the walt.id cell, fixed by one
+                  knob.
+                </p>
+                <span class="src">docs/interop-report.md</span>
+              </div>
+            </div>
+            <div class="row">
+              <span class="fig">3<small> of </small>3</span>
+              <div>
+                <b>Verifier labels at the real Inji Verify</b>
+                <p>Valid, Invalid and Valid-but-Expired, exactly as expected.</p>
+                <span class="src">docs/evidence/T-47-labels.md</span>
+              </div>
+            </div>
+            <div class="row">
+              <span class="fig">2</span>
+              <div>
+                <b>Credential formats live</b>
+                <p>SD-JWT VC (dc+sd-jwt) and W3C VC JSON-LD (ldp_vc), issued and presented.</p>
+                <span class="src">README, "Formats and labels"</span>
+              </div>
+            </div>
+            <div class="row">
+              <span class="fig">1</span>
+              <div>
+                <b>Fix proven by a re-run</b>
+                <p>FP-01 + KNOB-01: Fail to Pass with one setting changed, classified fixed.</p>
+                <span class="src">docs/reports/01M5B6M723AQ7T818D36816PRV.md</span>
+              </div>
+            </div>
+            <div class="row">
+              <span class="fig">3<small> min </small>1<small> s</small></span>
+              <div>
+                <b>Fresh clone to the first Pass</b>
+                <p>git clone, scripts/up.sh, first run; on a host with the images cached.</p>
+                <span class="src">docs/evidence/T-55-fresh-clone.md</span>
+              </div>
+            </div>
+            <div class="row">
+              <span class="fig">682</span>
+              <div>
+                <b>Automated tests passing</b>
+                <p>Plus 54 fixture Playwright tests: axe, 320 to 1440 px, light and dark.</p>
+                <span class="src">README, "Development and tests" (2026-10-21)</span>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="foot"><span>Team Bhrinjal &nbsp;·&nbsp; PS02</span><span>Pass rate = (pass + lenient) / (pass + lenient + fail + blocked), per cell</span></div>
+        <div class="foot">
+          <span>Team Bhrinjal &nbsp;·&nbsp; PS02</span
+          ><span>Pass rate = (pass + lenient) / (pass + lenient + fail + blocked), per cell</span>
+        </div>
       </section>
       <aside class="notes">
         Sources as printed under each figure. 682 passing and 8 skipped in a fresh clone of commit
@@ -1314,7 +1649,10 @@
 
       <!-- 10 Audience and impact -->
       <section class="sheet" id="s10">
-        <div class="head"><span><b>Interop Playground</b> &nbsp;·&nbsp; Brief for MOSIP Decode 2026</span><span class="folio">Sheet 10 <em>of</em> 12</span></div>
+        <div class="head">
+          <span><b>Interop Playground</b> &nbsp;·&nbsp; Brief for MOSIP Decode 2026</span
+          ><span class="folio">Sheet 10 <em>of</em> 12</span>
+        </div>
         <p class="sec">Who it is for, and what it changes</p>
         <h2>For anyone who must make Inji work with something it did not ship with.</h2>
         <div class="body">
@@ -1322,35 +1660,74 @@
             <div>
               <span class="label col-h">Who it is for</span>
               <div class="who">
-                <div><b>Inji and MOSIP developers</b><p>See where a change breaks interop, with the exact exchange and the spec clause.</p></div>
-                <div><b>Wallet, issuer and verifier vendors</b><p>Test against real Inji services before integrating; the walt.id issuer is the worked example.</p></div>
-                <div><b>Country ID programmes and integrators</b><p>Check which combinations work, with evidence, before a rollout.</p></div>
-                <div><b>Conformance and QA teams</b><p>Repeatable runs from digest-pinned images and fixture credentials for each label.</p></div>
+                <div>
+                  <b>Inji and MOSIP developers</b>
+                  <p>
+                    See where a change breaks interop, with the exact exchange and the spec clause.
+                  </p>
+                </div>
+                <div>
+                  <b>Wallet, issuer and verifier vendors</b>
+                  <p>
+                    Test against real Inji services before integrating; the walt.id issuer is the
+                    worked example.
+                  </p>
+                </div>
+                <div>
+                  <b>Country ID programmes and integrators</b>
+                  <p>Check which combinations work, with evidence, before a rollout.</p>
+                </div>
+                <div>
+                  <b>Conformance and QA teams</b>
+                  <p>
+                    Repeatable runs from digest-pinned images and fixture credentials for each
+                    label.
+                  </p>
+                </div>
               </div>
             </div>
             <div>
               <span class="label col-h">What it changes</span>
               <div class="who">
-                <div><b>From one error code to the cause</b><p>The failing exchange, its decoded payload and a matched cause on one screen.</p></div>
-                <div><b>From a guessed fix to a proven one</b><p>A fix is shown to work by a re-run that changes only that setting.</p></div>
-                <div><b>From anecdotes to evidence</b><p>Bug reports that carry the run, the messages and the spec clause.</p></div>
+                <div>
+                  <b>From one error code to the cause</b>
+                  <p>
+                    The failing exchange, its decoded payload and a matched cause on one screen.
+                  </p>
+                </div>
+                <div>
+                  <b>From a guessed fix to a proven one</b>
+                  <p>A fix is shown to work by a re-run that changes only that setting.</p>
+                </div>
+                <div>
+                  <b>From anecdotes to evidence</b>
+                  <p>Bug reports that carry the run, the messages and the spec clause.</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
-        <div class="foot"><span>Team Bhrinjal &nbsp;·&nbsp; PS02</span><span>docs/overview.md</span></div>
+        <div class="foot">
+          <span>Team Bhrinjal &nbsp;·&nbsp; PS02</span><span>docs/overview.md</span>
+        </div>
       </section>
       <aside class="notes">
-        Each audience maps to a shipped feature: selector and inspector (README "What it does"),
-        the walt.id flows (FLOW-08), versions.lock, the fixture issuer (FLOW-14, FLOW-40).
+        Each audience maps to a shipped feature: selector and inspector (README "What it does"), the
+        walt.id flows (FLOW-08), versions.lock, the fixture issuer (FLOW-14, FLOW-40).
       </aside>
 
       <!-- 11 Roadmap -->
       <section class="sheet" id="s11">
-        <div class="head"><span><b>Interop Playground</b> &nbsp;·&nbsp; Brief for MOSIP Decode 2026</span><span class="folio">Sheet 11 <em>of</em> 12</span></div>
+        <div class="head">
+          <span><b>Interop Playground</b> &nbsp;·&nbsp; Brief for MOSIP Decode 2026</span
+          ><span class="folio">Sheet 11 <em>of</em> 12</span>
+        </div>
         <p class="sec">Roadmap</p>
         <h2>From one proven fix to a shared compatibility record.</h2>
-        <p class="lede">The first column is shipped. The other two are planned work, listed in the README as not in v1.</p>
+        <p class="lede">
+          The first column is shipped. The other two are planned work, listed in the README as not
+          in v1.
+        </p>
         <div class="body">
           <div class="road">
             <div class="stage now">
@@ -1369,7 +1746,10 @@
               <h3>Next</h3>
               <span class="label">Wider coverage</span>
               <ul>
-                <li><b>More adapters</b>: the Inji JVM wallet, Inji Web, the phone wallet, walt.id and EUDI verifiers</li>
+                <li>
+                  <b>More adapters</b>: the Inji JVM wallet, Inji Web, the phone wallet, walt.id and
+                  EUDI verifiers
+                </li>
                 <li><b>mDoc</b> (mso_mdoc), cut from v1</li>
                 <li><b>More fingerprints and knobs</b> for fix-it</li>
                 <li><b>Tamper mode</b> and suites</li>
@@ -1388,8 +1768,14 @@
             </div>
           </div>
         </div>
-        <p class="claim" style="font-size: 19px; margin-top: 18px">The same runs that prove one fix today can feed a cross-vendor compatibility record: every cell a run, every run a report.</p>
-        <div class="foot"><span>Team Bhrinjal &nbsp;·&nbsp; PS02</span><span>README "Known limitations"; docs/decisions.md</span></div>
+        <p class="claim" style="font-size: 19px; margin-top: 18px">
+          The same runs that prove one fix today can feed a cross-vendor compatibility record: every
+          cell a run, every run a report.
+        </p>
+        <div class="foot">
+          <span>Team Bhrinjal &nbsp;·&nbsp; PS02</span
+          ><span>README "Known limitations"; docs/decisions.md</span>
+        </div>
       </section>
       <aside class="notes">
         Source: README "Known limitations" (built adapters; not in v1: tamper mode, suites, the
@@ -1399,37 +1785,77 @@
 
       <!-- 12 Team and links -->
       <section class="sheet" id="s12">
-        <div class="head"><span><b>Interop Playground</b> &nbsp;·&nbsp; Brief for MOSIP Decode 2026</span><span class="folio">Sheet 12 <em>of</em> 12</span></div>
+        <div class="head">
+          <span><b>Interop Playground</b> &nbsp;·&nbsp; Brief for MOSIP Decode 2026</span
+          ><span class="folio">Sheet 12 <em>of</em> 12</span>
+        </div>
         <p class="sec">Team and links</p>
         <h2>Team Bhrinjal</h2>
         <div class="body" style="gap: 64px">
           <div style="flex: 1">
             <div class="team">
-              <div class="person"><span class="k">i.</span><span class="nm">Abhijay Jindal</span></div>
-              <div class="person"><span class="k">ii.</span><span class="nm">Shrey Bhardwaj</span></div>
-              <div class="person"><span class="k">iii.</span><span class="nm">Aryan Bedwal</span></div>
+              <div class="person">
+                <span class="k">i.</span><span class="nm">Abhijay Jindal</span>
+              </div>
+              <div class="person">
+                <span class="k">ii.</span><span class="nm">Shrey Bhardwaj</span>
+              </div>
+              <div class="person">
+                <span class="k">iii.</span><span class="nm">Aryan Bedwal</span>
+              </div>
             </div>
             <div style="margin-top: 28px; display: flex; align-items: center; gap: 26px">
-              <span class="stamp" style="color: var(--green); font-size: 20px">PS02<small>MOSIP Decode 2026</small></span>
-              <p style="font-size: 15px; color: var(--ink-2); max-width: 340px">Open source under MPL-2.0. Thank you for reading.</p>
+              <span class="stamp" style="color: var(--green); font-size: 20px"
+                >PS02<small>MOSIP Decode 2026</small></span
+              >
+              <p style="font-size: 15px; color: var(--ink-2); max-width: 340px">
+                Open source under MPL-2.0. Thank you for reading.
+              </p>
             </div>
           </div>
           <div style="width: 560px; flex: none">
             <span class="label col-h">Run it yourself</span>
             <div class="steps">
-              <div><span class="n">1</span><span>Clone the repository<span class="mono">git clone https://github.com/abhijay-jindal-604/interop-playground</span></span></div>
-              <div><span class="n">2</span><span>Start the digest-pinned bundle<span class="mono">scripts/up.sh</span></span></div>
-              <div><span class="n">3</span><span>Open the playground and press Run<span class="mono">http://127.0.0.1:3100</span></span></div>
+              <div>
+                <span class="n">1</span
+                ><span
+                  >Clone the repository<span class="mono"
+                    >git clone https://github.com/abhijay-jindal-604/interop-playground</span
+                  ></span
+                >
+              </div>
+              <div>
+                <span class="n">2</span
+                ><span>Start the digest-pinned bundle<span class="mono">scripts/up.sh</span></span>
+              </div>
+              <div>
+                <span class="n">3</span
+                ><span
+                  >Open the playground and press Run<span class="mono"
+                    >http://127.0.0.1:3100</span
+                  ></span
+                >
+              </div>
             </div>
             <span class="label col-h" style="margin-top: 22px">Read more in the repository</span>
             <div class="steps">
-              <div><span class="n">·</span><span>README.md: quickstart, flows, limitations</span></div>
-              <div><span class="n">·</span><span>docs/architecture.md, docs/design.md, docs/gaps.md</span></div>
-              <div><span class="n">·</span><span>docs/interop-report.md and the per-run reports</span></div>
+              <div>
+                <span class="n">·</span><span>README.md: quickstart, flows, limitations</span>
+              </div>
+              <div>
+                <span class="n">·</span
+                ><span>docs/architecture.md, docs/design.md, docs/gaps.md</span>
+              </div>
+              <div>
+                <span class="n">·</span><span>docs/interop-report.md and the per-run reports</span>
+              </div>
             </div>
           </div>
         </div>
-        <div class="foot"><span>Team Bhrinjal &nbsp;·&nbsp; PS02</span><span>github.com/abhijay-jindal-604/interop-playground</span></div>
+        <div class="foot">
+          <span>Team Bhrinjal &nbsp;·&nbsp; PS02</span
+          ><span>github.com/abhijay-jindal-604/interop-playground</span>
+        </div>
       </section>
       <aside class="notes">
         Sources: README "Quickstart"; LICENSE (MPL-2.0); docs/evidence/T-55-fresh-clone.md.
