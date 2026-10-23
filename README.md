@@ -2,7 +2,7 @@
 
 Interop Playground lets you run Inji issuer → wallet → verifier combinations, inspect every protocol message, and prove the fix for a failure with a re-run that changes one knob.
 
-Team Bhrinjal (Abhijay Jindal), MOSIP Decode 2026, problem statement PS02.
+Team Bhrinjal (Abhijay Jindal, Shrey Bhardwaj, Aryan Bedwal), MOSIP Decode 2026, problem statement PS02.
 
 > **v1 (2026-10-20).** This README describes only what is built and tested on that date. Demo video: [`deliverables/video/demo-v1.mp4`](deliverables/video/demo-v1.mp4).
 
@@ -236,7 +236,7 @@ Repositories:
 
 ## Credits
 
-Team Bhrinjal: Abhijay Jindal. Built for MOSIP Decode 2026, problem statement PS02.
+Team Bhrinjal: Abhijay Jindal, Shrey Bhardwaj, Aryan Bedwal. Built for MOSIP Decode 2026, problem statement PS02.
 
 ## License
 

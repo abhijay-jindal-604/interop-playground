@@ -1,6 +1,6 @@
 # Interop Playground: test cases and results
 
-_v1, 2026-10-21. Team Bhrinjal (Abhijay Jindal)._
+_v1, 2026-10-21. Team Bhrinjal (Abhijay Jindal, Shrey Bhardwaj, Aryan Bedwal)._
 
 The playground has four layers of tests: fast Vitest suites that need no Docker (unit, contract, integration, repository checks and UI components), a Playwright suite against the built UI with recorded API answers, opt-in tests against the running bundle, and live Playwright specs that drive the real Inji services. This page lists the cases, the edge cases they cover, and the results.
 

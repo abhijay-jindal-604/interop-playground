@@ -1,6 +1,6 @@
 # Interop Playground: test data
 
-_v1, 2026-10-21. Team Bhrinjal (Abhijay Jindal)._
+_v1, 2026-10-21. Team Bhrinjal (Abhijay Jindal, Shrey Bhardwaj, Aryan Bedwal)._
 
 This page lists every piece of sample data you need to test the playground: identities, credential configurations, test keys, recorded runs and the settings each flow uses. **All of it is test data.** Nothing here is a real person, a real credential or a production key.
 

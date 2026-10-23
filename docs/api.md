@@ -1,6 +1,6 @@
 # Interop Playground: API documentation
 
-_v1, 2026-10-21. Team Bhrinjal (Abhijay Jindal)._
+_v1, 2026-10-21. Team Bhrinjal (Abhijay Jindal, Shrey Bhardwaj, Aryan Bedwal)._
 
 The backend for frontend (BFF) serves the web UI and a REST + Server-Sent Events (SSE) API. The UI uses only this API, so anything the UI does can be scripted with `curl`.
 
